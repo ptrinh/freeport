@@ -1,0 +1,15 @@
+{
+  "side": "request",
+  "market": "sg-rideshare",
+  "schema": "rideshare/1",
+  "title": "Ride Orchard → Hougang at 15:45",
+  "payload": {
+    "from": { "name": "Orchard Rd", "geohash": "w21z6v" },
+    "to": { "name": "Hougang Central", "geohash": "w21zgc" },
+    "seats": 1,
+    "price_hint": "$12"
+  },
+  "window": { "start": 0, "end": 0 },
+  "flex_minutes": 30,
+  "geohashes": ["w21z6"]
+}

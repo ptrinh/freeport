@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Freeport",
+    "slug": "freeport",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": { "bundleIdentifier": "uk.trinh.freeport" },
+    "android": { "package": "uk.trinh.freeport" }
+  }
+}

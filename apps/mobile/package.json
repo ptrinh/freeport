@@ -1,0 +1,27 @@
+{
+  "name": "freeport-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo start --ios",
+    "android": "expo start --android"
+  },
+  "dependencies": {
+    "@freeport/protocol": "file:../../packages/protocol",
+    "expo": "~52.0.0",
+    "expo-crypto": "~14.0.0",
+    "expo-secure-store": "~14.0.0",
+    "expo-status-bar": "~2.0.0",
+    "nostr-tools": "^2.10.0",
+    "react": "18.3.1",
+    "react-native": "0.76.5",
+    "react-native-get-random-values": "~1.11.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.0",
+    "@types/react": "~18.3.0",
+    "typescript": "~5.3.0"
+  }
+}

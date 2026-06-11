@@ -1,0 +1,18 @@
+{
+  "name": "alice-rider",
+  "profile": "demo-rider",
+  "relays": [
+    "wss://relay.damus.io",
+    "wss://nos.lol",
+    "wss://relay.primal.net"
+  ],
+  "markets": ["sg-rideshare"],
+  "rules": [
+    {
+      "schema": "rideshare/1",
+      "side": "request",
+      "market": "sg-rideshare",
+      "contact": "tg:@alice_demo"
+    }
+  ]
+}

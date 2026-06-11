@@ -1,0 +1,23 @@
+{
+  "name": "@freeport/agent",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "freeport": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "tsx src/cli.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@freeport/protocol": "*",
+    "nostr-tools": "^2.10.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.1",
+    "vitest": "^2.1.9",
+    "ws": "^8.21.0"
+  }
+}

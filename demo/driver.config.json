@@ -1,0 +1,24 @@
+{
+  "name": "bob-driver",
+  "profile": "demo-driver",
+  "relays": [
+    "wss://nos.lol",
+    "wss://relay.nostr.band",
+    "wss://nostr.mom"
+  ],
+  "markets": ["sg-rideshare"],
+  "rules": [
+    {
+      "schema": "rideshare/1",
+      "side": "offer",
+      "market": "sg-rideshare",
+      "route": { "from_geohash": "w21z6v", "to_geohash": "w21zgc" },
+      "daily_window": { "start": "16:00", "end": "18:00" },
+      "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+      "flex_minutes": 30,
+      "price_hint": "split petrol",
+      "auto_accept": true,
+      "contact": "tg:@bob_drives"
+    }
+  ]
+}
