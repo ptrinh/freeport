@@ -38,6 +38,9 @@ export const DEFAULT_RELAYS = [
   'wss://relay.nostr.band',
 ];
 
-/** Demo vertical: Singapore rideshare. */
+/** Demo verticals. */
 export const DEMO_MARKET = 'sg-rideshare';
 export const DEMO_SCHEMA = 'rideshare/1';
+
+export const SERVICE_MARKET = 'sg-service';
+export const SERVICE_SCHEMA = 'service/1';

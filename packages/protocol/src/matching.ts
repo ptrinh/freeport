@@ -1,5 +1,5 @@
 import { geohashNear } from './geohash.js';
-import type { Intent, ProposedTerms, RidesharePayload, TimeWindow } from './types.js';
+import type { Intent, ProposedTerms, RidesharePayload, ServicePayload, TimeWindow } from './types.js';
 
 /**
  * A standing rule from the agent owner's local config, e.g.
@@ -92,6 +92,7 @@ export function matchIntent(intent: Intent, rule: MatchRule, nowSec = Math.floor
   if (c.expires_at <= nowSec) return { matched: false, reason: 'expired' };
 
   if (rule.schema.startsWith('rideshare/')) return matchRideshare(intent, rule);
+  if (rule.schema.startsWith('service/')) return matchService(intent, rule);
 
   // Generic fallback: market+schema+side matched, no vertical logic → surface to human.
   return { matched: true, acceptAsIs: true, reason: 'generic match (no vertical matcher)' };
@@ -124,7 +125,7 @@ function matchRideshare(intent: Intent, rule: MatchRule): MatchResult {
     }
     return {
       matched: true,
-      counterTerms: { window: overlap, price: rule.price, note: 'adjusted to my schedule' },
+      counterTerms: { window: overlap, payment: rule.price, note: 'adjusted to my schedule' },
     };
   }
 
@@ -132,8 +133,35 @@ function matchRideshare(intent: Intent, rule: MatchRule): MatchResult {
   if (shifted) {
     return {
       matched: true,
-      counterTerms: { window: shifted, price: rule.price, note: 'time shifted within flexibility' },
+      counterTerms: { window: shifted, payment: rule.price, note: 'time shifted within flexibility' },
     };
   }
+  return { matched: false, reason: 'no time overlap within flexibility' };
+}
+
+function matchService(intent: Intent, rule: MatchRule): MatchResult {
+  const p = intent.content.payload as ServicePayload;
+  if (!p.location?.geohash) return { matched: false, reason: 'missing location' };
+  if (rule.route) {
+    const prox = rule.proximity ?? 5;
+    if (!geohashNear(p.location.geohash, rule.route.from_geohash, prox))
+      return { matched: false, reason: 'location too far' };
+  }
+
+  const theirWindow = intent.content.window;
+  if (!theirWindow) return { matched: true, acceptAsIs: true };
+
+  const ourWindow = ruleWindowOn(new Date(theirWindow.start * 1000), rule);
+  if (!ourWindow) return { matched: false, reason: 'outside schedule (day)' };
+
+  const flexSec = Math.max(rule.flex_minutes ?? 0, intent.content.flex_minutes ?? 0) * 60;
+  if (windowsOverlap(theirWindow, ourWindow)) {
+    const overlap = reconcileWindows(theirWindow, ourWindow, 0)!;
+    if (overlap.start === theirWindow.start && overlap.end === theirWindow.end)
+      return { matched: true, acceptAsIs: true };
+    return { matched: true, counterTerms: { window: overlap, payment: rule.price, note: 'adjusted to my availability' } };
+  }
+  const shifted = reconcileWindows(theirWindow, ourWindow, flexSec);
+  if (shifted) return { matched: true, counterTerms: { window: shifted, payment: rule.price, note: 'time shifted' } };
   return { matched: false, reason: 'no time overlap within flexibility' };
 }

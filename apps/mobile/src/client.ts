@@ -17,10 +17,12 @@ import {
   applyOutbound,
   makeAccept,
   makeCancel,
+  makeCounter,
   openNegotiation,
   type BuildIntentInput,
   type Intent,
   type Negotiation,
+  type ProposedTerms,
 } from '@freeport/protocol';
 
 export class MobileClient {
@@ -99,6 +101,17 @@ export class MobileClient {
     const nego = this.negotiations.get(negoId);
     if (!nego) return;
     const msg = makeAccept(nego, contact);
+    const updated = applyOutbound(nego, msg);
+    this.negotiations.set(updated.id, updated);
+    await this.sendDM(updated.peer, JSON.stringify(msg));
+    this.onNegotiationUpdate?.(updated);
+  }
+
+  /** Human edited and submitted a counter-offer. */
+  async counter(negoId: string, terms: ProposedTerms): Promise<void> {
+    const nego = this.negotiations.get(negoId);
+    if (!nego) return;
+    const msg = makeCounter(nego, terms);
     const updated = applyOutbound(nego, msg);
     this.negotiations.set(updated.id, updated);
     await this.sendDM(updated.peer, JSON.stringify(msg));

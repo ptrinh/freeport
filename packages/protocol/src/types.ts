@@ -39,7 +39,16 @@ export interface RidesharePayload extends Record<string, unknown> {
   from: { name: string; geohash: string };
   to: { name: string; geohash: string };
   seats?: number;
-  price_hint?: string; // free text in v1 ("$10", "split petrol")
+  payment?: string; // e.g. "$12", "split petrol"
+}
+
+/** Vertical payload for schema "service/1". */
+export interface ServicePayload extends Record<string, unknown> {
+  location: { name: string; geohash: string };
+  service: string; // e.g. "plumber", "house cleaning"
+  payment?: string; // e.g. "$80/hr"
+  duration_minutes?: number; // estimated duration
+  notes?: string; // additional information
 }
 
 /** A parsed intent: validated content + the event identifiers we need. */
@@ -73,8 +82,15 @@ export interface NegotiationMessage {
 
 export interface ProposedTerms {
   window?: TimeWindow;
-  price?: string;
+  payment?: string;
   note?: string;
+  // rideshare
+  from?: string;
+  to?: string;
+  // service
+  location?: string;
+  service?: string;
+  duration_minutes?: number;
   [k: string]: unknown;
 }
 
