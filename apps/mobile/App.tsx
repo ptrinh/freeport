@@ -32,8 +32,9 @@ import {
 import { loadOrCreateKey, npubOf, makeBackup } from './src/identity';
 import { MobileClient } from './src/client';
 import { uploadImage, UploadError } from './src/upload';
+import { loadProfile, saveProfile, type UserProfile } from './src/profile';
 
-type Tab = 'market' | 'post' | 'deals' | 'key';
+type Tab = 'market' | 'post' | 'deals' | 'settings';
 type PostType = 'rideshare' | 'service';
 
 // ─── Root ────────────────────────────────────────────────────────────────────
@@ -44,6 +45,7 @@ export default function App() {
   const [npub, setNpub] = useState('');
   const [intents, setIntents] = useState<Intent[]>([]);
   const [negos, setNegos] = useState<Negotiation[]>([]);
+  const [profile, setProfile] = useState<UserProfile>({ name: '', picture: '', about: '' });
   const skRef = useRef<Uint8Array | null>(null);
 
   useEffect(() => {
@@ -51,10 +53,14 @@ export default function App() {
       const sk = await loadOrCreateKey();
       skRef.current = sk;
       setNpub(npubOf(sk));
+      const p = await loadProfile();
+      setProfile(p);
       const c = new MobileClient(sk);
       c.onIntent = (i) =>
         setIntents((prev) => (prev.some((p) => p.id === i.id) ? prev : [i, ...prev].slice(0, 100)));
       c.onNegotiationUpdate = () => setNegos([...c.negotiations.values()]);
+      // Re-render market cards when a profile is fetched
+      c.onProfileFetched = () => setIntents((prev) => [...prev]);
       c.watchMarket(DEMO_MARKET);
       c.watchMarket(SERVICE_MARKET);
       c.watchDMs();
@@ -73,12 +79,24 @@ export default function App() {
         <Text style={s.header}>Freeport</Text>
         <Text style={s.headerSub}>decentralised marketplace</Text>
       </View>
-      {tab === 'market' && <MarketTab intents={intents} />}
-      {tab === 'post' && <PostTab client={client} />}
-      {tab === 'deals' && <DealsTab client={client} negos={negos} setNegos={setNegos} />}
-      {tab === 'key' && <KeyTab npub={npub} sk={skRef} />}
+      {tab === 'market' && <MarketTab intents={intents} client={client} />}
+      {tab === 'post' && <PostTab client={client} profile={profile} />}
+      {tab === 'deals' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} />}
+      {tab === 'settings' && (
+        <SettingsTab
+          npub={npub}
+          sk={skRef}
+          profile={profile}
+          client={client}
+          onProfileChange={async (p) => {
+            setProfile(p);
+            await saveProfile(p);
+            client?.publishProfile(p).catch(() => {});
+          }}
+        />
+      )}
       <View style={s.tabbar}>
-        {(['market', 'post', 'deals', 'key'] as Tab[]).map((t) => (
+        {(['market', 'post', 'deals', 'settings'] as Tab[]).map((t) => (
           <Pressable key={t} onPress={() => setTab(t)} style={[s.tab, tab === t && s.tabActive]}>
             <Text style={[s.tabText, tab === t && s.tabTextActive]}>{t}</Text>
             {t === 'deals' && pendingCount > 0 && (
@@ -93,7 +111,7 @@ export default function App() {
 
 // ─── Market tab ──────────────────────────────────────────────────────────────
 
-function MarketTab({ intents }: { intents: Intent[] }) {
+function MarketTab({ intents, client }: { intents: Intent[]; client: MobileClient | null }) {
   return (
     <FlatList
       data={intents}
@@ -112,6 +130,17 @@ function MarketTab({ intents }: { intents: Intent[] }) {
                 {item.content.side}
               </Text>
             </View>
+            {(() => {
+              const prof = client?.profiles.get(item.pubkey);
+              return (
+                <View style={[s.row, { marginTop: 6 }]}>
+                  {prof?.picture
+                    ? <Image source={{ uri: prof.picture }} style={s.authorAvatar} />
+                    : <View style={[s.authorAvatar, s.avatarEmpty]} />}
+                  <Text style={s.authorName}>{prof?.name || item.pubkey.slice(0, 10) + '…'}</Text>
+                </View>
+              );
+            })()}
             <Text style={s.cardTitle}>{item.content.title}</Text>
             {isRide && (
               <>
@@ -151,7 +180,7 @@ function MarketTab({ intents }: { intents: Intent[] }) {
 
 // ─── Post tab ────────────────────────────────────────────────────────────────
 
-function PostTab({ client }: { client: MobileClient | null }) {
+function PostTab({ client, profile }: { client: MobileClient | null; profile: UserProfile }) {
   const [type, setType] = useState<PostType>('rideshare');
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
@@ -164,13 +193,13 @@ function PostTab({ client }: { client: MobileClient | null }) {
             </Pressable>
           ))}
         </View>
-        {type === 'rideshare' ? <RideshareForm client={client} /> : <ServiceForm client={client} />}
+        {type === 'rideshare' ? <RideshareForm client={client} profile={profile} /> : <ServiceForm client={client} profile={profile} />}
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-function RideshareForm({ client }: { client: MobileClient | null }) {
+function RideshareForm({ client, profile }: { client: MobileClient | null; profile: UserProfile }) {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [time, setTime] = useState('');
@@ -194,7 +223,7 @@ function RideshareForm({ client }: { client: MobileClient | null }) {
         flexMinutes: 30,
         expiresAt: Math.floor(Date.now() / 1000) + 6 * 3600,
         geohashes: ['w21z6'],
-      });
+      }, profile);
       Alert.alert('Posted', 'Your ride request is live.');
     } finally { setPosting(false); }
   };
@@ -211,7 +240,7 @@ function RideshareForm({ client }: { client: MobileClient | null }) {
   );
 }
 
-function ServiceForm({ client }: { client: MobileClient | null }) {
+function ServiceForm({ client, profile }: { client: MobileClient | null; profile: UserProfile }) {
   const [location, setLocation] = useState('');
   const [service, setService] = useState('');
   const [payment, setPayment] = useState('');
@@ -245,7 +274,7 @@ function ServiceForm({ client }: { client: MobileClient | null }) {
         flexMinutes: 30,
         expiresAt: Math.floor(Date.now() / 1000) + 6 * 3600,
         geohashes: ['w21z6'],
-      });
+      }, profile);
       Alert.alert('Posted', 'Your service request is live.');
     } finally { setPosting(false); }
   };
@@ -270,10 +299,12 @@ function DealsTab({
   client,
   negos,
   setNegos,
+  profile,
 }: {
   client: MobileClient | null;
   negos: Negotiation[];
   setNegos: React.Dispatch<React.SetStateAction<Negotiation[]>>;
+  profile: UserProfile;
 }) {
   const [counteringId, setCounteringId] = useState<string | null>(null);
   const sorted = [...negos].sort((a, b) => b.updatedAt - a.updatedAt);
@@ -312,7 +343,7 @@ function DealsTab({
             {/* Action buttons when peer proposed terms */}
             {needsAction && !isCountering && (
               <View style={s.btnRow}>
-                <Pressable style={s.btnAccept} onPress={() => client?.accept(item.id, 'tg:@me')}>
+                <Pressable style={s.btnAccept} onPress={() => client?.accept(item.id, profile.name || client.pubkey.slice(0, 12))}>
                   <Text style={s.btnText}>Accept</Text>
                 </Pressable>
                 <Pressable style={s.btnCounter} onPress={() => setCounteringId(item.id)}>
@@ -409,18 +440,94 @@ function CounterEditor({
 
 // ─── Key tab ─────────────────────────────────────────────────────────────────
 
-function KeyTab({ npub, sk }: { npub: string; sk: React.MutableRefObject<Uint8Array | null> }) {
+function SettingsTab({
+  npub,
+  sk,
+  profile,
+  client,
+  onProfileChange,
+}: {
+  npub: string;
+  sk: React.MutableRefObject<Uint8Array | null>;
+  profile: UserProfile;
+  client: MobileClient | null;
+  onProfileChange: (p: UserProfile) => Promise<void>;
+}) {
+  const [name, setName] = useState(profile.name);
+  const [about, setAbout] = useState(profile.about);
+  const [picture, setPicture] = useState(profile.picture);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [pass, setPass] = useState('');
   const [blob, setBlob] = useState('');
+
+  // Sync when profile loads from storage after mount
+  React.useEffect(() => {
+    setName(profile.name);
+    setAbout(profile.about);
+    setPicture(profile.picture);
+  }, [profile.name, profile.about, profile.picture]);
+
+  const pickAvatar = async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) { Alert.alert('Permission needed', 'Allow photo access to set a profile picture.'); return; }
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [1, 1], quality: 0.8 });
+    if (result.canceled || !result.assets[0]) return;
+    setUploading(true);
+    try {
+      const url = await uploadImage(result.assets[0].uri);
+      setPicture(url);
+    } catch (e) {
+      Alert.alert('Upload failed', e instanceof UploadError ? e.message : 'Try again.');
+    } finally { setUploading(false); }
+  };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await onProfileChange({ name, picture, about });
+      Alert.alert('Saved', 'Profile published to relays.');
+    } finally { setSaving(false); }
+  };
+
   return (
-    <ScrollView contentContainerStyle={s.pad}>
-      <Text style={s.sectionTitle}>Your identity</Text>
-      <Text style={s.dim}>Created silently on first launch — no signup required.</Text>
+    <ScrollView contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled">
+      <Text style={s.sectionTitle}>Profile</Text>
+      <Text style={s.dim}>Sent as Nostr metadata (kind:0) alongside your intents so counterparties know who you are.</Text>
+
+      {/* Avatar */}
+      <View style={s.avatarRow}>
+        <Pressable onPress={pickAvatar} disabled={uploading}>
+          {picture
+            ? <Image source={{ uri: picture }} style={s.avatar} />
+            : <View style={[s.avatar, s.avatarEmpty]}><Text style={s.avatarPlaceholder}>{uploading ? '…' : '+'}</Text></View>
+          }
+          {uploading && <ActivityIndicator style={StyleSheet.absoluteFillObject} color="#3b82f6" />}
+        </Pressable>
+        <View style={{ flex: 1, marginLeft: 14 }}>
+          <Text style={s.label}>Display Name</Text>
+          <TextInput style={s.input} value={name} onChangeText={setName} placeholder="How others see you" placeholderTextColor="#4b5563" autoCapitalize="words" />
+        </View>
+      </View>
+
+      <Field label="About Me" value={about} onChange={setAbout} placeholder="A short bio…" multiline />
+
+      <Text style={s.label}>Profile Picture URL</Text>
+      <TextInput style={s.input} value={picture} onChangeText={setPicture} placeholder="https:// — or tap avatar to upload" placeholderTextColor="#4b5563" autoCapitalize="none" autoCorrect={false} />
+
+      <Pressable style={[s.btnAccept, { marginTop: 20 }, saving && { opacity: 0.6 }]} onPress={save} disabled={saving}>
+        {saving ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>Save & publish</Text>}
+      </Pressable>
+
+      {/* Identity + key backup */}
+      <Text style={s.sectionTitle}>Identity</Text>
+      <Text style={s.dim}>Your Nostr public key. Created silently on first launch — no signup required.</Text>
       <Text selectable style={s.mono}>{npub}</Text>
-      <Text style={s.sectionTitle}>Encrypted key backup (NIP-49)</Text>
-      <Text style={s.dim}>Set a passphrase → copy the blob anywhere (email, cloud). Unreadable without the passphrase.</Text>
+
+      <Text style={s.sectionTitle}>Key backup (NIP-49)</Text>
+      <Text style={s.dim}>Set a passphrase → copy the blob anywhere. Unreadable without it.</Text>
       <Field label="Passphrase" value={pass} onChange={setPass} secure />
-      <Pressable style={s.btnAccept} onPress={() => sk.current && pass && setBlob(makeBackup(sk.current, pass))}>
+      <Pressable style={[s.btnAccept, { marginTop: 12 }]} onPress={() => sk.current && pass && setBlob(makeBackup(sk.current, pass))}>
         <Text style={s.btnText}>Generate backup</Text>
       </Pressable>
       {blob ? <Text selectable style={s.mono}>{blob}</Text> : null}
@@ -629,6 +736,12 @@ const s = StyleSheet.create({
   dealText: { color: '#4ade80', fontWeight: '700' },
   dealContact: { color: '#6ee7b7', fontSize: 13, marginTop: 2 },
   counterBox: { marginTop: 12, padding: 12, backgroundColor: '#0d1520', borderRadius: 10, borderWidth: 1, borderColor: '#1e3a5f' },
+  authorAvatar: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#1a2030', marginRight: 6 },
+  authorName: { color: '#4b5a6e', fontSize: 12 },
+  avatarRow: { flexDirection: 'row', alignItems: 'center', marginTop: 12 },
+  avatar: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#1a2030' },
+  avatarEmpty: { alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#1e2a3a', borderStyle: 'dashed' },
+  avatarPlaceholder: { color: '#4b5a6e', fontSize: 28 },
   imageGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   imageThumbWrap: { position: 'relative' },
   imageThumb: { width: 80, height: 80, borderRadius: 8, backgroundColor: '#1a2030' },

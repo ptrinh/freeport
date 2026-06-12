@@ -6,6 +6,7 @@
 import { SimplePool } from 'nostr-tools/pool';
 import { finalizeEvent, getPublicKey, type Event } from 'nostr-tools/pure';
 import * as nip04 from 'nostr-tools/nip04';
+import { publishProfile, type UserProfile } from './profile';
 import {
   DEFAULT_RELAYS,
   KIND_INTENT_OFFER,
@@ -30,8 +31,11 @@ export class MobileClient {
   readonly pubkey: string;
   readonly negotiations = new Map<string, Negotiation>();
   private published = new Map<string, Intent>();
+  /** Cache of fetched kind:0 profiles keyed by pubkey. */
+  readonly profiles = new Map<string, { name?: string; picture?: string; about?: string }>();
   onIntent?: (intent: Intent) => void;
   onNegotiationUpdate?: (nego: Negotiation) => void;
+  onProfileFetched?: (pubkey: string) => void;
 
   constructor(
     private sk: Uint8Array,
@@ -51,11 +55,33 @@ export class MobileClient {
       {
         onevent: (ev: Event) => {
           const intent = parseIntentEvent(ev);
-          if (intent && intent.pubkey !== this.pubkey) this.onIntent?.(intent);
+          if (!intent || intent.pubkey === this.pubkey) return;
+          this.onIntent?.(intent);
+          this.fetchProfile(intent.pubkey);
         },
       },
     );
     return () => sub.close();
+  }
+
+  /** Fetch and cache a counterparty's kind:0 profile. No-op if already cached. */
+  private fetchProfile(pubkey: string): void {
+    if (this.profiles.has(pubkey)) return;
+    this.profiles.set(pubkey, {}); // mark as in-flight
+    const sub = this.pool.subscribeMany(
+      this.relays,
+      { kinds: [0], authors: [pubkey], limit: 1 },
+      {
+        onevent: (ev: Event) => {
+          try {
+            const meta = JSON.parse(ev.content);
+            this.profiles.set(pubkey, { name: meta.name, picture: meta.picture, about: meta.about });
+            this.onProfileFetched?.(pubkey);
+          } catch {}
+        },
+        oneose: () => sub.close(),
+      },
+    );
   }
 
   watchDMs(): () => void {
@@ -88,7 +114,23 @@ export class MobileClient {
     return () => sub.close();
   }
 
-  async postIntent(input: BuildIntentInput): Promise<Intent> {
+  /**
+   * Publish the user's kind:0 profile (NIP-01). Call whenever the profile is
+   * saved so counterparties can fetch the author's name/picture/about.
+   */
+  async publishProfile(profile: UserProfile): Promise<void> {
+    await publishProfile(this.sk, profile, this.relays);
+  }
+
+  /**
+   * Post an intent. If a profile is provided it is (re-)published first so
+   * counterparties see up-to-date metadata alongside the new intent.
+   */
+  async postIntent(input: BuildIntentInput, profile?: UserProfile): Promise<Intent> {
+    if (profile && (profile.name || profile.picture || profile.about)) {
+      // Fire-and-forget: profile publish is best-effort, don't block posting
+      publishProfile(this.sk, profile, this.relays).catch(() => {});
+    }
     const ev = buildIntentEvent(input, this.sk);
     const intent = parseIntentEvent(ev)!;
     this.published.set(intent.id, intent);
