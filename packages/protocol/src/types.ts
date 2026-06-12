@@ -40,6 +40,7 @@ export interface RidesharePayload extends Record<string, unknown> {
   to: { name: string; geohash: string };
   seats?: number;
   payment?: string; // e.g. "$12", "split petrol"
+  images?: string[]; // NIP-96 URLs
 }
 
 /** Vertical payload for schema "service/1". */
@@ -49,6 +50,7 @@ export interface ServicePayload extends Record<string, unknown> {
   payment?: string; // e.g. "$80/hr"
   duration_minutes?: number; // estimated duration
   notes?: string; // additional information
+  images?: string[]; // NIP-96 URLs — photos of the problem/location
 }
 
 /** A parsed intent: validated content + the event identifiers we need. */

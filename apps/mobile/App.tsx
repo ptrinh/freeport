@@ -4,8 +4,10 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -16,6 +18,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { StatusBar } from 'expo-status-bar';
 import {
   DEMO_MARKET,
@@ -28,6 +31,7 @@ import {
 } from '@freeport/protocol';
 import { loadOrCreateKey, npubOf, makeBackup } from './src/identity';
 import { MobileClient } from './src/client';
+import { uploadImage, UploadError } from './src/upload';
 
 type Tab = 'market' | 'post' | 'deals' | 'key';
 type PostType = 'rideshare' | 'service';
@@ -128,6 +132,13 @@ function MarketTab({ intents }: { intents: Intent[] }) {
             {item.content.window && (
               <Row label="Time" value={fmtWindow(item.content.window)} />
             )}
+            {Array.isArray(p.images) && p.images.length > 0 && (
+              <View style={s.imageGrid}>
+                {(p.images as string[]).map((url: string) => (
+                  <Image key={url} source={{ uri: url }} style={s.imageThumb} />
+                ))}
+              </View>
+            )}
             <Text style={s.meta}>
               {item.pubkey.slice(0, 10)}… · expires {new Date(item.content.expires_at * 1000).toLocaleTimeString()}
             </Text>
@@ -164,23 +175,28 @@ function RideshareForm({ client }: { client: MobileClient | null }) {
   const [to, setTo] = useState('');
   const [time, setTime] = useState('');
   const [payment, setPayment] = useState('');
+  const [images, setImages] = useState<string[]>([]);
+  const [posting, setPosting] = useState(false);
 
   const post = async () => {
     if (!client) return;
     if (!from.trim() || !to.trim()) { Alert.alert('Missing fields', 'From and To are required.'); return; }
-    const window = parseTimeToWindow(time);
-    await client.postIntent({
-      side: 'request',
-      market: DEMO_MARKET,
-      schema: DEMO_SCHEMA,
-      title: `Ride ${from} → ${to}${time ? ' at ' + time : ''}`,
-      payload: { from: { name: from, geohash: 'w21z6v' }, to: { name: to, geohash: 'w21zgc' }, payment: payment || undefined },
-      window: window ?? undefined,
-      flexMinutes: 30,
-      expiresAt: Math.floor(Date.now() / 1000) + 6 * 3600,
-      geohashes: ['w21z6'],
-    });
-    Alert.alert('Posted', 'Your ride request is live.');
+    setPosting(true);
+    try {
+      const window = parseTimeToWindow(time);
+      await client.postIntent({
+        side: 'request',
+        market: DEMO_MARKET,
+        schema: DEMO_SCHEMA,
+        title: `Ride ${from} → ${to}${time ? ' at ' + time : ''}`,
+        payload: { from: { name: from, geohash: 'w21z6v' }, to: { name: to, geohash: 'w21zgc' }, payment: payment || undefined, images: images.length ? images : undefined },
+        window: window ?? undefined,
+        flexMinutes: 30,
+        expiresAt: Math.floor(Date.now() / 1000) + 6 * 3600,
+        geohashes: ['w21z6'],
+      });
+      Alert.alert('Posted', 'Your ride request is live.');
+    } finally { setPosting(false); }
   };
 
   return (
@@ -189,7 +205,8 @@ function RideshareForm({ client }: { client: MobileClient | null }) {
       <Field label="To *" value={to} onChange={setTo} placeholder="e.g. Hougang Central" />
       <Field label="Time" value={time} onChange={setTime} placeholder="HH:MM (leave blank for flexible)" />
       <Field label="Payment" value={payment} onChange={setPayment} placeholder="e.g. $12 or split petrol" />
-      <PostButton onPress={post} />
+      <ImagePickerField images={images} onChange={setImages} />
+      <PostButton onPress={post} loading={posting} />
     </>
   );
 }
@@ -201,30 +218,36 @@ function ServiceForm({ client }: { client: MobileClient | null }) {
   const [time, setTime] = useState('');
   const [duration, setDuration] = useState('');
   const [notes, setNotes] = useState('');
+  const [images, setImages] = useState<string[]>([]);
+  const [posting, setPosting] = useState(false);
 
   const post = async () => {
     if (!client) return;
     if (!location.trim() || !service.trim()) { Alert.alert('Missing fields', 'Location and Service are required.'); return; }
-    const window = parseTimeToWindow(time);
-    const durationMin = duration ? parseInt(duration, 10) : undefined;
-    await client.postIntent({
-      side: 'request',
-      market: SERVICE_MARKET,
-      schema: SERVICE_SCHEMA,
-      title: `${service} at ${location}${time ? ' at ' + time : ''}`,
-      payload: {
-        location: { name: location, geohash: 'w21z6v' },
-        service,
-        payment: payment || undefined,
-        duration_minutes: durationMin,
-        notes: notes || undefined,
-      },
-      window: window ?? undefined,
-      flexMinutes: 30,
-      expiresAt: Math.floor(Date.now() / 1000) + 6 * 3600,
-      geohashes: ['w21z6'],
-    });
-    Alert.alert('Posted', 'Your service request is live.');
+    setPosting(true);
+    try {
+      const window = parseTimeToWindow(time);
+      const durationMin = duration ? parseInt(duration, 10) : undefined;
+      await client.postIntent({
+        side: 'request',
+        market: SERVICE_MARKET,
+        schema: SERVICE_SCHEMA,
+        title: `${service} at ${location}${time ? ' at ' + time : ''}`,
+        payload: {
+          location: { name: location, geohash: 'w21z6v' },
+          service,
+          payment: payment || undefined,
+          duration_minutes: durationMin,
+          notes: notes || undefined,
+          images: images.length ? images : undefined,
+        },
+        window: window ?? undefined,
+        flexMinutes: 30,
+        expiresAt: Math.floor(Date.now() / 1000) + 6 * 3600,
+        geohashes: ['w21z6'],
+      });
+      Alert.alert('Posted', 'Your service request is live.');
+    } finally { setPosting(false); }
   };
 
   return (
@@ -235,7 +258,8 @@ function ServiceForm({ client }: { client: MobileClient | null }) {
       <Field label="Time" value={time} onChange={setTime} placeholder="HH:MM" />
       <Field label="Duration (minutes)" value={duration} onChange={setDuration} placeholder="e.g. 120" keyboardType="numeric" />
       <Field label="Additional information" value={notes} onChange={setNotes} placeholder="Any details…" multiline />
-      <PostButton onPress={post} />
+      <ImagePickerField images={images} onChange={setImages} label="Photos (optional)" />
+      <PostButton onPress={post} loading={posting} />
     </>
   );
 }
@@ -430,11 +454,70 @@ function Field({
   );
 }
 
-function PostButton({ onPress }: { onPress: () => void }) {
+function PostButton({ onPress, loading = false }: { onPress: () => void; loading?: boolean }) {
   return (
-    <Pressable style={[s.btnAccept, { marginTop: 20 }]} onPress={onPress}>
-      <Text style={s.btnText}>Post to market</Text>
+    <Pressable style={[s.btnAccept, { marginTop: 20 }, loading && { opacity: 0.6 }]} onPress={onPress} disabled={loading}>
+      {loading ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>Post to market</Text>}
     </Pressable>
+  );
+}
+
+function ImagePickerField({
+  images,
+  onChange,
+  label = 'Photos (optional)',
+}: {
+  images: string[];
+  onChange: (urls: string[]) => void;
+  label?: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+
+  const pick = async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) { Alert.alert('Permission needed', 'Allow photo access to attach images.'); return; }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      quality: 0.8,
+      selectionLimit: 4,
+    });
+    if (result.canceled || !result.assets.length) return;
+    setUploading(true);
+    try {
+      const urls = await Promise.all(result.assets.map((a) => uploadImage(a.uri)));
+      onChange([...images, ...urls]);
+    } catch (e) {
+      Alert.alert('Upload failed', e instanceof UploadError ? e.message : 'Try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const remove = (url: string) => onChange(images.filter((u) => u !== url));
+
+  return (
+    <View style={{ marginTop: 16 }}>
+      <Text style={s.label}>{label}</Text>
+      <View style={s.imageGrid}>
+        {images.map((url) => (
+          <View key={url} style={s.imageThumbWrap}>
+            <Image source={{ uri: url }} style={s.imageThumb} />
+            <Pressable style={s.imageRemove} onPress={() => remove(url)}>
+              <Text style={s.imageRemoveText}>✕</Text>
+            </Pressable>
+          </View>
+        ))}
+        {images.length < 4 && (
+          <Pressable style={s.imageAdd} onPress={pick} disabled={uploading}>
+            {uploading
+              ? <ActivityIndicator color="#4b5a6e" />
+              : <Text style={s.imageAddText}>{images.length === 0 ? '+ Add photos' : '+'}</Text>
+            }
+          </Pressable>
+        )}
+      </View>
+    </View>
   );
 }
 
@@ -546,6 +629,13 @@ const s = StyleSheet.create({
   dealText: { color: '#4ade80', fontWeight: '700' },
   dealContact: { color: '#6ee7b7', fontSize: 13, marginTop: 2 },
   counterBox: { marginTop: 12, padding: 12, backgroundColor: '#0d1520', borderRadius: 10, borderWidth: 1, borderColor: '#1e3a5f' },
+  imageGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  imageThumbWrap: { position: 'relative' },
+  imageThumb: { width: 80, height: 80, borderRadius: 8, backgroundColor: '#1a2030' },
+  imageRemove: { position: 'absolute', top: -6, right: -6, backgroundColor: '#374151', borderRadius: 10, width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
+  imageRemoveText: { color: 'white', fontSize: 10, fontWeight: '700' },
+  imageAdd: { width: 80, height: 80, borderRadius: 8, borderWidth: 1, borderColor: '#1e2a3a', borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', backgroundColor: '#111827' },
+  imageAddText: { color: '#4b5a6e', fontSize: 13 },
   segRow: { flexDirection: 'row', marginTop: 8, borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: '#1e2a3a' },
   seg: { flex: 1, paddingVertical: 10, alignItems: 'center', backgroundColor: '#111827' },
   segActive: { backgroundColor: '#1e3a5f' },
