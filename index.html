@@ -30,8 +30,13 @@
   .btn-ghost{background:transparent;color:var(--text);border-color:var(--border)}
   .btn-ghost:hover{border-color:var(--text3);text-decoration:none}
 
+  /* Language switch */
+  .langbar{position:absolute;top:16px;right:22px;font-size:14px;color:var(--text3);z-index:5}
+  .langbar a{color:var(--text3);padding:0 6px}
+  .langbar a.on{color:var(--text);font-weight:700}
+
   /* Hero */
-  header{padding:64px 0 40px;text-align:center;background:
+  header{position:relative;padding:64px 0 40px;text-align:center;background:
     radial-gradient(1100px 460px at 50% -120px,rgba(59,130,246,.18),transparent 70%);}
   .logo{width:92px;height:92px;border-radius:22px;box-shadow:0 12px 40px rgba(59,130,246,.35)}
   h1{font-size:clamp(34px,6vw,56px);line-height:1.05;margin:22px 0 10px;letter-spacing:-.02em;font-weight:800}
@@ -60,6 +65,10 @@
   .step h3{margin:0 0 6px;font-size:17.5px}
   .step p{margin:0;color:var(--text2);font-size:15px}
 
+  /* Whitepaper band */
+  .paper{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center}
+  .paper .lead{margin-left:auto;margin-right:auto}
+
   /* Showcase */
   .shots{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:8px}
   .shots img{width:248px;border-radius:26px;border:1px solid var(--border);
@@ -77,51 +86,63 @@
 </head>
 <body>
 
+<div class="langbar">
+  <a href="?lang=en" data-lang-en>EN</a><span>·</span><a href="?lang=vi" data-lang-vi>VI</a>
+</div>
+
 <header>
   <div class="wrap">
     <img class="logo" src="icon.png" alt="Freeport" />
-    <h1>The marketplace with no middleman.</h1>
-    <p class="tag">Freeport is a decentralized, peer-to-peer marketplace for rides, services and goods — built on Nostr. No company in the middle, no commission, no account. Your keys, your price.</p>
+    <h1 data-i18n="h1">The marketplace with no middleman.</h1>
+    <p class="tag" data-i18n="tag">Freeport is a decentralized, peer-to-peer marketplace for rides, services and goods — built on Nostr. No company in the middle, no commission, no account. Your keys, your price.</p>
     <div class="cta">
-      <a class="btn btn-primary" href="https://freeport.trinh.uk">Open the web app</a>
-      <a class="btn btn-ghost" href="#how">How it works</a>
-      <span class="soon">📱 Native iOS &amp; Android apps coming soon</span>
+      <a class="btn btn-primary" href="https://freeport.trinh.uk" data-i18n="cta_open">Open the web app</a>
+      <a class="btn btn-ghost" href="#how" data-i18n="cta_how">How it works</a>
+      <span class="soon" data-i18n="soon">📱 Native iOS &amp; Android apps coming soon</span>
     </div>
   </div>
 </header>
 
 <section>
   <div class="wrap">
-    <h2>Why Freeport</h2>
-    <p class="lead">A real peer-to-peer network — not another platform taking a cut and holding your data.</p>
+    <h2 data-i18n="why_h">Why Freeport</h2>
+    <p class="lead" data-i18n="why_lead">A real peer-to-peer network — not another platform taking a cut and holding your data.</p>
     <div class="grid">
-      <div class="feat"><div class="ic">🤝</div><h3>No middleman</h3><p>Deal directly with the other person and agree your own price. No platform fee, no surge pricing.</p></div>
-      <div class="feat"><div class="ic">🔑</div><h3>No sign-up</h3><p>Your identity is a secure key created on your device — no email, no phone-number account, no password.</p></div>
-      <div class="feat"><div class="ic">💸</div><h3>Your price</h3><p>Negotiate openly with a built-in estimator. Zero commission means more stays with you.</p></div>
-      <div class="feat"><div class="ic">🔒</div><h3>Private by design</h3><p>Messages are end-to-end encrypted. Listings carry only a coarse, neighborhood-level location — never your exact spot.</p></div>
-      <div class="feat"><div class="ic">🌐</div><h3>Built on Nostr</h3><p>Runs on an open protocol, not a private server — so no single company can shut it down, censor it, or sell your data.</p></div>
-      <div class="feat"><div class="ic">⭐</div><h3>Earn reputation</h3><p>A transparent, peer-rated karma system builds trust between strangers, with no central authority.</p></div>
+      <div class="feat"><div class="ic">🤝</div><h3 data-i18n="f1_h">No middleman</h3><p data-i18n="f1_p">Deal directly with the other person and agree your own price. No platform fee, no surge pricing.</p></div>
+      <div class="feat"><div class="ic">🔑</div><h3 data-i18n="f2_h">No sign-up</h3><p data-i18n="f2_p">Your identity is a secure key created on your device — no email, no phone-number account, no password.</p></div>
+      <div class="feat"><div class="ic">💸</div><h3 data-i18n="f3_h">Your price</h3><p data-i18n="f3_p">Negotiate openly with a built-in estimator. Zero commission means more stays with you.</p></div>
+      <div class="feat"><div class="ic">🔒</div><h3 data-i18n="f4_h">Private by design</h3><p data-i18n="f4_p">Messages are end-to-end encrypted. Listings carry only a coarse, neighborhood-level location — never your exact spot.</p></div>
+      <div class="feat"><div class="ic">🌐</div><h3 data-i18n="f5_h">Built on Nostr</h3><p data-i18n="f5_p">Runs on an open protocol, not a private server — so no single company can shut it down, censor it, or sell your data.</p></div>
+      <div class="feat"><div class="ic">⭐</div><h3 data-i18n="f6_h">Earn reputation</h3><p data-i18n="f6_p">A transparent, peer-rated karma system builds trust between strangers, with no central authority.</p></div>
     </div>
   </div>
 </section>
 
 <section id="how" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="wrap">
-    <h2>How it works</h2>
-    <p class="lead">Post or browse, negotiate, done — all between you and the other party.</p>
+    <h2 data-i18n="how_h">How it works</h2>
+    <p class="lead" data-i18n="how_lead">Post or browse, negotiate, done — all between you and the other party.</p>
     <div class="steps">
-      <div class="step"><h3>Post or browse</h3><p>Request a ride or service, or browse what people nearby are offering.</p></div>
-      <div class="step"><h3>Negotiate</h3><p>Offers and counter-offers go back and forth privately until you both agree.</p></div>
-      <div class="step"><h3>Make the deal</h3><p>Confirm, swap contact details over an encrypted message, and meet up.</p></div>
+      <div class="step"><h3 data-i18n="s1_h">Post or browse</h3><p data-i18n="s1_p">Request a ride or service, or browse what people nearby are offering.</p></div>
+      <div class="step"><h3 data-i18n="s2_h">Negotiate</h3><p data-i18n="s2_p">Offers and counter-offers go back and forth privately until you both agree.</p></div>
+      <div class="step"><h3 data-i18n="s3_h">Make the deal</h3><p data-i18n="s3_p">Confirm, swap contact details over an encrypted message, and meet up.</p></div>
     </div>
+  </div>
+</section>
+
+<section class="paper">
+  <div class="wrap">
+    <h2 data-i18n="wp_h">Read the whitepaper</h2>
+    <p class="lead" data-i18n="wp_lead">The full protocol: signed intents, encrypted negotiation, co-signed deal receipts, and reputation as a subjective quantity that makes fake identities weightless.</p>
+    <a class="btn btn-primary" id="wp-link" href="whitepaper.pdf" target="_blank" rel="noopener" data-i18n="wp_btn">Open the whitepaper (PDF)</a>
   </div>
 </section>
 
 <section>
   <div class="wrap" style="text-align:center">
-    <span class="pill">Live now on the web</span>
-    <h2>See it in action</h2>
-    <p class="lead" style="margin-left:auto;margin-right:auto">Request a ride, set your price, and negotiate directly — right from your browser.</p>
+    <span class="pill" data-i18n="live">Live now on the web</span>
+    <h2 data-i18n="see_h">See it in action</h2>
+    <p class="lead" style="margin-left:auto;margin-right:auto" data-i18n="see_lead">Request a ride, set your price, and negotiate directly — right from your browser.</p>
     <div class="shots">
       <img src="shot-request.png" alt="Posting a ride request in Freeport" />
       <img src="shot-deals.png" alt="A passenger's requests and a confirmed deal" />
@@ -132,14 +153,72 @@
 <footer>
   <div class="wrap">
     <div class="links">
-      <a href="https://freeport.trinh.uk">Web app</a>
-      <a href="https://freeport.trinh.uk/privacy">Privacy Policy</a>
-      <a href="#how">How it works</a>
+      <a href="https://freeport.trinh.uk" data-i18n="ft_app">Web app</a>
+      <a id="wp-foot" href="whitepaper.pdf" target="_blank" rel="noopener" data-i18n="ft_wp">Whitepaper</a>
+      <a href="https://freeport.trinh.uk/privacy" data-i18n="ft_privacy">Privacy Policy</a>
+      <a href="#how" data-i18n="ft_how">How it works</a>
     </div>
-    <p class="support">Support &amp; questions: <a href="mailto:freeport@trinh.uk">freeport@trinh.uk</a></p>
-    <p class="copy">© Phil Trinh · Freeport — a peer-to-peer marketplace on Nostr</p>
+    <p class="support" data-i18n-html="ft_support">Support &amp; questions: <a href="mailto:freeport@trinh.uk">freeport@trinh.uk</a></p>
+    <p class="copy" data-i18n="ft_copy">© Phil Trinh · Freeport — a peer-to-peer marketplace on Nostr</p>
   </div>
 </footer>
+
+<script>
+const I18N = {
+  vi: {
+    h1: "Chợ không có trung gian.",
+    tag: "Freeport là một chợ ngang hàng, phi tập trung cho xe cộ, dịch vụ và hàng hóa — xây trên Nostr. Không công ty đứng giữa, không hoa hồng, không tài khoản. Khóa của bạn, giá của bạn.",
+    cta_open: "Mở ứng dụng web",
+    cta_how: "Cách hoạt động",
+    soon: "📱 Ứng dụng iOS &amp; Android sắp ra mắt",
+    why_h: "Vì sao chọn Freeport",
+    why_lead: "Một mạng ngang hàng thực sự — không phải thêm một nền tảng ăn phần trăm và giữ dữ liệu của bạn.",
+    f1_h: "Không trung gian", f1_p: "Giao dịch trực tiếp với người kia và tự thỏa thuận giá. Không phí nền tảng, không tăng giá giờ cao điểm.",
+    f2_h: "Không cần đăng ký", f2_p: "Danh tính của bạn là một khóa an toàn tạo ngay trên thiết bị — không email, không tài khoản theo số điện thoại, không mật khẩu.",
+    f3_h: "Giá của bạn", f3_p: "Thương lượng công khai với công cụ ước tính tích hợp. Không hoa hồng nghĩa là bạn giữ lại nhiều hơn.",
+    f4_h: "Riêng tư từ thiết kế", f4_p: "Tin nhắn được mã hóa đầu-cuối. Bài đăng chỉ kèm vị trí thô ở mức khu phố — không bao giờ là điểm chính xác của bạn.",
+    f5_h: "Xây trên Nostr", f5_p: "Chạy trên một giao thức mở, không phải máy chủ riêng — nên không công ty nào có thể đóng cửa, kiểm duyệt hay bán dữ liệu của bạn.",
+    f6_h: "Tích lũy uy tín", f6_p: "Hệ thống karma minh bạch do người dùng đánh giá xây dựng niềm tin giữa người lạ, không cần cơ quan trung tâm.",
+    how_h: "Cách hoạt động",
+    how_lead: "Đăng hoặc duyệt, thương lượng, xong — tất cả chỉ giữa bạn và bên kia.",
+    s1_h: "Đăng hoặc duyệt", s1_p: "Yêu cầu một chuyến xe hay dịch vụ, hoặc duyệt những gì người gần bạn đang chào.",
+    s2_h: "Thương lượng", s2_p: "Đề nghị và đối-đề nghị qua lại riêng tư cho đến khi cả hai đồng ý.",
+    s3_h: "Chốt giao dịch", s3_p: "Xác nhận, trao đổi thông tin liên hệ qua tin nhắn mã hóa, rồi gặp nhau.",
+    wp_h: "Đọc whitepaper",
+    wp_lead: "Toàn bộ giao thức: ý định đã ký, thương lượng mã hóa, biên nhận giao dịch đồng ký, và uy tín như một đại lượng chủ quan khiến danh tính giả trở nên vô trọng lượng.",
+    wp_btn: "Mở whitepaper (PDF)",
+    live: "Đang hoạt động trên web",
+    see_h: "Xem thử",
+    see_lead: "Yêu cầu một chuyến xe, đặt giá của bạn, và thương lượng trực tiếp — ngay trên trình duyệt.",
+    ft_app: "Ứng dụng web", ft_wp: "Whitepaper", ft_privacy: "Chính sách riêng tư", ft_how: "Cách hoạt động",
+    ft_support: 'Hỗ trợ &amp; câu hỏi: <a href="mailto:freeport@trinh.uk">freeport@trinh.uk</a>',
+    ft_copy: "© Phil Trinh · Freeport — chợ ngang hàng trên Nostr",
+  }
+};
+
+(function(){
+  const params = new URLSearchParams(location.search);
+  const lang = (params.get('lang') || 'en').toLowerCase() === 'vi' ? 'vi' : 'en';
+  const sw = document.querySelector('[data-lang-' + lang + ']');
+  if (sw) sw.classList.add('on');
+  // whitepaper links per language
+  const wpFile = lang === 'vi' ? 'whitepaper.vi.pdf' : 'whitepaper.pdf';
+  document.getElementById('wp-link').setAttribute('href', wpFile);
+  document.getElementById('wp-foot').setAttribute('href', wpFile);
+  if (lang === 'en') return;            // English is the markup default
+  document.documentElement.lang = 'vi';
+  const dict = I18N.vi;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (dict[k] != null) el.innerHTML = dict[k];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const k = el.getAttribute('data-i18n-html');
+    if (dict[k] != null) el.innerHTML = dict[k];
+  });
+  document.title = "Freeport — chợ ngang hàng trên Nostr";
+})();
+</script>
 
 </body>
 </html>
