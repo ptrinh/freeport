@@ -39,7 +39,9 @@ export interface RidesharePayload extends Record<string, unknown> {
   from: { name: string; geohash: string };
   to: { name: string; geohash: string };
   seats?: number;
+  category?: string; // vehicle subcategory (Motorbike, Compact Car, …)
   payment?: string; // e.g. "$12", "split petrol"
+  note?: string; // short free-text note (≤100 chars)
   images?: string[]; // NIP-96 URLs
 }
 
@@ -47,6 +49,8 @@ export interface RidesharePayload extends Record<string, unknown> {
 export interface ServicePayload extends Record<string, unknown> {
   location: { name: string; geohash: string };
   service: string; // e.g. "plumber", "house cleaning"
+  category?: string; // coarse category for discovery/filtering
+  subcategory?: string; // finer subcategory within the category
   payment?: string; // e.g. "$80/hr"
   duration_minutes?: number; // estimated duration
   notes?: string; // additional information
@@ -79,7 +83,22 @@ export interface NegotiationMessage {
   /** Only present on accept — never sent before a deal is sealed. */
   contact?: string;
   reason?: string; // for cancel
+  text?: string; // free-text chat message (for chat type)
+  /** Fulfillment progress on a confirmed deal (for status type). */
+  stage?: 'picked_up' | 'completed';
   ts: EpochSeconds;
+}
+
+export interface ChatMessage {
+  dir: 'in' | 'out';
+  text: string;
+  ts: EpochSeconds;
+  /**
+   * Source DM event id (inbound) — used to dedupe relay echoes and the reload
+   * backfill so the same message is never appended twice. Optional for back-
+   * compat with messages stored before this field existed.
+   */
+  id?: string;
 }
 
 export interface ProposedTerms {
@@ -101,6 +120,7 @@ export type NegotiationState =
   | 'accepted_by_us' // we sent accept (with contact), waiting for theirs
   | 'accepted_by_them' // they accepted; needs our (human-confirmed) accept
   | 'confirmed' // both accepts exchanged — deal done
+  | 'cancel_requested' // a confirmed deal where one side asked to mutually cancel
   | 'cancelled'
   | 'expired';
 
@@ -118,6 +138,16 @@ export interface Negotiation {
   rounds: number;
   ourContact?: string;
   theirContact?: string;
+  /** Who asked to cancel, while state is `cancel_requested`. */
+  cancelRequestedBy?: 'us' | 'them';
   updatedAt: EpochSeconds;
   log: { dir: 'in' | 'out'; msg: NegotiationMessage }[];
+  /** Free-text chat, mainly used after the deal is confirmed to coordinate. */
+  messages?: ChatMessage[];
+  /**
+   * Fulfillment progress on a confirmed deal, mirrored to both parties: the
+   * provider (driver) advances it and the message syncs it to the requester.
+   * undefined → not started; 'picked_up' → in transit; 'completed' → done.
+   */
+  stage?: 'picked_up' | 'completed';
 }

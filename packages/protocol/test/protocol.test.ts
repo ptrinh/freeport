@@ -13,8 +13,13 @@ import {
   makeCounter,
   makeAccept,
   makeCancel,
+  makeCancelRequest,
+  makeCancelDecline,
+  makeStatus,
+  makeChat,
   applyOutbound,
   applyInbound,
+  dedupeMessages,
   parseNegotiationMessage,
   KIND_INTENT_REQUEST,
   DEMO_MARKET,
@@ -196,19 +201,124 @@ describe('negotiation state machine', () => {
     b = applyInbound(b, c2, pkA)!;
     expect(b.rounds).toBe(2);
 
+    // One-step Accept: a single accept confirms the deal for both sides.
     const acc1 = makeAccept(b, 'tg:@bob');
     b = applyOutbound(b, acc1);
-    expect(b.state).toBe('accepted_by_us');
+    expect(b.state).toBe('confirmed');
+    expect(b.ourContact).toBe('tg:@bob');
     a = applyInbound(a, acc1, pkB)!;
-    expect(a.state).toBe('accepted_by_them');
+    expect(a.state).toBe('confirmed');
     expect(a.theirContact).toBe('tg:@bob');
 
+    // Automatic contact back-flow: the proposer replies with their own contact
+    // while already confirmed — captured by the peer, state stays confirmed.
     const acc2 = makeAccept(a, 'tg:@alice');
     a = applyOutbound(a, acc2);
     expect(a.state).toBe('confirmed');
+    expect(a.ourContact).toBe('tg:@alice');
     b = applyInbound(b, acc2, pkA)!;
     expect(b.state).toBe('confirmed');
     expect(b.theirContact).toBe('tg:@alice');
+  });
+
+  it('inbound chat is idempotent: a redelivered DM (same event id) is not appended twice', () => {
+    const intent = rideRequest();
+    let owner = openNegotiation(intent, pkA, false, pkB);
+    const chat = makeChat(owner, 'on my way');
+
+    // First delivery appends the message.
+    owner = applyInbound(owner, chat, pkB, 'evt-1')!;
+    expect(owner.messages).toHaveLength(1);
+    expect(owner.messages![0]).toMatchObject({ dir: 'in', text: 'on my way', id: 'evt-1' });
+
+    // Same DM redelivered by another relay / replayed by the reload backfill —
+    // identical event id → ignored (returns null, no second copy).
+    expect(applyInbound(owner, chat, pkB, 'evt-1')).toBeNull();
+
+    // A genuinely new message with the same text but a different event id IS kept.
+    owner = applyInbound(owner, makeChat(owner, 'on my way'), pkB, 'evt-2')!;
+    expect(owner.messages).toHaveLength(2);
+  });
+
+  it('dedupeMessages heals stores duplicated before the fix (by id, and legacy by dir/ts/text)', () => {
+    // New-format duplicates collapse by id.
+    const byId = dedupeMessages([
+      { dir: 'in', text: 'hi', ts: 100, id: 'e1' },
+      { dir: 'in', text: 'hi', ts: 100, id: 'e1' },
+      { dir: 'in', text: 'hi', ts: 100, id: 'e1' },
+    ]);
+    expect(byId).toHaveLength(1);
+
+    // Legacy id-less duplicates (same dir/ts/text = same replayed event) collapse;
+    // a distinct message (different ts) is preserved.
+    const legacy = dedupeMessages([
+      { dir: 'in', text: 'hi', ts: 100 },
+      { dir: 'in', text: 'hi', ts: 100 },
+      { dir: 'out', text: 'hi', ts: 101 },
+    ]);
+    expect(legacy).toHaveLength(2);
+  });
+
+  it('a hard cancel from the owner terminates a losing bid that optimistically self-confirmed', () => {
+    const intent = rideRequest();
+    // Driver B one-tap-accepts at the asking price → optimistically `confirmed`.
+    let driver = openNegotiation(intent, pkB, true);
+    driver = applyOutbound(driver, makeCounter(driver, { payment: '125,000₫' })); // offer form seeds terms
+    driver = applyOutbound(driver, makeAccept(driver, 'tg:@driverB'));
+    expect(driver.state).toBe('confirmed');
+    // The intent owner already filled with another driver and hard-cancels this
+    // bid. The inbound cancel must still apply, even though driver is `confirmed`.
+    const owner = openNegotiation(intent, pkA, false, pkB);
+    const cancel = makeCancel(owner, 'Filled — taken by another offer');
+    const after = applyInbound(driver, cancel, pkA);
+    expect(after).not.toBeNull();
+    expect(after!.state).toBe('cancelled');
+  });
+
+  it('a hard cancel never undoes a completed trip', () => {
+    const intent = rideRequest();
+    let nego = openNegotiation(intent, pkB, true);
+    nego = applyOutbound(nego, makeCounter(nego, { payment: '125,000₫' }));
+    nego = applyOutbound(nego, makeAccept(nego, 'tg:@x'));
+    nego = { ...nego, stage: 'completed' };
+    const cancel = makeCancel(openNegotiation(intent, pkA, false, pkB), 'late cancel');
+    expect(applyInbound(nego, cancel, pkA)).toBeNull();
+  });
+
+  it('haggle preserves negotiated price when a later counter only changes the time', () => {
+    // Regression: counters are partial edits (the UI omits unchanged fields).
+    // A counter that only shifts the time must NOT wipe a price haggled earlier,
+    // otherwise the confirmed deal card falls back to the original posted terms.
+    const intent = rideRequest();
+    const now = Math.floor(Date.now() / 1000);
+    let b = openNegotiation(intent, pkB, true);
+    let a = openNegotiation(intent, pkA, false, pkB);
+
+    // Round 1: B counters the PRICE only.
+    const c1 = makeCounter(b, { payment: 'SGD 20' });
+    b = applyOutbound(b, c1);
+    a = applyInbound(a, c1, pkB)!;
+    expect(a.terms?.payment).toBe('SGD 20');
+
+    // Round 2: A counters the TIME only (no payment field on the message).
+    const c2 = makeCounter(a, { window: { start: now + 4000, end: now + 5800 } });
+    a = applyOutbound(a, c2);
+    expect(a.terms?.payment).toBe('SGD 20');          // price carried forward locally
+    expect(a.terms?.window?.start).toBe(now + 4000);
+    b = applyInbound(b, c2, pkA)!;
+    expect(b.terms?.payment).toBe('SGD 20');          // and on the peer
+    expect(b.terms?.window?.start).toBe(now + 4000);
+
+    // B accepts → both sides confirm with the FULL negotiated terms.
+    const acc = makeAccept(b, 'tg:@bob');
+    b = applyOutbound(b, acc);
+    a = applyInbound(a, acc, pkB)!;
+    expect(a.state).toBe('confirmed');
+    expect(b.state).toBe('confirmed');
+    expect(a.terms?.payment).toBe('SGD 20');
+    expect(b.terms?.payment).toBe('SGD 20');
+    expect(a.terms?.window?.start).toBe(now + 4000);
+    expect(b.terms?.window?.start).toBe(now + 4000);
   });
 
   it('cancel terminates from either side', () => {
@@ -245,6 +355,42 @@ describe('negotiation state machine', () => {
     let b = openNegotiation(intent, pkB, true);
     for (let i = 0; i < 8; i++) b = applyOutbound(b, makeCounter(b, { note: `r${i}` }));
     expect(() => makeCounter(b, { note: 'one too many' })).toThrow();
+  });
+
+  it('ignores a stale/backfilled cancel-request after decline or completion', () => {
+    // Regression: passenger declined a cancel-request (deal kept) and the trip
+    // later completed; on reopen the relay replays the OLD request out of order.
+    // It must NOT resurrect the cancel prompt.
+    const intent = rideRequest();
+    let b = openNegotiation(intent, pkB, true);          // driver initiates
+    let a = openNegotiation(intent, pkA, false, pkB);    // passenger (intent owner)
+    const c1 = makeCounter(b, { payment: 'SGD 20' });    // seat terms
+    b = applyOutbound(b, c1);
+    a = applyInbound(a, c1, pkB)!;
+    const acc = makeAccept(b, 'tg:@bob');
+    b = applyOutbound(b, acc);
+    a = applyInbound(a, acc, pkB)!;
+    expect(a.state).toBe('confirmed');
+
+    // Driver requests cancel; passenger declines → back to confirmed.
+    const req = makeCancelRequest(b);
+    b = applyOutbound(b, req);
+    a = applyInbound(a, req, pkB)!;
+    expect(a.state).toBe('cancel_requested');
+    a = applyOutbound(a, makeCancelDecline(a));
+    expect(a.state).toBe('confirmed');
+
+    // Replaying that SAME request must be ignored (already in the log).
+    expect(applyInbound(a, req, pkB)).toBeNull();
+    expect(a.state).toBe('confirmed');
+
+    // Trip completes; a replayed request must still be ignored.
+    const done = makeStatus(b, 'completed');
+    a = applyInbound(a, done, pkB)!;
+    expect(a.stage).toBe('completed');
+    expect(applyInbound(a, req, pkB)).toBeNull();
+    expect(a.state).toBe('confirmed');
+    expect(a.stage).toBe('completed');
   });
 
   it('parses only valid envelopes', () => {

@@ -3,3 +3,22 @@ dist/
 .expo/
 *.log
 .DS_Store
+
+# Secrets & signing material — never commit
+.env
+.env.*
+*.p8
+*.pem
+*.key
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+*.certSigningRequest
+google-services.json
+GoogleService-Info.plist
+
+# Build artifacts (use EAS / releases, not git)
+*.aab
+*.apk
+*.ipa

@@ -1,0 +1,7 @@
+{
+  "name": "expo-background-task",
+  "version": "1.0.0",
+  "description": "iOS beginBackgroundTask bridge to keep the relay socket alive briefly when backgrounded",
+  "main": "index.ts",
+  "private": true
+}

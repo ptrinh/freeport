@@ -1,0 +1,53 @@
+{
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "channel": "preview",
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": false
+      }
+    },
+    "preview-sim": {
+      "extends": "preview",
+      "ios": {
+        "simulator": true
+      },
+      "channel": "preview-sim"
+    },
+    "production": {
+      "channel": "production",
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascApiKeyPath": "./store/fastlane-AuthKey_Y44R3985XS.p8",
+        "ascApiKeyId": "Y44R3985XS",
+        "ascApiKeyIssuerId": "4ff9ebe9-3f49-429f-a20e-604dc979e5b9",
+        "ascAppId": "6781200901"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./store/play-service-account.json",
+        "track": "internal",
+        "releaseStatus": "draft"
+      }
+    }
+  }
+}

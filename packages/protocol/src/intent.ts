@@ -24,10 +24,13 @@ export interface BuildIntentInput {
   d?: string;
   /** Geohashes to tag for location-scoped discovery. */
   geohashes?: string[];
+  /** Extra topic (`t`) tags for sharded discovery (location/category/subcategory). */
+  topics?: string[];
   createdAt?: number;
 }
 
-export function buildIntentEvent(input: BuildIntentInput, secretKey: Uint8Array): Event {
+/** Build the unsigned intent event template (for external signers, e.g. NIP-07). */
+export function buildIntentTemplate(input: BuildIntentInput): EventTemplate {
   const content: IntentContent = {
     v: SCHEMA_VERSION,
     side: input.side,
@@ -47,13 +50,18 @@ export function buildIntentEvent(input: BuildIntentInput, secretKey: Uint8Array)
     [PROTOCOL_TAG, String(SCHEMA_VERSION)],
   ];
   for (const g of input.geohashes ?? []) tags.push(['g', g]);
-  const template: EventTemplate = {
+  // Sharded topic tags (e.g. vn_hanoi, vn_hanoi_ridesharing, …) — deduped.
+  for (const t of [...new Set(input.topics ?? [])]) tags.push(['t', t]);
+  return {
     kind: kindForSide(input.side),
     created_at: input.createdAt ?? Math.floor(Date.now() / 1000),
     tags,
     content: JSON.stringify(content),
   };
-  return finalizeEvent(template, secretKey);
+}
+
+export function buildIntentEvent(input: BuildIntentInput, secretKey: Uint8Array): Event {
+  return finalizeEvent(buildIntentTemplate(input), secretKey);
 }
 
 /**

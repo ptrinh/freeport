@@ -2,18 +2,86 @@
   "expo": {
     "name": "Freeport",
     "slug": "freeport",
+    "owner": "ptrinh",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "icon": "./assets/icon.png",
     "ios": {
-      "bundleIdentifier": "uk.trinh.freeport"
+      "bundleIdentifier": "uk.trinh.freeport",
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "buildNumber": "5"
     },
     "android": {
-      "package": "uk.trinh.freeport"
+      "package": "uk.trinh.freeport",
+      "softwareKeyboardLayoutMode": "pan",
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB70aRYEMJlBtl3LgvnBpGe6dkKuJhwJY4"
+        }
+      },
+      "versionCode": 5
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-asset"
-    ]
+      "expo-asset",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Freeport uses your location to set your pickup point and show nearby rides and services."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Freeport needs photo access so you can attach pictures to your profile, listings and messages.",
+          "cameraPermission": "Freeport needs camera access so you can take photos to attach to listings and messages."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Freeport uses the microphone so you can record and send voice messages."
+        }
+      ],
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "color": "#3b82f6"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1c014d95-0907-4e4c-a65a-8beedf0fc805"
+      },
+      "webBase": "https://freeport.trinh.uk"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1c014d95-0907-4e4c-a65a-8beedf0fc805"
+    }
   }
 }

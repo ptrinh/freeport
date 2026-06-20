@@ -1,0 +1,7 @@
+{
+  "name": "expo-cloud-backup",
+  "version": "1.0.0",
+  "description": "Cloud identity backup — iCloud Keychain (iOS) / Google Block Store (Android)",
+  "main": "index.ts",
+  "private": true
+}

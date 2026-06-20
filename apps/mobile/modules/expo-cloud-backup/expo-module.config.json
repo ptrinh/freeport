@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["FreeportCloudBackupModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.cloudbackup.FreeportCloudBackupModule"]
+  }
+}

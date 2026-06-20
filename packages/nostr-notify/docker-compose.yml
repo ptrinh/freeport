@@ -1,0 +1,21 @@
+services:
+  freeport-nostr-notify:
+    image: freeport-nostr-notify:latest
+    container_name: freeport-nostr-notify
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8789:8789"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8789
+      - DATA_DIR=/data
+      - VAPID_SUBJECT=mailto:admin@trinh.uk
+      # Pin VAPID keys via env so subscriptions survive a volume wipe (optional):
+      # - VAPID_PUBLIC_KEY=...
+      # - VAPID_PRIVATE_KEY=...
+      # - FREEPORT_RELAYS=wss://relay.damus.io,wss://nos.lol,...
+    volumes:
+      - notify-data:/data
+
+volumes:
+  notify-data:

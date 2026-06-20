@@ -1,0 +1,34 @@
+services:
+  freeport-nostr-mcp:
+    image: freeport-nostr-mcp:latest
+    container_name: freeport-nostr-mcp
+    restart: unless-stopped
+    # Bound to loopback only; public access is via the Cloudflare tunnel,
+    # matching the host's other services (Hestia holds 80/443).
+    ports:
+      - "127.0.0.1:8788:8788"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8788
+      # Rate limits (per-IP + global token buckets). See src/ratelimit.ts.
+      - RATE_LIMIT_PER_MIN=300
+      - RATE_LIMIT_BURST=60
+      - RATE_LIMIT_GLOBAL_PER_MIN=2500
+      # Web Push notifier (shares this hostname). Set ENABLE_NOTIFY=0 for MCP-only.
+      - ENABLE_NOTIFY=1
+      - DATA_DIR=/data
+      - VAPID_SUBJECT=mailto:admin@trinh.uk
+      # Pin VAPID keys via env so push subscriptions survive a volume wipe:
+      # - VAPID_PUBLIC_KEY=...
+      # - VAPID_PRIVATE_KEY=...
+      # - FREEPORT_RELAYS=wss://relay.damus.io,wss://nos.lol,...
+    volumes:
+      - notify-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:8788/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  notify-data:

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Freeport — Privacy Policy</title>
+<meta name="color-scheme" content="dark light" />
+<style>
+  :root { color-scheme: dark light; }
+  body { margin: 0; background: #06080c; color: #e7ecf3;
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 32px 20px 80px; }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 30px; margin: 0 0 4px; }
+  h2 { font-size: 20px; margin: 32px 0 8px; }
+  .sub { color: #8b97a6; margin: 0 0 24px; }
+  a { color: #6ea8ff; }
+  code { background: #11151c; padding: 1px 5px; border-radius: 5px; }
+  ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+  .muted { color: #8b97a6; }
+  hr { border: none; border-top: 1px solid #1c2430; margin: 28px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Freeport — Privacy Policy</h1>
+  <p class="sub">Last updated: 17 June 2026</p>
+
+  <p>Freeport is a decentralized, peer-to-peer marketplace built on the Nostr
+  protocol. There is no Freeport server, no account, and no sign-up. Your
+  identity is a cryptographic key created on your device. This policy explains
+  what data the app handles and where it goes.</p>
+
+  <h2>The short version</h2>
+  <ul>
+    <li>We do <strong>not</strong> operate a server that collects or stores your data.</li>
+    <li>We do <strong>not</strong> run analytics, advertising, trackers, or data brokers.</li>
+    <li>Your identity key is generated and stored <strong>on your device</strong>. We never receive it.</li>
+    <li>Direct messages are <strong>end-to-end encrypted</strong> (Nostr NIP-04); we cannot read them.</li>
+    <li>Listings you post are <strong>public</strong> by design — they are broadcast to public Nostr relays.</li>
+  </ul>
+
+  <h2>Information handled by the app</h2>
+  <ul>
+    <li><strong>Identity key.</strong> A Nostr keypair is generated locally and stored in your device's
+      secure storage (iOS Keychain / Android Keystore via Expo SecureStore, or browser storage on web).
+      You may optionally back it up to your own iCloud Keychain (iOS), Google Block Store (Android), or an
+      exported file. In all cases the key stays under your control; Freeport's developer never receives it.</li>
+    <li><strong>Profile.</strong> A display name, optional bio, optional photos, and a phone number you choose
+      to add. Your profile is published to public Nostr relays so counterparties can reach you. You choose
+      whether your phone number is shown <em>masked</em> or in full; the full number is otherwise shared only
+      through an encrypted direct message after a deal is confirmed.</li>
+    <li><strong>Listings &amp; deals.</strong> Ride/service/goods requests and offers you post are public Nostr
+      events. They include the listing details, a price, and a <strong>coarse</strong> location (a ~city /
+      neighborhood-level geohash). Precise GPS coordinates are <strong>not</strong> published.</li>
+    <li><strong>Messages.</strong> Negotiation and chat happen over Nostr direct messages, which are
+      end-to-end encrypted (NIP-04). They are relayed by public Nostr relays that you cannot be individually
+      identified to beyond your public key.</li>
+    <li><strong>Location.</strong> With your permission, the app uses your device location to set your pickup
+      point and show nearby listings. If you decline, it falls back to a coarse, IP-based location from a
+      third-party lookup. Only a coarse geohash is ever attached to public listings.</li>
+    <li><strong>Photos / microphone / camera.</strong> Used only when you choose to attach an image or record
+      a voice message. Media you attach is uploaded to a third-party media host (nostr.build) and referenced by
+      URL in your public listing or encrypted message.</li>
+    <li><strong>Notifications.</strong> If you enable them, local/push notifications alert you to new messages.
+      Web push, where used, relies on your browser/OS push service.</li>
+  </ul>
+
+  <h2>Third parties your data may reach</h2>
+  <p>Because Freeport has no backend of its own, data flows directly from your device to decentralized or
+  third-party infrastructure that you or the network rely on:</p>
+  <ul>
+    <li><strong>Public Nostr relays</strong> — carry your public listings, profile, and encrypted messages.</li>
+    <li><strong>nostr.build</strong> — hosts images/voice clips you choose to attach.</li>
+    <li><strong>IP-geolocation providers</strong> (ipwho.is, ipapi.co) — used only as a coarse location fallback
+      when device location is unavailable.</li>
+    <li><strong>Apple / Google</strong> — only if you opt into cloud key backup or enable push notifications.</li>
+    <li><strong>Google Maps</strong> — renders maps on Android.</li>
+  </ul>
+  <p class="muted">Each of these operates under its own privacy policy. Freeport does not sell or share your
+  data with anyone for advertising or marketing.</p>
+
+  <h2>Data retention &amp; deletion</h2>
+  <ul>
+    <li>App data lives on your device. Deleting the app (and any cloud backup you created) removes your local copy.</li>
+    <li>Public events already broadcast to Nostr relays are outside any single party's control and may persist on
+      relays you do not operate. Listings carry an expiration tag (NIP-40), but individual relays decide how long
+      to keep data. Treat anything you publish publicly as potentially permanent.</li>
+  </ul>
+
+  <h2>Children</h2>
+  <p>Freeport is not directed to children and is intended for users 17+.</p>
+
+  <h2>Changes</h2>
+  <p>We may update this policy; the "last updated" date reflects the latest version.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about privacy: <a href="mailto:privacy@trinh.uk">privacy@trinh.uk</a></p>
+
+  <hr />
+  <p class="muted">Freeport · a peer-to-peer marketplace on Nostr · <a href="https://freeport.trinh.uk">freeport.trinh.uk</a></p>
+</main>
+</body>
+</html>
