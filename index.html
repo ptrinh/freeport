@@ -29,6 +29,8 @@
   .btn-primary:hover{background:#2f6fe0;text-decoration:none}
   .btn-ghost{background:transparent;color:var(--text);border-color:var(--border)}
   .btn-ghost:hover{border-color:var(--text3);text-decoration:none}
+  .btn-appstore{background:#000;color:#fff;border-color:#2b2b2b}
+  .btn-appstore:hover{background:#161616;text-decoration:none}
 
   /* Language switch */
   .langbar{position:absolute;top:16px;right:22px;font-size:14px;color:var(--text3);z-index:5}
@@ -96,9 +98,10 @@
     <h1 data-i18n="h1">The marketplace with no middleman.</h1>
     <p class="tag" data-i18n="tag">Freeport is a decentralized, peer-to-peer marketplace for rides, services and goods — built on Nostr. No company in the middle, no commission, no account. Your keys, your price.</p>
     <div class="cta">
+      <a class="btn btn-appstore" href="https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901" target="_blank" rel="noopener" data-i18n="cta_ios">&#xF8FF;&nbsp; Download on the App Store</a>
       <a class="btn btn-primary" href="https://freeport.trinh.uk" data-i18n="cta_open">Open the web app</a>
       <a class="btn btn-ghost" href="#how" data-i18n="cta_how">How it works</a>
-      <span class="soon" data-i18n="soon">📱 Native iOS &amp; Android apps coming soon</span>
+      <span class="soon" data-i18n="soon">🤖 Android app coming soon</span>
     </div>
   </div>
 </header>
@@ -140,7 +143,7 @@
 
 <section>
   <div class="wrap" style="text-align:center">
-    <span class="pill" data-i18n="live">Live now on the web</span>
+    <span class="pill" data-i18n="live">Live now on iOS &amp; the web</span>
     <h2 data-i18n="see_h">See it in action</h2>
     <p class="lead" style="margin-left:auto;margin-right:auto" data-i18n="see_lead">Request a ride, set your price, and negotiate directly — right from your browser.</p>
     <div class="shots">
@@ -153,6 +156,7 @@
 <footer>
   <div class="wrap">
     <div class="links">
+      <a href="https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901" target="_blank" rel="noopener" data-i18n="ft_ios">iOS app</a>
       <a href="https://freeport.trinh.uk" data-i18n="ft_app">Web app</a>
       <a id="wp-foot" href="whitepaper.pdf" target="_blank" rel="noopener" data-i18n="ft_wp">Whitepaper</a>
       <a href="https://freeport.trinh.uk/privacy" data-i18n="ft_privacy">Privacy Policy</a>
@@ -168,9 +172,10 @@ const I18N = {
   vi: {
     h1: "Chợ không có trung gian.",
     tag: "Freeport là một chợ ngang hàng, phi tập trung cho xe cộ, dịch vụ và hàng hóa — xây trên Nostr. Không công ty đứng giữa, không hoa hồng, không tài khoản. Khóa của bạn, giá của bạn.",
+    cta_ios: "&#xF8FF;&nbsp; Tải trên App Store",
     cta_open: "Mở ứng dụng web",
     cta_how: "Cách hoạt động",
-    soon: "📱 Ứng dụng iOS &amp; Android sắp ra mắt",
+    soon: "🤖 Ứng dụng Android sắp ra mắt",
     why_h: "Vì sao chọn Freeport",
     why_lead: "Một mạng ngang hàng thực sự — không phải thêm một nền tảng ăn phần trăm và giữ dữ liệu của bạn.",
     f1_h: "Không trung gian", f1_p: "Giao dịch trực tiếp với người kia và tự thỏa thuận giá. Không phí nền tảng, không tăng giá giờ cao điểm.",
@@ -187,10 +192,10 @@ const I18N = {
     wp_h: "Đọc whitepaper",
     wp_lead: "Toàn bộ giao thức: ý định đã ký, thương lượng mã hóa, biên nhận giao dịch đồng ký, và uy tín như một đại lượng chủ quan khiến danh tính giả trở nên vô trọng lượng.",
     wp_btn: "Mở whitepaper (PDF)",
-    live: "Đang hoạt động trên web",
+    live: "Đã có trên iOS &amp; web",
     see_h: "Xem thử",
     see_lead: "Yêu cầu một chuyến xe, đặt giá của bạn, và thương lượng trực tiếp — ngay trên trình duyệt.",
-    ft_app: "Ứng dụng web", ft_wp: "Whitepaper", ft_privacy: "Chính sách riêng tư", ft_how: "Cách hoạt động",
+    ft_ios: "Ứng dụng iOS", ft_app: "Ứng dụng web", ft_wp: "Whitepaper", ft_privacy: "Chính sách riêng tư", ft_how: "Cách hoạt động",
     ft_support: 'Hỗ trợ &amp; câu hỏi: <a href="mailto:freeport@trinh.uk">freeport@trinh.uk</a>',
     ft_copy: "© Phil Trinh · Freeport — chợ ngang hàng trên Nostr",
   }
