@@ -1,0 +1,78 @@
+#!/usr/bin/env node
+/**
+ * Streamable-HTTP entry — the hosted public endpoint (behind a TLS tunnel).
+ *
+ * Serves two things on ONE hostname:
+ *  - POST /mcp — the stateless, read-only MCP endpoint (fresh server+transport
+ *    per request, all sharing the process-wide `sharedPool`).
+ *  - the Web Push notifier routes (/subscribe, /vapidPublicKey, /unsubscribe),
+ *    which are stateful (subscription store + VAPID secret + a long-lived relay
+ *    watcher). Enabled by default; set ENABLE_NOTIFY=0 to run MCP-only.
+ */
+import express from 'express';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { createServer, sharedPool, NAME, VERSION } from './server.js';
+import { rateLimit } from './ratelimit.js';
+import { mountNotify, type Notifier } from './notify/routes.js';
+
+const PORT = Number(process.env.PORT ?? 8788);
+const HOST = process.env.HOST ?? '127.0.0.1';
+const NOTIFY = process.env.ENABLE_NOTIFY !== '0';
+const DATA_DIR = process.env.DATA_DIR ?? './data';
+
+const app = express();
+// Behind the Cloudflare tunnel: trust the proxy so req.ip / forwarded headers
+// are meaningful (the rate limiter prefers CF-Connecting-IP regardless).
+app.set('trust proxy', true);
+app.use(express.json({ limit: '256kb' }));
+
+// Rate-limit only the MCP/notify routes; /health stays free for the healthcheck.
+const limiter = rateLimit();
+
+// Stand up the notifier (if enabled) before routes so /health can report it.
+let notifier: Notifier | null = null;
+if (NOTIFY) notifier = mountNotify(app, sharedPool.relays, DATA_DIR, limiter);
+
+app.get('/health', (_req, res) => {
+  res.json({
+    ok: true, name: NAME, version: VERSION, relays: sharedPool.relays,
+    notify: notifier ? { enabled: true, subscriptions: notifier.store.size() } : { enabled: false },
+  });
+});
+
+app.post('/mcp', limiter, async (req, res) => {
+  const server = createServer(); // uses sharedPool by default
+  const transport = new StreamableHTTPServerTransport({
+    sessionIdGenerator: undefined, // stateless
+    enableJsonResponse: true,
+  });
+  res.on('close', () => {
+    transport.close();
+    server.close();
+  });
+  try {
+    await server.connect(transport);
+    await transport.handleRequest(req, res, req.body);
+  } catch (err) {
+    if (!res.headersSent) {
+      res.status(500).json({
+        jsonrpc: '2.0', id: null,
+        error: { code: -32603, message: 'Internal server error' },
+      });
+    }
+    console.error('[freeport-nostr] request error', err);
+  }
+});
+
+// GET/DELETE are only meaningful in stateful (SSE-stream) mode; reject cleanly.
+const methodNotAllowed = (_req: express.Request, res: express.Response) =>
+  res.status(405).json({
+    jsonrpc: '2.0', id: null,
+    error: { code: -32000, message: 'Method not allowed (stateless server).' },
+  });
+app.get('/mcp', limiter, methodNotAllowed);
+app.delete('/mcp', limiter, methodNotAllowed);
+
+app.listen(PORT, HOST, () => {
+  console.error(`[freeport-nostr] HTTP server on http://${HOST}:${PORT}/mcp${NOTIFY ? ' (+notify)' : ''}`);
+});

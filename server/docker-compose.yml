@@ -1,0 +1,39 @@
+# Run the Freeport Nostr MCP + push notifier with one command:
+#   docker compose up -d
+# Then point an MCP client at http://localhost:8788/mcp and check
+# http://localhost:8788/health
+services:
+  freeport-nostr-mcp:
+    build: .
+    image: freeport-nostr-mcp:local
+    container_name: freeport-nostr-mcp
+    restart: unless-stopped
+    ports:
+      - "8788:8788"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8788
+      # Rate limits (per-IP + global token buckets). See packages/nostr-mcp/src/ratelimit.ts
+      - RATE_LIMIT_PER_MIN=300
+      - RATE_LIMIT_BURST=60
+      - RATE_LIMIT_GLOBAL_PER_MIN=2500
+      # Push notifier (shares this hostname). Set ENABLE_NOTIFY=0 for an MCP-only server.
+      - ENABLE_NOTIFY=1
+      - DATA_DIR=/data
+      - VAPID_SUBJECT=mailto:you@example.com
+      # Pin VAPID keys so push subscriptions survive a volume wipe (generate with:
+      #   docker compose run --rm freeport-nostr-mcp node -e "console.log(require('web-push').generateVAPIDKeys())")
+      # - VAPID_PUBLIC_KEY=...
+      # - VAPID_PRIVATE_KEY=...
+      # Override the default relay set if you like:
+      # - FREEPORT_RELAYS=wss://relay.damus.io,wss://nos.lol,wss://relay.primal.net
+    volumes:
+      - notify-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:8788/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  notify-data:

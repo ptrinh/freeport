@@ -1,0 +1,18 @@
+{
+  "name": "freeport-nostr-mcp-server",
+  "private": true,
+  "version": "0.5.0",
+  "description": "Self-hostable Freeport server: a read-only Nostr MCP endpoint that doubles as a Web Push / Expo push notifier.",
+  "license": "MIT",
+  "workspaces": [
+    "packages/protocol",
+    "packages/nostr-mcp"
+  ],
+  "scripts": {
+    "build": "npm run build -w @freeport/protocol -w freeport-nostr-mcp",
+    "start": "node packages/nostr-mcp/dist/http.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

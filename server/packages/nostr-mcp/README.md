@@ -1,0 +1,60 @@
+# freeport-nostr-mcp
+
+An MCP server that lets AI agents **search Freeport's decentralized Nostr marketplace** — ride requests, driver/provider offers, service & product posts, and reputation — by **kind, tag, and geohash radius**. Read-only; never signs or publishes; never touches encrypted DMs.
+
+## Tools
+
+| Tool | What it does |
+|------|--------------|
+| `nostr_search_intents` | Offers/requests by side + topic tags + distance radius. Decoded, expiry-filtered, sorted nearest-first. |
+| `nostr_search_reputation` | Karma ratings (kind 32103) + proven deal count (kind 32104 receipt pairs) for a pubkey. |
+| `nostr_profile` | NIP-01 profile metadata (kind 0) for any pubkey(s), optionally with recent notes. General-purpose. |
+| `nostr_get_event` | Fetch events by id. |
+| `nostr_query_raw` | Arbitrary NIP-01 filter escape hatch. |
+
+Every query tool accepts an optional `relays` array to override the relay set for that call (ws/wss only, max 10, private/loopback hosts blocked).
+
+On connect, the server sends an **instructions** string and exposes two **resources** so an agent self-onboards: `freeport://relays` (active relay set) and `freeport://protocol` (event kinds, intent schema, discovery tags, tool usage).
+
+## Example agent prompts
+
+- "Find ride requests within 10 km of {lat},{lon} in Hanoi." → `nostr_search_intents { side:"request", near:{lat,lon,radiusKm:10}, topics:["vn_hanoi_ridesharing"] }`
+- "Any plumbers offering service near me right now?" → `nostr_search_intents { side:"offer", near:{...}, topics:["<area>_homeservices_plumbing"] }`
+- "Is this seller trustworthy before I deal with them?" → `nostr_search_reputation { pubkey }`
+- "Who is npub… and what have they posted?" → `nostr_profile { pubkeys:["<hex>"], recentNotes:5 }`
+- "Show me everything new in my city in the last hour." → `nostr_search_intents { topics:["<area>"], since:<unix-1h> }`
+
+## Run
+
+```bash
+# stdio (Claude Desktop / registry self-host)
+npx freeport-nostr-mcp
+
+# hosted HTTP endpoint
+PORT=8788 npm run start:http   # POST /mcp, GET /health
+```
+
+`FREEPORT_RELAYS` (comma-separated wss URLs) overrides the default relay set.
+
+## Scalability
+
+- **One shared `SimplePool`** — a single websocket per relay, multiplexed across all requests.
+- **Short-TTL query cache + in-flight dedup** — repeated/identical agent queries collapse to one relay round-trip.
+- **Stateless HTTP** — no per-session state; scale horizontally behind a load balancer (add a shared cache like Redis if you run multiple nodes).
+- **Rate limiting** (hosted endpoint) — per-IP + global token buckets return `429` with `Retry-After`. Tunables: `RATE_LIMIT_PER_MIN` (default 60), `RATE_LIMIT_GLOBAL_PER_MIN` (1200), `RATE_LIMIT_BURST` (20). Behind Cloudflare it keys on `CF-Connecting-IP`. `/health` is exempt.
+
+## Web Push notifier (same hostname)
+
+The HTTP server also runs a self-hostable, content-blind **Web Push** notifier on the same host — so anyone running this becomes a push host for Freeport web/PWA users (incl. iOS 16.4+ Home-Screen installs). It does **not** push to the native App Store iOS app (that needs Apple's APNs key, runnable only by the app owner). Set `ENABLE_NOTIFY=0` for MCP-only.
+
+| Route | Purpose |
+|-------|---------|
+| `GET /vapidPublicKey` | Public key — clients create a push subscription bound to this host. |
+| `POST /subscribe` | `{ subscription, filters }`; `filters`: `{ kinds?, topics?, near?{lat,lon,radiusKm} }`. |
+| `POST /unsubscribe` | `{ id }`. |
+
+It watches relays for new intents matching each subscriber's filters and sends a short generic notification. Config: `DATA_DIR` (subscription store + VAPID keys), `VAPID_SUBJECT`, optional `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` to pin keys across redeploys. Stores only opaque push keys + coarse filters — no identity or message content.
+
+## Geohash radius note
+
+Nostr relay filters match tag values **exactly** — no prefix/radius operator. `nostr_search_intents` filters by topic (`#t`) at the relay and refines distance **client-side** via haversine on each post's `g` tag. To push radius filtering to the relay (`relaySideGeohash: true`), posts must carry **multi-precision geohash prefix tags**; today they carry a single precision-6 `g`, so relay-side geohash is opt-in and a no-op until publishers add prefix tags.
