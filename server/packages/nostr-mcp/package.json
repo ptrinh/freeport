@@ -1,6 +1,6 @@
 {
   "name": "freeport-nostr-mcp",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "MCP server for searching Freeport Nostr events (ride requests, driver/provider offers, service & product posts, reputation) by kind, tag, and geohash radius.",
   "type": "module",
   "mcpName": "io.github.ptrinh/freeport-nostr",
