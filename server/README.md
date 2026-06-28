@@ -47,8 +47,9 @@ Then:
 - `nostr_profile` — a pubkey's profile (kind 0)
 - `nostr_get_event` — fetch one event by id
 - `nostr_query_raw` — generic relay filter (advanced)
+- `freeport_create_post` — **write** (optional, off unless `ENABLE_WRITE=1`): publish an offer/request. Provide a dedicated agent `secretKey` (server builds + signs; the key is used transiently and never stored/logged) **or** a pre-signed `event` (keyless). Strict per-key + global write rate limits apply.
 
-All tools accept a per-call `relays` override (capped by `MAX_RELAYS`).
+Read tools accept a per-call `relays` override (capped by `MAX_RELAYS`).
 
 ## Configuration
 

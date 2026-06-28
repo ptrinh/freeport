@@ -27,6 +27,11 @@ services:
       # - VAPID_PRIVATE_KEY=...
       # Override the default relay set if you like:
       # - FREEPORT_RELAYS=wss://relay.damus.io,wss://nos.lol,wss://relay.primal.net
+      # Optional WRITE surface: let agents publish posts via the freeport_create_post
+      # tool. OFF by default. Strict per-key + global write rate limits apply.
+      # - ENABLE_WRITE=1
+      # - WRITE_PER_MIN=5
+      # - WRITE_GLOBAL_PER_MIN=60
     volumes:
       - notify-data:/data
     healthcheck:

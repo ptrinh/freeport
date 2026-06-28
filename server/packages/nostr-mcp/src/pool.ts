@@ -9,7 +9,8 @@
  * - In-flight de-duplication: concurrent identical queries await the same
  *   promise instead of each opening a subscription.
  *
- * Read-only. This module never signs or publishes.
+ * Queries never sign. `publish` sends an already-signed event (the optional,
+ * rate-limited write path) — signing happens in the write tool, not here.
  */
 import { SimplePool } from 'nostr-tools/pool';
 import type { Event, Filter } from 'nostr-tools';
@@ -61,6 +62,20 @@ export class RelayPool {
 
     if (ttl > 0) this.inflight.set(key, run);
     return run;
+  }
+
+  /**
+   * Publish an already-signed event to relays. Resolves with which relays
+   * accepted / rejected; succeeds as long as at least one accepts.
+   */
+  async publish(event: Event, relays?: string[]): Promise<{ ok: string[]; failed: string[] }> {
+    const useRelays = relays?.length ? relays : this.relays;
+    const results = await Promise.allSettled(this.pool.publish(useRelays, event as any));
+    const ok: string[] = [];
+    const failed: string[] = [];
+    results.forEach((r, i) => (r.status === 'fulfilled' ? ok : failed).push(useRelays[i]));
+    if (ok.length === 0) throw new Error('No relay accepted the event.');
+    return { ok, failed };
   }
 
   /** Open a subscription, gather events until EOSE or timeout, then close. */

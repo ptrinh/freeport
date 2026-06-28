@@ -33,7 +33,7 @@ jobs:
           images: ghcr.io/ptrinh/freeport-nostr-mcp
           tags: |
             type=raw,value=latest
-            type=raw,value=0.5.0
+            type=raw,value=0.6.0
 
       - uses: docker/build-push-action@v6
         with:
