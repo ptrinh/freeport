@@ -38,16 +38,20 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = (event.notification.data && event.notification.data.url) || '/';
+  const data = event.notification.data || {};
+  const url = data.url || '/';
+  const tab = data.tab;
   event.waitUntil(
     (async () => {
       const clientsArr = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
       for (const client of clientsArr) {
         if ('focus' in client) {
-          try { await client.navigate(url); } catch (_) {}
+          // Already open: switch tabs in place (no reload) via a message.
+          try { client.postMessage({ type: 'freeport-nav', tab }); } catch (_) {}
           return client.focus();
         }
       }
+      // Cold open: the app reads ?tab= on load and lands on the right screen.
       if (self.clients.openWindow) return self.clients.openWindow(url);
     })(),
   );

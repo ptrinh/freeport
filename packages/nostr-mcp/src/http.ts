@@ -24,6 +24,21 @@ const app = express();
 // Behind the Cloudflare tunnel: trust the proxy so req.ip / forwarded headers
 // are meaningful (the rate limiter prefers CF-Connecting-IP regardless).
 app.set('trust proxy', true);
+
+// CORS: the web app / iOS PWA (e.g. freeport.trinh.uk) and browser-based MCP
+// clients call these endpoints cross-origin. They carry no cookies/credentials,
+// so any origin is safe. Without this, the browser blocks /vapidPublicKey and
+// /subscribe and the PWA reports "couldn't reach the notification service".
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, mcp-session-id, mcp-protocol-version');
+  res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
+  res.setHeader('Access-Control-Max-Age', '86400');
+  if (req.method === 'OPTIONS') { res.status(204).end(); return; }
+  next();
+});
+
 app.use(express.json({ limit: '256kb' }));
 
 // Rate-limit only the MCP/notify routes; /health stays free for the healthcheck.

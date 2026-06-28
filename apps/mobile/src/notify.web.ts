@@ -29,11 +29,22 @@ export async function requestNotifications(): Promise<boolean> {
   } catch { return false; }
 }
 
-export async function notify(title: string, body: string): Promise<void> {
+/** Tab a tapped notification should open. */
+export type NotifTarget = { tab?: 'post' | 'messages' | 'browse' | 'settings' };
+
+// On web, taps are handled by the service worker's `notificationclick` (which
+// navigates / postMessages the app), so this is a no-op for API parity.
+export function onNotificationTap(_cb: (data: NotifTarget) => void): () => void {
+  return () => {};
+}
+
+export async function notify(title: string, body: string, data?: NotifTarget): Promise<void> {
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  const url = data?.tab ? `/?tab=${data.tab}` : '/';
   try {
     // Prefer the service worker registration: it shows the notification even
-    // when the page is backgrounded, and matches the SW push styling.
+    // when the page is backgrounded, and matches the SW push styling. The `data`
+    // is read by the SW's notificationclick handler to deep-link on tap.
     if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.getRegistration();
       if (reg) {
@@ -42,12 +53,14 @@ export async function notify(title: string, body: string): Promise<void> {
           icon: '/icons/icon-192.png',
           badge: '/icons/icon-192.png',
           tag: 'freeport-msg',
+          data: { url, tab: data?.tab },
         });
         return;
       }
     }
     // Fallback: page-level notification (works while the tab is alive).
-    new Notification(title, { body, icon: '/icons/icon-192.png' });
+    const n = new Notification(title, { body, icon: '/icons/icon-192.png' });
+    n.onclick = () => { try { window.focus(); if (data?.tab) location.search = `?tab=${data.tab}`; } catch { /* ignore */ } };
   } catch {
     /* best-effort */
   }

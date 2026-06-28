@@ -541,7 +541,7 @@ const c: Record<string, string> = {
   "New offer on your post": "Đề nghị mới cho bài đăng của bạn",
   "Your deal is confirmed": "Giao dịch của bạn đã được xác nhận",
   "Updates paused": "Đã tạm dừng cập nhật",
-  "Freeport was paused in the background, so new-offer alerts have stopped. Keep the app open or check back periodically for updates.": "Freeport đã bị tạm dừng ở chế độ nền nên thông báo về ưu đãi mới đã ngừng. Hãy giữ ứng dụng mở hoặc kiểm tra lại định kỳ để nhận cập nhật.",
+  "Freeport was paused in the background, so new-offer alerts have stopped. Keep the app open or check back periodically for updates.": "Freeport đã bị tạm dừng ở chế độ nền nên thông báo về đề nghị mới đã ngừng. Hãy giữ ứng dụng mở hoặc kiểm tra lại định kỳ để nhận cập nhật.",
   "Back up to a file instead": "Sao lưu ra tệp thay vì vậy",
   "Saved to {name}.": "Đã lưu vào {name}.",
   "Backed up to your {name} account — restores automatically on a new device.": "Đã sao lưu vào tài khoản {name} của bạn — tự động khôi phục trên thiết bị mới.",

@@ -60,8 +60,26 @@ export async function requestNotifications(): Promise<boolean> {
   } catch { return false; }
 }
 
-/** Fire an immediate local notification. No-op until permission is granted. */
-export async function notify(title: string, body: string): Promise<void> {
+/** Tab a tapped notification should open (carried in the notification's data). */
+export type NotifTarget = { tab?: 'post' | 'messages' | 'browse' | 'settings' };
+
+/**
+ * Wire a callback for when the user TAPS a notification (local or push),
+ * including a cold start launched from one. Returns an unsubscribe fn.
+ */
+export function onNotificationTap(cb: (data: NotifTarget) => void): () => void {
+  Notifications.getLastNotificationResponseAsync()
+    .then((r) => { if (r) cb((r.notification.request.content.data ?? {}) as NotifTarget); })
+    .catch(() => {});
+  const sub = Notifications.addNotificationResponseReceivedListener((r) => {
+    cb((r.notification.request.content.data ?? {}) as NotifTarget);
+  });
+  return () => sub.remove();
+}
+
+/** Fire an immediate local notification. No-op until permission is granted.
+ *  `data` (e.g. {tab}) is attached so tapping it can deep-link into the app. */
+export async function notify(title: string, body: string, data?: NotifTarget): Promise<void> {
   if (!ready) return;
   try {
     let trigger: Notifications.NotificationTriggerInput;
@@ -82,7 +100,7 @@ export async function notify(title: string, body: string): Promise<void> {
         : { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 1 }
       ) as Notifications.NotificationTriggerInput;
     }
-    await Notifications.scheduleNotificationAsync({ content: { title, body }, trigger });
+    await Notifications.scheduleNotificationAsync({ content: { title, body, data: data ?? {} }, trigger });
   } catch {
     /* best-effort */
   }

@@ -59,7 +59,7 @@ import { wheelTick, eventAlert } from './src/haptics';
 import { onWheelDemo, triggerWheelDemo } from './src/wheelDemo';
 import { Fireworks } from './src/Fireworks';
 import { installDebugApi, registerDebugClient } from './src/debug';
-import { initNotifications, notify, notificationGranted, requestNotifications } from './src/notify';
+import { initNotifications, notify, notificationGranted, requestNotifications, onNotificationTap } from './src/notify';
 import { beginBackgroundTask, endBackgroundTask } from './src/backgroundTask';
 import { uploadImage, uploadFile, UploadError } from './src/upload';
 import { startRecording, stopRecording, playAudio } from './src/voice';
@@ -254,7 +254,16 @@ function TripViewer({ view }: { view: TripView }) {
 
 function AppInner() {
   const insets = useSafeAreaInsets();
-  const [tab, setTab] = useState<Tab>('post');
+  // Set when a notification tap (or a `?tab=` deep link) chose the tab, so the
+  // role-based auto-tab effects below don't override the user's intent.
+  const deepLinkedRef = useRef(false);
+  const [tab, setTab] = useState<Tab>(() => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location) {
+      const t = new URLSearchParams(window.location.search).get('tab');
+      if (t === 'messages' || t === 'browse' || t === 'post' || t === 'settings') { deepLinkedRef.current = true; return t as Tab; }
+    }
+    return 'post';
+  });
   const [messagesView, setMessagesView] = useState<'active' | 'completed'>('active');
   // Celebration: fireworks overlay (deal completed / onboarding done) + the deal id
   // whose rating panel should glow after the fireworks finish.
@@ -455,7 +464,7 @@ function AppInner() {
       if (wantNag) {
         nagTimer = setTimeout(() => {
           suspendNotifiedRef.current = Date.now();
-          notify(t('Updates paused'), t('Freeport was paused in the background, so new-offer alerts have stopped. Keep the app open or check back periodically for updates.'));
+          notify(t('Updates paused'), t('Freeport was paused in the background, so new-offer alerts have stopped. Keep the app open or check back periodically for updates.'), { tab: 'browse' });
         }, 5000);
       }
       // Hold the extended-background window longer (~25s) so the relay socket
@@ -588,8 +597,9 @@ function AppInner() {
       setLanguage(p.language || systemLanguage()); // '' pref = follow the device language
       setFareConfigState(p.fareConfig);
       setFareConfig(p.fareConfig); // point the estimator at the saved coefficients
-      // Drivers/providers browse listings first → open Browse on launch.
-      if (p.role === 'driver') setTab('browse');
+      // Drivers/providers browse listings first → open Browse on launch (unless
+      // a notification tap / deep link already chose a tab).
+      if (p.role === 'driver' && !deepLinkedRef.current) setTab('browse');
 
       // A location the user explicitly chose (onboarding confirm / Settings) is
       // sticky — never silently overwrite it with a coarse IP guess on later
@@ -635,7 +645,7 @@ function AppInner() {
   useEffect(() => {
     autoMsgDone.current = false;
     const id = setTimeout(() => {
-      if (autoMsgDone.current) return;
+      if (autoMsgDone.current || deepLinkedRef.current) return;
       const { role: r, tab: tb, myIntents: mi, negos: ng } = autoMsgState.current;
       if (r !== 'passenger' || tb !== 'post') return;
       const nowSec = Math.floor(Date.now() / 1000);
@@ -647,6 +657,21 @@ function AppInner() {
     }, 4000);
     return () => clearTimeout(id);
   }, [initVersion]);
+
+  // Deep-link on notification tap. Native: a tapped local/push notification
+  // (incl. cold start). Web: the service worker postMessages an open client.
+  useEffect(() => {
+    const go = (t: unknown) => {
+      if (t === 'messages' || t === 'browse' || t === 'post' || t === 'settings') { deepLinkedRef.current = true; setTab(t); }
+    };
+    if (Platform.OS !== 'web') {
+      return onNotificationTap((data) => go(data?.tab));
+    }
+    if (typeof navigator === 'undefined' || !navigator.serviceWorker) return;
+    const handler = (e: MessageEvent) => { if (e.data?.type === 'freeport-nav') go(e.data.tab); };
+    navigator.serviceWorker.addEventListener('message', handler);
+    return () => navigator.serviceWorker.removeEventListener('message', handler);
+  }, []);
 
   // Currency follows the set location; before one is set (or when GPS/IP
   // detection returns empty), fall back to the device locale's region rather
@@ -710,7 +735,7 @@ function AppInner() {
             && subcategoryOf(i.content.schema, pl) === bp.subcategory;
           if (matches) {
             if (bp.sound && AppState.currentState === 'active') eventAlert();
-            if (bp.notify && !pushOnRef.current) notify(t('New post'), (i.content.title || '').trim() || `${t(bp.category)} · ${t(bp.subcategory)}`);
+            if (bp.notify && !pushOnRef.current) notify(t('New post'), (i.content.title || '').trim() || `${t(bp.category)} · ${t(bp.subcategory)}`, { tab: 'browse' });
           }
         }
         intentsIndex.current.set(key, i);
@@ -747,7 +772,7 @@ function AppInner() {
           body = msg.type === MSG_ACCEPT ? t('Your deal is confirmed')
             : t('New activity on your deal');
         }
-        notify('Freeport', body);
+        notify('Freeport', body, { tab: 'messages' });
       };
       // Re-sort the feed when an author's profile/reputation arrives (karma &
       // distance sorts depend on it) — batched via the same flush.
@@ -2480,14 +2505,20 @@ function PostTab({
       <ScrollView contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
         {(() => {
           const nowSec = Math.floor(Date.now() / 1000);
-          // Hide posts that are no longer live: withdrawn after a deal, or past
-          // their expiry / requested time with no confirmed deal (those surface
-          // as a System notice in Messages instead). Re-evaluated on the minute tick.
+          // Show only LIVE, still-open requests here. Drop:
+          //  - withdrawn posts;
+          //  - posts that have closed a confirmed deal — those are managed in
+          //    Messages (Active while in progress, Completed when done) and can't
+          //    be cancelled from here anyway, so leaving them lingered as an
+          //    "open request" with no cancel button was confusing;
+          //  - posts past their expiry / requested time (surface as a System
+          //    notice in Messages instead). Re-evaluated on the minute tick.
           const posts = myIntents.filter((i) => {
             if ((i.content.payload as any)?.withdrawn) return false;
-            const deadByTime = i.content.expires_at < nowSec || (!!i.content.window && i.content.window.start < nowSec);
             const confirmed = negos.some((n) => n.intent.id === i.id && n.state === 'confirmed');
-            if (deadByTime && !confirmed) return false;
+            if (confirmed) return false;
+            const deadByTime = i.content.expires_at < nowSec || (!!i.content.window && i.content.window.start < nowSec);
+            if (deadByTime) return false;
             return true;
           });
           if (posts.length === 0) return null;

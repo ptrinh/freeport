@@ -91,7 +91,7 @@ const c: Record<string, string> = {
   "Next": "下一步",
   "Tap here to find rides, negotiate, or accept a ride.": "点这里查找行程、议价或接单。",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "达成交易后，点这里聊天、议价或取消行程。",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "在这里编辑你的信息。备份你的身份，以免换设备时丢失业力积分。",
+  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "在这里编辑你的信息。备份你的身份，以免换设备时丢失 karma 积分。",
   "Posted": "已发布",
   "Your ride request is live.": "您的叫车请求已上线。",
   "Your service offer is live.": "您的服务报价已上线。",

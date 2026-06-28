@@ -355,7 +355,7 @@ const c: Record<string, string> = {
   "⭐⭐ Excellent": "⭐⭐ Ausgezeichnet",
   "⭐ Good": "⭐ Gut",
   "⚠️ Poor": "⚠️ Mangelhaft",
-  "{deals} deals · {partners} partners · {inNetwork} in your network": "{deals} Angebote · {partners} Partner · {inNetwork} in deinem Netzwerk",
+  "{deals} deals · {partners} partners · {inNetwork} in your network": "{deals} Deals · {partners} Partner · {inNetwork} in deinem Netzwerk",
   "verified by {n}": "verifiziert von {n}",
   "{n} results": "{n} Ergebnisse",
   "Showing {n} of {m} — scroll for more": "{n} von {m} werden angezeigt — scrolle für mehr",
