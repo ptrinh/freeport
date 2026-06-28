@@ -22,3 +22,5 @@ GoogleService-Info.plist
 *.aab
 *.apk
 *.ipa
+*service-account*.json
+play-service-account.json

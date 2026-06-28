@@ -13,7 +13,6 @@
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.3",
     "@freeport/protocol": "file:../../packages/protocol",
-    "@notifee/react-native": "^9.1.8",
     "@react-native-community/datetimepicker": "8.4.4",
     "@react-native-picker/picker": "2.11.1",
     "@types/leaflet": "^1.9.21",

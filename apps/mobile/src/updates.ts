@@ -14,6 +14,51 @@ import { Platform } from 'react-native';
 import * as Updates from 'expo-updates';
 import Constants from 'expo-constants';
 import * as Application from 'expo-application';
+import { kvGet, kvSet } from './kv';
+
+// ── Update track ("which release to follow") ────────────────────────────────
+// Two EAS channels: `production` = Latest (newest), `stable` = one release
+// behind. A user can pick either; we override the channel at runtime (needs
+// `updates.disableAntiBrickingMeasures` in app.json — present from app v0.2.0).
+const UPDATE_URL = 'https://u.expo.dev/1c014d95-0907-4e4c-a65a-8beedf0fc805';
+export type UpdateTrack = 'latest' | 'stable';
+const TRACK_CHANNEL: Record<UpdateTrack, string> = { latest: 'production', stable: 'stable' };
+const TRACK_KEY = 'freeport.updateTrack';
+
+/** OTA tracks are only switchable on native builds that ship the override flag,
+ *  which first lands in the 0.2.0 binary. Gate on the native binary version
+ *  (NOT OTA-overridable) so this code can ride a 0.1.0 OTA to current users
+ *  without surfacing a dead toggle on builds that lack the flag. */
+export function trackSupported(): boolean {
+  if (Platform.OS === 'web' || !Updates.isEnabled) return false;
+  const v = Application.nativeApplicationVersion ?? '0.0.0';
+  const [a = 0, b = 0] = v.split('.').map((n) => parseInt(n, 10) || 0);
+  return a > 0 || (a === 0 && b >= 2); // >= 0.2.0
+}
+
+/** The track the user has chosen (defaults to Latest). */
+export async function getTrack(): Promise<UpdateTrack> {
+  return (await kvGet(TRACK_KEY)) === 'stable' ? 'stable' : 'latest';
+}
+
+/** Point OTA at the chosen track's channel. Safe to call on every launch; a
+ *  no-op on web or on builds without the anti-bricking flag. */
+export function applyTrack(track: UpdateTrack): void {
+  if (!trackSupported()) return;
+  try {
+    Updates.setUpdateURLAndRequestHeadersOverride({
+      updateUrl: UPDATE_URL,
+      requestHeaders: { 'expo-channel-name': TRACK_CHANNEL[track] },
+    });
+  } catch { /* flag absent on this build — leave the baked channel in place */ }
+}
+
+/** Persist + apply a track, then fetch that track's head (caller reloads on 'updated'). */
+export async function setTrack(track: UpdateTrack): Promise<UpdateResult> {
+  await kvSet(TRACK_KEY, track).catch(() => {});
+  applyTrack(track);
+  return checkForUpdate();
+}
 
 /**
  * Live "is an OTA update being fetched right now" flag, for the header status.

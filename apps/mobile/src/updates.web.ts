@@ -8,6 +8,13 @@ import Constants from 'expo-constants';
 export type UpdateOutcome = 'updated' | 'up-to-date' | 'unsupported' | 'error';
 export interface UpdateResult { outcome: UpdateOutcome; message?: string }
 
+// Web has no OTA channels — the browser always serves the newest deploy.
+export type UpdateTrack = 'latest' | 'stable';
+export function trackSupported(): boolean { return false; }
+export async function getTrack(): Promise<UpdateTrack> { return 'latest'; }
+export function applyTrack(_track: UpdateTrack): void { /* no-op on web */ }
+export async function setTrack(_track: UpdateTrack): Promise<UpdateResult> { return { outcome: 'up-to-date' }; }
+
 export function versionLabel(): string {
   return `v${Constants.expoConfig?.version ?? '—'} · web`;
 }

@@ -3,7 +3,7 @@
     "name": "Freeport",
     "slug": "freeport",
     "owner": "ptrinh",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
@@ -14,7 +14,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "5"
+      "buildNumber": "8"
     },
     "android": {
       "package": "uk.trinh.freeport",
@@ -24,18 +24,21 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
-        "android.permission.READ_MEDIA_IMAGES",
         "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "blockedPermissions": [
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO"
       ],
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyB70aRYEMJlBtl3LgvnBpGe6dkKuJhwJY4"
         }
       },
-      "versionCode": 5
+      "versionCode": 11
     },
     "web": {
       "bundler": "metro",
@@ -81,7 +84,9 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/1c014d95-0907-4e4c-a65a-8beedf0fc805"
+      "url": "https://u.expo.dev/1c014d95-0907-4e4c-a65a-8beedf0fc805",
+      "disableAntiBrickingMeasures": true,
+      "checkAutomatically": "ON_ERROR_RECOVERY"
     }
   }
 }

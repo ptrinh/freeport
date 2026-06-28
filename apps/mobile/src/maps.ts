@@ -28,6 +28,19 @@ export function routeUrl(from: string, to: string): string {
 }
 
 /**
+ * Turn-by-turn navigation link to a single destination. Origin is omitted so
+ * Google Maps starts from the user's *current* location — what a driver heading
+ * to a pickup, or a provider heading to a job, actually wants.
+ */
+export function dirUrl(dest: string): string {
+  return (
+    'https://www.google.com/maps/dir/?api=1' +
+    `&destination=${encodeURIComponent(dest)}` +
+    '&travelmode=driving'
+  );
+}
+
+/**
  * A Google-Maps place param from a geohash: precise "lat,lon" when the geohash
  * decodes (i.e. the user pinned a real point), else the human label as fallback.
  */
@@ -58,7 +71,7 @@ export function placeUrl(name: string, geohash?: string): string {
  */
 export async function geohashForPlace(name: string, fallback: string): Promise<string> {
   const c = await forwardGeocode(name);
-  return c ? geohashEncode(c.latitude, c.longitude, 6) : fallback;
+  return c ? geohashEncode(c.latitude, c.longitude, 10) : fallback;
 }
 
 /**
@@ -122,9 +135,14 @@ export function distanceKmBetweenGeohashes(a: string, b: string): number | null 
   return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
 
-/** Encode picked map coordinates to a 6-char geohash (±0.6km). */
+/**
+ * Encode picked map coordinates to a high-precision 10-char geohash (~±0.6m) so
+ * navigation goes to the EXACT pin, not a fuzzy cell centre. Relay `#g` filtering
+ * uses only a coarse 5-char PREFIX of this (see `geohashes: [gh.slice(0, 5)]` at
+ * post time), so the higher precision here doesn't change location bucketing.
+ */
 export function coordsToGeohash(latitude: number, longitude: number): string {
-  return geohashEncode(latitude, longitude, 6);
+  return geohashEncode(latitude, longitude, 10);
 }
 
 export interface RawLocation { countryCode?: string; region?: string; city?: string }

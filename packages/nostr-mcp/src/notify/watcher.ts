@@ -64,10 +64,15 @@ export class Watcher {
 
   private async onIntent(ev: Event): Promise<void> {
     const offer = ev.kind % 2 === 1; // 32101 offer (odd) / 32102 request (even)
+    // Intents are PUBLIC, so the push can name what it is (unlike encrypted DMs).
+    let title = '';
+    try { const c = JSON.parse(ev.content); if (typeof c?.title === 'string') title = c.title.trim().slice(0, 80); } catch { /* ignore */ }
+    const label = offer ? 'New offer near you' : 'New request near you';
+    const body = title ? `${label}: ${title}` : label;
     for (const rec of this.store.all()) {
       if (!matches(ev, rec.filters)) continue;
       await this.maybePush(rec, ev.id, {
-        body: offer ? 'New offer near you' : 'New request near you',
+        body,
         tag: 'freeport-intent',
         data: { kind: ev.kind, id: ev.id, url: '/' },
       });

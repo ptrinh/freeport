@@ -6,8 +6,11 @@
  * fires (without it the app suspends in ~5s and the timer never runs).
  * `endBackgroundTask()` releases it.
  *
- * No-op on Android (uses a foreground service) and web (the native module is
- * absent, so requireOptionalNativeModule returns null).
+ * No-op on Android — there is no equivalent extended-background API (that was
+ * the removed foreground service); Android relies on the time-interval local
+ * notification trigger in notify.ts to survive suspend, and on push for
+ * closed-app delivery. Also no-op on web (the native module is absent, so
+ * requireOptionalNativeModule returns null).
  */
 import { requireOptionalNativeModule } from 'expo-modules-core';
 

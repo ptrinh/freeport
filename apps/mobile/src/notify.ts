@@ -65,20 +65,22 @@ export async function notify(title: string, body: string): Promise<void> {
   if (!ready) return;
   try {
     let trigger: Notifications.NotificationTriggerInput;
-    if (Platform.OS === 'android') {
-      // `{ channelId }` is an immediate trigger routed to our HIGH-importance channel.
-      trigger = { channelId: CHANNEL_ID } as Notifications.NotificationTriggerInput;
-    } else if (Platform.OS === 'ios') {
-      // iOS: a `null` (immediate) trigger requested while the app is backgrounding
-      // can be dropped — the process suspends before UNUserNotificationCenter
-      // presents it, so the banner only shows when the app is reopened. Handing
-      // iOS a short time-interval trigger schedules it as a real local
-      // notification that the OS presents on the lock screen / banner even after
-      // we suspend (within the begin-background-task window). 1s is below the
-      // perceptible delay but enough to survive the background→suspend race.
-      trigger = { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 1 } as Notifications.NotificationTriggerInput;
+    if (Platform.OS === 'web') {
+      trigger = null;
     } else {
-      trigger = null; // web / other
+      // Both iOS AND Android now suspend the process quickly in the background —
+      // Android no longer runs a foreground service to stay awake. An immediate
+      // trigger requested while the app is backgrounding can be dropped before the
+      // OS presents it (the process suspends first), so the banner only shows on
+      // reopen. A short time-interval trigger hands the OS a real scheduled local
+      // notification it presents on the lock screen / banner even after we
+      // suspend. 1s is below the perceptible delay but enough to survive the
+      // background→suspend race. On Android the channel is set on the trigger so
+      // it still routes to our HIGH-importance channel.
+      trigger = (Platform.OS === 'android'
+        ? { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 1, channelId: CHANNEL_ID }
+        : { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 1 }
+      ) as Notifications.NotificationTriggerInput;
     }
     await Notifications.scheduleNotificationAsync({ content: { title, body }, trigger });
   } catch {

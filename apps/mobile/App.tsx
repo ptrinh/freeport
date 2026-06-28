@@ -12,6 +12,7 @@ import {
   FlatList,
   Image,
   KeyboardAvoidingView,
+  PanResponder,
   Linking,
   Modal,
   Platform,
@@ -45,9 +46,9 @@ import {
   type Negotiation,
   type ProposedTerms,
 } from '@freeport/protocol';
-import { loadKey, createKey, clearKey, npubFromHex, npubOf, getStoredNsec } from './src/identity';
+import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, getStoredNsec } from './src/identity';
 import { backupToFile, restoreFromFile, buildCloudBundle, restoreFromBundleText } from './src/backup';
-import { cloudAvailable, cloudSave, cloudRestore, cloudName } from './src/cloudBackup';
+import { cloudAvailable, cloudSave, cloudRestore, cloudClear, cloudName } from './src/cloudBackup';
 import { LocalSigner, Nip07Signer, hasNip07, type Signer } from './src/signer';
 import { karmaLabel, type KarmaScore } from './src/karma';
 import { query } from './src/query';
@@ -59,14 +60,13 @@ import { onWheelDemo, triggerWheelDemo } from './src/wheelDemo';
 import { Fireworks } from './src/Fireworks';
 import { installDebugApi, registerDebugClient } from './src/debug';
 import { initNotifications, notify, notificationGranted, requestNotifications } from './src/notify';
-import { startBackgroundService, stopBackgroundService } from './src/foregroundService';
 import { beginBackgroundTask, endBackgroundTask } from './src/backgroundTask';
 import { uploadImage, uploadFile, UploadError } from './src/upload';
 import { startRecording, stopRecording, playAudio } from './src/voice';
 import { loadAddressBook, addRecent, togglePinned, isPinned, type AddressBook } from './src/addressbook';
 import { loadProfile, saveProfile, maskPhone, maskPlate, isDisplayablePhone, defaultAvatarUrl, type UserProfile, type PhoneDisplay } from './src/profile';
 import { normalizePhone, detectDialCode, dialForCountry } from './src/phone';
-import { routeUrl, placeUrl, placeParam, geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, locationGranted, requestLocationPermission, reverseGeocode, detectRawLocationGPS, detectRawLocationIP, detectCoordsIP, distanceKmBetweenGeohashes, formatDistance, suggest } from './src/maps';
+import { routeUrl, placeUrl, placeParam, dirUrl, geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, locationGranted, requestLocationPermission, reverseGeocode, detectRawLocationGPS, detectRawLocationIP, detectCoordsIP, distanceKmBetweenGeohashes, formatDistance, suggest } from './src/maps';
 import { loadPrefs, savePrefs, type Prefs, type UserLocation } from './src/prefs';
 import { LANGUAGE_CODES, languageLabel, systemLanguage, systemCountry } from './src/language';
 import { SERVICE_CATEGORIES, SERVICE_SUBCATEGORIES, RIDESHARE_CATEGORY, RIDESHARE_SUBCATEGORIES, DEFAULT_RIDESHARE_SUBCATEGORY, VEHICLE_ICONS, VEHICLE_SEATERS, CATEGORY_ICONS, SUBCATEGORY_ICONS, categoryIcon, subcategoryIcon, categoryOf, subcategoryOf, subcategoriesFor } from './src/categories';
@@ -74,9 +74,9 @@ import { intentTopics, browseTopic } from './src/topics';
 import { applySideBackdrop } from './src/sideBackdrop';
 import { suggestPrice, estimateFare, setFareConfig, defaultFareConfig, type PriceSuggestion, type FareConfig } from './src/pricing';
 import { pushSupported, enablePush, updatePush, disablePush, pushStatus, type PushStatus, type PushFilters } from './src/push';
-import { createTripSession, tripLink, decodeTripHash, publishTripLocation, subscribeTrip, type TripStatic, type TripSession, type TripView, type TripUpdate } from './src/livetrip';
+import { createTripSession, tripLink, tripSecret, restoreTripSession, decodeTripHash, publishTripLocation, subscribeTrip, type TripStatic, type TripSession, type TripView, type TripUpdate } from './src/livetrip';
 import { webBase } from './src/webBase';
-import { versionLabel, checkForUpdate, applyUpdate, useUpdateState } from './src/updates';
+import { versionLabel, checkForUpdate, applyUpdate, useUpdateState, getTrack, applyTrack, setTrack, trackSupported, type UpdateTrack } from './src/updates';
 import { useWebUpdateAvailable } from './src/webUpdate';
 import { SimplePool } from 'nostr-tools/pool';
 import { getPow } from 'nostr-tools/nip13';
@@ -362,9 +362,28 @@ function AppInner() {
   const [browseAlertSound, setBrowseAlertSound] = useState(false);
   const [browseAlertNotify, setBrowseAlertNotify] = useState(false);
   const [browseMaxDistance, setBrowseMaxDistance] = useState(100);
+  const [sendLocationOnDeal, setSendLocationOnDeal] = useState(true);
   const [role, setRole] = useState<'passenger' | 'driver' | ''>('');
   // The onIntent handler is a one-time closure; read live browse-alert prefs via a ref.
   const browseAlertRef = useRef({ category: '', subcategory: '', sound: false, notify: false });
+  // Whether the push notification server is the active notifier. When it is, the
+  // app skips its own local fallback notifications so a message alerts only once
+  // (the server push), instead of doubling up when you open the app.
+  const pushOnRef = useRef(false);
+  useEffect(() => {
+    const read = () => { kvGet('freeport.pushOn').then((v) => { pushOnRef.current = v === '1'; }).catch(() => {}); };
+    read();
+    const sub = AppState.addEventListener('change', (st) => { if (st === 'active') read(); });
+    return () => sub.remove();
+  }, []);
+  // Honour the chosen OTA track on launch: point updates at its channel BEFORE
+  // checking, then stage that track's newest bundle (applied on the next launch).
+  // Native auto-check is off (checkAutomatically=ON_ERROR_RECOVERY) so this is
+  // the single, track-aware update check.
+  useEffect(() => {
+    if (!trackSupported()) return;
+    getTrack().then((tk) => { applyTrack(tk); checkForUpdate().catch(() => {}); }).catch(() => {});
+  }, []);
   useEffect(() => {
     // A Driver's category is fixed to Ridesharing (stored as ''), so resolve the
     // effective category here to match categoryOf() on incoming posts.
@@ -564,12 +583,11 @@ function AppInner() {
       setBrowseAlertSound(p.browseAlertSound);
       setBrowseAlertNotify(p.browseAlertNotify);
       setBrowseMaxDistance(p.browseMaxDistance);
+      setSendLocationOnDeal(p.sendLocationOnDeal);
       setRole(p.role);
       setLanguage(p.language || systemLanguage()); // '' pref = follow the device language
       setFareConfigState(p.fareConfig);
       setFareConfig(p.fareConfig); // point the estimator at the saved coefficients
-      // Resume the Android background service if the user left it on.
-      if (p.backgroundService) startBackgroundService();
       // Drivers/providers browse listings first → open Browse on launch.
       if (p.role === 'driver') setTab('browse');
 
@@ -692,7 +710,7 @@ function AppInner() {
             && subcategoryOf(i.content.schema, pl) === bp.subcategory;
           if (matches) {
             if (bp.sound && AppState.currentState === 'active') eventAlert();
-            if (bp.notify) notify(t('New post'), `${t(bp.category)} · ${t(bp.subcategory)}`);
+            if (bp.notify && !pushOnRef.current) notify(t('New post'), (i.content.title || '').trim() || `${t(bp.category)} · ${t(bp.subcategory)}`);
           }
         }
         intentsIndex.current.set(key, i);
@@ -710,10 +728,25 @@ function AppInner() {
       // in-app Messages badge already covers the foreground. Content-blind body.
       c.onIncomingMessage = (_nego, msg) => {
         if (AppState.currentState === 'active') { eventAlert(); return; } // in-app sound+haptic
-        const body = msg.type === MSG_CHAT ? t('New message')
-          : msg.type === MSG_COUNTER ? t('New offer on your post')
-          : msg.type === MSG_ACCEPT ? t('Your deal is confirmed')
-          : t('New activity on your deal');
+        if (pushOnRef.current) return; // the notification server handles background → avoid a double alert
+        // The app can decrypt, so show the actual chat text (media types as a
+        // friendly label). Server pushes stay content-blind for privacy.
+        let body: string;
+        if (msg.type === MSG_CHAT) {
+          const txt = (msg.text || '').trim();
+          body = !txt ? t('New message')
+            : isImageMsg(txt) ? '📷 ' + t('Photo')
+            : isAudioMsg(txt) ? '🎙 ' + t('Voice memo')
+            : isTripMsg(txt) ? '📍 ' + t('Live location')
+            : txt.length > 120 ? txt.slice(0, 117) + '…' : txt;
+        } else if (msg.type === MSG_COUNTER) {
+          // Surface the proposed price/terms, not just "an offer arrived".
+          const pay = (msg.terms?.payment || '').trim();
+          body = pay ? `${t('New offer on your post')}: ${pay}` : t('New offer on your post');
+        } else {
+          body = msg.type === MSG_ACCEPT ? t('Your deal is confirmed')
+            : t('New activity on your deal');
+        }
         notify('Freeport', body);
       };
       // Re-sort the feed when an author's profile/reputation arrives (karma &
@@ -870,13 +903,15 @@ function AppInner() {
   // missing vehicle details (rideshare Driver only) is derived synchronously.
   const [locOk, setLocOk] = useState(true);
   const [notifOk, setNotifOk] = useState(true);
-  // Web can't always offer notifications (a plain Safari tab has no Notification
-  // API at all), so let web users permanently dismiss that required action.
-  const [notifDismissed, setNotifDismissed] = useState<boolean>(() => {
-    try { return Platform.OS === 'web' && (globalThis as any).localStorage?.getItem('freeport.notifDismiss') === '1'; } catch { return false; }
-  });
+  // Notifications are optional, so let users permanently dismiss that required
+  // action on every platform. Persisted via kv (localStorage on web, SecureStore
+  // on native) so it survives relaunch; loaded async since native storage is async.
+  const [notifDismissed, setNotifDismissed] = useState(false);
+  useEffect(() => {
+    kvGet('freeport.notifDismiss').then((v) => { if (v === '1') setNotifDismissed(true); }).catch(() => {});
+  }, []);
   const dismissNotif = React.useCallback(() => {
-    try { (globalThis as any).localStorage?.setItem('freeport.notifDismiss', '1'); } catch { /* ignore */ }
+    kvSet('freeport.notifDismiss', '1').catch(() => {});
     setNotifDismissed(true);
   }, []);
   const refreshRequired = React.useCallback((override?: { loc?: boolean; notif?: boolean }) => {
@@ -1123,7 +1158,7 @@ function AppInner() {
       </Animated.View>
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnit={effectiveDistanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
       {tab === 'post' && <PostTab client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} />}
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} sendLocationOnDeal={sendLocationOnDeal} />}
       {tab === 'settings' && (
         <SettingsTab
           npub={npub}
@@ -1173,6 +1208,11 @@ function AppInner() {
           onDistanceUnitChange={(u) => {
             setDistanceUnit(u);
             savePrefs({ distanceUnit: u }).catch(() => {});
+          }}
+          sendLocationOnDeal={sendLocationOnDeal}
+          onSendLocationOnDealChange={(v) => {
+            setSendLocationOnDeal(v);
+            savePrefs({ sendLocationOnDeal: v }).catch(() => {});
           }}
           browseCategory={browseCategory}
           browseSubcategory={browseSubcategory}
@@ -1226,6 +1266,31 @@ function AppInner() {
             signerRef.current = null;
             setTab('post');
             setOnboarding(true);
+          }}
+          onDeleteAccount={async () => {
+            // Permanent account deletion. Best-effort NETWORK cleanup first (needs
+            // the key): withdraw my live posts and blank my public profile so
+            // others stop seeing me, then remove off-device copies.
+            try {
+              if (client) {
+                for (const i of myIntents) { try { await client.withdrawIntent(i); } catch {} }
+                const blank: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+                try { await client.publishProfile(blank); } catch {}
+              }
+            } catch {}
+            try { await cloudClear(); } catch {}                       // delete cloud backup of the key
+            try { const p = await loadPrefs(); await disablePush(client?.pubkey ?? '', (p.notifyEndpoint || '').trim()); } catch {} // unsubscribe push
+            await kvSet('freeport.pushOn', '0').catch(() => {});
+            // Erase EVERYTHING on this device (key, profile, settings, posts, deals…).
+            await wipeAllLocalData();
+            setFareConfig(null); setFareConfigState(null);
+            if (useNip07) setUseNip07(false);
+            const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+            setRole(''); setProfile(empty); setNpub('');
+            resetIntents(); setNegos([]); setMyIntents([]);
+            setExpiredLog([]); setExpiredSeen(new Set());
+            setClient(null); signerRef.current = null;
+            setTab('post'); setOnboarding(true);
           }}
           onScroll={onContentScroll}
         />
@@ -1788,6 +1853,7 @@ function MarketTab({
   const [drillCategory, setDrillCategory] = useState<string | null>(initCat);
   const PAGE_SIZE = 50;
   const [limit, setLimit] = useState(PAGE_SIZE);
+  const [cardViewerUri, setCardViewerUri] = useState<string | null>(null); // full-screen post image
   // Re-evaluate the feed every 30s so a post drops off as soon as it passes its
   // expiry / requested time — without waiting for an unrelated re-render.
   const [nowTick, setNowTick] = useState(() => Math.floor(Date.now() / 1000));
@@ -2025,6 +2091,9 @@ function MarketTab({
       showsVerticalScrollIndicator={false}
       keyExtractor={(i) => i.id}
       contentContainerStyle={{ paddingVertical: 8 }}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
+      automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
       onEndReachedThreshold={0.5}
       onEndReached={() => { if (hasMore) setLimit((l) => l + PAGE_SIZE); }}
       removeClippedSubviews
@@ -2126,7 +2195,9 @@ function MarketTab({
             {Array.isArray(p.images) && p.images.length > 0 && (
               <View style={s.imageGrid}>
                 {(p.images as string[]).map((url: string) => (
-                  <Image key={url} source={{ uri: url }} style={s.imageThumb} />
+                  <Pressable key={url} onPress={() => setCardViewerUri(url)}>
+                    <Image source={{ uri: url }} style={s.imageThumb} />
+                  </Pressable>
                 ))}
               </View>
             )}
@@ -2195,6 +2266,24 @@ function MarketTab({
         );
       }}
     />
+    <Modal visible={!!cardViewerUri} transparent animationType="fade" onRequestClose={() => setCardViewerUri(null)}>
+      <View style={s.imgViewerBackdrop}>
+        <ScrollView
+          style={s.imgViewerScroll}
+          contentContainerStyle={s.imgViewerContent}
+          maximumZoomScale={4}
+          minimumZoomScale={1}
+          centerContent
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        >
+          {cardViewerUri ? <Image source={{ uri: cardViewerUri }} style={s.imgViewerImage} resizeMode="contain" /> : null}
+        </ScrollView>
+        <Pressable style={s.imgViewerClose} onPress={() => setCardViewerUri(null)} hitSlop={12}>
+          <Ionicons name="close" size={26} color="#fff" />
+        </Pressable>
+      </View>
+    </Modal>
     </View>
   );
 }
@@ -2389,7 +2478,43 @@ function PostTab({
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
-        <Pressable style={s.collapseHeader} onPress={() => setFormOpen((v) => !v)}>
+        {(() => {
+          const nowSec = Math.floor(Date.now() / 1000);
+          // Hide posts that are no longer live: withdrawn after a deal, or past
+          // their expiry / requested time with no confirmed deal (those surface
+          // as a System notice in Messages instead). Re-evaluated on the minute tick.
+          const posts = myIntents.filter((i) => {
+            if ((i.content.payload as any)?.withdrawn) return false;
+            const deadByTime = i.content.expires_at < nowSec || (!!i.content.window && i.content.window.start < nowSec);
+            const confirmed = negos.some((n) => n.intent.id === i.id && n.state === 'confirmed');
+            if (deadByTime && !confirmed) return false;
+            return true;
+          });
+          if (posts.length === 0) return null;
+          // Still waiting on at least one live post that hasn't closed a deal yet.
+          const waiting = posts.some(
+            (i) => i.content.expires_at >= nowSec && !negos.some((n) => n.intent.id === i.id && n.state === 'confirmed'),
+          );
+          return (
+            <>
+              {waiting && (
+                <View style={{ marginBottom: 2 }}>
+                  <WaitingBar />
+                  <Text style={s.dim}>{t('Waiting for offers from Drivers/Providers… You will receive a message once someone accepts your offer.')}</Text>
+                </View>
+              )}
+              <Pressable style={[s.collapseHeader, { marginTop: waiting ? 14 : 0 }]} onPress={() => setPostsOpen((v) => !v)}>
+                <Text style={s.sectionTitle}>{t(role === 'passenger' ? 'My Requests' : 'My Posts')} ({posts.length})</Text>
+                <Text style={s.collapseChevron}>{postsOpen ? '▾' : '▸'}</Text>
+              </Pressable>
+              {postsOpen && [...posts]
+                .sort((a, b) => b.createdAt - a.createdAt)
+                .map((intent) => <MyPostCard key={intent.d} intent={intent} negos={negos} client={client} />)}
+            </>
+          );
+        })()}
+
+        <Pressable style={[s.collapseHeader, { marginTop: 28 }]} onPress={() => setFormOpen((v) => !v)}>
           <Text style={s.collapseTitle}>{formTitle}</Text>
           <Text style={s.collapseChevron}>{formOpen ? '▾' : '▸'}</Text>
         </Pressable>
@@ -2417,42 +2542,6 @@ function PostTab({
             </Animated.View>
           </>
         )}
-
-        {(() => {
-          const nowSec = Math.floor(Date.now() / 1000);
-          // Hide posts that are no longer live: withdrawn after a deal, or past
-          // their expiry / requested time with no confirmed deal (those surface
-          // as a System notice in Messages instead). Re-evaluated on the minute tick.
-          const posts = myIntents.filter((i) => {
-            if ((i.content.payload as any)?.withdrawn) return false;
-            const deadByTime = i.content.expires_at < nowSec || (!!i.content.window && i.content.window.start < nowSec);
-            const confirmed = negos.some((n) => n.intent.id === i.id && n.state === 'confirmed');
-            if (deadByTime && !confirmed) return false;
-            return true;
-          });
-          if (posts.length === 0) return null;
-          // Still waiting on at least one live post that hasn't closed a deal yet.
-          const waiting = posts.some(
-            (i) => i.content.expires_at >= nowSec && !negos.some((n) => n.intent.id === i.id && n.state === 'confirmed'),
-          );
-          return (
-            <>
-              {waiting && (
-                <View style={{ marginTop: 28, marginBottom: 2 }}>
-                  <WaitingBar />
-                  <Text style={s.dim}>{t('Waiting for offers from Drivers/Providers… You will receive a message once someone accepts your offer.')}</Text>
-                </View>
-              )}
-              <Pressable style={[s.collapseHeader, { marginTop: waiting ? 14 : 28 }]} onPress={() => setPostsOpen((v) => !v)}>
-                <Text style={s.sectionTitle}>{t(role === 'passenger' ? 'My Requests' : 'My Posts')} ({posts.length})</Text>
-                <Text style={s.collapseChevron}>{postsOpen ? '▾' : '▸'}</Text>
-              </Pressable>
-              {postsOpen && [...posts]
-                .sort((a, b) => b.createdAt - a.createdAt)
-                .map((intent) => <MyPostCard key={intent.d} intent={intent} negos={negos} client={client} />)}
-            </>
-          );
-        })()}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -2854,14 +2943,74 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
 // over Nostr (kind 30420, throwaway key) on a foreground interval and hands out
 // a "#trip=…" link anyone can open to watch live. Foreground-only on web — the
 // browser pauses timers/geolocation when the tab is backgrounded.
-function LiveTripShare({ client, info }: { client: MobileClient | null; info: TripStatic }) {
+/**
+ * Slide-to-confirm control — drag the thumb to the end to fire onConfirm.
+ * Used for stage advances (Picked up / Completed) so they can't be tapped by
+ * accident. JS-driven translateX (setValue during drag + spring/timing release).
+ */
+function SlideToConfirm({ label, onConfirm }: { label: string; onConfirm: () => void }) {
+  const c = palette;
+  const THUMB = 54;
+  const x = useRef(new Animated.Value(0)).current;
+  const maxRef = useRef(0);
+  const doneRef = useRef(false);
+  const pan = useRef(
+    PanResponder.create({
+      // The thumb owns the gesture from touch-down so the drag can't be stolen,
+      // and we bias to horizontal so a vertical drift doesn't hand off to scroll.
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_e, g) => Math.abs(g.dx) >= Math.abs(g.dy),
+      onMoveShouldSetPanResponderCapture: (_e, g) => Math.abs(g.dx) >= Math.abs(g.dy) && Math.abs(g.dx) > 2,
+      // Once dragging, do NOT surrender the responder to an ancestor
+      // ScrollView/FlatList when the finger drifts vertically — that was what
+      // froze the slide mid-track.
+      onPanResponderTerminationRequest: () => false,
+      onShouldBlockNativeResponder: () => true,
+      onPanResponderMove: (_e, g) => {
+        x.setValue(Math.min(maxRef.current, Math.max(0, g.dx)));
+      },
+      onPanResponderRelease: (_e, g) => {
+        const max = maxRef.current;
+        const nx = Math.min(max, Math.max(0, g.dx));
+        if (max > 0 && nx >= max - 6 && !doneRef.current) {
+          doneRef.current = true;
+          Animated.timing(x, { toValue: max, duration: 100, useNativeDriver: false }).start(() => onConfirm());
+        } else {
+          Animated.spring(x, { toValue: 0, useNativeDriver: false, bounciness: 0 }).start();
+        }
+      },
+      // If the OS still force-terminates the gesture, snap back instead of freezing.
+      onPanResponderTerminate: () => {
+        if (!doneRef.current) Animated.spring(x, { toValue: 0, useNativeDriver: false, bounciness: 0 }).start();
+      },
+    }),
+  ).current;
+  return (
+    <View
+      style={s.slideTrack}
+      onLayout={(e) => { maxRef.current = Math.max(0, e.nativeEvent.layout.width - THUMB - 6); }}
+    >
+      <Text style={s.slideLabel} numberOfLines={1}>{label}</Text>
+      <Animated.View style={[s.slideThumb, { transform: [{ translateX: x }] }]} {...pan.panHandlers}>
+        <Ionicons name="chevron-forward" size={22} color="#fff" />
+      </Animated.View>
+    </View>
+  );
+}
+
+function LiveTripShare({ client, info, onShare, auto, dealId, alreadyShared }: { client: MobileClient | null; info: TripStatic; onShare?: (link: string) => void; auto?: boolean; dealId?: string; alreadyShared?: boolean }) {
   const c = palette;
   const [sharing, setSharing] = useState(false);
   const [link, setLink] = useState('');
   const [copied, setCopied] = useState(false);
   const [located, setLocated] = useState(false);
+  const [optedOut, setOptedOut] = useState(false);
   const session = useRef<TripSession | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  // dealId is a negotiation id ("d:pubkey:pubkey") — the colons are INVALID in an
+  // expo-secure-store key (only [A-Za-z0-9._-] allowed), so kvGet/kvSet would throw
+  // and the auto-start would hang forever at "Starting live location…". Sanitize it.
+  const kvId = (dealId || '').replace(/[^A-Za-z0-9._-]/g, '_');
 
   const push = async (status: 'live' | 'ended') => {
     if (!client || !session.current) return;
@@ -2873,24 +3022,46 @@ function LiveTripShare({ client, info }: { client: MobileClient | null; info: Tr
     if (status === 'live') setLocated(true);
   };
 
-  const start = async () => {
+  // Begin publishing for a prepared session: post the link to chat (when asked),
+  // push the current position, then keep refreshing every 20s. The link is valid
+  // right away; the position publishes as soon as GPS resolves and the timer
+  // keeps retrying until permission is granted / a fix is available.
+  const begin = async (sess: TripSession, shouldPost: boolean) => {
     if (!client) return;
-    // Open the panel immediately so the button always responds (on web, a missing
-    // Alert is a no-op — bailing here looked like "nothing happens"). The link is
-    // valid right away; the location publishes as soon as GPS resolves, and the
-    // 20s timer keeps retrying until permission is granted / a fix is available.
-    const sess = createTripSession(info);
     session.current = sess;
-    setLink(tripLink(sess, webBase()));
+    const url = tripLink(sess, webBase());
+    setLink(url);
     setLocated(false);
     setSharing(true);
+    // Drop the tracking link straight into the conversation so the other party
+    // gets a tappable "Track live location" button — no copy/paste, no tap.
+    if (shouldPost) { try { onShare?.(url); } catch { /* ignore */ } }
     const coords = await getCurrentCoords();
     if (coords) {
       await publishTripLocation(client.pool, sess, {
         lat: coords.latitude, lon: coords.longitude, ts: Math.floor(Date.now() / 1000), status: 'live',
       }).then(() => setLocated(true)).catch(() => {});
     }
-    timer.current = setInterval(() => { push('live').catch(() => {}); }, 20000);
+    if (!timer.current) timer.current = setInterval(() => { push('live').catch(() => {}); }, 20000);
+  };
+
+  // Auto-share path: reuse a persisted per-deal key so the link stays stable
+  // across remounts/restarts, and only post it to chat the first time.
+  const autoBegin = async () => {
+    if (!client || !dealId) return;
+    const saved = await kvGet(`freeport.trip.${kvId}`);
+    let sess = saved ? restoreTripSession(saved, info) : null;
+    let created = false;
+    if (!sess) { sess = createTripSession(info); created = true; await kvSet(`freeport.trip.${kvId}`, tripSecret(sess)).catch(() => {}); }
+    await begin(sess, created || !alreadyShared);
+  };
+
+  const start = async () => { await begin(createTripSession(info), true); };
+
+  const resume = async () => {
+    if (dealId) await kvSet(`freeport.tripStop.${kvId}`, '0').catch(() => {});
+    setOptedOut(false);
+    await autoBegin();
   };
 
   const stop = async () => {
@@ -2900,6 +3071,8 @@ function LiveTripShare({ client, info }: { client: MobileClient | null; info: Tr
     setSharing(false);
     setCopied(false);
     setLocated(false);
+    // Remember an explicit opt-out so auto-sharing doesn't restart on remount.
+    if (auto) { setOptedOut(true); if (dealId) kvSet(`freeport.tripStop.${kvId}`, '1').catch(() => {}); }
   };
 
   const shareLink = async () => {
@@ -2911,6 +3084,36 @@ function LiveTripShare({ client, info }: { client: MobileClient | null; info: Tr
 
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
 
+  // Kick off automatic sharing for the travelling party once the deal is live.
+  // Shared by default — there's no UI to stop it, so we don't gate on a stored
+  // opt-out; the driver/provider just shares while the deal is underway.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!auto || !dealId || !client || autoStarted.current) return;
+    autoStarted.current = true;
+    autoBegin().catch((e) => { autoStarted.current = false; console.warn('[livetrip] auto-start failed', e); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auto, dealId, client]);
+
+  if (auto) {
+    // Shared automatically — the driver/provider doesn't manage it. Passive
+    // status only (no controls); the link is auto-posted to the other party's chat.
+    return (
+      <View style={{ marginTop: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Ionicons name="navigate" size={14} color={c.text3} />
+          <Text style={{ color: c.text3, fontSize: 12, flex: 1 }}>
+            🛰 {t('Sharing live location — anyone with the link can see this trip while the app is open.')}
+          </Text>
+        </View>
+        {sharing && !located && (
+          <Text style={{ color: c.warn, fontSize: 12, marginTop: 4 }}>
+            📍 {t('Waiting for your location — allow location access to share your position.')}
+          </Text>
+        )}
+      </View>
+    );
+  }
   if (!sharing) {
     return (
       <Pressable
@@ -2978,6 +3181,7 @@ function DealsTab({
   glowDealId = null,
   glowCompleted = false,
   role,
+  sendLocationOnDeal = true,
 }: {
   client: MobileClient | null;
   negos: Negotiation[];
@@ -2995,6 +3199,8 @@ function DealsTab({
   glowDealId?: string | null;
   /** Pulse the Completed segment — the guided tour's "completed rides" step. */
   glowCompleted?: boolean;
+  /** When off, don't auto-share live location during an active deal. */
+  sendLocationOnDeal?: boolean;
 }) {
   const [counteringId, setCounteringId] = useState<string | null>(null);
   // Our full contact (name · phone [· 🚗 vehicle • plate if we're the driver]),
@@ -3118,6 +3324,9 @@ function DealsTab({
       showsVerticalScrollIndicator={false}
       keyExtractor={(n) => n.id}
       contentContainerStyle={{ paddingVertical: 8 }}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
+      automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
       removeClippedSubviews
       initialNumToRender={6}
       maxToRenderPerBatch={6}
@@ -3191,8 +3400,9 @@ function DealsTab({
             {(() => {
               const p = item.intent.content.payload as Record<string, any>;
               if (item.intent.content.schema.startsWith('rideshare') && p.from?.name && p.to?.name) {
-                // Use the pinned GPS coords for the route (precise), unless the
-                // route was renegotiated to a different label in terms.
+                // Route to the EXACT pinned coordinates (now a high-precision
+                // geohash), unless the route was renegotiated to a different label
+                // in terms (which carries no pin) — then use that label.
                 const from = item.terms?.from && item.terms.from !== p.from.name
                   ? item.terms.from : placeParam(p.from?.geohash, p.from.name);
                 const to = item.terms?.to && item.terms.to !== p.to.name
@@ -3292,6 +3502,44 @@ function DealsTab({
                   return (
                     <>
                       <Text style={s.stageLine}>{statusText}</Text>
+                      {/* Turn-by-turn navigation for whoever travels: the driver
+                          heads to the pickup, then to the destination once the
+                          passenger is aboard; for a service/product deal, either
+                          side can route to the agreed meeting point. */}
+                      {st !== 'completed' && (() => {
+                        const p = item.intent.content.payload as Record<string, any>;
+                        const iAmDriver = item.weInitiated;
+                        // Navigation prefers the human ADDRESS over the geohash: a 6-char
+                        // geohash (~±600m) decodes to a centre Google snaps to the nearest
+                        // building (e.g. "100 Orchard Road" landed on "The Metz, 83
+                        // Devonshire Rd"). The typed address geocodes accurately; fall back
+                        // to the geohash coordinate only when there's no name.
+                        // Prefer the EXACT pinned coordinates (high-precision geohash);
+                        // fall back to the typed name only if there's no pin.
+                        const navDest = (name?: string, geohash?: string) =>
+                          placeParam(geohash, (name || '').trim());
+                        let dest = '', label = '';
+                        if (isRide) {
+                          if (!iAmDriver) return null; // passenger tracks the driver instead
+                          if (st === 'picked_up') {
+                            dest = navDest(item.terms?.to || p.to?.name, p.to?.geohash);
+                            label = t('Navigate to destination');
+                          } else {
+                            dest = navDest(item.terms?.from || p.from?.name, p.from?.geohash);
+                            label = t('Navigate to pickup');
+                          }
+                        } else {
+                          dest = navDest(item.terms?.location || p.location?.name, p.location?.geohash);
+                          label = t('Navigate to location');
+                        }
+                        if (!dest) return null;
+                        return (
+                          <Pressable style={s.navBtn} onPress={() => Linking.openURL(dirUrl(dest))}>
+                            <Ionicons name="navigate" size={15} color={palette.link} />
+                            <Text style={s.navBtnText}>{label}</Text>
+                          </Pressable>
+                        );
+                      })()}
                       {!st && (
                         // Buyer side (rideshare passenger / services customer): before the
                         // deal proceeds, confirm they met the *right* counterparty. The
@@ -3327,15 +3575,11 @@ function DealsTab({
                             </Pressable>
                           </View>
                         ) : (
-                          <Pressable style={s.btnAccept} onPress={() => client?.setStage(item.id, 'picked_up')}>
-                            <Text style={s.btnText}>{startLabel}</Text>
-                          </Pressable>
+                          <SlideToConfirm label={startLabel} onConfirm={() => client?.setStage(item.id, 'picked_up')} />
                         )
                       )}
                       {st === 'picked_up' && (
-                        <Pressable style={s.btnAccept} onPress={() => client?.setStage(item.id, 'completed')}>
-                          <Text style={s.btnText}>{doneLabel}</Text>
-                        </Pressable>
+                        <SlideToConfirm label={doneLabel} onConfirm={() => client?.setStage(item.id, 'completed')} />
                       )}
                       {/* Trip done → the rater opens automatically. Skipping shows a
                           button to reopen it; once submitted it's locked. */}
@@ -3357,37 +3601,54 @@ function DealsTab({
                           />
                         )
                       )}
-                      {/* Live trip sharing — rideshare only, while the trip is underway. */}
-                      {isRide && st !== 'completed' && (() => {
+                      {/* Live-location sharing while the deal is underway. BOTH parties
+                          auto-share the moment the deal is confirmed — each one's link is
+                          posted into the chat so the other just taps "Track live location".
+                          No button to press; the share UI is a passive status line. */}
+                      {st !== 'completed' && sendLocationOnDeal && (() => {
                         const p = item.intent.content.payload as Record<string, any>;
-                        // Rideshare: the responder (weInitiated) is the driver.
-                        const iAmDriver = item.weInitiated;
+                        const iAmDriver = item.weInitiated; // rideshare responder = driver
+                        // BOTH sides auto-share once the deal is confirmed (no role gate),
+                        // so passenger+driver / customer+provider can each follow the other.
                         const myName = profile.name || undefined;
                         const theirName = (item.theirContact || '').split('·')[0].trim() || undefined;
-                        const theirPhone = extractPhone(item.theirContact || '') || undefined;
-                        // Vehicle model + plate come from the driver: my profile if I'm the
-                        // driver, else parsed out of their contact ("🚗 Model • Plate").
-                        let driver, driverPhone, vehicleModel, plateNumber, passenger;
-                        if (iAmDriver) {
-                          driver = myName; driverPhone = profile.phone || undefined;
-                          vehicleModel = profile.vehicleModel?.trim() || undefined;
-                          plateNumber = profile.plateNumber?.trim() || undefined;
-                          passenger = theirName;
-                        } else {
-                          driver = theirName; driverPhone = theirPhone;
-                          const m = (item.theirContact || '').match(/🚗\s*(.+)$/);
-                          if (m) { const [vm, pl] = m[1].split('•').map((x) => x.trim()); vehicleModel = vm || undefined; plateNumber = pl || undefined; }
-                          passenger = myName;
+                        const shareLink = (link: string) => { client?.sendChat(item.id, link).catch(() => {}); };
+                        const alreadyShared = (item.messages || []).some((m) => m.dir === 'out' && isTripMsg(m.text));
+                        // Trip metadata (route + the driver's vehicle/plate) is identical for
+                        // both parties; only which name is the "driver" flips by side.
+                        let vehicleModel: string | undefined, plateNumber: string | undefined;
+                        if (isRide) {
+                          if (iAmDriver) {
+                            vehicleModel = profile.vehicleModel?.trim() || undefined;
+                            plateNumber = profile.plateNumber?.trim() || undefined;
+                          } else {
+                            const m = (item.theirContact || '').match(/🚗\s*(.+)$/);
+                            if (m) { const [vm, pl] = m[1].split('•').map((x) => x.trim()); vehicleModel = vm || undefined; plateNumber = pl || undefined; }
+                          }
                         }
-                        return (
-                          <LiveTripShare
-                            client={client}
-                            info={{
+                        const info: TripStatic = isRide
+                          ? {
                               from: item.terms?.from || p.from?.name || '',
                               to: item.terms?.to || p.to?.name || '',
                               vehicle: p.subcategory || p.vehicle || undefined,
-                              driver, phone: driverPhone, vehicleModel, plateNumber, passenger,
-                            }}
+                              driver: iAmDriver ? myName : theirName,
+                              phone: iAmDriver ? (profile.phone || undefined) : (extractPhone(item.theirContact || '') || undefined),
+                              vehicleModel, plateNumber,
+                              passenger: iAmDriver ? theirName : myName,
+                            }
+                          : {
+                              from: item.terms?.location || p.location?.name || '',
+                              to: '',
+                              driver: myName, phone: profile.phone || undefined, passenger: theirName,
+                            };
+                        return (
+                          <LiveTripShare
+                            client={client}
+                            auto
+                            dealId={item.id}
+                            alreadyShared={alreadyShared}
+                            onShare={shareLink}
+                            info={info}
                           />
                         );
                       })()}
@@ -3926,6 +4187,11 @@ function isAudioMsg(t: string): boolean {
   return /\.(m4a|mp3|webm|ogg|caf|mp4|wav|aac)(\?|$)/i.test(t);
 }
 
+/** A live-location share link (".../#t=<key>") renders as a tap-to-track button. */
+function isTripMsg(t: string): boolean {
+  return /^https?:\/\/\S+#t=[A-Za-z0-9\-_]+/.test(t.trim());
+}
+
 /** A single voice-memo bubble with a tap-to-play button. */
 function VoiceMessage({ url }: { url: string }) {
   const [playing, setPlaying] = useState(false);
@@ -3961,6 +4227,11 @@ const ChatBubble = React.memo(function ChatBubble({
         ? <Pressable onPress={() => onZoom(text)}>
             <Image source={{ uri: text }} style={s.chatImage} resizeMode="cover" />
           </Pressable>
+        : isTripMsg(text)
+        ? <Pressable style={s.trackMsg} onPress={() => Linking.openURL(text.trim())}>
+            <Ionicons name="navigate" size={16} color={palette.link} />
+            <Text style={s.trackMsgText}>{t('Track live location')}</Text>
+          </Pressable>
         : <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn]}>{text}</Text>}
     </View>
   );
@@ -3972,7 +4243,13 @@ function ChatThread({ nego, onSend }: { nego: Negotiation; onSend: (text: string
   const [uploading, setUploading] = useState(false);
   const [recording, setRecording] = useState(false);
   const [viewerUri, setViewerUri] = useState<string | null>(null);
+  const [showAllMsgs, setShowAllMsgs] = useState(false);
   const msgs = nego.messages ?? [];
+  // Keep the thread compact: show only the most recent few, with a tap to reveal
+  // the rest. Otherwise a long conversation pushes the input box far down the card.
+  const CHAT_PREVIEW = 5;
+  const collapsedMsgs = !showAllMsgs && msgs.length > CHAT_PREVIEW;
+  const shownMsgs = collapsedMsgs ? msgs.slice(-CHAT_PREVIEW) : msgs;
 
   const toggleRecord = async () => {
     if (recording) {
@@ -4005,8 +4282,7 @@ function ChatThread({ nego, onSend }: { nego: Negotiation; onSend: (text: string
   };
 
   const attach = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) { Alert.alert('Permission needed', 'Allow photo access to attach an image.'); return; }
+    // System photo picker — no media permission needed (Play-policy compliant).
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.8 });
     if (result.canceled || !result.assets[0]) return;
     setUploading(true);
@@ -4024,15 +4300,22 @@ function ChatThread({ nego, onSend }: { nego: Negotiation; onSend: (text: string
       {msgs.length === 0 ? (
         <Text style={s.dim}>{t("Send a message to coordinate the pickup.")}</Text>
       ) : (
-        msgs.map((m, i) => (
-          // Stable per-message key. Index keys made React reuse the memoised
-          // bubble at a given slot when the array grew (new send / inbound DM /
-          // FlatList clipping its card), which mis-reconciled and visually
-          // duplicated the last bubble — and the constant tear-down/rebuild
-          // thrashed layout while scrolling. ts is epoch *seconds* so two quick
-          // messages can share one; disambiguate with dir + index.
-          <ChatBubble key={m.id ?? `${m.ts}-${m.dir}-${i}`} text={m.text} dir={m.dir} onZoom={setViewerUri} />
-        ))
+        <>
+          {collapsedMsgs && (
+            <Pressable onPress={() => setShowAllMsgs(true)} style={s.chatExpand} hitSlop={6}>
+              <Text style={s.chatExpandText}>{t("Show earlier messages")} ({msgs.length - CHAT_PREVIEW})</Text>
+            </Pressable>
+          )}
+          {shownMsgs.map((m, i) => (
+            // Stable per-message key. Index keys made React reuse the memoised
+            // bubble at a given slot when the array grew (new send / inbound DM /
+            // FlatList clipping its card), which mis-reconciled and visually
+            // duplicated the last bubble — and the constant tear-down/rebuild
+            // thrashed layout while scrolling. ts is epoch *seconds* so two quick
+            // messages can share one; disambiguate with dir + index.
+            <ChatBubble key={m.id ?? `${m.ts}-${m.dir}-${i}`} text={m.text} dir={m.dir} onZoom={setViewerUri} />
+          ))}
+        </>
       )}
       <View style={[s.row, { marginTop: 8 }]}>
         <TextInput
@@ -4202,6 +4485,8 @@ function SettingsTab({
   onThemeChange,
   distanceUnit,
   onDistanceUnitChange,
+  sendLocationOnDeal,
+  onSendLocationOnDealChange,
   browseCategory,
   browseSubcategory,
   browseAlertSound,
@@ -4217,6 +4502,7 @@ function SettingsTab({
   fareCurrency,
   onFareConfigChange,
   onSignOut,
+  onDeleteAccount,
   onScroll,
 }: {
   npub: string;
@@ -4241,6 +4527,8 @@ function SettingsTab({
   onThemeChange: (t: 'system' | 'dark' | 'light') => void;
   distanceUnit: 'auto' | 'km' | 'mi';
   onDistanceUnitChange: (u: 'auto' | 'km' | 'mi') => void;
+  sendLocationOnDeal: boolean;
+  onSendLocationOnDealChange: (v: boolean) => void;
   browseCategory: string;
   browseSubcategory: string;
   browseAlertSound: boolean;
@@ -4256,6 +4544,7 @@ function SettingsTab({
   fareCurrency: Currency;
   onFareConfigChange: (cfg: FareConfig | null) => void;
   onSignOut: () => void | Promise<void>;
+  onDeleteAccount: () => void | Promise<void>;
   onScroll?: (e: any) => void;
 }) {
   const [name, setName] = useState(profile.name);
@@ -4433,6 +4722,9 @@ function SettingsTab({
   const [fareOpen, setFareOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   // On a mobile-browser web session (not the installed PWA / native app),
   // suggest the native app — shown as a passive notice in About.
   const nativeOS = useMemo<'ios' | 'android' | null>(() => {
@@ -4447,13 +4739,29 @@ function SettingsTab({
   }, []);
   // Web Push (PWA) — opt-in "new message" notifications via a content-blind sender.
   const [notifyOpen, setNotifyOpen] = useState(false);
+  const [notifyHelpOpen, setNotifyHelpOpen] = useState(false);
   const [notifyEndpoint, setNotifyEndpoint] = useState('');
   const [pushState, setPushState] = useState<PushStatus>('off');
   const [pushBusy, setPushBusy] = useState(false);
   // Android background service toggle.
-  const [bgService, setBgService] = useState(false);
   const [updBusy, setUpdBusy] = useState(false);
   const [updMsg, setUpdMsg] = useState('');
+  const [updTrack, setUpdTrack] = useState<UpdateTrack>('latest');
+  const changeTrack = async (track: UpdateTrack) => {
+    if (track === updTrack || updBusy) return;
+    const ok = await confirmAsync(
+      t('Switch update track?'),
+      t('This downloads the selected release and restarts the app.'),
+      t('Switch'),
+    );
+    if (!ok) return;
+    setUpdBusy(true); setUpdMsg('');
+    setUpdTrack(track);
+    const r = await setTrack(track);
+    if (r.outcome === 'updated') { setUpdMsg(t('Update found — restarting…')); await applyUpdate(); return; }
+    setUpdMsg(r.outcome === 'up-to-date' ? t("You're on the latest version.") : t('Could not check for updates.'));
+    setUpdBusy(false);
+  };
   const checkUpdates = async () => {
     setUpdBusy(true); setUpdMsg('');
     const r = await checkForUpdate();
@@ -4466,14 +4774,10 @@ function SettingsTab({
     setUpdBusy(false);
   };
   React.useEffect(() => {
-    loadPrefs().then((p) => { setNotifyEndpoint(p.notifyEndpoint ?? ''); setBgService(!!p.backgroundService); });
+    loadPrefs().then((p) => { setNotifyEndpoint(p.notifyEndpoint ?? ''); });
     pushStatus().then(setPushState);
+    getTrack().then(setUpdTrack).catch(() => {});
   }, []);
-  const toggleBgService = async (on: boolean) => {
-    setBgService(on);
-    await savePrefs({ backgroundService: on });
-    if (on) await startBackgroundService(); else await stopBackgroundService();
-  };
   const myPubkeyHex = client?.pubkey ?? '';
   // Intent-alert filters for push: only when the user opted into Browse alerts.
   // Topic mirrors what Browse subscribes to (area + default category/subcat), so
@@ -4494,8 +4798,13 @@ function SettingsTab({
       if (pushState === 'on') {
         await disablePush(myPubkeyHex, notifyEndpoint.trim());
         setPushState('off');
+        await kvSet('freeport.pushOn', '0').catch(() => {});
       } else {
-        setPushState(await enablePush(myPubkeyHex, notifyEndpoint.trim(), pushFilters));
+        const st = await enablePush(myPubkeyHex, notifyEndpoint.trim(), pushFilters);
+        setPushState(st);
+        // Mark the server as the active notifier so the app skips its local
+        // fallback notification (avoids a second alert when you open the app).
+        await kvSet('freeport.pushOn', st === 'on' ? '1' : '0').catch(() => {});
       }
     } finally { setPushBusy(false); }
   };
@@ -4529,8 +4838,7 @@ function SettingsTab({
   }, [profile.name, profile.about, profile.picture, profile.gallery, profile.phone, profile.phoneDisplay, profile.externalLink, profile.vehicleModel, profile.plateNumber, profile.plateDisplay]);
 
   const pickAvatar = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) { Alert.alert('Permission needed', 'Allow photo access to set a profile picture.'); return; }
+    // System photo picker — no media permission needed (Play-policy compliant).
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [1, 1], quality: 0.8 });
     if (result.canceled || !result.assets[0]) return;
     setUploading(true);
@@ -4608,7 +4916,7 @@ function SettingsTab({
   };
 
   return (
-    <ScrollView ref={settingsScroll} contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
+    <ScrollView ref={settingsScroll} contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
       {hasRequiredActions && (
         <View style={s.requiredBox}>
           <Text style={s.requiredTitle}>{t("⚠️ Required actions")}</Text>
@@ -4619,14 +4927,12 @@ function SettingsTab({
           )}
           {!requiredNotifOk && (
             <View style={s.requiredRow}>
-              <Pressable style={[s.requiredBtn, Platform.OS === 'web' && { flex: 1 }]} onPress={enableNotif}>
+              <Pressable style={[s.requiredBtn, { flex: 1 }]} onPress={enableNotif}>
                 <Text style={s.requiredBtnText}>{t("Enable notifications")}</Text>
               </Pressable>
-              {Platform.OS === 'web' && (
-                <Pressable style={s.requiredDismiss} onPress={onDismissNotif} accessibilityLabel={t("Dismiss")}>
-                  <Text style={s.requiredDismissText}>✕</Text>
-                </Pressable>
-              )}
+              <Pressable style={s.requiredDismiss} onPress={onDismissNotif} accessibilityLabel={t("Dismiss")}>
+                <Text style={s.requiredDismissText}>✕</Text>
+              </Pressable>
             </View>
           )}
           {vehicleMissing && (
@@ -4834,6 +5140,17 @@ function SettingsTab({
           />
         </>
       ) : null}
+
+      {/* Live-location sharing while a deal is active (auto-stops on completion). */}
+      <Pressable style={s.toggleRow} onPress={() => onSendLocationOnDealChange(!sendLocationOnDeal)}>
+        <View style={{ flex: 1, marginRight: 12 }}>
+          <Text style={s.toggleTitle}>{t("Send location on active deal")}</Text>
+          <Text style={s.dim}>{t("Share your live location with the other party while a deal is active. Sharing stops when the deal completes.")}</Text>
+        </View>
+        <View style={[s.switchTrack, sendLocationOnDeal && s.switchTrackOn]}>
+          <View style={[s.switchThumb, sendLocationOnDeal && s.switchThumbOn]} />
+        </View>
+      </Pressable>
       </>
       )}
 
@@ -4870,7 +5187,6 @@ function SettingsTab({
       </View>
 
       <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("Distance unit")}</Text>
-      <Text style={s.dim}>{t("Auto uses kilometres everywhere except the US (miles).")}</Text>
       <View style={[s.segRow, { marginTop: 8 }]}>
         {(['auto', 'km', 'mi'] as const).map((u) => (
           <Pressable key={u} onPress={() => onDistanceUnitChange(u)} style={[s.seg, distanceUnit === u && s.segActive]}>
@@ -4991,6 +5307,9 @@ function SettingsTab({
               <Text style={s.dim}>{Platform.OS === 'web'
                 ? t("Get notified about new messages and nearby posts, even when the app is closed. On iOS, add Freeport to your Home Screen first. Delivered by a content-blind sender you set below — it never sees your messages.")
                 : t("Get notified about new messages and nearby posts, even when the app is closed. Delivered by a content-blind sender you set below — it never sees your messages.")}</Text>
+              <Pressable onPress={() => setNotifyHelpOpen(true)} hitSlop={6} style={{ marginTop: 6 }}>
+                <Text style={{ color: palette.link, fontWeight: '600' }}>{'ⓘ ' + t("What's a notification server?")}</Text>
+              </Pressable>
               <Field label={t("Notification service URL")} value={notifyEndpoint} onChange={setNotifyEndpoint} placeholder="https://nostr-mcp.trinh.uk" />
               <Text style={s.dim}>{t("Leave the default to use the public sender, or point to your own self-hosted one.")}</Text>
               <Pressable
@@ -5008,25 +5327,29 @@ function SettingsTab({
         </>
       )}
 
-      {/* Android: keep-alive foreground service so notifications keep arriving
-          while the app is backgrounded (opt-in — shows an ongoing notice). */}
-      {Platform.OS === 'android' && (
-        <>
-          <View style={[s.collapseHeader, { justifyContent: 'space-between' }]}>
-            <View style={s.collapseLeft}>
-              <Ionicons name="sync-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-              <Text style={s.collapseTitle}>{t("Background messages")}</Text>
-            </View>
-            <Pressable
-              onPress={() => { toggleBgService(!bgService); }}
-              style={[s.seg, bgService && s.segActive, { paddingHorizontal: 16 }]}
-            >
-              <Text style={[s.segText, bgService && s.segTextActive]}>{bgService ? t('On') : t('Off')}</Text>
-            </Pressable>
-          </View>
-          <Text style={s.dim}>{t("Keep receiving message notifications while Freeport is in the background. Shows a quiet ongoing notification and uses a little battery. Doesn't survive force-closing the app.")}</Text>
-        </>
-      )}
+      {/* "What's a notification server?" explainer + self-host instructions. */}
+      <Modal visible={notifyHelpOpen} transparent animationType="fade" onRequestClose={() => setNotifyHelpOpen(false)}>
+        <Pressable style={s.sortBackdrop} onPress={() => setNotifyHelpOpen(false)}>
+          <Pressable style={s.sortSheet} onPress={() => {}}>
+            <ScrollView style={{ maxHeight: 460 }} showsVerticalScrollIndicator={false}>
+              <Text style={s.sectionTitle}>{t("What's a notification server?")}</Text>
+              <Text style={[s.dim, { marginTop: 4 }]}>{t("Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.")}</Text>
+              <Text style={[s.dim, { marginTop: 10 }]}>{t("It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.")}</Text>
+              <Text style={[s.dim, { marginTop: 10 }]}>{t("Use the public one (the default URL), or run your own in one command and point the URL above at it:")}</Text>
+              <View style={s.codeBox}>
+                <Text style={s.codeText} selectable>{'git clone https://github.com/ptrinh/freeport.git\ncd freeport/server\ndocker compose up -d'}</Text>
+              </View>
+              <Text style={[s.dim, { marginTop: 10 }]}>{t("Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.")}</Text>
+              <Pressable style={[s.mapLink, { marginTop: 12 }]} onPress={() => Linking.openURL('https://github.com/ptrinh/freeport/tree/main/server')}>
+                <Text style={s.mapLinkText}>{'🔗 ' + t("Self-hosting guide on GitHub")}</Text>
+              </Pressable>
+              <Pressable style={[s.btnAccept, { marginTop: 12 }]} onPress={() => setNotifyHelpOpen(false)}>
+                <Text style={s.btnText}>{t("Got it")}</Text>
+              </Pressable>
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       {/* Fare Estimator — user-tunable coefficients for the ride-fare estimate */}
       <Pressable style={s.collapseHeader} onPress={() => setFareOpen((v) => !v)}>
@@ -5078,6 +5401,19 @@ function SettingsTab({
             </Pressable>
           </View>
           {!!updMsg && <Text style={s.dim}>{updMsg}</Text>}
+          {trackSupported() && (
+            <View style={{ marginTop: 12 }}>
+              <Text style={s.label}>{t('Update track')}</Text>
+              <View style={s.segRow}>
+                {(['latest', 'stable'] as UpdateTrack[]).map((tk) => (
+                  <Pressable key={tk} disabled={updBusy} onPress={() => { changeTrack(tk); }} style={[s.seg, updTrack === tk && s.segActive]}>
+                    <Text style={[s.segText, updTrack === tk && s.segTextActive]}>{t(tk === 'latest' ? 'Latest' : 'Stable')}</Text>
+                  </Pressable>
+                ))}
+              </View>
+              <Text style={s.dim}>{t('Latest receives updates first. Stable stays one release behind for extra safety.')}</Text>
+            </View>
+          )}
           {nativeOS && (
             <Text style={[s.dim, { marginTop: 8 }]}>
               📱 {nativeOS === 'ios' ? t('Use the iOS app for the best experience.') : t('Use the Android app for the best experience.')}
@@ -5175,6 +5511,38 @@ function SettingsTab({
                     onPress={() => { setSignOutOpen(false); setBackedUp(false); onSignOut(); }}
                   >
                     <Text style={s.btnText}>{t("Sign out")}</Text>
+                  </Pressable>
+                </View>
+              </Pressable>
+            </Pressable>
+          </Modal>
+
+          {/* Delete account — permanently erases the identity + all data (Apple
+              Guideline 5.1.1(v)). Distinct from Sign out; no backup gate. */}
+          <Text style={[s.dim, { marginTop: 20 }]}>{t("Permanently delete your account and all of its data from this device. This is different from signing out and cannot be undone.")}</Text>
+          <Pressable style={[s.btnDecline, { marginTop: 8, backgroundColor: '#b91c1c' }]} onPress={() => { setDeleteConfirm(false); setDeleteOpen(true); }}>
+            <Text style={s.btnText}>{t("Delete account")}</Text>
+          </Pressable>
+
+          <Modal visible={deleteOpen} transparent animationType="fade" onRequestClose={() => { if (!deleting) setDeleteOpen(false); }}>
+            <Pressable style={s.sortBackdrop} onPress={() => { if (!deleting) setDeleteOpen(false); }}>
+              <Pressable style={s.sortSheet} onPress={() => {}}>
+                <Text style={s.sectionTitle}>{t("Delete account")}</Text>
+                <Text style={s.dim}>{t("This permanently deletes your account. Your identity key, profile, posts, messages, reputation and settings are erased from this device, your cloud backup is removed, and your public listings are withdrawn. This cannot be undone and your account cannot be recovered.")}</Text>
+                <Pressable style={s.checkRow} onPress={() => setDeleteConfirm((v) => !v)}>
+                  <View style={[s.checkbox, deleteConfirm && s.checkboxOn]}>{deleteConfirm && <Text style={s.checkboxTick}>✓</Text>}</View>
+                  <Text style={s.checkLabel}>{t("I understand this permanently deletes my account and cannot be undone")}</Text>
+                </Pressable>
+                <View style={s.btnRow}>
+                  <Pressable style={[s.btnDecline, { flex: 1 }]} disabled={deleting} onPress={() => setDeleteOpen(false)}>
+                    <Text style={s.btnText}>{t("Cancel")}</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[s.btnAccept, { flex: 1, backgroundColor: '#b91c1c' }, (!deleteConfirm || deleting) && { opacity: 0.5 }]}
+                    disabled={!deleteConfirm || deleting}
+                    onPress={async () => { setDeleting(true); try { await onDeleteAccount(); } finally { setDeleting(false); setDeleteOpen(false); } }}
+                  >
+                    {deleting ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t("Delete account")}</Text>}
                   </Pressable>
                 </View>
               </Pressable>
@@ -5650,8 +6018,7 @@ function ImagePickerField({
   const [uploading, setUploading] = useState(false);
 
   const pick = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) { Alert.alert('Permission needed', 'Allow photo access to attach images.'); return; }
+    // System photo picker — no media permission needed (Play-policy compliant).
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
@@ -5799,12 +6166,11 @@ function TimeField({
 }) {
   const [showPicker, setShowPicker] = useState(false);
 
-  // Picked clock time lands on today; if that's already past, roll to tomorrow
+  // The picker now carries a date too, so honour the full chosen date+time.
+  // A selection in the past is bumped to the next 15-min slot from now.
   const applyPicked = (picked: Date) => {
-    const d = new Date();
-    d.setHours(picked.getHours(), picked.getMinutes(), 0, 0);
-    if (d.getTime() < Date.now()) d.setDate(d.getDate() + 1);
-    onChange(roundTo15(d));
+    const d = roundTo15(picked);
+    onChange(d.getTime() < Date.now() ? roundTo15(new Date(Date.now() + 15 * 60 * 1000)) : d);
   };
 
   const shift = (mins: number) => {
@@ -5899,6 +6265,25 @@ function snapToStep(amount: number, currency: Currency): number {
 
 const fmtPayment = fmtMoney;
 
+/**
+ * Parse a number out of a money string formatted in ANY locale. `fmtMoney`
+ * localises decimals — Vietnamese writes 5.50 as "5,50" and 1234.50 as
+ * "1.234,50", English as "5.50" / "1,234.50" — so a fixed dot-only parse turned
+ * a VI "5,50" counter into 550. Treat the rightmost '.'/',' as the decimal
+ * point, unless it's followed by a 3-digit group (then it's thousands, no
+ * decimal). Currency symbols and stray marks are ignored.
+ */
+function parseLocaleAmount(str: string): number {
+  const s = str.replace(/[^\d.,]/g, '');
+  if (!s) return 0;
+  const lastSep = Math.max(s.lastIndexOf('.'), s.lastIndexOf(','));
+  if (lastSep === -1) return parseInt(s, 10) || 0;
+  const intDigits = s.slice(0, lastSep).replace(/[.,]/g, '');
+  const frac = s.slice(lastSep + 1);
+  if (/^\d{3}$/.test(frac)) return parseInt(intDigits + frac, 10) || 0; // thousands group, not a decimal
+  return parseFloat(`${intDigits || '0'}.${frac}`) || 0;
+}
+
 /** Best-effort parse of a payment string back into amount+currency (for counter-offers). */
 function parsePayment(str: string | undefined, fallbackCurrency: Currency): { amount: number; currency: Currency } {
   if (!str) return { amount: 0, currency: fallbackCurrency };
@@ -5911,7 +6296,7 @@ function parsePayment(str: string | undefined, fallbackCurrency: Currency): { am
     amount = parseInt(str.replace(/\D/g, ''), 10) || 0;
     if (/\d+\s*k\b/i.test(str)) amount = (parseInt(str.replace(/\D/g, ''), 10) || 0) * 1000;
   } else {
-    amount = parseFloat(str.replace(/[^\d.]/g, '')) || 0;
+    amount = parseLocaleAmount(str);
   }
   return { amount: snapToStep(amount, currency), currency };
 }
@@ -6451,6 +6836,17 @@ function makeStyles(c: Palette) {
     termsTitle: { color: c.dim, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
     chatBox: { marginTop: 10, padding: 10, backgroundColor: c.panel, borderRadius: 10, borderWidth: 1, borderColor: c.border },
     chatTitle: { color: c.dim, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 },
+    chatExpand: { alignSelf: 'center', paddingVertical: 5, paddingHorizontal: 12, marginBottom: 4, borderRadius: 999, backgroundColor: c.card, borderWidth: 1, borderColor: c.border },
+    chatExpandText: { color: c.accent, fontSize: 12, fontWeight: '600' },
+    trackMsg: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    trackMsgText: { color: c.link, fontSize: 14, fontWeight: '600', textDecorationLine: 'underline' },
+    // Outlined/secondary so it reads as a utility (open Maps) and never sits as a
+    // second solid-blue block right above the primary "Picked up" action.
+    navBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: c.card, borderWidth: 1, borderColor: c.accentBorder, borderRadius: 8, paddingVertical: 10, marginTop: 8 },
+    slideTrack: { height: 54, borderRadius: 12, backgroundColor: c.panel, borderWidth: 1, borderColor: c.accentBorder, justifyContent: 'center', alignItems: 'center', overflow: 'hidden', marginTop: 8 },
+    slideLabel: { color: c.link, fontWeight: '700', fontSize: 15 },
+    slideThumb: { position: 'absolute', left: 3, top: 3, bottom: 3, width: 54, borderRadius: 9, backgroundColor: c.accentBtn, alignItems: 'center', justifyContent: 'center' },
+    navBtnText: { color: c.link, fontWeight: '700' },
     chatBubble: { maxWidth: '85%', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7, marginVertical: 3 },
     chatOut: { backgroundColor: c.accentBtn, alignSelf: 'flex-end' },
     chatIn: { backgroundColor: c.chipBg, alignSelf: 'flex-start' },
@@ -6644,6 +7040,8 @@ function makeStyles(c: Palette) {
     wheelCenterTri: { width: 0, height: 0, borderLeftWidth: 5, borderRightWidth: 5, borderTopWidth: 7, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: c.link, marginBottom: 1 },
     mapLink: { marginTop: 8, alignSelf: 'flex-start', backgroundColor: c.panel, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 1, borderColor: c.accentBorder },
     mapLinkText: { color: c.link, fontSize: 12, fontWeight: '600' },
+    codeBox: { marginTop: 10, backgroundColor: c.panel, borderRadius: 8, borderWidth: 1, borderColor: c.border, padding: 10 },
+    codeText: { color: c.text2, fontSize: 12.5, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', lineHeight: 19 },
     link: { color: c.link, fontWeight: '600' },
     respondBtn: { marginTop: 10, backgroundColor: c.accentBtn, borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
     respondBtnText: { color: 'white', fontWeight: '600', fontSize: 14 },

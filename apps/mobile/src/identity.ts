@@ -42,6 +42,25 @@ export async function clearKey(): Promise<void> {
   await kvDelete(KEY);
 }
 
+/**
+ * Permanently erase ALL on-device account data — the identity key plus every
+ * piece of local state tied to it (profile, settings, negotiations, posts,
+ * address book, push token, and assorted flags). Used by "Delete account".
+ * Irrecoverable. Caller is responsible for any network-side cleanup (withdraw
+ * intents, blank the public profile, remove cloud backup) BEFORE calling this,
+ * since that needs the key.
+ */
+export async function wipeAllLocalData(): Promise<void> {
+  const KEYS = [
+    'freeport.nsec', 'freeport.profile', 'freeport.prefs', 'freeport.negotiations',
+    'freeport.published', 'freeport.addressbook', 'freeport.created', 'freeport.rated',
+    'freeport.celebrated', 'freeport.expiredLog', 'freeport.expiredSeen',
+    'freeport.expoPushToken', 'freeport.geoOk', 'freeport.guidanceSeen', 'freeport.notifDismiss',
+    'freeport.pushOn',
+  ];
+  await Promise.all(KEYS.map((k) => kvDelete(k).catch(() => {})));
+}
+
 /** The raw stored nsec string (for cloud backup), or null if none. */
 export async function getStoredNsec(): Promise<string | null> {
   return (await kvGet(KEY)) ?? null;

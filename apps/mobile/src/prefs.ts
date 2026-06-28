@@ -50,6 +50,9 @@ export interface Prefs {
   browseAlertNotify: boolean;
   /** Max distance for Browse results, in the active distance unit (km/mi). Default 100. */
   browseMaxDistance: number;
+  /** Auto-share your live location to the other party while a deal is active
+   *  (until it completes). On by default. */
+  sendLocationOnDeal: boolean;
 }
 
 const DEFAULTS: Prefs = {
@@ -69,6 +72,7 @@ const DEFAULTS: Prefs = {
   browseAlertSound: false,
   browseAlertNotify: false,
   browseMaxDistance: 100,
+  sendLocationOnDeal: true,
 };
 
 export async function loadPrefs(): Promise<Prefs> {

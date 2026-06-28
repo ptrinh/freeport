@@ -1,5 +1,7 @@
-/** Web time picker — native HTML <input type="time"> (15-min steps). */
+/** Web date+time picker — native HTML <input type="datetime-local"> (15-min steps). */
 import React from 'react';
+
+const pad = (n: number) => String(n).padStart(2, '0');
 
 export function TimeSpinner({
   value,
@@ -12,16 +14,24 @@ export function TimeSpinner({
   onClose: () => void;
 }) {
   if (!visible) return null;
-  const hh = String(value.getHours()).padStart(2, '0');
-  const mm = String(value.getMinutes()).padStart(2, '0');
+  const fmt = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const local = fmt(value);
+  // Allow booking up to 7 days ahead.
+  const max = fmt(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
   return React.createElement('input', {
-    type: 'time',
+    type: 'datetime-local',
     step: 900,
-    value: `${hh}:${mm}`,
+    value: local,
+    max,
     onChange: (e: any) => {
-      const [h, m] = String(e.target.value).split(':').map(Number);
+      const v = String(e.target.value);
+      if (!v) return;
+      const [datePart, timePart] = v.split('T');
+      const [y, mo, da] = datePart.split('-').map(Number);
+      const [h, mi] = (timePart || '0:0').split(':').map(Number);
       const d = new Date(value);
-      d.setHours(h || 0, m || 0, 0, 0);
+      d.setFullYear(y, (mo || 1) - 1, da || 1);
+      d.setHours(h || 0, mi || 0, 0, 0);
       onPick(d);
     },
     style: {

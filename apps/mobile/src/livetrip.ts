@@ -81,6 +81,22 @@ export function tripLink(session: TripSession, origin: string): string {
   return `${origin.replace(/\/$/, '')}/#t=${b64FromBytes(session.sk)}`;
 }
 
+/** The session's base64url secret — persist this to reuse the SAME link/key
+ *  across app restarts so a shared link never goes stale. */
+export function tripSecret(session: TripSession): string {
+  return b64FromBytes(session.sk);
+}
+
+/** Rebuild a session from a persisted secret (see `tripSecret`). */
+export function restoreTripSession(secretB64: string, info: TripStatic): TripSession | null {
+  try {
+    const sk = b64ToBytes(secretB64);
+    if (sk.length !== 32) return null;
+    const pk = getPublicKey(sk);
+    return { sk, pk, id: pk.slice(0, 16), info };
+  } catch { return null; }
+}
+
 /** Parse a viewer URL hash like "#t=…" → reconstruct the full view, or null. */
 export function decodeTripHash(hash: string): TripView | null {
   const m = /#t=([A-Za-z0-9\-_]+)/.exec(hash || '');
