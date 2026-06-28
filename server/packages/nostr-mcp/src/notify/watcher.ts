@@ -18,6 +18,12 @@ import { matches, unionKinds } from './match.js';
 import type { SubStore, SubRecord } from './store.js';
 
 const KIND_DM = 4;
+// Freeport sends negotiation CONTROL messages (offers, accepts, counters, stage
+// updates, contact exchange, the auto-shared trip link) as kind-4 DMs too, not
+// just human chat. The notifier is content-blind (NIP-04), so it can't tell them
+// apart — without this, an active deal spams "New message". Coalesce: at most one
+// DM push per subscriber per this window. Tune with DM_NOTIFY_COOLDOWN_SEC.
+const DM_COOLDOWN_MS = Math.max(0, Number(process.env.DM_NOTIFY_COOLDOWN_SEC ?? 90)) * 1000;
 
 export class Watcher {
   private readonly pool = new SimplePool();
@@ -28,6 +34,8 @@ export class Watcher {
   private pubkeys: string[] = [];
   /** Bounded dedupe of (subId|eventId) already pushed. */
   private seen = new Set<string>();
+  /** Last DM-notification time per subscriber id, for burst coalescing. */
+  private readonly lastDmPush = new Map<string, number>();
 
   constructor(private readonly relays: string[], private readonly store: SubStore) {}
 
@@ -83,15 +91,25 @@ export class Watcher {
     const recipients = new Set(ev.tags.filter((t) => t[0] === 'p').map((t) => t[1]));
     for (const rec of this.store.all()) {
       if (!rec.pubkey || !recipients.has(rec.pubkey)) continue;
-      await this.maybePush(rec, ev.id, { body: 'New message', tag: 'freeport-dm', data: { url: '/' } });
+      await this.maybePush(rec, ev.id, { body: 'New message', tag: 'freeport-dm', data: { url: '/' } }, rec.id);
     }
   }
 
-  private async maybePush(rec: SubRecord, eventId: string, body: { body: string; tag: string; data: Record<string, unknown> }): Promise<void> {
+  /**
+   * @param coalesceKey when set, collapse pushes for this key into one per
+   *   DM_COOLDOWN_MS (used for DMs, which include bursty control traffic).
+   */
+  private async maybePush(rec: SubRecord, eventId: string, body: { body: string; tag: string; data: Record<string, unknown> }, coalesceKey?: string): Promise<void> {
     const key = `${rec.id}|${eventId}`;
     if (this.seen.has(key)) return;
     this.seen.add(key);
     if (this.seen.size > 50000) this.seen.clear(); // bound memory
+    if (coalesceKey && DM_COOLDOWN_MS > 0) {
+      const now = Date.now();
+      const last = this.lastDmPush.get(coalesceKey) ?? 0;
+      if (now - last < DM_COOLDOWN_MS) return; // within the window → skip (already notified recently)
+      this.lastDmPush.set(coalesceKey, now);
+    }
     if (rec.expoPushToken) await this.pushExpo(rec, body);
     else if (rec.subscription) await this.pushWeb(rec, body);
   }

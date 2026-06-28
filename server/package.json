@@ -1,7 +1,7 @@
 {
   "name": "freeport-nostr-mcp-server",
   "private": true,
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Self-hostable Freeport server: a read-only Nostr MCP endpoint that doubles as a Web Push / Expo push notifier.",
   "license": "MIT",
   "workspaces": [
