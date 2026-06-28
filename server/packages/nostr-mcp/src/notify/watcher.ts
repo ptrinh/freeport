@@ -77,21 +77,25 @@ export class Watcher {
     try { const c = JSON.parse(ev.content); if (typeof c?.title === 'string') title = c.title.trim().slice(0, 80); } catch { /* ignore */ }
     const label = offer ? 'New offer near you' : 'New request near you';
     const body = title ? `${label}: ${title}` : label;
-    for (const rec of this.store.all()) {
+    // Index lookup: only subs watching a matching topic (or with no topic
+    // filter) are candidates; `matches()` still does the precise kinds+geohash test.
+    const evTopics = ev.tags.filter((t) => t[0] === 't').map((t) => t[1]);
+    for (const rec of this.store.intentCandidates(evTopics)) {
       if (!matches(ev, rec.filters)) continue;
       await this.maybePush(rec, ev.id, {
         body,
         tag: 'freeport-intent',
-        data: { kind: ev.kind, id: ev.id, url: '/' },
+        // Tapping it should land on Browse (where nearby posts live).
+        data: { kind: ev.kind, id: ev.id, tab: 'browse', url: '/?tab=browse' },
       });
     }
   }
 
   private async onDM(ev: Event): Promise<void> {
-    const recipients = new Set(ev.tags.filter((t) => t[0] === 'p').map((t) => t[1]));
-    for (const rec of this.store.all()) {
-      if (!rec.pubkey || !recipients.has(rec.pubkey)) continue;
-      await this.maybePush(rec, ev.id, { body: 'New message', tag: 'freeport-dm', data: { url: '/' } }, rec.id);
+    const recipients = ev.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
+    // Index lookup by recipient pubkey — O(recipients), not O(all subscribers).
+    for (const rec of this.store.subsForPubkeys(recipients)) {
+      await this.maybePush(rec, ev.id, { body: 'New message', tag: 'freeport-dm', data: { tab: 'messages', url: '/?tab=messages' } }, rec.id);
     }
   }
 

@@ -1,9 +1,17 @@
 /**
- * Subscription store — JSON file on disk. Each record pairs a browser Push
- * subscription with the filters that decide which intents trigger a push.
+ * Subscription store — in-memory with secondary indexes, persisted to a JSON
+ * file on disk (same format as before; loads existing files unchanged).
  *
- * Content-blind: we keep only the push endpoint/keys (opaque) and coarse
- * filter criteria the user chose. No identity, no message content.
+ * Scaling notes:
+ *  - Records live in a Map; matching goes through indexes (pubkey -> subs for
+ *    DMs, topic -> subs for intents) so a single event is matched in
+ *    O(recipients/topics), not O(all subscribers).
+ *  - Writes are DEBOUNCED: a burst of subscribe/unsubscribe coalesces into one
+ *    file write instead of rewriting the whole JSON on every change. A final
+ *    synchronous flush runs on process exit so nothing in the window is lost.
+ *
+ * Content-blind: we keep only the push endpoint/keys (opaque) and coarse filter
+ * criteria the user chose. No identity, no message content.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
@@ -36,16 +44,58 @@ export interface SubRecord {
 
 export class SubStore {
   private map = new Map<string, SubRecord>();
+  // Secondary indexes (rebuilt from `map`; kept in sync on put/remove).
+  private byPubkey = new Map<string, Set<string>>(); // pubkey -> sub ids (DM routing)
+  private byTopic = new Map<string, Set<string>>();   // topic  -> sub ids (intent routing)
+  private noTopic = new Set<string>();                // subs with no topic filter (match any intent topic)
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private readonly path: string) {
+  constructor(private readonly path: string, private readonly flushDelayMs = 1500) {
     if (existsSync(path)) {
       try {
-        for (const r of JSON.parse(readFileSync(path, 'utf8')) as SubRecord[]) this.map.set(r.id, r);
+        for (const r of JSON.parse(readFileSync(path, 'utf8')) as SubRecord[]) {
+          this.map.set(r.id, r);
+          this.index(r);
+        }
       } catch { /* start empty on corrupt file */ }
+    }
+    // Last-chance synchronous flush so a pending debounced write isn't lost.
+    const onExit = () => { if (this.flushTimer) this.flushNow(); };
+    process.once('SIGTERM', () => { onExit(); process.exit(0); });
+    process.once('SIGINT', () => { onExit(); process.exit(0); });
+    process.once('beforeExit', onExit);
+  }
+
+  private index(rec: SubRecord): void {
+    if (rec.pubkey) {
+      let s = this.byPubkey.get(rec.pubkey); if (!s) { s = new Set(); this.byPubkey.set(rec.pubkey, s); }
+      s.add(rec.id);
+    }
+    const topics = rec.filters?.topics;
+    if (topics?.length) {
+      for (const t of topics) { let s = this.byTopic.get(t); if (!s) { s = new Set(); this.byTopic.set(t, s); } s.add(rec.id); }
+    } else {
+      this.noTopic.add(rec.id);
     }
   }
 
-  private flush(): void {
+  private unindex(rec: SubRecord): void {
+    if (rec.pubkey) { const s = this.byPubkey.get(rec.pubkey); if (s) { s.delete(rec.id); if (!s.size) this.byPubkey.delete(rec.pubkey); } }
+    const topics = rec.filters?.topics;
+    if (topics?.length) {
+      for (const t of topics) { const s = this.byTopic.get(t); if (s) { s.delete(rec.id); if (!s.size) this.byTopic.delete(t); } }
+    } else {
+      this.noTopic.delete(rec.id);
+    }
+  }
+
+  private scheduleFlush(): void {
+    if (this.flushTimer) return;
+    this.flushTimer = setTimeout(() => this.flushNow(), this.flushDelayMs);
+  }
+
+  private flushNow(): void {
+    if (this.flushTimer) { clearTimeout(this.flushTimer); this.flushTimer = null; }
     mkdirSync(dirname(this.path), { recursive: true });
     writeFileSync(this.path, JSON.stringify([...this.map.values()], null, 2));
   }
@@ -61,9 +111,12 @@ export class SubStore {
   }
 
   private put(id: string, partial: Omit<SubRecord, 'id' | 'createdAt'>): SubRecord {
-    const rec: SubRecord = { id, ...partial, createdAt: this.map.get(id)?.createdAt ?? Date.now() };
+    const old = this.map.get(id);
+    if (old) this.unindex(old);
+    const rec: SubRecord = { id, ...partial, createdAt: old?.createdAt ?? Date.now() };
     this.map.set(id, rec);
-    this.flush();
+    this.index(rec);
+    this.scheduleFlush();
     return rec;
   }
 
@@ -73,13 +126,42 @@ export class SubStore {
   }
 
   remove(id: string): boolean {
-    const had = this.map.delete(id);
-    if (had) this.flush();
-    return had;
+    const rec = this.map.get(id);
+    if (!rec) return false;
+    this.unindex(rec);
+    this.map.delete(id);
+    this.scheduleFlush();
+    return true;
   }
 
   all(): SubRecord[] { return [...this.map.values()]; }
   size(): number { return this.map.size; }
+
+  /** Subscribers watching any of these pubkeys for inbound DMs. O(pubkeys). */
+  subsForPubkeys(pubkeys: Iterable<string>): SubRecord[] {
+    const out: SubRecord[] = [];
+    const seen = new Set<string>();
+    for (const pk of pubkeys) {
+      const ids = this.byPubkey.get(pk);
+      if (!ids) continue;
+      for (const id of ids) { if (seen.has(id)) continue; seen.add(id); const r = this.map.get(id); if (r) out.push(r); }
+    }
+    return out;
+  }
+
+  /**
+   * Candidate subscribers for an intent with these topic tags: those watching a
+   * matching topic, plus those with no topic filter (which match any topic).
+   * Callers still run the precise `matches()` (kinds + geohash radius) on each.
+   */
+  intentCandidates(eventTopics: Iterable<string>): SubRecord[] {
+    const out: SubRecord[] = [];
+    const seen = new Set<string>();
+    const add = (id: string) => { if (seen.has(id)) return; seen.add(id); const r = this.map.get(id); if (r) out.push(r); };
+    for (const t of eventTopics) { const ids = this.byTopic.get(t); if (ids) for (const id of ids) add(id); }
+    for (const id of this.noTopic) add(id);
+    return out;
+  }
 }
 
 /** Stable, non-reversible id from a transport key (endpoint URL or Expo token). */
