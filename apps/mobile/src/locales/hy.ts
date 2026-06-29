@@ -1,5 +1,16 @@
 /** Armenian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Հրապարակել",
+  "Pin the location": "Ամրացրեք վայրը",
+  "Tap “Pin location on map” to set where this is.": "Հպեք «Ամրացնել վայրը քարտեզի վրա», որպեսզի նշեք, թե որտեղ է սա։",
+  "Missing field": "Բացակայող դաշտ",
+  "Service / Product is required.": "Ծառայությունը / Ապրանքը պարտադիր է։",
+  "Not allowed": "Չի թույլատրվում",
+  "Could not post.": "Չհաջողվեց հրապարակել։",
+  "Pin your pickup": "Ամրացրեք վերցնելու վայրը",
+  "Tap “Pin location on map” to set where the ride starts.": "Հպեք «Ամրացնել վայրը քարտեզի վրա», որպեսզի նշեք, թե որտեղ է սկսվում երթը։",
+  "Missing fields": "Բացակայող դաշտեր",
+  "Destination (To) is required.": "Նպատակակետը (Դեպի) պարտադիր է։",
   "Send location on active deal": "Ուղարկել տեղադրությունն ակտիվ գործարքի ժամանակ",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Կիսվեք ձեր ուղիղ տեղադրությամբ մյուս կողմի հետ, քանի դեռ գործարքն ակտիվ է: Կիսվելը դադարում է գործարքի ավարտից հետո:",
   "Update track": "Թարմացման ալիք",

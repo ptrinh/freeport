@@ -1,5 +1,16 @@
 /** Chinese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "发布",
+  "Pin the location": "标记地点",
+  "Tap “Pin location on map” to set where this is.": "点按“在地图上标记位置”以设置这里的位置。",
+  "Missing field": "信息缺失",
+  "Service / Product is required.": "需要填写服务 / 商品。",
+  "Not allowed": "不允许",
+  "Could not post.": "无法发布。",
+  "Pin your pickup": "标记上车点",
+  "Tap “Pin location on map” to set where the ride starts.": "点按“在地图上标记位置”以设置行程的出发地。",
+  "Missing fields": "信息缺失",
+  "Destination (To) is required.": "需要填写目的地（到达）。",
   "Send location on active deal": "交易进行中发送位置",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "在交易进行期间与对方共享你的实时位置。交易完成后将停止共享。",
   "Update track": "更新通道",

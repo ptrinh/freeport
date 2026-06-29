@@ -1,5 +1,16 @@
 /** Persian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "انتشار",
+  "Pin the location": "موقعیت را پین کنید",
+  "Tap “Pin location on map” to set where this is.": "برای تعیین محل این، روی «پین کردن موقعیت روی نقشه» ضربه بزنید.",
+  "Missing field": "فیلد ناقص",
+  "Service / Product is required.": "خدمت / محصول الزامی است.",
+  "Not allowed": "مجاز نیست",
+  "Could not post.": "انتشار ممکن نشد.",
+  "Pin your pickup": "محل سوار شدن را پین کنید",
+  "Tap “Pin location on map” to set where the ride starts.": "برای تعیین محل شروع سفر، روی «پین کردن موقعیت روی نقشه» ضربه بزنید.",
+  "Missing fields": "فیلدهای ناقص",
+  "Destination (To) is required.": "مقصد (به) الزامی است.",
   "Send location on active deal": "ارسال موقعیت در معامله فعال",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "موقعیت زنده خود را در حین فعال بودن معامله با طرف مقابل به اشتراک بگذارید. با تکمیل معامله، اشتراک‌گذاری متوقف می‌شود.",
   "Update track": "کانال بهروزرسانی",

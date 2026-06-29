@@ -1,5 +1,16 @@
 /** Japanese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "公開",
+  "Pin the location": "場所をピン留め",
+  "Tap “Pin location on map” to set where this is.": "「地図に場所をピン留め」をタップして、ここがどこかを設定します。",
+  "Missing field": "未入力の項目",
+  "Service / Product is required.": "サービス / 商品は必須です。",
+  "Not allowed": "許可されていません",
+  "Could not post.": "投稿できませんでした。",
+  "Pin your pickup": "乗車地点をピン留め",
+  "Tap “Pin location on map” to set where the ride starts.": "「地図に場所をピン留め」をタップして、乗車の出発地を設定します。",
+  "Missing fields": "未入力の項目",
+  "Destination (To) is required.": "目的地（行き先）は必須です。",
   "Send location on active deal": "取引中に位置情報を送信",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "取引が進行中の間、相手にリアルタイムの位置情報を共有します。取引が完了すると共有は停止します。",
   "Update track": "更新チャンネル",

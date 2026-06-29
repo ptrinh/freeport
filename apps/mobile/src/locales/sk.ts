@@ -1,5 +1,16 @@
 /** Slovak translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Zverejniť",
+  "Pin the location": "Pripnúť miesto",
+  "Tap “Pin location on map” to set where this is.": "Ťuknite na „Pripnúť miesto na mape“ a nastavte, kde to je.",
+  "Missing field": "Chýbajúce pole",
+  "Service / Product is required.": "Služba / Produkt je povinné.",
+  "Not allowed": "Nie je povolené",
+  "Could not post.": "Nepodarilo sa zverejniť.",
+  "Pin your pickup": "Pripnúť miesto vyzdvihnutia",
+  "Tap “Pin location on map” to set where the ride starts.": "Ťuknite na „Pripnúť miesto na mape“ a nastavte, kde jazda začína.",
+  "Missing fields": "Chýbajúce polia",
+  "Destination (To) is required.": "Cieľ (Kam) je povinný.",
   "Send location on active deal": "Odosielať polohu počas aktívnej transakcie",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Zdieľajte svoju polohu v reálnom čase s druhou stranou počas trvania transakcie. Zdieľanie sa zastaví po dokončení transakcie.",
   "Update track": "Kanál aktualizácií",

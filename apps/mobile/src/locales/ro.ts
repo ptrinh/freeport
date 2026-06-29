@@ -1,5 +1,16 @@
 /** Romanian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Publică",
+  "Pin the location": "Fixează locația",
+  "Tap “Pin location on map” to set where this is.": "Atinge „Fixează locația pe hartă” pentru a stabili unde este aceasta.",
+  "Missing field": "Câmp lipsă",
+  "Service / Product is required.": "Serviciul / Produsul este obligatoriu.",
+  "Not allowed": "Nepermis",
+  "Could not post.": "Publicarea a eșuat.",
+  "Pin your pickup": "Fixează punctul de preluare",
+  "Tap “Pin location on map” to set where the ride starts.": "Atinge „Fixează locația pe hartă” pentru a stabili unde începe cursa.",
+  "Missing fields": "Câmpuri lipsă",
+  "Destination (To) is required.": "Destinația (Spre) este obligatorie.",
   "Send location on active deal": "Trimite locația în timpul unei tranzacții active",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Partajează-ți locația în timp real cu cealaltă parte cât timp o tranzacție este activă. Partajarea se oprește la finalizarea tranzacției.",
   "Update track": "Canal de actualizări",

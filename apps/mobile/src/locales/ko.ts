@@ -1,5 +1,16 @@
 /** Korean translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "게시",
+  "Pin the location": "위치 고정",
+  "Tap “Pin location on map” to set where this is.": "“지도에 위치 고정”을 탭하여 이곳이 어디인지 설정하세요.",
+  "Missing field": "누락된 항목",
+  "Service / Product is required.": "서비스 / 상품은 필수입니다.",
+  "Not allowed": "허용되지 않음",
+  "Could not post.": "게시하지 못했습니다.",
+  "Pin your pickup": "탑승 위치 고정",
+  "Tap “Pin location on map” to set where the ride starts.": "“지도에 위치 고정”을 탭하여 운행이 시작되는 곳을 설정하세요.",
+  "Missing fields": "누락된 항목",
+  "Destination (To) is required.": "목적지(도착지)는 필수입니다.",
   "Send location on active deal": "거래 중 위치 전송",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "거래가 진행되는 동안 상대방과 실시간 위치를 공유합니다. 거래가 완료되면 공유가 중단됩니다.",
   "Update track": "업데이트 채널",

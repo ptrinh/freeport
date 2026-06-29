@@ -1,5 +1,16 @@
 /** Swedish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Publicera",
+  "Pin the location": "Fäst platsen",
+  "Tap “Pin location on map” to set where this is.": "Tryck på “Fäst plats på karta” för att ange var detta är.",
+  "Missing field": "Saknat fält",
+  "Service / Product is required.": "Tjänst / Produkt krävs.",
+  "Not allowed": "Inte tillåtet",
+  "Could not post.": "Det gick inte att publicera.",
+  "Pin your pickup": "Fäst din upphämtningsplats",
+  "Tap “Pin location on map” to set where the ride starts.": "Tryck på “Fäst plats på karta” för att ange var resan börjar.",
+  "Missing fields": "Saknade fält",
+  "Destination (To) is required.": "Destination (Till) krävs.",
   "Send location on active deal": "Skicka plats vid aktiv affär",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Dela din liveplats med den andra parten medan en affär pågår. Delningen upphör när affären är slutförd.",
   "Update track": "Uppdateringskanal",

@@ -1,5 +1,16 @@
 /** Hindi translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "प्रकाशित करें",
+  "Pin the location": "स्थान पिन करें",
+  "Tap “Pin location on map” to set where this is.": "यह कहाँ है, यह तय करने के लिए “मानचित्र पर स्थान पिन करें” पर टैप करें।",
+  "Missing field": "अनुपस्थित फ़ील्ड",
+  "Service / Product is required.": "सेवा / उत्पाद आवश्यक है।",
+  "Not allowed": "अनुमति नहीं है",
+  "Could not post.": "पोस्ट नहीं हो सका।",
+  "Pin your pickup": "अपना पिकअप पिन करें",
+  "Tap “Pin location on map” to set where the ride starts.": "यात्रा कहाँ से शुरू होती है, यह तय करने के लिए “मानचित्र पर स्थान पिन करें” पर टैप करें।",
+  "Missing fields": "अनुपस्थित फ़ील्ड",
+  "Destination (To) is required.": "गंतव्य (तक) आवश्यक है।",
   "Send location on active deal": "सक्रिय सौदे पर स्थान भेजें",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "सौदा सक्रिय रहने के दौरान अपना लाइव स्थान दूसरे पक्ष के साथ साझा करें। सौदा पूरा होने पर साझा करना बंद हो जाता है।",
   "Update track": "अपडेट चैनल",

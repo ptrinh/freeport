@@ -1,5 +1,16 @@
 /** Estonian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Avalda",
+  "Pin the location": "Kinnita asukoht",
+  "Tap “Pin location on map” to set where this is.": "Puuduta „Kinnita asukoht kaardil“, et määrata, kus see on.",
+  "Missing field": "Puuduv väli",
+  "Service / Product is required.": "Teenus / Toode on kohustuslik.",
+  "Not allowed": "Pole lubatud",
+  "Could not post.": "Avaldamine ebaõnnestus.",
+  "Pin your pickup": "Kinnita pealevõtukoht",
+  "Tap “Pin location on map” to set where the ride starts.": "Puuduta „Kinnita asukoht kaardil“, et määrata, kust sõit algab.",
+  "Missing fields": "Puuduvad väljad",
+  "Destination (To) is required.": "Sihtkoht (Kuhu) on kohustuslik.",
   "Send location on active deal": "Saada asukoht aktiivse tehingu ajal",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Jaga oma reaalajas asukohta teise osapoolega, kuni tehing on aktiivne. Jagamine lõpeb tehingu lõppedes.",
   "Update track": "Värskenduskanal",

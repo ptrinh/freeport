@@ -1,5 +1,16 @@
 /** Czech translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Zveřejnit",
+  "Pin the location": "Připnout místo",
+  "Tap “Pin location on map” to set where this is.": "Klepnutím na „Připnout místo na mapě“ určete, kde to je.",
+  "Missing field": "Chybějící pole",
+  "Service / Product is required.": "Služba / Produkt je povinné.",
+  "Not allowed": "Není povoleno",
+  "Could not post.": "Nepodařilo se zveřejnit.",
+  "Pin your pickup": "Připnout místo vyzvednutí",
+  "Tap “Pin location on map” to set where the ride starts.": "Klepnutím na „Připnout místo na mapě“ určete, kde jízda začíná.",
+  "Missing fields": "Chybějící pole",
+  "Destination (To) is required.": "Cíl (Kam) je povinný.",
   "Send location on active deal": "Odesílat polohu při aktivní transakci",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Sdílejte svou živou polohu s druhou stranou po dobu trvání transakce. Sdílení se ukončí, jakmile je transakce dokončena.",
   "Update track": "Kanál aktualizací",

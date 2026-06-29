@@ -2765,8 +2765,8 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
 
   const post = async () => {
     if (!client) return;
-    if (!fromGeohash) { Alert.alert('Pin your pickup', 'Tap “Pin location on map” to set where the ride starts.'); return; }
-    if (!to.trim()) { Alert.alert('Missing fields', 'Destination (To) is required.'); return; }
+    if (!fromGeohash) { Alert.alert(t('Pin your pickup'), t('Tap “Pin location on map” to set where the ride starts.')); return; }
+    if (!to.trim()) { Alert.alert(t('Missing fields'), t('Destination (To) is required.')); return; }
     // Anti-spam caps on live ride requests (a request lingers in drivers' search
     // results, so unbounded posting — esp. flexible/long ones — is the abuse
     // vector). Count my own live, unconfirmed, not-withdrawn rideshare requests.
@@ -2825,7 +2825,7 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
       onPosted?.(); // collapse the form, reveal My Requests
       Alert.alert(t('Posted'), t('Your ride request is live.'));
     } catch (e: any) {
-      Alert.alert('Not allowed', e?.message ?? 'Could not post.');
+      Alert.alert(t('Not allowed'), e?.message ?? t('Could not post.'));
     } finally { setPosting(false); }
   };
 
@@ -2880,8 +2880,8 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
 
   const post = async () => {
     if (!client) return;
-    if (!locationGeohash) { Alert.alert('Pin the location', 'Tap “Pin location on map” to set where this is.'); return; }
-    if (!service.trim()) { Alert.alert('Missing field', 'Service / Product is required.'); return; }
+    if (!locationGeohash) { Alert.alert(t('Pin the location'), t('Tap “Pin location on map” to set where this is.')); return; }
+    if (!service.trim()) { Alert.alert(t('Missing field'), t('Service / Product is required.')); return; }
     setPosting(true);
     try {
       const window = timeToWindow(time, flexible);
@@ -2920,7 +2920,7 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
       onPosted?.(); // collapse the form, reveal My Posts
       Alert.alert(t('Posted'), side === 'offer' ? t('Your service offer is live.') : t('Your service request is live.'));
     } catch (e: any) {
-      Alert.alert('Not allowed', e?.message ?? 'Could not post.');
+      Alert.alert(t('Not allowed'), e?.message ?? t('Could not post.'));
     } finally { setPosting(false); }
   };
 
@@ -2963,7 +2963,7 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
       <DurationField hours={durHours} minutes={durMinutes} onChange={(h, m) => { setDurHours(h); setDurMinutes(m); }} />
       <Field label={t("Note")} value={notes} onChange={setNotes} placeholder={t("Any details…")} maxLength={100} multiline />
       <ImagePickerField images={images} onChange={setImages} label={t("Photos (optional)")} />
-      <PostButton onPress={post} loading={posting} />
+      <PostButton onPress={post} loading={posting} label={t("Publish")} />
     </>
   );
 }
@@ -3406,7 +3406,7 @@ function DealsTab({
               } else {
                 const svc = String(item.terms?.service ?? p.service ?? '').trim();
                 const locShort = String(item.terms?.location ?? p.location?.name ?? '').split(',')[0].trim();
-                title = `${svc}${locShort ? ' @ ' + locShort : ''}`;
+                title = `${svc}${locShort ? ' @ ' + locShort : ''}${timeStr ? ' · ' + timeStr : ''}`;
               }
               if (pay) title += ` · ${pay}`;
               return (
@@ -4815,13 +4815,18 @@ function SettingsTab({
   // pushes track new posts in the slice they care about.
   const pushFilters = React.useMemo<PushFilters | undefined>(() => {
     if (!browseAlertNotify) return undefined;
+    // Use the EFFECTIVE category/subcategory the Browse UI shows (browseCat/
+    // browseEffSub), not the raw pref — otherwise an unset pref ('') fell back to
+    // 'All' here while Browse showed Ridesharing, so the push topic was area-only
+    // ("sg") and matched every category. This keeps the alert scoped to the slice
+    // the user actually sees.
     const topic = browseTopic(location, {
       servicesEnabled,
-      filterCat: browseCategory || 'All',
-      filterSub: browseSubcategory || null,
+      filterCat: browseCat,
+      filterSub: browseEffSub || null,
     });
     return { topics: [topic] };
-  }, [browseAlertNotify, location, servicesEnabled, browseCategory, browseSubcategory]);
+  }, [browseAlertNotify, location, servicesEnabled, browseCat, browseEffSub]);
   const togglePush = async () => {
     setPushBusy(true);
     try {

@@ -1,5 +1,16 @@
 /** Vietnamese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Đăng",
+  "Pin the location": "Ghim địa điểm",
+  "Tap “Pin location on map” to set where this is.": "Chạm “Ghim vị trí trên bản đồ” để đặt nơi này.",
+  "Missing field": "Thiếu thông tin",
+  "Service / Product is required.": "Cần nhập Dịch vụ / Sản phẩm.",
+  "Not allowed": "Không được phép",
+  "Could not post.": "Không thể đăng.",
+  "Pin your pickup": "Ghim điểm đón",
+  "Tap “Pin location on map” to set where the ride starts.": "Chạm “Ghim vị trí trên bản đồ” để đặt nơi bắt đầu chuyến đi.",
+  "Missing fields": "Thiếu thông tin",
+  "Destination (To) is required.": "Cần nhập Điểm đến (Đến).",
   "Send location on active deal": "Gửi vị trí khi có giao dịch",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Chia sẻ vị trí trực tiếp của bạn với bên kia trong khi giao dịch đang diễn ra. Việc chia sẻ sẽ dừng khi giao dịch hoàn tất.",
   "Update track": "Kênh cập nhật",

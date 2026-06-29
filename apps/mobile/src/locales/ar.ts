@@ -1,5 +1,16 @@
 /** Arabic translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "نشر",
+  "Pin the location": "حدّد الموقع",
+  "Tap “Pin location on map” to set where this is.": "اضغط على “تحديد الموقع على الخريطة” لتعيين مكان هذا.",
+  "Missing field": "حقل ناقص",
+  "Service / Product is required.": "الخدمة / المنتج مطلوب.",
+  "Not allowed": "غير مسموح",
+  "Could not post.": "تعذّر النشر.",
+  "Pin your pickup": "حدّد نقطة الانطلاق",
+  "Tap “Pin location on map” to set where the ride starts.": "اضغط على “تحديد الموقع على الخريطة” لتعيين مكان بدء الرحلة.",
+  "Missing fields": "حقول ناقصة",
+  "Destination (To) is required.": "الوجهة (إلى) مطلوبة.",
   "Send location on active deal": "إرسال الموقع أثناء صفقة نشطة",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "شارك موقعك المباشر مع الطرف الآخر أثناء سريان الصفقة. تتوقف المشاركة عند اكتمال الصفقة.",
   "Update track": "قناة التحديث",

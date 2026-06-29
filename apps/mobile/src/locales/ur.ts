@@ -1,5 +1,16 @@
 /** Urdu translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "شائع کریں",
+  "Pin the location": "مقام پن کریں",
+  "Tap “Pin location on map” to set where this is.": "یہ کہاں ہے یہ طے کرنے کے لیے “نقشے پر مقام پن کریں” پر ٹیپ کریں۔",
+  "Missing field": "خانہ نامکمل",
+  "Service / Product is required.": "سروس / پروڈکٹ درکار ہے۔",
+  "Not allowed": "اجازت نہیں ہے",
+  "Could not post.": "پوسٹ نہیں ہو سکا۔",
+  "Pin your pickup": "اپنا پک اپ پن کریں",
+  "Tap “Pin location on map” to set where the ride starts.": "سفر کہاں سے شروع ہوتا ہے یہ طے کرنے کے لیے “نقشے پر مقام پن کریں” پر ٹیپ کریں۔",
+  "Missing fields": "خانے نامکمل",
+  "Destination (To) is required.": "منزل (تک) درکار ہے۔",
   "Send location on active deal": "فعال ڈیل کے دوران مقام بھیجیں",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "ڈیل جاری رہنے کے دوران اپنا براہ راست مقام دوسرے فریق کے ساتھ شیئر کریں۔ ڈیل مکمل ہونے پر شیئرنگ رک جاتی ہے۔",
   "Update track": "اپ ڈیٹ چینل",

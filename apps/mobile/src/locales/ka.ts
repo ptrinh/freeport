@@ -1,5 +1,16 @@
 /** Georgian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "გამოქვეყნება",
+  "Pin the location": "ჩამაგრეთ მდებარეობა",
+  "Tap “Pin location on map” to set where this is.": "შეეხეთ „მდებარეობის ჩამაგრება რუკაზე“, რათა მიუთითოთ, სად არის ეს.",
+  "Missing field": "გამოტოვებული ველი",
+  "Service / Product is required.": "სერვისი / პროდუქტი სავალდებულოა.",
+  "Not allowed": "დაუშვებელია",
+  "Could not post.": "გამოქვეყნება ვერ მოხერხდა.",
+  "Pin your pickup": "ჩამაგრეთ აყვანის ადგილი",
+  "Tap “Pin location on map” to set where the ride starts.": "შეეხეთ „მდებარეობის ჩამაგრება რუკაზე“, რათა მიუთითოთ, საიდან იწყება მგზავრობა.",
+  "Missing fields": "გამოტოვებული ველები",
+  "Destination (To) is required.": "დანიშნულება (სად) სავალდებულოა.",
   "Send location on active deal": "მდებარეობის გაგზავნა აქტიური გარიგებისას",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "გააზიარეთ თქვენი რეალურ დროში მდებარეობა მეორე მხარესთან, სანამ გარიგება აქტიურია. გაზიარება ჩერდება გარიგების დასრულებისას.",
   "Update track": "განახლების არხი",

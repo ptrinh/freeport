@@ -1,5 +1,16 @@
 /** Afrikaans translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Plaas",
+  "Pin the location": "Speld die plek vas",
+  "Tap “Pin location on map” to set where this is.": "Tik op “Speld plek op kaart vas” om aan te dui waar dit is.",
+  "Missing field": "Ontbrekende veld",
+  "Service / Product is required.": "Diens / Produk is verpligtend.",
+  "Not allowed": "Nie toegelaat nie",
+  "Could not post.": "Kon nie plaas nie.",
+  "Pin your pickup": "Speld jou oplaaipunt vas",
+  "Tap “Pin location on map” to set where the ride starts.": "Tik op “Speld plek op kaart vas” om aan te dui waar die rit begin.",
+  "Missing fields": "Ontbrekende velde",
+  "Destination (To) is required.": "Bestemming (Na) is verpligtend.",
   "Send location on active deal": "Stuur ligging by aktiewe transaksie",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Deel jou regstreekse ligging met die ander party terwyl 'n transaksie aktief is. Deling stop wanneer die transaksie voltooi is.",
   "Update track": "Opdateringskanaal",

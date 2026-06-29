@@ -1,5 +1,16 @@
 /** Serbian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Објави",
+  "Pin the location": "Закачи локацију",
+  "Tap “Pin location on map” to set where this is.": "Додирните „Закачи локацију на мапи“ да одредите где је ово.",
+  "Missing field": "Недостаје поље",
+  "Service / Product is required.": "Услуга / Производ је обавезно.",
+  "Not allowed": "Није дозвољено",
+  "Could not post.": "Објављивање није успело.",
+  "Pin your pickup": "Закачи место преузимања",
+  "Tap “Pin location on map” to set where the ride starts.": "Додирните „Закачи локацију на мапи“ да одредите где вожња почиње.",
+  "Missing fields": "Недостају поља",
+  "Destination (To) is required.": "Одредиште (До) је обавезно.",
   "Send location on active deal": "Слање локације током активног посла",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Поделите своју локацију уживо са другом страном док је посао активан. Дељење престаје када се посао заврши.",
   "Update track": "Канал ажурирања",

@@ -1,5 +1,16 @@
 /** Burmese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "တင်ပါ",
+  "Pin the location": "တည်နေရာကို ပင်ထိုးပါ",
+  "Tap “Pin location on map” to set where this is.": "ဤနေရာသည် ဘယ်နေရာဖြစ်ကြောင်း သတ်မှတ်ရန် “မြေပုံပေါ်တွင် တည်နေရာ ပင်ထိုးပါ” ကို တို့ပါ။",
+  "Missing field": "ဖြည့်ရန်ကျန်နေသည်",
+  "Service / Product is required.": "ဝန်ဆောင်မှု / ကုန်ပစ္စည်း လိုအပ်သည်။",
+  "Not allowed": "ခွင့်မပြုပါ",
+  "Could not post.": "မတင်နိုင်ပါ။",
+  "Pin your pickup": "ကြိုဆိုမည့်နေရာ ပင်ထိုးပါ",
+  "Tap “Pin location on map” to set where the ride starts.": "ခရီးစတင်မည့်နေရာ သတ်မှတ်ရန် “မြေပုံပေါ်တွင် တည်နေရာ ပင်ထိုးပါ” ကို တို့ပါ။",
+  "Missing fields": "ဖြည့်ရန်ကျန်နေသည်",
+  "Destination (To) is required.": "ခရီးဆုံး (သို့) လိုအပ်သည်။",
   "Send location on active deal": "အရောင်းအဝယ်လုပ်နေစဉ် တည်နေရာ ပို့ပါ",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "အရောင်းအဝယ်လုပ်နေစဉ် သင့်တိုက်ရိုက်တည်နေရာကို တစ်ဖက်လူနှင့် မျှဝေပါ။ အရောင်းအဝယ်ပြီးဆုံးသွားသောအခါ မျှဝေမှု ရပ်တန့်သွားပါမည်။",
   "Update track": "အပ်ဒိတ်လမ်းကြောင်း",

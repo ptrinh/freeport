@@ -1,5 +1,16 @@
 /** Bulgarian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Публикувай",
+  "Pin the location": "Закачи местоположението",
+  "Tap “Pin location on map” to set where this is.": "Докоснете „Закачи местоположение на картата“, за да зададете къде е това.",
+  "Missing field": "Липсващо поле",
+  "Service / Product is required.": "Услуга / Продукт е задължително.",
+  "Not allowed": "Не е разрешено",
+  "Could not post.": "Публикуването е неуспешно.",
+  "Pin your pickup": "Закачи мястото за качване",
+  "Tap “Pin location on map” to set where the ride starts.": "Докоснете „Закачи местоположение на картата“, за да зададете откъде започва пътуването.",
+  "Missing fields": "Липсващи полета",
+  "Destination (To) is required.": "Дестинация (До) е задължителна.",
   "Send location on active deal": "Изпращане на местоположение при активна сделка",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Споделяйте местоположението си на живо с другата страна, докато сделката е активна. Споделянето спира при приключване на сделката.",
   "Update track": "Канал за актуализации",

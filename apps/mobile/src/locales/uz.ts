@@ -1,5 +1,16 @@
 /** Uzbek translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Eʼlon qilish",
+  "Pin the location": "Joyni belgilang",
+  "Tap “Pin location on map” to set where this is.": "Bu qayerda ekanini belgilash uchun “Joyni xaritada belgilash”ga teging.",
+  "Missing field": "Toʻldirilmagan maydon",
+  "Service / Product is required.": "Xizmat / Mahsulot talab qilinadi.",
+  "Not allowed": "Ruxsat etilmagan",
+  "Could not post.": "Eʼlon qilib boʻlmadi.",
+  "Pin your pickup": "Olib ketish joyini belgilang",
+  "Tap “Pin location on map” to set where the ride starts.": "Sayohat qayerdan boshlanishini belgilash uchun “Joyni xaritada belgilash”ga teging.",
+  "Missing fields": "Toʻldirilmagan maydonlar",
+  "Destination (To) is required.": "Manzil (Qayerga) talab qilinadi.",
   "Send location on active deal": "Faol bitim vaqtida joylashuvni yuborish",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Bitim davom etayotganda jonli joylashuvingizni boshqa tomon bilan ulashing. Bitim yakunlangach, ulashish to'xtaydi.",
   "Update track": "Yangilanish kanali",

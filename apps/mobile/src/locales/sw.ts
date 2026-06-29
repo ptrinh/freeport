@@ -1,5 +1,16 @@
 /** Swahili translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Chapisha",
+  "Pin the location": "Bandika eneo",
+  "Tap “Pin location on map” to set where this is.": "Gusa “Bandika eneo kwenye ramani” ili kuweka mahali hapa palipo.",
+  "Missing field": "Sehemu inakosekana",
+  "Service / Product is required.": "Huduma / Bidhaa inahitajika.",
+  "Not allowed": "Hairuhusiwi",
+  "Could not post.": "Imeshindwa kuchapisha.",
+  "Pin your pickup": "Bandika eneo lako la kupanda",
+  "Tap “Pin location on map” to set where the ride starts.": "Gusa “Bandika eneo kwenye ramani” ili kuweka mahali safari inapoanzia.",
+  "Missing fields": "Sehemu zinakosekana",
+  "Destination (To) is required.": "Mwisho wa safari (Hadi) unahitajika.",
   "Send location on active deal": "Tuma eneo wakati wa mpango unaoendelea",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Shiriki eneo lako la moja kwa moja na upande mwingine wakati mpango unaendelea. Kushiriki kunasimama mpango unapokamilika.",
   "Update track": "Mkondo wa masasisho",

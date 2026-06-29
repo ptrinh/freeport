@@ -1,5 +1,16 @@
 /** Sinhala translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "ප්‍රකාශ කරන්න",
+  "Pin the location": "ස්ථානය අමුණන්න",
+  "Tap “Pin location on map” to set where this is.": "මෙය කොහේද යන්න සැකසීමට “සිතියමේ ස්ථානය අමුණන්න” තට්ටු කරන්න.",
+  "Missing field": "අස්ථානගත ක්ෂේත්‍රය",
+  "Service / Product is required.": "සේවාව / නිෂ්පාදනය අවශ්‍යයි.",
+  "Not allowed": "අවසර නැත",
+  "Could not post.": "පළ කළ නොහැකි විය.",
+  "Pin your pickup": "ඔබේ පිකප් එක අමුණන්න",
+  "Tap “Pin location on map” to set where the ride starts.": "ගමන ආරම්භ වන්නේ කොහෙන්ද යන්න සැකසීමට “සිතියමේ ස්ථානය අමුණන්න” තට්ටු කරන්න.",
+  "Missing fields": "අස්ථානගත ක්ෂේත්‍ර",
+  "Destination (To) is required.": "ගමනාන්තය (වෙත) අවශ්‍යයි.",
   "Send location on active deal": "ක්‍රියාකාරී ගනුදෙනුවකදී ස්ථානය යවන්න",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "ගනුදෙනුව ක්‍රියාත්මක වන අතරතුර ඔබේ සජීවී ස්ථානය අනෙක් පාර්ශවය සමඟ බෙදා ගන්න. ගනුදෙනුව සම්පූර්ණ වූ විට බෙදා ගැනීම නතර වේ.",
   "Update track": "යාවත්කාලීන නාලිකාව",

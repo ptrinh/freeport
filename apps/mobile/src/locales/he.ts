@@ -1,5 +1,16 @@
 /** Hebrew translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "פרסם",
+  "Pin the location": "נעץ את המיקום",
+  "Tap “Pin location on map” to set where this is.": "הקש על “נעיצת מיקום על המפה” כדי לקבוע היכן זה.",
+  "Missing field": "שדה חסר",
+  "Service / Product is required.": "שירות / מוצר נדרש.",
+  "Not allowed": "לא מורשה",
+  "Could not post.": "הפרסום נכשל.",
+  "Pin your pickup": "נעץ את נקודת האיסוף",
+  "Tap “Pin location on map” to set where the ride starts.": "הקש על “נעיצת מיקום על המפה” כדי לקבוע היכן הנסיעה מתחילה.",
+  "Missing fields": "שדות חסרים",
+  "Destination (To) is required.": "יעד (אל) נדרש.",
   "Send location on active deal": "שליחת מיקום בעסקה פעילה",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "שתף את המיקום החי שלך עם הצד השני כל עוד העסקה פעילה. השיתוף נפסק עם השלמת העסקה.",
   "Update track": "ערוץ עדכונים",

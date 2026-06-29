@@ -1,5 +1,16 @@
 /** Azerbaijani translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Dərc et",
+  "Pin the location": "Yeri qeyd edin",
+  "Tap “Pin location on map” to set where this is.": "Bunun harada olduğunu təyin etmək üçün “Yeri xəritədə qeyd et”ə toxunun.",
+  "Missing field": "Çatışmayan sahə",
+  "Service / Product is required.": "Xidmət / Məhsul tələb olunur.",
+  "Not allowed": "İcazə verilmir",
+  "Could not post.": "Dərc etmək mümkün olmadı.",
+  "Pin your pickup": "Götürülmə yerini qeyd edin",
+  "Tap “Pin location on map” to set where the ride starts.": "Səfərin başlanğıcını təyin etmək üçün “Yeri xəritədə qeyd et”ə toxunun.",
+  "Missing fields": "Çatışmayan sahələr",
+  "Destination (To) is required.": "Təyinat (Hara) tələb olunur.",
   "Send location on active deal": "Aktiv sövdələşmədə yeri göndər",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Sövdələşmə aktiv olarkən canlı yerinizi qarşı tərəflə paylaşın. Sövdələşmə tamamlandıqda paylaşım dayanır.",
   "Update track": "Yeniləmə kanalı",

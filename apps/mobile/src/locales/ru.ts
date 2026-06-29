@@ -1,5 +1,16 @@
 /** Russian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Опубликовать",
+  "Pin the location": "Отметьте место",
+  "Tap “Pin location on map” to set where this is.": "Нажмите «Отметить место на карте», чтобы указать, где это.",
+  "Missing field": "Не заполнено поле",
+  "Service / Product is required.": "Услуга / Товар обязательны.",
+  "Not allowed": "Не разрешено",
+  "Could not post.": "Не удалось опубликовать.",
+  "Pin your pickup": "Отметьте место посадки",
+  "Tap “Pin location on map” to set where the ride starts.": "Нажмите «Отметить место на карте», чтобы указать, где начинается поездка.",
+  "Missing fields": "Не заполнены поля",
+  "Destination (To) is required.": "Пункт назначения (Куда) обязателен.",
   "Send location on active deal": "Отправлять местоположение при активной сделке",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Делитесь своим местоположением в реальном времени с другой стороной, пока сделка активна. Передача прекращается по завершении сделки.",
   "Update track": "Канал обновлений",

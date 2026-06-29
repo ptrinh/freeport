@@ -1,5 +1,16 @@
 /** Albanian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Publiko",
+  "Pin the location": "Fikso vendndodhjen",
+  "Tap “Pin location on map” to set where this is.": "Trokit “Fikso vendndodhjen në hartë” për të caktuar se ku është kjo.",
+  "Missing field": "Fushë e munguar",
+  "Service / Product is required.": "Shërbimi / Produkti është i detyrueshëm.",
+  "Not allowed": "Nuk lejohet",
+  "Could not post.": "Nuk u publikua dot.",
+  "Pin your pickup": "Fikso pikën e marrjes",
+  "Tap “Pin location on map” to set where the ride starts.": "Trokit “Fikso vendndodhjen në hartë” për të caktuar se ku fillon udhëtimi.",
+  "Missing fields": "Fusha të munguara",
+  "Destination (To) is required.": "Destinacioni (Drejt) është i detyrueshëm.",
   "Send location on active deal": "Dërgo vendndodhjen gjatë një marrëveshjeje aktive",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Ndaje vendndodhjen tënde të drejtpërdrejtë me palën tjetër ndërsa marrëveshja është aktive. Ndarja ndalon kur marrëveshja përfundon.",
   "Update track": "Kanali i përditësimeve",

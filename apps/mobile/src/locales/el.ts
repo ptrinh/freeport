@@ -1,5 +1,16 @@
 /** Greek translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Δημοσίευση",
+  "Pin the location": "Καρφιτσώστε την τοποθεσία",
+  "Tap “Pin location on map” to set where this is.": "Πατήστε «Καρφίτσωμα τοποθεσίας στον χάρτη» για να ορίσετε πού είναι αυτό.",
+  "Missing field": "Λείπει πεδίο",
+  "Service / Product is required.": "Η Υπηρεσία / Προϊόν είναι υποχρεωτική.",
+  "Not allowed": "Δεν επιτρέπεται",
+  "Could not post.": "Η δημοσίευση απέτυχε.",
+  "Pin your pickup": "Καρφιτσώστε το σημείο παραλαβής",
+  "Tap “Pin location on map” to set where the ride starts.": "Πατήστε «Καρφίτσωμα τοποθεσίας στον χάρτη» για να ορίσετε πού ξεκινά η διαδρομή.",
+  "Missing fields": "Λείπουν πεδία",
+  "Destination (To) is required.": "Ο προορισμός (Προς) είναι υποχρεωτικός.",
   "Send location on active deal": "Αποστολή τοποθεσίας σε ενεργή συναλλαγή",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Μοιραστείτε τη ζωντανή τοποθεσία σας με το άλλο μέρος όσο μια συναλλαγή είναι ενεργή. Η κοινοποίηση σταματά όταν η συναλλαγή ολοκληρωθεί.",
   "Update track": "Κανάλι ενημερώσεων",

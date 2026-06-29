@@ -1,5 +1,16 @@
 /** Malay translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Terbitkan",
+  "Pin the location": "Pin lokasi",
+  "Tap “Pin location on map” to set where this is.": "Ketik “Pin lokasi pada peta” untuk menetapkan di mana ini.",
+  "Missing field": "Medan tiada",
+  "Service / Product is required.": "Perkhidmatan / Produk diperlukan.",
+  "Not allowed": "Tidak dibenarkan",
+  "Could not post.": "Tidak dapat menyiarkan.",
+  "Pin your pickup": "Pin titik ambilan anda",
+  "Tap “Pin location on map” to set where the ride starts.": "Ketik “Pin lokasi pada peta” untuk menetapkan di mana perjalanan bermula.",
+  "Missing fields": "Medan tiada",
+  "Destination (To) is required.": "Destinasi (Ke) diperlukan.",
   "Send location on active deal": "Hantar lokasi semasa urus niaga aktif",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Kongsi lokasi langsung anda dengan pihak lain semasa urus niaga sedang berjalan. Perkongsian berhenti apabila urus niaga selesai.",
   "Update track": "Saluran kemas kini",

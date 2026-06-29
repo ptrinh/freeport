@@ -29,6 +29,11 @@ export function matches(ev: Event, f: SubFilters): boolean {
   const kinds = f.kinds?.length ? f.kinds : DEFAULT_KINDS;
   if (!kinds.includes(ev.kind)) return false;
 
+  // A subscriber with NO topic and NO geo filter has no intent interest — it
+  // subscribed for DMs only (e.g. Browse alerts off). Don't fire for every post
+  // on the network; only push intents the user actually scoped to via Browse.
+  if (!f.topics?.length && !f.near) return false;
+
   if (f.topics?.length) {
     const evTopics = new Set(ev.tags.filter((t) => t[0] === 't').map((t) => t[1]));
     if (!f.topics.some((t) => evTopics.has(t))) return false;

@@ -1,5 +1,16 @@
 /** Filipino translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "I-publish",
+  "Pin the location": "I-pin ang lokasyon",
+  "Tap “Pin location on map” to set where this is.": "I-tap ang “I-pin ang lokasyon sa mapa” para itakda kung nasaan ito.",
+  "Missing field": "Kulang na field",
+  "Service / Product is required.": "Kailangan ang Serbisyo / Produkto.",
+  "Not allowed": "Hindi pinapayagan",
+  "Could not post.": "Hindi ma-post.",
+  "Pin your pickup": "I-pin ang iyong sakayan",
+  "Tap “Pin location on map” to set where the ride starts.": "I-tap ang “I-pin ang lokasyon sa mapa” para itakda kung saan magsisimula ang biyahe.",
+  "Missing fields": "Kulang na mga field",
+  "Destination (To) is required.": "Kailangan ang Patutunguhan (Papunta).",
   "Send location on active deal": "Ipadala ang lokasyon sa aktibong deal",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Ibahagi ang iyong live na lokasyon sa kabilang partido habang aktibo ang deal. Hihinto ang pagbabahagi kapag nakumpleto na ang deal.",
   "Update track": "Update channel",

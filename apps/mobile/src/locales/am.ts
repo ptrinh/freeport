@@ -1,5 +1,16 @@
 /** Amharic translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "አትም",
+  "Pin the location": "ቦታውን ይሰኩ",
+  "Tap “Pin location on map” to set where this is.": "ይህ የት እንዳለ ለማስቀመጥ “ቦታን በካርታ ላይ ይሰኩ”ን ይንኩ።",
+  "Missing field": "የጎደለ መስክ",
+  "Service / Product is required.": "አገልግሎት / ምርት ያስፈልጋል።",
+  "Not allowed": "አይፈቀድም",
+  "Could not post.": "ማተም አልተቻለም።",
+  "Pin your pickup": "የመነሻ ቦታዎን ይሰኩ",
+  "Tap “Pin location on map” to set where the ride starts.": "ጉዞው የሚጀምርበትን ለማስቀመጥ “ቦታን በካርታ ላይ ይሰኩ”ን ይንኩ።",
+  "Missing fields": "የጎደሉ መስኮች",
+  "Destination (To) is required.": "መድረሻ (ወደ) ያስፈልጋል።",
   "Send location on active deal": "በንቁ ስምምነት ጊዜ አካባቢ ላክ",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "ስምምነቱ ንቁ በሆነ ጊዜ ቀጥታ አካባቢዎን ከሌላኛው ወገን ጋር ያጋሩ። ስምምነቱ ሲጠናቀቅ ማጋራቱ ይቆማል።",
   "Update track": "የዝማኔ መስመር",

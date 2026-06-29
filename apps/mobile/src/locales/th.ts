@@ -1,5 +1,16 @@
 /** Thai translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "เผยแพร่",
+  "Pin the location": "ปักหมุดตำแหน่ง",
+  "Tap “Pin location on map” to set where this is.": "แตะ “ปักหมุดตำแหน่งบนแผนที่” เพื่อกำหนดว่านี่อยู่ที่ใด",
+  "Missing field": "ข้อมูลไม่ครบ",
+  "Service / Product is required.": "ต้องระบุบริการ / สินค้า",
+  "Not allowed": "ไม่อนุญาต",
+  "Could not post.": "ไม่สามารถโพสต์ได้",
+  "Pin your pickup": "ปักหมุดจุดรับ",
+  "Tap “Pin location on map” to set where the ride starts.": "แตะ “ปักหมุดตำแหน่งบนแผนที่” เพื่อกำหนดจุดที่เริ่มการเดินทาง",
+  "Missing fields": "ข้อมูลไม่ครบ",
+  "Destination (To) is required.": "ต้องระบุปลายทาง (ถึง)",
   "Send location on active deal": "ส่งตำแหน่งเมื่อมีดีลที่กำลังดำเนินอยู่",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "แชร์ตำแหน่งแบบเรียลไทม์ของคุณกับอีกฝ่ายขณะที่ดีลกำลังดำเนินอยู่ การแชร์จะหยุดเมื่อดีลเสร็จสิ้น",
   "Update track": "ช่องอัปเดต",

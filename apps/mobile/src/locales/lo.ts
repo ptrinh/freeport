@@ -1,5 +1,16 @@
 /** Lao translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "ເຜີຍແຜ່",
+  "Pin the location": "ປັກໝຸດສະຖານທີ່",
+  "Tap “Pin location on map” to set where this is.": "ແຕະ “ປັກໝຸດສະຖານທີ່ໃນແຜນທີ່” ເພື່ອກຳນົດວ່ານີ້ຢູ່ໃສ.",
+  "Missing field": "ຊ່ອງຂໍ້ມູນທີ່ຂາດ",
+  "Service / Product is required.": "ຕ້ອງການ ບໍລິການ / ສິນຄ້າ.",
+  "Not allowed": "ບໍ່ອະນຸຍາດ",
+  "Could not post.": "ບໍ່ສາມາດໂພສໄດ້.",
+  "Pin your pickup": "ປັກໝຸດຈຸດຮັບ",
+  "Tap “Pin location on map” to set where the ride starts.": "ແຕະ “ປັກໝຸດສະຖານທີ່ໃນແຜນທີ່” ເພື່ອກຳນົດບ່ອນທີ່ການເດີນທາງເລີ່ມຕົ້ນ.",
+  "Missing fields": "ຊ່ອງຂໍ້ມູນທີ່ຂາດ",
+  "Destination (To) is required.": "ຕ້ອງການ ປາຍທາງ (ໄປ).",
   "Send location on active deal": "ສົ່ງທີ່ຕັ້ງເມື່ອມີການຕົກລົງທີ່ກຳລັງດຳເນີນ",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "ແບ່ງປັນທີ່ຕັ້ງສົດຂອງທ່ານກັບອີກຝ່າຍໃນຂະນະທີ່ການຕົກລົງກຳລັງດຳເນີນຢູ່. ການແບ່ງປັນຈະຢຸດເມື່ອການຕົກລົງສຳເລັດ.",
   "Update track": "ຊ່ອງທາງອັບເດດ",

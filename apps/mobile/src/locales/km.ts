@@ -1,5 +1,16 @@
 /** Khmer translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "បោះពុម្ពផ្សាយ",
+  "Pin the location": "ដៅទីតាំង",
+  "Tap “Pin location on map” to set where this is.": "ប៉ះ “ដៅទីតាំងលើផែនទី” ដើម្បីកំណត់ថាវានៅទីណា។",
+  "Missing field": "បំពេញមិនគ្រប់",
+  "Service / Product is required.": "សេវាកម្ម / ផលិតផល គឺត្រូវការ។",
+  "Not allowed": "មិនអនុញ្ញាត",
+  "Could not post.": "មិនអាចបង្ហោះបានទេ។",
+  "Pin your pickup": "ដៅចំណុចទទួល",
+  "Tap “Pin location on map” to set where the ride starts.": "ប៉ះ “ដៅទីតាំងលើផែនទី” ដើម្បីកំណត់កន្លែងដែលដំណើរចាប់ផ្តើម។",
+  "Missing fields": "បំពេញមិនគ្រប់",
+  "Destination (To) is required.": "គោលដៅ (ទៅ) គឺត្រូវការ។",
   "Send location on active deal": "ផ្ញើទីតាំងពេលមានកិច្ចព្រមព្រៀងសកម្ម",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "ចែករំលែកទីតាំងផ្ទាល់របស់អ្នកជាមួយភាគីម្ខាងទៀតពេលកិច្ចព្រមព្រៀងកំពុងដំណើរការ។ ការចែករំលែកនឹងឈប់នៅពេលកិច្ចព្រមព្រៀងបញ្ចប់។",
   "Update track": "ឆានែលធ្វើបច្ចុប្បន្នភាព",

@@ -1,5 +1,16 @@
 /** Kazakh translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Жариялау",
+  "Pin the location": "Орынды бекітіңіз",
+  "Tap “Pin location on map” to set where this is.": "Бұл қайда екенін белгілеу үшін «Картада орынды бекіту» түймесін түртіңіз.",
+  "Missing field": "Толтырылмаған өріс",
+  "Service / Product is required.": "Қызмет / Өнім міндетті.",
+  "Not allowed": "Рұқсат етілмеген",
+  "Could not post.": "Жариялау мүмкін болмады.",
+  "Pin your pickup": "Алу орнын бекітіңіз",
+  "Tap “Pin location on map” to set where the ride starts.": "Сапар қайдан басталатынын белгілеу үшін «Картада орынды бекіту» түймесін түртіңіз.",
+  "Missing fields": "Толтырылмаған өрістер",
+  "Destination (To) is required.": "Бару орны (Қайда) міндетті.",
   "Send location on active deal": "Белсенді мәміле кезінде орынды жіберу",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Мәміле белсенді кезде нақты уақыттағы орныңызды екінші тараппен бөлісіңіз. Мәміле аяқталғанда бөлісу тоқтайды.",
   "Update track": "Жаңарту арнасы",

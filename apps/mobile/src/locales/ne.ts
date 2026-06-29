@@ -1,5 +1,16 @@
 /** Nepali translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "प्रकाशित गर्नुहोस्",
+  "Pin the location": "स्थान पिन गर्नुहोस्",
+  "Tap “Pin location on map” to set where this is.": "यो कहाँ हो भनेर तय गर्न “नक्सामा स्थान पिन गर्नुहोस्” मा ट्याप गर्नुहोस्।",
+  "Missing field": "छुटेको फिल्ड",
+  "Service / Product is required.": "सेवा / उत्पादन आवश्यक छ।",
+  "Not allowed": "अनुमति छैन",
+  "Could not post.": "पोस्ट गर्न सकिएन।",
+  "Pin your pickup": "आफ्नो पिकअप पिन गर्नुहोस्",
+  "Tap “Pin location on map” to set where the ride starts.": "यात्रा कहाँबाट सुरु हुन्छ भनेर तय गर्न “नक्सामा स्थान पिन गर्नुहोस्” मा ट्याप गर्नुहोस्।",
+  "Missing fields": "छुटेका फिल्डहरू",
+  "Destination (To) is required.": "गन्तव्य (सम्म) आवश्यक छ।",
   "Send location on active deal": "सक्रिय सम्झौतामा स्थान पठाउनुहोस्",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "सम्झौता सक्रिय रहेसम्म अर्को पक्षसँग आफ्नो प्रत्यक्ष स्थान साझा गर्नुहोस्। सम्झौता पूरा भएपछि साझेदारी रोकिन्छ।",
   "Update track": "अपडेट च्यानल",

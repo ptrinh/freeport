@@ -1,5 +1,16 @@
 /** Hungarian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Közzététel",
+  "Pin the location": "Helyszín rögzítése",
+  "Tap “Pin location on map” to set where this is.": "Koppintson a „Helyszín rögzítése a térképen” lehetőségre, hogy beállítsa, hol van ez.",
+  "Missing field": "Hiányzó mező",
+  "Service / Product is required.": "A szolgáltatás / termék megadása kötelező.",
+  "Not allowed": "Nem engedélyezett",
+  "Could not post.": "A közzététel nem sikerült.",
+  "Pin your pickup": "Felvételi pont rögzítése",
+  "Tap “Pin location on map” to set where the ride starts.": "Koppintson a „Helyszín rögzítése a térképen” lehetőségre, hogy beállítsa, hol kezdődik az út.",
+  "Missing fields": "Hiányzó mezők",
+  "Destination (To) is required.": "A célállomás (Hová) megadása kötelező.",
   "Send location on active deal": "Helyzet küldése aktív ügylet alatt",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Ossza meg élő helyzetét a másik féllel, amíg az ügylet aktív. A megosztás leáll, amint az ügylet befejeződik.",
   "Update track": "Frissítési csatorna",

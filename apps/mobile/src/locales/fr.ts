@@ -1,5 +1,16 @@
 /** French translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Publier",
+  "Pin the location": "Épingler le lieu",
+  "Tap “Pin location on map” to set where this is.": "Touchez « Épingler le lieu sur la carte » pour définir où c’est.",
+  "Missing field": "Champ manquant",
+  "Service / Product is required.": "Le service / produit est requis.",
+  "Not allowed": "Non autorisé",
+  "Could not post.": "Publication impossible.",
+  "Pin your pickup": "Épingler votre point de départ",
+  "Tap “Pin location on map” to set where the ride starts.": "Touchez « Épingler le lieu sur la carte » pour définir où le trajet commence.",
+  "Missing fields": "Champs manquants",
+  "Destination (To) is required.": "La destination (Vers) est requise.",
   "Send location on active deal": "Envoyer la position lors d'un accord actif",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Partagez votre position en direct avec l'autre partie pendant qu'un accord est actif. Le partage s'arrête lorsque l'accord est terminé.",
   "Update track": "Canal de mise à jour",

@@ -1,5 +1,16 @@
 /** Bengali translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "প্রকাশ করুন",
+  "Pin the location": "অবস্থান পিন করুন",
+  "Tap “Pin location on map” to set where this is.": "এটি কোথায় তা নির্ধারণ করতে “মানচিত্রে অবস্থান পিন করুন” এ ট্যাপ করুন।",
+  "Missing field": "অনুপস্থিত ক্ষেত্র",
+  "Service / Product is required.": "পরিষেবা / পণ্য আবশ্যক।",
+  "Not allowed": "অনুমোদিত নয়",
+  "Could not post.": "পোস্ট করা যায়নি।",
+  "Pin your pickup": "আপনার পিকআপ পিন করুন",
+  "Tap “Pin location on map” to set where the ride starts.": "যাত্রা কোথা থেকে শুরু হবে তা নির্ধারণ করতে “মানচিত্রে অবস্থান পিন করুন” এ ট্যাপ করুন।",
+  "Missing fields": "অনুপস্থিত ক্ষেত্রগুলি",
+  "Destination (To) is required.": "গন্তব্য (পর্যন্ত) আবশ্যক।",
   "Send location on active deal": "সক্রিয় ডিলে অবস্থান পাঠান",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "ডিল চলাকালীন অন্য পক্ষের সাথে আপনার সরাসরি অবস্থান শেয়ার করুন। ডিল সম্পন্ন হলে শেয়ারিং বন্ধ হয়ে যায়।",
   "Update track": "আপডেট চ্যানেল",

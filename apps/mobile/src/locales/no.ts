@@ -1,5 +1,16 @@
 /** Norwegian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Publiser",
+  "Pin the location": "Fest stedet",
+  "Tap “Pin location on map” to set where this is.": "Trykk på “Fest sted på kart” for å angi hvor dette er.",
+  "Missing field": "Manglende felt",
+  "Service / Product is required.": "Tjeneste / Produkt er påkrevd.",
+  "Not allowed": "Ikke tillatt",
+  "Could not post.": "Kunne ikke publisere.",
+  "Pin your pickup": "Fest hentestedet",
+  "Tap “Pin location on map” to set where the ride starts.": "Trykk på “Fest sted på kart” for å angi hvor turen starter.",
+  "Missing fields": "Manglende felter",
+  "Destination (To) is required.": "Destinasjon (Til) er påkrevd.",
   "Send location on active deal": "Send posisjon under aktiv avtale",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Del din direkte posisjon med den andre parten mens en avtale er aktiv. Delingen stopper når avtalen er fullført.",
   "Update track": "Oppdateringskanal",

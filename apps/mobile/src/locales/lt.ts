@@ -1,5 +1,16 @@
 /** Lithuanian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Skelbti",
+  "Pin the location": "Prisekite vietą",
+  "Tap “Pin location on map” to set where this is.": "Bakstelėkite „Prisegti vietą žemėlapyje“, kad nustatytumėte, kur tai yra.",
+  "Missing field": "Trūksta lauko",
+  "Service / Product is required.": "Paslauga / Produktas yra privalomas.",
+  "Not allowed": "Neleidžiama",
+  "Could not post.": "Nepavyko paskelbti.",
+  "Pin your pickup": "Prisekite paėmimo vietą",
+  "Tap “Pin location on map” to set where the ride starts.": "Bakstelėkite „Prisegti vietą žemėlapyje“, kad nustatytumėte, kur prasideda kelionė.",
+  "Missing fields": "Trūksta laukų",
+  "Destination (To) is required.": "Kelionės tikslas (Kur) yra privalomas.",
   "Send location on active deal": "Siųsti vietą vykstant sandoriui",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Bendrinkite savo tiesioginę vietą su kita šalimi, kol sandoris vyksta. Bendrinimas sustoja, kai sandoris baigiamas.",
   "Update track": "Naujinimų kanalas",

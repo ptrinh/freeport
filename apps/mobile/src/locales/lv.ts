@@ -1,5 +1,16 @@
 /** Latvian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Publicēt",
+  "Pin the location": "Piespraudiet atrašanās vietu",
+  "Tap “Pin location on map” to set where this is.": "Pieskarieties “Piespraust atrašanās vietu kartē”, lai norādītu, kur tas ir.",
+  "Missing field": "Trūkst lauka",
+  "Service / Product is required.": "Pakalpojums / Prece ir obligāts.",
+  "Not allowed": "Nav atļauts",
+  "Could not post.": "Neizdevās publicēt.",
+  "Pin your pickup": "Piespraudiet uzņemšanas vietu",
+  "Tap “Pin location on map” to set where the ride starts.": "Pieskarieties “Piespraust atrašanās vietu kartē”, lai norādītu, kur sākas brauciens.",
+  "Missing fields": "Trūkst lauku",
+  "Destination (To) is required.": "Galamērķis (Uz) ir obligāts.",
   "Send location on active deal": "Sūtīt atrašanās vietu aktīva darījuma laikā",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Kopīgojiet savu reāllaika atrašanās vietu ar otru pusi, kamēr darījums ir aktīvs. Kopīgošana apstājas, kad darījums ir pabeigts.",
   "Update track": "Atjauninājumu kanāls",

@@ -1,5 +1,16 @@
 /** Ukrainian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Опублікувати",
+  "Pin the location": "Закріпіть місце",
+  "Tap “Pin location on map” to set where this is.": "Торкніться «Закріпити місце на карті», щоб указати, де це.",
+  "Missing field": "Не заповнено поле",
+  "Service / Product is required.": "Послуга / Товар обовʼязкові.",
+  "Not allowed": "Не дозволено",
+  "Could not post.": "Не вдалося опублікувати.",
+  "Pin your pickup": "Закріпіть місце посадки",
+  "Tap “Pin location on map” to set where the ride starts.": "Торкніться «Закріпити місце на карті», щоб указати, де починається поїздка.",
+  "Missing fields": "Не заповнено поля",
+  "Destination (To) is required.": "Пункт призначення (Куди) обовʼязковий.",
   "Send location on active deal": "Надсилати місцезнаходження під час активної угоди",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Діліться своїм місцезнаходженням у реальному часі з іншою стороною, поки угода активна. Поширення припиняється після завершення угоди.",
   "Update track": "Канал оновлень",

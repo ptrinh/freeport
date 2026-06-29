@@ -1,5 +1,16 @@
 /** Finnish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Julkaise",
+  "Pin the location": "Kiinnitä sijainti",
+  "Tap “Pin location on map” to set where this is.": "Napauta “Kiinnitä sijainti kartalle” asettaaksesi, missä tämä on.",
+  "Missing field": "Puuttuva kenttä",
+  "Service / Product is required.": "Palvelu / Tuote on pakollinen.",
+  "Not allowed": "Ei sallittu",
+  "Could not post.": "Julkaisu epäonnistui.",
+  "Pin your pickup": "Kiinnitä noutopaikka",
+  "Tap “Pin location on map” to set where the ride starts.": "Napauta “Kiinnitä sijainti kartalle” asettaaksesi, mistä matka alkaa.",
+  "Missing fields": "Puuttuvia kenttiä",
+  "Destination (To) is required.": "Määränpää (Minne) on pakollinen.",
   "Send location on active deal": "Lähetä sijainti aktiivisen sopimuksen aikana",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "Jaa reaaliaikainen sijaintisi toisen osapuolen kanssa sopimuksen ollessa aktiivinen. Jakaminen päättyy, kun sopimus on valmis.",
   "Update track": "Päivityskanava",

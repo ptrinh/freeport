@@ -1,5 +1,16 @@
 /** Turkish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "Yayınla",
+  "Pin the location": "Konumu sabitle",
+  "Tap “Pin location on map” to set where this is.": "Buranın neresi olduğunu belirlemek için “Konumu haritada sabitle”ye dokunun.",
+  "Missing field": "Eksik alan",
+  "Service / Product is required.": "Hizmet / Ürün gereklidir.",
+  "Not allowed": "İzin verilmiyor",
+  "Could not post.": "Yayınlanamadı.",
+  "Pin your pickup": "Biniş noktanızı sabitleyin",
+  "Tap “Pin location on map” to set where the ride starts.": "Yolculuğun nerede başladığını belirlemek için “Konumu haritada sabitle”ye dokunun.",
+  "Missing fields": "Eksik alanlar",
+  "Destination (To) is required.": "Varış noktası (Nereye) gereklidir.",
   "Send location on active deal": "Aktif işlemde konum gönder",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "İşlem devam ederken canlı konumunuzu diğer tarafla paylaşın. İşlem tamamlandığında paylaşım durur.",
   "Update track": "Güncelleme kanalı",

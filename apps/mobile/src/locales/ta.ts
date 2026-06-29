@@ -1,5 +1,16 @@
 /** Tamil translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Publish": "வெளியிடு",
+  "Pin the location": "இடத்தைப் பின் செய்யவும்",
+  "Tap “Pin location on map” to set where this is.": "இது எங்கே என்பதை அமைக்க “வரைபடத்தில் இடத்தைப் பின் செய்” என்பதைத் தட்டவும்.",
+  "Missing field": "காணாத புலம்",
+  "Service / Product is required.": "சேவை / பொருள் தேவை.",
+  "Not allowed": "அனுமதிக்கப்படவில்லை",
+  "Could not post.": "இடுகையிட முடியவில்லை.",
+  "Pin your pickup": "உங்கள் ஏறும் இடத்தைப் பின் செய்யவும்",
+  "Tap “Pin location on map” to set where the ride starts.": "பயணம் எங்கே தொடங்குகிறது என்பதை அமைக்க “வரைபடத்தில் இடத்தைப் பின் செய்” என்பதைத் தட்டவும்.",
+  "Missing fields": "காணாத புலங்கள்",
+  "Destination (To) is required.": "சேருமிடம் (வரை) தேவை.",
   "Send location on active deal": "செயலில் உள்ள ஒப்பந்தத்தில் இருப்பிடத்தை அனுப்பு",
   "Share your live location with the other party while a deal is active. Sharing stops when the deal completes.": "ஒப்பந்தம் நடைபெறும்போது உங்கள் நேரடி இருப்பிடத்தை மற்ற தரப்புடன் பகிரவும். ஒப்பந்தம் முடிந்ததும் பகிர்வு நிறுத்தப்படும்.",
   "Update track": "புதுப்பிப்பு சேனல்",
