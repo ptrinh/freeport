@@ -2723,11 +2723,22 @@ function MyPostCard({ intent, negos, client }: { intent: Intent; negos: Negotiat
 
   return (
     <View style={[s.card, { marginHorizontal: 0 }]}>
-      <View style={s.row}>
+      <View style={[s.row, { flexWrap: 'wrap' }]}>
         <Text style={s.chip}>{intent.content.schema.startsWith('rideshare') ? t('Rideshare') : t('Service/Product')}</Text>
         <Text style={[s.chip, intent.content.side === 'offer' ? s.chipGreen : s.chipBlue]}>
           {t(intent.content.side)}
         </Text>
+        {(() => {
+          const pl = intent.content.payload as any;
+          const cat = categoryOf(intent.content.schema, pl);
+          const sub = subcategoryOf(intent.content.schema, pl);
+          return (
+            <>
+              {cat ? <Text style={s.chip}>{t(cat)}</Text> : null}
+              {sub ? <Text style={s.chip}>{t(sub)}</Text> : null}
+            </>
+          );
+        })()}
         {confirmed > 0
           ? <Text style={[s.chip, s.chipGreen]}>{t("deal confirmed")}</Text>
           : expired
