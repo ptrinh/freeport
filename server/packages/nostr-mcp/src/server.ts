@@ -12,7 +12,7 @@ import { registerWriteTools } from './write.js';
 import { registerResources } from './resources.js';
 
 export const NAME = 'freeport-nostr';
-export const VERSION = '0.6.7';
+export const VERSION = '0.6.8';
 
 /** Whether the optional write tool (freeport_create_post) is enabled. */
 export const WRITE_ENABLED = process.env.ENABLE_WRITE === '1';
