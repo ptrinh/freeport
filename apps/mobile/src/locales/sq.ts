@@ -1,5 +1,10 @@
 /** Albanian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Blloko këtë person",
+  "Unblock": "Zhblloko",
+  "Block this person?": "Të bllokohet ky person?",
+  "You will not receive any more messages from them.": "Nuk do të merrni më asnjë mesazh nga ky person.",
+  "Block": "Blloko",
   "Publish": "Publiko",
   "Pin the location": "Fikso vendndodhjen",
   "Tap “Pin location on map” to set where this is.": "Trokit “Fikso vendndodhjen në hartë” për të caktuar se ku është kjo.",

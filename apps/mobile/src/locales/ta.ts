@@ -1,5 +1,10 @@
 /** Tamil translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "இந்த நபரைத் தடு",
+  "Unblock": "தடையை நீக்கு",
+  "Block this person?": "இந்த நபரைத் தடுக்கவா?",
+  "You will not receive any more messages from them.": "இந்த நபரிடமிருந்து இனி எந்தச் செய்தியும் உங்களுக்கு வராது.",
+  "Block": "தடு",
   "Publish": "வெளியிடு",
   "Pin the location": "இடத்தைப் பின் செய்யவும்",
   "Tap “Pin location on map” to set where this is.": "இது எங்கே என்பதை அமைக்க “வரைபடத்தில் இடத்தைப் பின் செய்” என்பதைத் தட்டவும்.",

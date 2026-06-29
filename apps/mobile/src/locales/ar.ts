@@ -1,5 +1,10 @@
 /** Arabic translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "حظر هذا الشخص",
+  "Unblock": "إلغاء الحظر",
+  "Block this person?": "حظر هذا الشخص؟",
+  "You will not receive any more messages from them.": "لن تتلقى أي رسائل أخرى منه.",
+  "Block": "حظر",
   "Publish": "نشر",
   "Pin the location": "حدّد الموقع",
   "Tap “Pin location on map” to set where this is.": "اضغط على “تحديد الموقع على الخريطة” لتعيين مكان هذا.",

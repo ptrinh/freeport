@@ -1,5 +1,10 @@
 /** Urdu translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "اس شخص کو بلاک کریں",
+  "Unblock": "ان بلاک کریں",
+  "Block this person?": "اس شخص کو بلاک کریں؟",
+  "You will not receive any more messages from them.": "آپ کو اس شخص سے مزید کوئی پیغام موصول نہیں ہوگا۔",
+  "Block": "بلاک کریں",
   "Publish": "شائع کریں",
   "Pin the location": "مقام پن کریں",
   "Tap “Pin location on map” to set where this is.": "یہ کہاں ہے یہ طے کرنے کے لیے “نقشے پر مقام پن کریں” پر ٹیپ کریں۔",

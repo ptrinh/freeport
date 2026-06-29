@@ -92,6 +92,8 @@ export class MobileClient {
    * a deal is never silently lost. Bounded per intent to avoid unbounded growth.
    */
   private pendingMsgs = new Map<string, Array<{ msg: NegotiationMessage; from: string; ts: number; eventId?: string }>>();
+  /** Peer pubkeys (hex) the user has blocked — inbound DMs from them are dropped. */
+  private blocked = new Set<string>();
   onIntent?: (intent: Intent) => void;
   /** Fires for our own intents — both freshly posted and echoed back from relays on startup. */
   onOwnIntent?: (intent: Intent) => void;
@@ -444,6 +446,11 @@ export class MobileClient {
     }
   }
 
+  /** Replace the set of blocked peer pubkeys (hex). Inbound DMs from them are dropped. */
+  setBlocked(pubkeys: Iterable<string>): void {
+    this.blocked = new Set(pubkeys);
+  }
+
   watchDMs(): () => void {
     this.watchStartTs = Math.floor(Date.now() / 1000);
     const sub = this.pool.subscribeMany(
@@ -451,6 +458,7 @@ export class MobileClient {
       { kinds: [4], '#p': [this.pubkey], since: Math.floor(Date.now() / 1000) - 7 * 24 * 3600 },
       {
         onevent: async (ev: Event) => {
+          if (this.blocked.has(ev.pubkey)) return; // blocked peer — drop without decrypting
           try {
             const plain = await this.signer.nip04Decrypt(ev.pubkey, ev.content);
             const msg = parseNegotiationMessage(plain);
@@ -472,6 +480,7 @@ export class MobileClient {
    * expired. `replay` marks a queued message so it isn't re-queued forever.
    */
   private processDM(msg: NegotiationMessage, from: string, createdAt: number, replay = false, eventId?: string): void {
+    if (this.blocked.has(from)) return; // blocked peer — drop (also covers replayed/pending DMs)
     let nego = this.negotiations.get(msg.nego);
     if (!nego) {
       // The intent may be ours (`published`) OR a market intent we responded to

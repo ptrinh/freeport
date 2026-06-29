@@ -1,5 +1,10 @@
 /** Dutch translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Deze persoon blokkeren",
+  "Unblock": "Deblokkeren",
+  "Block this person?": "Deze persoon blokkeren?",
+  "You will not receive any more messages from them.": "Je ontvangt geen berichten meer van deze persoon.",
+  "Block": "Blokkeren",
   "Publish": "Publiceren",
   "Pin the location": "Locatie vastzetten",
   "Tap “Pin location on map” to set where this is.": "Tik op “Locatie op kaart vastzetten” om in te stellen waar dit is.",

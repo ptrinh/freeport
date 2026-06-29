@@ -1,5 +1,10 @@
 /** Hindi translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "इस व्यक्ति को ब्लॉक करें",
+  "Unblock": "अनब्लॉक करें",
+  "Block this person?": "इस व्यक्ति को ब्लॉक करें?",
+  "You will not receive any more messages from them.": "अब आपको इस व्यक्ति से कोई संदेश नहीं मिलेगा।",
+  "Block": "ब्लॉक करें",
   "Publish": "प्रकाशित करें",
   "Pin the location": "स्थान पिन करें",
   "Tap “Pin location on map” to set where this is.": "यह कहाँ है, यह तय करने के लिए “मानचित्र पर स्थान पिन करें” पर टैप करें।",

@@ -1,5 +1,10 @@
 /** Burmese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "ဤသူကို ပိတ်ဆို့ရန်",
+  "Unblock": "ပြန်ဖွင့်ရန်",
+  "Block this person?": "ဤသူကို ပိတ်ဆို့မလား?",
+  "You will not receive any more messages from them.": "ဤသူထံမှ စာတိုများ နောက်ထပ်လက်ခံရရှိမည် မဟုတ်ပါ။",
+  "Block": "ပိတ်ဆို့ရန်",
   "Publish": "တင်ပါ",
   "Pin the location": "တည်နေရာကို ပင်ထိုးပါ",
   "Tap “Pin location on map” to set where this is.": "ဤနေရာသည် ဘယ်နေရာဖြစ်ကြောင်း သတ်မှတ်ရန် “မြေပုံပေါ်တွင် တည်နေရာ ပင်ထိုးပါ” ကို တို့ပါ။",

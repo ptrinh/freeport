@@ -1,5 +1,10 @@
 /** Georgian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "ამ პირის დაბლოკვა",
+  "Unblock": "განბლოკვა",
+  "Block this person?": "დაიბლოკოს ეს პირი?",
+  "You will not receive any more messages from them.": "ამ პირისგან მეტ შეტყობინებას ვეღარ მიიღებთ.",
+  "Block": "დაბლოკვა",
   "Publish": "გამოქვეყნება",
   "Pin the location": "ჩამაგრეთ მდებარეობა",
   "Tap “Pin location on map” to set where this is.": "შეეხეთ „მდებარეობის ჩამაგრება რუკაზე“, რათა მიუთითოთ, სად არის ეს.",

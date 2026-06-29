@@ -1,5 +1,10 @@
 /** Khmer translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "ទប់ស្កាត់មនុស្សនេះ",
+  "Unblock": "ដោះទប់ស្កាត់",
+  "Block this person?": "ទប់ស្កាត់មនុស្សនេះ?",
+  "You will not receive any more messages from them.": "អ្នកនឹងមិនទទួលបានសារពីបុគ្គលនេះទៀតទេ។",
+  "Block": "ទប់ស្កាត់",
   "Publish": "បោះពុម្ពផ្សាយ",
   "Pin the location": "ដៅទីតាំង",
   "Tap “Pin location on map” to set where this is.": "ប៉ះ “ដៅទីតាំងលើផែនទី” ដើម្បីកំណត់ថាវានៅទីណា។",

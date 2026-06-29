@@ -1,5 +1,10 @@
 /** Swahili translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Zuia mtu huyu",
+  "Unblock": "Ondoa kizuizi",
+  "Block this person?": "Zuia mtu huyu?",
+  "You will not receive any more messages from them.": "Hutapokea ujumbe wowote zaidi kutoka kwa mtu huyu.",
+  "Block": "Zuia",
   "Publish": "Chapisha",
   "Pin the location": "Bandika eneo",
   "Tap “Pin location on map” to set where this is.": "Gusa “Bandika eneo kwenye ramani” ili kuweka mahali hapa palipo.",

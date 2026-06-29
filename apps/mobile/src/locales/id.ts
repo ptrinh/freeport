@@ -1,5 +1,10 @@
 /** Indonesian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Blokir orang ini",
+  "Unblock": "Buka blokir",
+  "Block this person?": "Blokir orang ini?",
+  "You will not receive any more messages from them.": "Anda tidak akan menerima pesan lagi dari orang ini.",
+  "Block": "Blokir",
   "Publish": "Terbitkan",
   "Pin the location": "Sematkan lokasi",
   "Tap “Pin location on map” to set where this is.": "Ketuk “Sematkan lokasi di peta” untuk menentukan di mana ini.",

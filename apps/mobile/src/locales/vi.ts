@@ -1,5 +1,10 @@
 /** Vietnamese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Chặn người này",
+  "Unblock": "Bỏ chặn",
+  "Block this person?": "Chặn người này?",
+  "You will not receive any more messages from them.": "Bạn sẽ không nhận thêm tin nhắn nào từ người này nữa.",
+  "Block": "Chặn",
   "Publish": "Đăng",
   "Pin the location": "Ghim địa điểm",
   "Tap “Pin location on map” to set where this is.": "Chạm “Ghim vị trí trên bản đồ” để đặt nơi này.",

@@ -1,5 +1,10 @@
 /** Norwegian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Blokker denne personen",
+  "Unblock": "Fjern blokkering",
+  "Block this person?": "Blokkere denne personen?",
+  "You will not receive any more messages from them.": "Du vil ikke motta flere meldinger fra vedkommende.",
+  "Block": "Blokker",
   "Publish": "Publiser",
   "Pin the location": "Fest stedet",
   "Tap “Pin location on map” to set where this is.": "Trykk på “Fest sted på kart” for å angi hvor dette er.",

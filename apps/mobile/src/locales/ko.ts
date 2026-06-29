@@ -1,5 +1,10 @@
 /** Korean translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "이 사람 차단",
+  "Unblock": "차단 해제",
+  "Block this person?": "이 사람을 차단할까요?",
+  "You will not receive any more messages from them.": "이 사람으로부터 더 이상 메시지를 받지 않습니다.",
+  "Block": "차단",
   "Publish": "게시",
   "Pin the location": "위치 고정",
   "Tap “Pin location on map” to set where this is.": "“지도에 위치 고정”을 탭하여 이곳이 어디인지 설정하세요.",

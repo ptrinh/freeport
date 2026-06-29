@@ -1,5 +1,10 @@
 /** Azerbaijani translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Bu şəxsi blokla",
+  "Unblock": "Bloku aç",
+  "Block this person?": "Bu şəxsi bloklamaq?",
+  "You will not receive any more messages from them.": "Bu şəxsdən artıq heç bir mesaj almayacaqsınız.",
+  "Block": "Blokla",
   "Publish": "Dərc et",
   "Pin the location": "Yeri qeyd edin",
   "Tap “Pin location on map” to set where this is.": "Bunun harada olduğunu təyin etmək üçün “Yeri xəritədə qeyd et”ə toxunun.",

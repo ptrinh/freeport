@@ -1,5 +1,10 @@
 /** Slovak translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Zablokovať túto osobu",
+  "Unblock": "Odblokovať",
+  "Block this person?": "Zablokovať túto osobu?",
+  "You will not receive any more messages from them.": "Už od nej nebudete dostávať žiadne správy.",
+  "Block": "Zablokovať",
   "Publish": "Zverejniť",
   "Pin the location": "Pripnúť miesto",
   "Tap “Pin location on map” to set where this is.": "Ťuknite na „Pripnúť miesto na mape“ a nastavte, kde to je.",

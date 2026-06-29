@@ -1,5 +1,10 @@
 /** Uzbek translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Bu odamni bloklash",
+  "Unblock": "Blokdan chiqarish",
+  "Block this person?": "Bu odam bloklansinmi?",
+  "You will not receive any more messages from them.": "Bu odamdan boshqa xabar olmaysiz.",
+  "Block": "Bloklash",
   "Publish": "Eʼlon qilish",
   "Pin the location": "Joyni belgilang",
   "Tap “Pin location on map” to set where this is.": "Bu qayerda ekanini belgilash uchun “Joyni xaritada belgilash”ga teging.",

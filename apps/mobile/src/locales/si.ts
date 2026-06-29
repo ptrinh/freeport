@@ -1,5 +1,10 @@
 /** Sinhala translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "මෙම පුද්ගලයා අවහිර කරන්න",
+  "Unblock": "අවහිර කිරීම ඉවත් කරන්න",
+  "Block this person?": "මෙම පුද්ගලයා අවහිර කරන්නද?",
+  "You will not receive any more messages from them.": "ඔබට මෙම පුද්ගලයාගෙන් තවදුරටත් පණිවිඩ නොලැබෙනු ඇත.",
+  "Block": "අවහිර කරන්න",
   "Publish": "ප්‍රකාශ කරන්න",
   "Pin the location": "ස්ථානය අමුණන්න",
   "Tap “Pin location on map” to set where this is.": "මෙය කොහේද යන්න සැකසීමට “සිතියමේ ස්ථානය අමුණන්න” තට්ටු කරන්න.",

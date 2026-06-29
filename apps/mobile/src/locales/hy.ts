@@ -1,5 +1,10 @@
 /** Armenian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Արգելափակել այս անձին",
+  "Unblock": "Ապաարգելափակել",
+  "Block this person?": "Արգելափակե՞լ այս անձին",
+  "You will not receive any more messages from them.": "Այլևս ոչ մի հաղորդագրություն չեք ստանա այս անձից։",
+  "Block": "Արգելափակել",
   "Publish": "Հրապարակել",
   "Pin the location": "Ամրացրեք վայրը",
   "Tap “Pin location on map” to set where this is.": "Հպեք «Ամրացնել վայրը քարտեզի վրա», որպեսզի նշեք, թե որտեղ է սա։",

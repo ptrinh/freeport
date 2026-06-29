@@ -1,5 +1,10 @@
 /** Hebrew translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "חסום אדם זה",
+  "Unblock": "בטל חסימה",
+  "Block this person?": "לחסום אדם זה?",
+  "You will not receive any more messages from them.": "לא תקבל עוד הודעות מאדם זה.",
+  "Block": "חסום",
   "Publish": "פרסם",
   "Pin the location": "נעץ את המיקום",
   "Tap “Pin location on map” to set where this is.": "הקש על “נעיצת מיקום על המפה” כדי לקבוע היכן זה.",

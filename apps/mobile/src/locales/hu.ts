@@ -1,5 +1,10 @@
 /** Hungarian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Személy letiltása",
+  "Unblock": "Tiltás feloldása",
+  "Block this person?": "Letiltja ezt a személyt?",
+  "You will not receive any more messages from them.": "Nem fog több üzenetet kapni tőle.",
+  "Block": "Letiltás",
   "Publish": "Közzététel",
   "Pin the location": "Helyszín rögzítése",
   "Tap “Pin location on map” to set where this is.": "Koppintson a „Helyszín rögzítése a térképen” lehetőségre, hogy beállítsa, hol van ez.",

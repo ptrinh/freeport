@@ -1,5 +1,10 @@
 /** Latvian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Bloķēt šo personu",
+  "Unblock": "Atbloķēt",
+  "Block this person?": "Bloķēt šo personu?",
+  "You will not receive any more messages from them.": "Jūs vairs nesaņemsiet ziņas no šīs personas.",
+  "Block": "Bloķēt",
   "Publish": "Publicēt",
   "Pin the location": "Piespraudiet atrašanās vietu",
   "Tap “Pin location on map” to set where this is.": "Pieskarieties “Piespraust atrašanās vietu kartē”, lai norādītu, kur tas ir.",

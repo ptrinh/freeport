@@ -1,5 +1,10 @@
 /** Filipino translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "I-block ang taong ito",
+  "Unblock": "I-unblock",
+  "Block this person?": "I-block ang taong ito?",
+  "You will not receive any more messages from them.": "Hindi ka na makakatanggap ng mga mensahe mula sa kanya.",
+  "Block": "I-block",
   "Publish": "I-publish",
   "Pin the location": "I-pin ang lokasyon",
   "Tap “Pin location on map” to set where this is.": "I-tap ang “I-pin ang lokasyon sa mapa” para itakda kung nasaan ito.",

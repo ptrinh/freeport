@@ -1,5 +1,10 @@
 /** Turkish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Bu kişiyi engelle",
+  "Unblock": "Engeli kaldır",
+  "Block this person?": "Bu kişi engellensin mi?",
+  "You will not receive any more messages from them.": "Bu kişiden artık mesaj almayacaksınız.",
+  "Block": "Engelle",
   "Publish": "Yayınla",
   "Pin the location": "Konumu sabitle",
   "Tap “Pin location on map” to set where this is.": "Buranın neresi olduğunu belirlemek için “Konumu haritada sabitle”ye dokunun.",

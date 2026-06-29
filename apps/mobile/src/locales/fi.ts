@@ -1,5 +1,10 @@
 /** Finnish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Estä tämä henkilö",
+  "Unblock": "Poista esto",
+  "Block this person?": "Estetäänkö tämä henkilö?",
+  "You will not receive any more messages from them.": "Et saa häneltä enää viestejä.",
+  "Block": "Estä",
   "Publish": "Julkaise",
   "Pin the location": "Kiinnitä sijainti",
   "Tap “Pin location on map” to set where this is.": "Napauta “Kiinnitä sijainti kartalle” asettaaksesi, missä tämä on.",

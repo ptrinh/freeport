@@ -1,5 +1,10 @@
 /** Lithuanian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Užblokuoti šį asmenį",
+  "Unblock": "Atblokuoti",
+  "Block this person?": "Užblokuoti šį asmenį?",
+  "You will not receive any more messages from them.": "Daugiau negausite žinučių iš šio asmens.",
+  "Block": "Užblokuoti",
   "Publish": "Skelbti",
   "Pin the location": "Prisekite vietą",
   "Tap “Pin location on map” to set where this is.": "Bakstelėkite „Prisegti vietą žemėlapyje“, kad nustatytumėte, kur tai yra.",

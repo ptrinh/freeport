@@ -1,5 +1,10 @@
 /** Nepali translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "यो व्यक्तिलाई ब्लक गर्नुहोस्",
+  "Unblock": "अनब्लक गर्नुहोस्",
+  "Block this person?": "यो व्यक्तिलाई ब्लक गर्ने?",
+  "You will not receive any more messages from them.": "तपाईंले अब यो व्यक्तिबाट कुनै सन्देश प्राप्त गर्नुहुने छैन।",
+  "Block": "ब्लक गर्नुहोस्",
   "Publish": "प्रकाशित गर्नुहोस्",
   "Pin the location": "स्थान पिन गर्नुहोस्",
   "Tap “Pin location on map” to set where this is.": "यो कहाँ हो भनेर तय गर्न “नक्सामा स्थान पिन गर्नुहोस्” मा ट्याप गर्नुहोस्।",

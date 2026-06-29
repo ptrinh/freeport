@@ -1,5 +1,10 @@
 /** Thai translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "บล็อกบุคคลนี้",
+  "Unblock": "เลิกบล็อก",
+  "Block this person?": "บล็อกบุคคลนี้หรือไม่?",
+  "You will not receive any more messages from them.": "คุณจะไม่ได้รับข้อความจากบุคคลนี้อีกต่อไป",
+  "Block": "บล็อก",
   "Publish": "เผยแพร่",
   "Pin the location": "ปักหมุดตำแหน่ง",
   "Tap “Pin location on map” to set where this is.": "แตะ “ปักหมุดตำแหน่งบนแผนที่” เพื่อกำหนดว่านี่อยู่ที่ใด",

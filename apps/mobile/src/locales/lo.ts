@@ -1,5 +1,10 @@
 /** Lao translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "ບລັອກຄົນນີ້",
+  "Unblock": "ຍົກເລີກການບລັອກ",
+  "Block this person?": "ບລັອກຄົນນີ້ບໍ?",
+  "You will not receive any more messages from them.": "ທ່ານຈະບໍ່ໄດ້ຮັບຂໍ້ຄວາມຈາກຄົນນີ້ອີກຕໍ່ໄປ.",
+  "Block": "ບລັອກ",
   "Publish": "ເຜີຍແຜ່",
   "Pin the location": "ປັກໝຸດສະຖານທີ່",
   "Tap “Pin location on map” to set where this is.": "ແຕະ “ປັກໝຸດສະຖານທີ່ໃນແຜນທີ່” ເພື່ອກຳນົດວ່ານີ້ຢູ່ໃສ.",

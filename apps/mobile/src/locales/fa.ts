@@ -1,5 +1,10 @@
 /** Persian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "مسدود کردن این شخص",
+  "Unblock": "رفع مسدودیت",
+  "Block this person?": "این شخص مسدود شود؟",
+  "You will not receive any more messages from them.": "دیگر هیچ پیامی از این شخص دریافت نخواهید کرد.",
+  "Block": "مسدود کردن",
   "Publish": "انتشار",
   "Pin the location": "موقعیت را پین کنید",
   "Tap “Pin location on map” to set where this is.": "برای تعیین محل این، روی «پین کردن موقعیت روی نقشه» ضربه بزنید.",

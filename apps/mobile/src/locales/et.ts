@@ -1,5 +1,10 @@
 /** Estonian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Blokeeri see inimene",
+  "Unblock": "Eemalda blokeering",
+  "Block this person?": "Kas blokeerida see inimene?",
+  "You will not receive any more messages from them.": "Sa ei saa sellelt inimeselt enam ühtegi sõnumit.",
+  "Block": "Blokeeri",
   "Publish": "Avalda",
   "Pin the location": "Kinnita asukoht",
   "Tap “Pin location on map” to set where this is.": "Puuduta „Kinnita asukoht kaardil“, et määrata, kus see on.",

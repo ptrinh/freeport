@@ -1,5 +1,10 @@
 /** Croatian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Blokiraj ovu osobu",
+  "Unblock": "Odblokiraj",
+  "Block this person?": "Blokirati ovu osobu?",
+  "You will not receive any more messages from them.": "Više nećete primati poruke od ove osobe.",
+  "Block": "Blokiraj",
   "Publish": "Objavi",
   "Pin the location": "Pričvrsti lokaciju",
   "Tap “Pin location on map” to set where this is.": "Dodirnite „Pričvrsti lokaciju na karti“ da odredite gdje je to.",

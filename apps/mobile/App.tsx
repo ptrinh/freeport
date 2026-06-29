@@ -164,6 +164,16 @@ function uiAlert(title: string, body?: string): void {
   }
 }
 
+// A negotiation is "done" (shown under the Messages > Completed sub-tab) when it
+// was cancelled/expired, or confirmed and the deal has completed. Single source
+// of truth, shared by the DealsTab list filter and the auto-selection of which
+// sub-tab to open when a new message arrives.
+function negoIsDone(n: Negotiation): boolean {
+  if (n.state === 'cancelled' || n.state === 'expired') return true;
+  if (n.state === 'confirmed') return n.stage === 'completed';
+  return false;
+}
+
 // ─── Root ────────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -700,7 +710,11 @@ function AppInner() {
   // (incl. cold start). Web: the service worker postMessages an open client.
   useEffect(() => {
     const go = (t: unknown) => {
-      if (t === 'messages' || t === 'browse' || t === 'post' || t === 'settings') { deepLinkedRef.current = true; setTab(t); }
+      if (t === 'messages' || t === 'browse' || t === 'post' || t === 'settings') {
+        deepLinkedRef.current = true;
+        if (t === 'messages') { const v = pickMessagesViewRef.current(); if (v) setMessagesView(v); }
+        setTab(t);
+      }
     };
     if (Platform.OS !== 'web') {
       return onNotificationTap((data) => go(data?.tab));
@@ -929,12 +943,58 @@ function AppInner() {
   // action-needed offers). "Seen" advances whenever the Messages tab is open, so
   // viewing the thread clears it. Timestamps are in seconds (ChatMessage.ts).
   const [chatSeenTs, setChatSeenTs] = useState(() => Math.floor(Date.now() / 1000));
+  // Persisted so "unread" survives a cold start — otherwise the badge resets to 0
+  // on every launch, and a notification tapped from a cold start couldn't tell
+  // which deal the new message belongs to (see pickMessagesView).
   useEffect(() => {
-    if (tab === 'messages') setChatSeenTs(Math.floor(Date.now() / 1000));
+    kvGet('freeport.chatSeenTs').then((v) => { const n = Number(v); if (v && Number.isFinite(n)) setChatSeenTs(n); }).catch(() => {});
+  }, []);
+  useEffect(() => {
+    if (tab === 'messages') {
+      const now = Math.floor(Date.now() / 1000);
+      setChatSeenTs(now);
+      kvSet('freeport.chatSeenTs', String(now)).catch(() => {});
+    }
   }, [tab, negos]);
   const unreadChats = tab === 'messages'
     ? 0
     : negos.reduce((n, g) => n + (g.messages?.filter((m) => m.dir === 'in' && m.ts > chatSeenTs).length ?? 0), 0);
+
+  // When opening Messages (menu tap or notification), jump to the sub-tab where
+  // the newest UNREAD activity is: an inbound chat message, or a just-confirmed
+  // deal. Returns null when nothing is unread, so a manual sub-tab choice is kept.
+  const pickMessagesView = (): 'active' | 'completed' | null => {
+    let bestTs = chatSeenTs;
+    let bestView: 'active' | 'completed' | null = null;
+    for (const n of negos) {
+      for (const m of n.messages ?? []) {
+        if (m.dir === 'in' && m.ts > bestTs) { bestTs = m.ts; bestView = negoIsDone(n) ? 'completed' : 'active'; }
+      }
+      if (n.state === 'confirmed' && n.updatedAt > bestTs) { bestTs = n.updatedAt; bestView = negoIsDone(n) ? 'completed' : 'active'; }
+    }
+    return bestView;
+  };
+  const pickMessagesViewRef = useRef(pickMessagesView);
+  pickMessagesViewRef.current = pickMessagesView;
+  // Open Messages and auto-select the right sub-tab for any new message.
+  const openMessages = () => { const v = pickMessagesView(); if (v) setMessagesView(v); setTab('messages'); };
+
+  // Blocked peers (hex pubkeys). Inbound DMs from them are dropped by the client,
+  // so the user receives no more messages from a person they blocked. Persisted.
+  const [blocked, setBlocked] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    kvGet('freeport.blocked').then((v) => { try { if (v) setBlocked(new Set(JSON.parse(v) as string[])); } catch { /* ignore */ } }).catch(() => {});
+  }, []);
+  useEffect(() => { client?.setBlocked(blocked); }, [client, blocked]);
+  const toggleBlock = (pubkey: string) => {
+    if (!pubkey) return;
+    setBlocked((prev) => {
+      const next = new Set(prev);
+      if (next.has(pubkey)) next.delete(pubkey); else next.add(pubkey);
+      kvSet('freeport.blocked', JSON.stringify([...next])).catch(() => {});
+      return next;
+    });
+  };
 
   // A deal confirming is a state change, not an inbound chat message — so on the
   // Driver's side a passenger-confirmed deal arrives with no `messages` entry and
@@ -1235,7 +1295,7 @@ function AppInner() {
       </Animated.View>
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnit={effectiveDistanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
       {tab === 'post' && <PostTab client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} sendLocationOnDeal={sendLocationOnDeal} />}
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
       {tab === 'settings' && (
         <SettingsTab
           npub={npub}
@@ -1374,7 +1434,7 @@ function AppInner() {
       )}
       <View style={[s.tabbar, { paddingBottom: insets.bottom }]}>
         {visibleTabs.map((tk) => (
-          <Pressable key={tk} onPress={() => setTab(tk)} style={[s.tab, tab === tk && s.tabActive]}>
+          <Pressable key={tk} onPress={() => (tk === 'messages' ? openMessages() : setTab(tk))} style={[s.tab, tab === tk && s.tabActive]}>
             <Animated.View style={{ alignSelf: 'stretch', alignItems: 'center', paddingVertical: anim.tabPad }}>
               <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 {tourTab === tk && (
@@ -2724,7 +2784,11 @@ function MyPostCard({ intent, negos, client }: { intent: Intent; negos: Negotiat
   return (
     <View style={[s.card, { marginHorizontal: 0 }]}>
       <View style={[s.row, { flexWrap: 'wrap' }]}>
-        <Text style={s.chip}>{intent.content.schema.startsWith('rideshare') ? t('Rideshare') : t('Service/Product')}</Text>
+        {/* Rideshare's type chip is dropped: the "Ridesharing" category chip below
+            already says it. Service/Product keeps it (its category differs). */}
+        {!intent.content.schema.startsWith('rideshare') && (
+          <Text style={s.chip}>{t('Service/Product')}</Text>
+        )}
         <Text style={[s.chip, intent.content.side === 'offer' ? s.chipGreen : s.chipBlue]}>
           {t(intent.content.side)}
         </Text>
@@ -3400,6 +3464,8 @@ function DealsTab({
   glowCompleted = false,
   role,
   sendLocationOnDeal = true,
+  blockedPubkeys,
+  onToggleBlock,
 }: {
   client: MobileClient | null;
   negos: Negotiation[];
@@ -3419,6 +3485,10 @@ function DealsTab({
   glowCompleted?: boolean;
   /** When off, don't auto-share live location during an active deal. */
   sendLocationOnDeal?: boolean;
+  /** Peer pubkeys (hex) the user has blocked. */
+  blockedPubkeys: Set<string>;
+  /** Toggle a peer's blocked state (block ⇄ unblock). */
+  onToggleBlock: (pubkey: string) => void;
 }) {
   const [counteringId, setCounteringId] = useState<string | null>(null);
   // Our full contact (name · phone [· 🚗 vehicle • plate if we're the driver]),
@@ -3470,11 +3540,7 @@ function DealsTab({
 
   // A confirmed deal stays Active until its trip/service is marked completed.
   // Cancelled/expired are always Completed (history).
-  const isDone = (n: Negotiation) => {
-    if (n.state === 'cancelled' || n.state === 'expired') return true;
-    if (n.state === 'confirmed') return n.stage === 'completed';
-    return false;
-  };
+  const isDone = negoIsDone;
   const sorted = [...negos]
     .filter((n) => (view === 'completed' ? isDone(n) : !isDone(n)))
     .sort((a, b) => b.updatedAt - a.updatedAt);
@@ -3945,6 +4011,30 @@ function DealsTab({
                 {item.state === 'cancel_requested' && item.cancelRequestedBy === 'us' && (
                   <Text style={s.cancelBoxText}>{t("Cancellation requested — waiting for the other party to agree.")}</Text>
                 )}
+
+                {/* Block this person — completed deals only. Blocking drops all
+                    further inbound messages from this peer (client-side). */}
+                {isDone(item) && item.peer ? (() => {
+                  const isBlocked = blockedPubkeys.has(item.peer);
+                  const doBlock = () => onToggleBlock(item.peer);
+                  const onPress = () => {
+                    if (isBlocked) { doBlock(); return; } // unblock needs no confirm
+                    if (Platform.OS === 'web') {
+                      if ((globalThis as any).confirm?.(`${t('Block this person?')}\n\n${t('You will not receive any more messages from them.')}`)) doBlock();
+                    } else {
+                      Alert.alert(t('Block this person?'), t('You will not receive any more messages from them.'), [
+                        { text: t('Cancel'), style: 'cancel' },
+                        { text: t('Block'), style: 'destructive', onPress: doBlock },
+                      ]);
+                    }
+                  };
+                  return (
+                    <Pressable style={s.blockBtn} onPress={onPress} hitSlop={6}>
+                      <Ionicons name={isBlocked ? 'ban' : 'ban-outline'} size={14} color={palette.danger} />
+                      <Text style={s.blockBtnText}>{isBlocked ? t('Unblock') : t('Block this person')}</Text>
+                    </Pressable>
+                  );
+                })() : null}
 
                 <ChatThread nego={item} onSend={(t) => client?.sendChat(item.id, t) ?? Promise.resolve()} />
               </>
@@ -7113,6 +7203,8 @@ function makeStyles(c: Palette) {
     pendingSub: { color: c.warn, fontSize: 13, marginTop: 2, opacity: 0.9 },
     stageLine: { color: c.text2, fontSize: 13, fontWeight: '600', marginTop: 10, marginBottom: 6 },
     cancelLink: { color: '#fca5a5', fontSize: 12, marginTop: 10, textAlign: 'center' },
+    blockBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 10, marginTop: 6, marginBottom: 2 },
+    blockBtnText: { color: c.danger, fontSize: 12, fontWeight: '600' },
     cancelBtn: { marginTop: 12, borderWidth: 1, borderColor: '#ef4444', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 16, alignItems: 'center', alignSelf: 'stretch' },
     cancelBtnText: { color: '#ef4444', fontWeight: '700', fontSize: 14 },
     cancelBox: { marginTop: 10, padding: 10, backgroundColor: c.panel, borderRadius: 8, borderWidth: 1, borderColor: c.accentBorder },

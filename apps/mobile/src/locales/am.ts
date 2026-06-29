@@ -1,5 +1,10 @@
 /** Amharic translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "ይህን ሰው አግድ",
+  "Unblock": "እገዳ አንሳ",
+  "Block this person?": "ይህን ሰው አግድ?",
+  "You will not receive any more messages from them.": "ከዚህ ሰው ተጨማሪ መልዕክቶች አይደርሱዎትም።",
+  "Block": "አግድ",
   "Publish": "አትም",
   "Pin the location": "ቦታውን ይሰኩ",
   "Tap “Pin location on map” to set where this is.": "ይህ የት እንዳለ ለማስቀመጥ “ቦታን በካርታ ላይ ይሰኩ”ን ይንኩ።",

@@ -1,5 +1,10 @@
 /** Bulgarian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Блокирай този човек",
+  "Unblock": "Отблокирай",
+  "Block this person?": "Блокиране на този човек?",
+  "You will not receive any more messages from them.": "Няма да получавате повече съобщения от него.",
+  "Block": "Блокирай",
   "Publish": "Публикувай",
   "Pin the location": "Закачи местоположението",
   "Tap “Pin location on map” to set where this is.": "Докоснете „Закачи местоположение на картата“, за да зададете къде е това.",

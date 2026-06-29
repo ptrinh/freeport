@@ -1,5 +1,10 @@
 /** Japanese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "この人をブロック",
+  "Unblock": "ブロック解除",
+  "Block this person?": "この人をブロックしますか？",
+  "You will not receive any more messages from them.": "この人からのメッセージは今後届きません。",
+  "Block": "ブロック",
   "Publish": "公開",
   "Pin the location": "場所をピン留め",
   "Tap “Pin location on map” to set where this is.": "「地図に場所をピン留め」をタップして、ここがどこかを設定します。",

@@ -1,5 +1,10 @@
 /** Czech translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Zablokovat tuto osobu",
+  "Unblock": "Odblokovat",
+  "Block this person?": "Zablokovat tuto osobu?",
+  "You will not receive any more messages from them.": "Už od ní nebudete dostávat žádné zprávy.",
+  "Block": "Zablokovat",
   "Publish": "Zveřejnit",
   "Pin the location": "Připnout místo",
   "Tap “Pin location on map” to set where this is.": "Klepnutím na „Připnout místo na mapě“ určete, kde to je.",

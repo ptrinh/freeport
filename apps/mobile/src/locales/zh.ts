@@ -1,5 +1,10 @@
 /** Chinese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "屏蔽此人",
+  "Unblock": "取消屏蔽",
+  "Block this person?": "屏蔽此人？",
+  "You will not receive any more messages from them.": "您将不再收到此人的任何消息。",
+  "Block": "屏蔽",
   "Publish": "发布",
   "Pin the location": "标记地点",
   "Tap “Pin location on map” to set where this is.": "点按“在地图上标记位置”以设置这里的位置。",

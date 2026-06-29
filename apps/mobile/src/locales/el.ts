@@ -1,5 +1,10 @@
 /** Greek translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Αποκλεισμός αυτού του ατόμου",
+  "Unblock": "Άρση αποκλεισμού",
+  "Block this person?": "Αποκλεισμός αυτού του ατόμου;",
+  "You will not receive any more messages from them.": "Δεν θα λαμβάνετε άλλα μηνύματα από αυτό το άτομο.",
+  "Block": "Αποκλεισμός",
   "Publish": "Δημοσίευση",
   "Pin the location": "Καρφιτσώστε την τοποθεσία",
   "Tap “Pin location on map” to set where this is.": "Πατήστε «Καρφίτσωμα τοποθεσίας στον χάρτη» για να ορίσετε πού είναι αυτό.",

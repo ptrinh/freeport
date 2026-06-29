@@ -1,5 +1,10 @@
 /** Russian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Block this person": "Заблокировать этого человека",
+  "Unblock": "Разблокировать",
+  "Block this person?": "Заблокировать этого человека?",
+  "You will not receive any more messages from them.": "Вы больше не будете получать от него сообщения.",
+  "Block": "Заблокировать",
   "Publish": "Опубликовать",
   "Pin the location": "Отметьте место",
   "Tap “Pin location on map” to set where this is.": "Нажмите «Отметить место на карте», чтобы указать, где это.",
