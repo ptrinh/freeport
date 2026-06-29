@@ -3202,9 +3202,15 @@ function LiveTripShare({ client, info, onShare, auto, dealId, alreadyShared }: {
     if (!client || !dealId) return;
     const saved = await kvGet(`freeport.trip.${kvId}`);
     let sess = saved ? restoreTripSession(saved, info) : null;
-    let created = false;
-    if (!sess) { sess = createTripSession(info); created = true; await kvSet(`freeport.trip.${kvId}`, tripSecret(sess)).catch(() => {}); }
-    await begin(sess, created || !alreadyShared);
+    if (!sess) { sess = createTripSession(info); await kvSet(`freeport.trip.${kvId}`, tripSecret(sess)).catch(() => {}); }
+    // Post the tracking link to chat AT MOST ONCE per deal. The guard is persisted
+    // (not derived from `created`/messages, which both reset on remount/restart),
+    // so re-opening the app never re-DMs the link — that was spamming the other
+    // party with "New message" on every launch while a deal was live.
+    const posted = (await kvGet(`freeport.tripPosted.${kvId}`)) === '1';
+    const shouldPost = !posted && !alreadyShared;
+    if (shouldPost) await kvSet(`freeport.tripPosted.${kvId}`, '1').catch(() => {});
+    await begin(sess, shouldPost);
   };
 
   const start = async () => { await begin(createTripSession(info), true); };
@@ -4724,9 +4730,13 @@ function SettingsTab({
   const [phoneWarnOpen, setPhoneWarnOpen] = useState(false);
   const isProvider = role === 'driver' && servicesEnabled;
   const isDriver = role === 'driver';
-  // Browse-preference helpers: a Driver is fixed to Ridesharing; a Provider may
-  // pick any category. Subcategory options follow the chosen category.
-  const browseCat = isProvider ? (browseCategory || RIDESHARE_CATEGORY) : RIDESHARE_CATEGORY;
+  // A Customer (passenger with services on) browses provider offers, so it gets
+  // the same Browse preference as a Provider. Only a pure Passenger has none.
+  const isCustomer = role === 'passenger' && servicesEnabled;
+  const browsePicksCategory = isProvider || isCustomer;
+  // Browse-preference helpers: a Driver is fixed to Ridesharing; a Provider or
+  // Customer may pick any category. Subcategory options follow the chosen category.
+  const browseCat = browsePicksCategory ? (browseCategory || RIDESHARE_CATEGORY) : RIDESHARE_CATEGORY;
   const browseCatOptions = [RIDESHARE_CATEGORY, ...SERVICE_CATEGORIES];
   const browseSubOptions = subcategoriesFor(browseCat);
   const browseEffSub = browseSubcategory && browseSubOptions.includes(browseSubcategory)
@@ -5392,8 +5402,8 @@ function SettingsTab({
       </>
       )}
 
-      {/* Browse — driver/provider feed defaults: category, range, new-post alerts. */}
-      {isDriver && (
+      {/* Browse — driver/provider/customer feed defaults: category, range, new-post alerts. */}
+      {(isDriver || isCustomer) && (
         <>
           <Pressable style={s.collapseHeader} onPress={() => setBrowsePrefsOpen((v) => !v)}>
             <View style={s.collapseLeft}>
@@ -5405,7 +5415,7 @@ function SettingsTab({
           {browsePrefsOpen && (
             <>
               <Text style={s.dim}>{t("Browse opens to this category, and only shows posts within your range.")}</Text>
-              {isProvider ? (
+              {browsePicksCategory ? (
                 <>
                   <Text style={[s.toggleTitle, { marginTop: 10, fontWeight: '600' }]}>{t("Category")}</Text>
                   <SelectField
@@ -5424,7 +5434,7 @@ function SettingsTab({
               <SelectField
                 value={browseEffSub}
                 options={browseSubOptions}
-                onChange={(sub) => onBrowsePrefChange({ browseCategory: isProvider ? browseCat : '', browseSubcategory: sub })}
+                onChange={(sub) => onBrowsePrefChange({ browseCategory: browsePicksCategory ? browseCat : '', browseSubcategory: sub })}
                 iconFor={(sub) => subcategoryIcon(sub)}
                 labelFor={(sub) => t(sub)}
                 scroll
