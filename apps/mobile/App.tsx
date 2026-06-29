@@ -3203,13 +3203,26 @@ function LiveTripShare({ client, info, onShare, auto, dealId, alreadyShared }: {
     const saved = await kvGet(`freeport.trip.${kvId}`);
     let sess = saved ? restoreTripSession(saved, info) : null;
     if (!sess) { sess = createTripSession(info); await kvSet(`freeport.trip.${kvId}`, tripSecret(sess)).catch(() => {}); }
-    // Post the tracking link to chat AT MOST ONCE per deal. The guard is persisted
-    // (not derived from `created`/messages, which both reset on remount/restart),
-    // so re-opening the app never re-DMs the link — that was spamming the other
-    // party with "New message" on every launch while a deal was live.
-    const posted = (await kvGet(`freeport.tripPosted.${kvId}`)) === '1';
-    const shouldPost = !posted && !alreadyShared;
-    if (shouldPost) await kvSet(`freeport.tripPosted.${kvId}`, '1').catch(() => {});
+    // Post the tracking link to chat once per SESSION, keyed on the session id.
+    // The link is derived purely from the session secret, so the peer tracks
+    // whichever session we publish to. If the persisted secret ever fails to
+    // restore, the line above mints a NEW key; keying the guard on the id (not a
+    // deal-level flag) re-shares that new link exactly once, instead of silently
+    // publishing location to a session the peer (holding the old, dead link) isn't
+    // tracking. A stable, restorable session matches and re-posts nothing.
+    const postedId = await kvGet(`freeport.tripPosted.${kvId}`);
+    let shouldPost: boolean;
+    if (postedId && postedId !== '1') {
+      shouldPost = postedId !== sess.id; // re-share only when the session changed
+    } else if (postedId === '1' || alreadyShared) {
+      // Migration: link shared under the earlier deal-level guard ('1') or before
+      // any guard. Adopt this session's id silently, without re-sending.
+      shouldPost = false;
+      await kvSet(`freeport.tripPosted.${kvId}`, sess.id).catch(() => {});
+    } else {
+      shouldPost = true; // never shared for this deal
+    }
+    if (shouldPost) await kvSet(`freeport.tripPosted.${kvId}`, sess.id).catch(() => {});
     await begin(sess, shouldPost);
   };
 
