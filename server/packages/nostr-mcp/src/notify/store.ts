@@ -40,6 +40,11 @@ export interface SubRecord {
   /** Nostr pubkey (hex) to watch for inbound DMs (kind 4). Optional. */
   pubkey?: string;
   createdAt: number;
+  /** Last subscribe/re-subscribe time. The app re-POSTs /subscribe on launch
+   *  (a heartbeat), so this trails real device activity — the TTL sweep prunes
+   *  records that stop refreshing (e.g. the app was deleted and never pushed to,
+   *  so the 404/410/DeviceNotRegistered prune never fired). */
+  lastSeenAt: number;
 }
 
 export class SubStore {
@@ -54,6 +59,7 @@ export class SubStore {
     if (existsSync(path)) {
       try {
         for (const r of JSON.parse(readFileSync(path, 'utf8')) as SubRecord[]) {
+          if (typeof r.lastSeenAt !== 'number') r.lastSeenAt = r.createdAt; // migrate pre-TTL records
           this.map.set(r.id, r);
           this.index(r);
         }
@@ -115,14 +121,30 @@ export class SubStore {
     return this.put(idForKey(expoPushToken), { expoPushToken, filters, pubkey });
   }
 
-  private put(id: string, partial: Omit<SubRecord, 'id' | 'createdAt'>): SubRecord {
+  private put(id: string, partial: Omit<SubRecord, 'id' | 'createdAt' | 'lastSeenAt'>): SubRecord {
     const old = this.map.get(id);
     if (old) this.unindex(old);
-    const rec: SubRecord = { id, ...partial, createdAt: old?.createdAt ?? Date.now() };
+    const now = Date.now();
+    const rec: SubRecord = { id, ...partial, createdAt: old?.createdAt ?? now, lastSeenAt: now };
     this.map.set(id, rec);
     this.index(rec);
     this.scheduleFlush();
     return rec;
+  }
+
+  /**
+   * Prune subscriptions not refreshed within `maxAgeMs` (by lastSeenAt). The app
+   * re-subscribes on launch, so a record that goes stale means the device stopped
+   * checking in — typically an uninstall the push-failure prune never caught
+   * (its filters never matched an event, so we never tried to push to it).
+   * Returns the number removed. Caller should `watcher.refresh()` if > 0.
+   */
+  sweepStale(maxAgeMs: number): number {
+    const cutoff = Date.now() - maxAgeMs;
+    const stale: string[] = [];
+    for (const rec of this.map.values()) if ((rec.lastSeenAt ?? rec.createdAt) < cutoff) stale.push(rec.id);
+    for (const id of stale) this.remove(id);
+    return stale.length;
   }
 
   /** Remove by push endpoint URL or Expo token (the app knows these, not the id). */

@@ -55,6 +55,8 @@ The HTTP server also runs a self-hostable, content-blind **Web Push** notifier o
 
 It watches relays for new intents matching each subscriber's filters and sends a short generic notification. Config: `DATA_DIR` (subscription store + VAPID keys), `VAPID_SUBJECT`, optional `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` to pin keys across redeploys. Stores only opaque push keys + coarse filters — no identity or message content.
 
+Dead subscriptions are pruned automatically when a push fails (`404`/`410` for Web Push, `DeviceNotRegistered` for Expo). As a backstop for subs that go dead without ever being pushed to, a daily **TTL sweep** removes any not refreshed within `SUB_TTL_DAYS` (default `365`; set `0` to disable) — the app re-subscribes on launch, so this only catches devices that have stopped checking in.
+
 ### Hardware
 
 A **Raspberry Pi Zero with ~50 Mbps WiFi is enough to run a notification node for a few thousand subscribers** — this server is barely hardware-bound. Any always-on machine with ~256-512 MB RAM and a modest CPU (a Pi, the smallest VPS, an Umbrel/home-server container) covers a personal or community deployment. To make a home node reachable without port-forwarding, expose it publicly through **Tailscale Funnel** or a **Cloudflare Tunnel** — both also terminate inbound TLS at their edge, sparing the Pi that work.
