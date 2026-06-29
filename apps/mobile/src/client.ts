@@ -366,7 +366,11 @@ export class MobileClient {
       schema: intent.content.schema,
       title: '(withdrawn)',
       payload: { withdrawn: true },
-      expiresAt: now,
+      // Future expiration (not `now`): a born-expired event (expiration <= now) is
+      // rejected/instantly dropped by NIP-40 relays, so the withdrawal would never
+      // propagate and other browsers (Provider C) keep seeing the filled intent.
+      // Same TTL the manual withdrawIntent uses; our clients hide it now via `withdrawn`.
+      expiresAt: now + WITHDRAW_TTL_SECONDS,
       d: intent.d,
       createdAt: now,
     });
