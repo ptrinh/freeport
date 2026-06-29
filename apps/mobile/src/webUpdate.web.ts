@@ -14,6 +14,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { applyUpdate } from './updates';
 
+// Show the "update available" popup at most once per hour, so it doesn't nag on
+// every app open/close (deploys can land often). Persisted so the limit holds
+// across reloads / cold starts, not just within one session.
+const PROMPT_MIN_INTERVAL_MS = 60 * 60 * 1000;
+const PROMPT_AT_KEY = 'freeport.webUpdatePromptedAt';
+function lastPromptedAt(): number {
+  try { return Number(localStorage.getItem(PROMPT_AT_KEY)) || 0; } catch { return 0; }
+}
+function recordPrompted(): void {
+  try { localStorage.setItem(PROMPT_AT_KEY, String(Date.now())); } catch { /* ignore */ }
+}
+
 // Sorted, de-duped list of the content-hashed entry bundles referenced by an
 // HTML document — our deploy fingerprint. Returns null if none are found (e.g.
 // a dev server that doesn't emit hashed bundles), which disables detection.
@@ -51,7 +63,12 @@ export function useWebUpdateAvailable(): { available: boolean; apply: () => void
         const res = await fetch('/index.html', { cache: 'no-store' });
         if (!res.ok) return;
         const fresh = markerFromHtml(await res.text());
-        if (fresh && fresh !== loaded.current) setAvailable(true);
+        if (fresh && fresh !== loaded.current) {
+          // Throttle: at most one prompt per hour (persisted across reloads).
+          if (Date.now() - lastPromptedAt() < PROMPT_MIN_INTERVAL_MS) return;
+          recordPrompted();
+          setAvailable(true);
+        }
       } catch { /* offline / transient — try again next tick */ }
     };
 
