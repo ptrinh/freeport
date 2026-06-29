@@ -55,6 +55,18 @@ The HTTP server also runs a self-hostable, content-blind **Web Push** notifier o
 
 It watches relays for new intents matching each subscriber's filters and sends a short generic notification. Config: `DATA_DIR` (subscription store + VAPID keys), `VAPID_SUBJECT`, optional `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` to pin keys across redeploys. Stores only opaque push keys + coarse filters — no identity or message content.
 
+### Hardware
+
+A **Raspberry Pi Zero with ~50 Mbps WiFi is enough to run a notification node for a few thousand subscribers** — this server is barely hardware-bound. Any always-on machine with ~256-512 MB RAM and a modest CPU (a Pi, the smallest VPS, an Umbrel/home-server container) covers a personal or community deployment. To make a home node reachable without port-forwarding, expose it publicly through **Tailscale Funnel** or a **Cloudflare Tunnel** — both also terminate inbound TLS at their edge, sparing the Pi that work.
+
+What actually scales:
+
+- **RAM** tracks subscriber count: ~300 bytes per subscription, so ~3 MB per 10k subs (1M subs ≈ 300 MB). Rarely the limit.
+- **CPU / bandwidth** track event + push *throughput*, not subscriber count. Matching is single-threaded; for high volume run multiple instances (`cluster`) and partition by region using `#t` topic tags so no single node pulls the whole network's firehose.
+- **Disk** is trivial — small atomic JSON writes; any SSD/SD card is fine.
+
+For most self-hosters the constraint is bandwidth and uptime, not the box.
+
 ## Geohash radius note
 
 Nostr relay filters match tag values **exactly** — no prefix/radius operator. `nostr_search_intents` filters by topic (`#t`) at the relay and refines distance **client-side** via haversine on each post's `g` tag. To push radius filtering to the relay (`relaySideGeohash: true`), posts must carry **multi-precision geohash prefix tags**; today they carry a single precision-6 `g`, so relay-side geohash is opt-in and a no-op until publishers add prefix tags.
