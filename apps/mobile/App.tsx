@@ -6924,7 +6924,7 @@ function makeStyles(c: Palette) {
     trackMsgText: { color: c.link, fontSize: 14, fontWeight: '600', textDecorationLine: 'underline' },
     // Outlined/secondary so it reads as a utility (open Maps) and never sits as a
     // second solid-blue block right above the primary "Picked up" action.
-    navBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: c.card, borderWidth: 1, borderColor: c.accentBorder, borderRadius: 8, paddingVertical: 10, marginTop: 8 },
+    navBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: c.card, borderWidth: 1, borderColor: c.accentBorder, borderRadius: 8, paddingVertical: 10, marginTop: 8, marginBottom: 8 },
     slideTrack: { height: 54, borderRadius: 12, backgroundColor: c.panel, borderWidth: 1, borderColor: c.accentBorder, justifyContent: 'center', alignItems: 'center', overflow: 'hidden', marginTop: 8 },
     slideLabel: { color: c.link, fontWeight: '700', fontSize: 15 },
     slideThumb: { position: 'absolute', left: 3, top: 3, bottom: 3, width: 54, borderRadius: 9, backgroundColor: c.accentBtn, alignItems: 'center', justifyContent: 'center' },
