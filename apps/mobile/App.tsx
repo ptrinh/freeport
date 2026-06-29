@@ -126,6 +126,34 @@ function isStandalonePWA(): boolean {
   } catch { return false; }
 }
 
+// Open a Google-Maps link. On an installed iOS PWA, opening the maps WEBSITE
+// (https://www.google.com/maps/...) renders inside a system in-app browser that
+// the PWA cannot dismiss — it lingers on top after the user returns (the stuck
+// "internal browser" screen). A URL *scheme* hands off to a native app instead
+// (exactly like tel: links do), so it app-switches and comes back cleanly.
+// Rewrite our https links to the Apple Maps scheme (always present on iOS) only
+// in that case; native apps, Android, and desktop web get the https link as-is.
+function openMaps(httpsUrl: string): void {
+  if (isIOSWeb() && isStandalonePWA()) {
+    try {
+      const p = new URL(httpsUrl).searchParams;
+      const origin = p.get('origin');
+      const destination = p.get('destination');
+      const query = p.get('query');
+      let scheme: string | null = null;
+      if (destination) {
+        scheme = 'maps://?'
+          + (origin ? `saddr=${encodeURIComponent(origin)}&` : '')
+          + `daddr=${encodeURIComponent(destination)}&dirflg=d`; // d = driving
+      } else if (query) {
+        scheme = `maps://?q=${encodeURIComponent(query)}`;
+      }
+      if (scheme) { window.location.href = scheme; return; }
+    } catch { /* fall through to the https link */ }
+  }
+  Linking.openURL(httpsUrl).catch(() => {});
+}
+
 // Alert.alert is a no-op on react-native-web, so any user-facing message in a
 // web code path must fall back to the browser's own dialog.
 function uiAlert(title: string, body?: string): void {
@@ -2251,7 +2279,7 @@ function MarketTab({
               </View>
             )}
             {isRide && p.from?.name && p.to?.name && (
-              <Pressable style={s.mapLink} onPress={() => Linking.openURL(routeUrl(placeParam(p.from?.geohash, p.from.name), placeParam(p.to?.geohash, p.to.name)))}>
+              <Pressable style={s.mapLink} onPress={() => openMaps(routeUrl(placeParam(p.from?.geohash, p.from.name), placeParam(p.to?.geohash, p.to.name)))}>
                 <Text style={s.mapLinkText}>{'🗺 ' + t('View route in Google Maps')}</Text>
               </Pressable>
             )}
@@ -2266,7 +2294,7 @@ function MarketTab({
                   </Pressable>
                   <Pressable
                     style={s.mapLink}
-                    onPress={() => Linking.openURL(placeUrl(p.location?.name ?? '', p.location?.geohash))}
+                    onPress={() => openMaps(placeUrl(p.location?.name ?? '', p.location?.geohash))}
                   >
                     <Text style={s.mapLinkText}>{t("Open in Google Maps")}</Text>
                   </Pressable>
@@ -3588,7 +3616,7 @@ function DealsTab({
                 const to = item.terms?.to && item.terms.to !== p.to.name
                   ? item.terms.to : placeParam(p.to?.geohash, p.to.name);
                 return (
-                  <Pressable style={s.mapLink} onPress={() => Linking.openURL(routeUrl(from, to))}>
+                  <Pressable style={s.mapLink} onPress={() => openMaps(routeUrl(from, to))}>
                     <Text style={s.mapLinkText}>{'🗺 ' + t('View route in Google Maps')}</Text>
                   </Pressable>
                 );
@@ -3596,7 +3624,7 @@ function DealsTab({
               if (item.intent.content.schema.startsWith('service') && p.location?.name) {
                 const loc = item.terms?.location ?? p.location.name;
                 return (
-                  <Pressable style={s.mapLink} onPress={() => Linking.openURL(placeUrl(loc, p.location?.geohash))}>
+                  <Pressable style={s.mapLink} onPress={() => openMaps(placeUrl(loc, p.location?.geohash))}>
                     <Text style={s.mapLinkText}>{'🗺 ' + t('View location in Google Maps')}</Text>
                   </Pressable>
                 );
@@ -3716,7 +3744,7 @@ function DealsTab({
                         }
                         if (!dest) return null;
                         return (
-                          <Pressable style={s.navBtn} onPress={() => Linking.openURL(dirUrl(dest))}>
+                          <Pressable style={s.navBtn} onPress={() => openMaps(dirUrl(dest))}>
                             <Ionicons name="navigate" size={15} color={palette.link} />
                             <Text style={s.navBtnText}>{label}</Text>
                           </Pressable>
