@@ -23,7 +23,7 @@ const KIND_DM = 4;
 // just human chat. The notifier is content-blind (NIP-04), so it can't tell them
 // apart — without this, an active deal spams "New message". Coalesce: at most one
 // DM push per subscriber per this window. Tune with DM_NOTIFY_COOLDOWN_SEC.
-const DM_COOLDOWN_MS = Math.max(0, Number(process.env.DM_NOTIFY_COOLDOWN_SEC ?? 90)) * 1000;
+const DM_COOLDOWN_MS = Math.max(0, Number(process.env.DM_NOTIFY_COOLDOWN_SEC ?? 30)) * 1000;
 
 export class Watcher {
   private readonly pool = new SimplePool();
