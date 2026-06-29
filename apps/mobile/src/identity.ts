@@ -56,7 +56,7 @@ export async function wipeAllLocalData(): Promise<void> {
     'freeport.published', 'freeport.addressbook', 'freeport.created', 'freeport.rated',
     'freeport.celebrated', 'freeport.expiredLog', 'freeport.expiredSeen',
     'freeport.expoPushToken', 'freeport.geoOk', 'freeport.guidanceSeen', 'freeport.notifDismiss',
-    'freeport.pushOn',
+    'freeport.pushOn', 'freeport.autoContactSent',
   ];
   await Promise.all(KEYS.map((k) => kvDelete(k).catch(() => {})));
 }

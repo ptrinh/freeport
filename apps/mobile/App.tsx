@@ -966,16 +966,30 @@ function AppInner() {
     return parts.filter(Boolean).join(' · ') || (client?.pubkey.slice(0, 12) ?? '');
   };
   const buildContactFor = (n: Negotiation): string => buildContact(n.intent, n.weInitiated);
+  // Auto-send our contact back exactly ONCE per deal. The guard is persisted to
+  // kv (not just an in-memory ref) so an app reload / OTA update doesn't re-send,
+  // and we deliberately do NOT un-guard on a publish error — accept() commits our
+  // contact locally and best-effort-publishes to the relays; re-firing on every
+  // transient failure or reload re-publishes the same DM (new event id) and spams
+  // the other party with "New message". Send once; if it truly failed, the user
+  // can message manually.
   const autoContactSent = useRef<Set<string>>(new Set());
+  const [autoContactReady, setAutoContactReady] = useState(false);
   useEffect(() => {
-    if (!client) return;
+    kvGet('freeport.autoContactSent')
+      .then((v) => { try { if (v) for (const id of JSON.parse(v) as string[]) autoContactSent.current.add(id); } catch { /* ignore */ } })
+      .finally(() => setAutoContactReady(true));
+  }, []);
+  useEffect(() => {
+    if (!client || !autoContactReady) return;
     for (const n of negos) {
       if (n.state === 'confirmed' && n.theirContact && !n.ourContact && !autoContactSent.current.has(n.id)) {
         autoContactSent.current.add(n.id);
-        client.accept(n.id, buildContactFor(n)).catch(() => autoContactSent.current.delete(n.id));
+        kvSet('freeport.autoContactSent', JSON.stringify([...autoContactSent.current])).catch(() => {});
+        client.accept(n.id, buildContactFor(n)).catch(() => {});
       }
     }
-  }, [negos, client, profile]);
+  }, [negos, client, profile, autoContactReady]);
 
   // A pure passenger only posts ride requests and waits for drivers — Browse
   // (where you pick listings) is noise. Show it for drivers, or once the
@@ -3415,6 +3429,16 @@ function DealsTab({
                     <View style={[s.row, { flexWrap: 'wrap', flex: 1 }]}>
                       <Text style={[s.chip, s.chipBlue]}>{role}</Text>
                       <Text style={[s.chip, stateColor(item.state)]}>{t(stateLabel(item.state))}</Text>
+                      {(() => {
+                        const cat = categoryOf(item.intent.content.schema, p);
+                        const sub = subcategoryOf(item.intent.content.schema, p);
+                        return (
+                          <>
+                            {cat ? <Text style={s.chip}>{t(cat)}</Text> : null}
+                            {sub ? <Text style={s.chip}>{t(sub)}</Text> : null}
+                          </>
+                        );
+                      })()}
                     </View>
                     {item.state === 'confirmed' && (
                       <Pressable onPress={() => setReportingId(item.id)} hitSlop={8}>
@@ -3505,7 +3529,7 @@ function DealsTab({
                     const phone = extractPhone(item.theirContact);
                     return phone ? (
                       <>
-                        <Text style={s.dealContact}>{t('Their contact')}: {item.theirContact}</Text>
+                        <Text style={s.dealContact}>{t('Their contact')}: {contactWithoutPhone(item.theirContact, phone)}</Text>
                         <Pressable style={s.callBtn} onPress={() => Linking.openURL('tel:' + phone)}>
                           <Ionicons name="call" size={14} color="white" />
                           <Text style={s.callBtnText}>{t('Call')} {phone}</Text>
@@ -6698,6 +6722,17 @@ function extractPhone(strInput?: string): string | null {
   if (!m) return null;
   const digits = m[0].replace(/[^\d+]/g, '');
   return /^\+?\d{8,15}$/.test(digits) ? digits : null;
+}
+
+/** A "·"-joined contact string with the phone part removed — used when a Call
+ *  button already shows the number, so it isn't repeated on the contact line. */
+function contactWithoutPhone(contact?: string, phone?: string | null): string {
+  const c = (contact ?? '').trim();
+  if (!c) return '—';
+  const digits = (phone ?? '').replace(/\D/g, '');
+  const parts = c.split('·').map((s) => s.trim()).filter(Boolean)
+    .filter((part) => !(digits.length >= 6 && part.replace(/\D/g, '').includes(digits)));
+  return parts.join(' · ') || '—';
 }
 
 // English label (= i18n key) for a negotiation state chip; t()'d at the call site
