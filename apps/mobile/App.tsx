@@ -429,6 +429,11 @@ function AppInner() {
   // (our proxy for the suspension signal, which managed RN can't observe directly)
   // and is cancelled if they return. Throttled to avoid repeat nags.
   const suspendNotifiedRef = useRef(0);
+  // Persist the last "updates paused" nag time so a reload/cold start doesn't
+  // reset the throttle and re-nag on the next open→close.
+  useEffect(() => {
+    kvGet('freeport.suspendNotifiedAt').then((v) => { const n = parseInt(v || '0', 10); if (n) suspendNotifiedRef.current = n; }).catch(() => {});
+  }, []);
   useEffect(() => {
     if (Platform.OS !== 'ios') return;
     let nagTimer: ReturnType<typeof setTimeout> | null = null;
@@ -457,13 +462,17 @@ function AppInner() {
           && !(i.content.window && i.content.window.start < nowSec)
           && !negos.some((n) => n.intent.id === i.id && n.state === 'confirmed'),
       );
-      const wantNag = hasOpenPost && Date.now() - suspendNotifiedRef.current >= 10 * 60_000; // throttle
+      // Skip entirely when the push notification server is on — it keeps
+      // delivering in the background, so "alerts paused" would be misleading.
+      // Otherwise throttle to at most once per hour, persisted across reloads.
+      const wantNag = hasOpenPost && !pushOnRef.current && Date.now() - suspendNotifiedRef.current >= 60 * 60_000;
       // Fire the "updates paused" nag EARLY (5s) — iOS doesn't always grant the
       // full ~30s window, so a notification scheduled at 25s often never presents
       // and only appears on reopen. 5s is safely inside even the minimal window.
       if (wantNag) {
         nagTimer = setTimeout(() => {
           suspendNotifiedRef.current = Date.now();
+          kvSet('freeport.suspendNotifiedAt', String(suspendNotifiedRef.current)).catch(() => {});
           notify(t('Updates paused'), t('Freeport was paused in the background, so new-offer alerts have stopped. Keep the app open or check back periodically for updates.'), { tab: 'browse' });
         }, 5000);
       }
