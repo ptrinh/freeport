@@ -10,6 +10,7 @@ import {
   AppState,
   Easing,
   FlatList,
+  findNodeHandle,
   Image,
   KeyboardAvoidingView,
   PanResponder,
@@ -1205,7 +1206,7 @@ function AppInner() {
         ) : null}
       </Animated.View>
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnit={effectiveDistanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
-      {tab === 'post' && <PostTab client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} onScroll={onContentScroll} />}
+      {tab === 'post' && <PostTab client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
       {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} sendLocationOnDeal={sendLocationOnDeal} />}
       {tab === 'settings' && (
         <SettingsTab
@@ -2495,6 +2496,8 @@ function PostTab({
   defaultCurrency,
   location,
   role,
+  browseCategory,
+  browseSubcategory,
   onScroll,
 }: {
   client: MobileClient | null;
@@ -2505,9 +2508,16 @@ function PostTab({
   defaultCurrency: Currency;
   location: UserLocation;
   role: 'passenger' | 'driver' | '';
+  browseCategory?: string;
+  browseSubcategory?: string;
   onScroll?: (e: any) => void;
 }) {
-  const [type, setType] = useState<PostType>('rideshare');
+  // Pre-select the post type + category from the user's Browse preference, so a
+  // new post defaults to whatever they're set up to browse. A service category
+  // opens the Service/Product form; anything else (incl. Ridesharing) stays on
+  // Rideshare. The user can still switch — this is only the default.
+  const browseIsService = !!browseCategory && SERVICE_CATEGORIES.includes(browseCategory);
+  const [type, setType] = useState<PostType>(browseIsService ? 'service' : 'rideshare');
   // Force rideshare when the Service/Product vertical is disabled
   const activeType = servicesEnabled ? type : 'rideshare';
   // Animate the form in on the next line when switching segment (Rideshare ↔
@@ -2523,9 +2533,10 @@ function PostTab({
   const [postsOpen, setPostsOpen] = useState(true);
   const markPosted = () => { setFormOpen(false); setPostsOpen(true); };
   const formTitle = t(role === 'passenger' ? 'New Request' : 'New Post');
+  const formScroll = useRef<ScrollView>(null);  // so a form can scroll a missing required field into view
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={formScroll} contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
         {(() => {
           const nowSec = Math.floor(Date.now() / 1000);
           // Show only LIVE, still-open requests here. Drop:
@@ -2591,8 +2602,8 @@ function PostTab({
             )}
             <Animated.View style={{ opacity: formAnim, transform: [{ translateY: formAnim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }] }}>
               {activeType === 'rideshare'
-                ? <RideshareForm client={client} profile={profile} defaultCurrency={defaultCurrency} location={location} onPosted={markPosted} myIntents={myIntents} negos={negos} />
-                : <ServiceForm client={client} profile={profile} defaultCurrency={defaultCurrency} location={location} onPosted={markPosted} />}
+                ? <RideshareForm client={client} profile={profile} defaultCurrency={defaultCurrency} location={location} onPosted={markPosted} myIntents={myIntents} negos={negos} scrollRef={formScroll} />
+                : <ServiceForm client={client} profile={profile} defaultCurrency={defaultCurrency} location={location} onPosted={markPosted} defaultCategory={browseIsService ? browseCategory : undefined} defaultSubcategory={browseIsService ? browseSubcategory : undefined} scrollRef={formScroll} />}
             </Animated.View>
           </>
         )}
@@ -2724,7 +2735,65 @@ function MyPostCard({ intent, negos, client }: { intent: Intent; negos: Negotiat
   );
 }
 
-function RideshareForm({ client, profile, defaultCurrency, location, onPosted, myIntents, negos }: { client: MobileClient | null; profile: UserProfile; defaultCurrency: Currency; location: UserLocation; onPosted?: () => void; myIntents: Intent[]; negos: Negotiation[] }) {
+// Wraps a required form field so it can be flagged when it blocks Publish:
+// pulses a red outline (absolute overlay, so layout never shifts) and forwards
+// its layout node so the form can scroll it into view.
+const RequiredField = React.forwardRef<View, { active: boolean; nonce: number; children: React.ReactNode }>(
+  ({ active, nonce, children }, ref) => {
+    const glow = useRef(new Animated.Value(0)).current;
+    useEffect(() => {
+      if (!active) { glow.stopAnimation(); glow.setValue(0); return; }
+      const loop = Animated.loop(
+        Animated.sequence([
+          Animated.timing(glow, { toValue: 1, duration: 480, useNativeDriver: false }),
+          Animated.timing(glow, { toValue: 0, duration: 480, useNativeDriver: false }),
+        ]),
+        { iterations: 3 },
+      );
+      loop.start();
+      return () => loop.stop();
+    }, [active, nonce, glow]);
+    return (
+      <View ref={ref}>
+        {children}
+        <Animated.View
+          pointerEvents="none"
+          style={{ position: 'absolute', top: -3, left: -3, right: -3, bottom: -3, borderWidth: 2, borderColor: palette.danger, borderRadius: 14, opacity: glow }}
+        />
+      </View>
+    );
+  },
+);
+
+// Shared logic for "Publish blocked by a missing field": register a node per
+// required field, then `focus(key)` scrolls it into view and flags it to pulse.
+// On web Alert.alert is a no-op, so this visual cue is the only feedback there.
+function useRequiredFields(scrollRef?: React.RefObject<ScrollView | null>) {
+  const nodes = useRef<Record<string, View | null>>({});
+  const [flag, setFlag] = useState<{ key: string; n: number }>({ key: '', n: 0 });
+  const register = (key: string) => (node: View | null) => { nodes.current[key] = node; };
+  const focus = (key: string) => {
+    setFlag((f) => ({ key, n: f.n + 1 }));
+    const sv = scrollRef?.current;
+    const node = nodes.current[key];
+    if (!sv || !node) return;
+    const handle = findNodeHandle(sv);
+    if (handle == null) return;
+    // Defer a tick so any just-opened section is laid out before measuring.
+    setTimeout(() => {
+      try {
+        (node as any).measureLayout?.(
+          handle,
+          (_x: number, y: number) => sv.scrollTo({ y: Math.max(0, y - 24), animated: true }),
+          () => {},
+        );
+      } catch { /* measureLayout unsupported here — the pulse still fires */ }
+    }, 60);
+  };
+  return { register, focus, flag };
+}
+
+function RideshareForm({ client, profile, defaultCurrency, location, onPosted, myIntents, negos, scrollRef }: { client: MobileClient | null; profile: UserProfile; defaultCurrency: Currency; location: UserLocation; onPosted?: () => void; myIntents: Intent[]; negos: Negotiation[]; scrollRef?: React.RefObject<ScrollView | null> }) {
   // Rideshare is one-directional: passengers post ride requests; drivers pick
   // them from the market and respond. Drivers never post, so no offer side.
   const [from, setFrom] = useState('');
@@ -2786,10 +2855,15 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
     return raw == null ? null : snapToStep(raw, payCurrency);
   }, [fromGeohash, homeCoords, toCoords, category, payCurrency, time, flexible, location.country]);
 
+  const req = useRequiredFields(scrollRef);
+
   const post = async () => {
     if (!client) return;
-    if (!fromGeohash) { Alert.alert(t('Pin your pickup'), t('Tap “Pin location on map” to set where the ride starts.')); return; }
-    if (!to.trim()) { Alert.alert(t('Missing fields'), t('Destination (To) is required.')); return; }
+    // Inline error (not Alert.alert, which is a no-op on web/Home-Screen PWA) so
+    // the missing field is reported on every platform; req.focus also scrolls to
+    // and pulses the field.
+    if (!fromGeohash) { req.focus('from'); setLimitErr(t('Tap “Pin location on map” to set where the ride starts.')); return; }
+    if (!to.trim()) { req.focus('to'); setLimitErr(t('Destination (To) is required.')); return; }
     // Anti-spam caps on live ride requests (a request lingers in drivers' search
     // results, so unbounded posting — esp. flexible/long ones — is the abuse
     // vector). Count my own live, unconfirmed, not-withdrawn rideshare requests.
@@ -2854,14 +2928,18 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
 
   return (
     <>
-      <LocationField
-        label={t("From *")}
-        address={from}
-        geohash={fromGeohash}
-        onChange={(a, g) => { setFrom(a); setFromGeohash(g); }}
-        placeholder={t("e.g. Orchard Rd — or tap 📍 to pin")}
-      />
-      <AddressBookField label={t("To *")} value={to} onChange={(v) => { setTo(v); setToCoords(null); }} placeholder={t("e.g. 123 Main Street")} near={toNear} country={location.country} onSelectCoords={setToCoords} />
+      <RequiredField ref={req.register('from')} active={req.flag.key === 'from'} nonce={req.flag.n}>
+        <LocationField
+          label={t("From *")}
+          address={from}
+          geohash={fromGeohash}
+          onChange={(a, g) => { setFrom(a); setFromGeohash(g); }}
+          placeholder={t("e.g. Orchard Rd — or tap 📍 to pin")}
+        />
+      </RequiredField>
+      <RequiredField ref={req.register('to')} active={req.flag.key === 'to'} nonce={req.flag.n}>
+        <AddressBookField label={t("To *")} value={to} onChange={(v) => { setTo(v); setToCoords(null); }} placeholder={t("e.g. 123 Main Street")} near={toNear} country={location.country} onSelectCoords={setToCoords} />
+      </RequiredField>
       <Text style={s.label}>{t("Vehicle")}</Text>
       <SelectField value={category} options={RIDESHARE_SUBCATEGORIES} onChange={setCategory} icons={VEHICLE_ICONS} labelFor={vehicleLabel} />
       <TimeField time={time} onChange={setTime} flexible={flexible} onFlexible={setFlexible} />
@@ -2874,14 +2952,22 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
   );
 }
 
-function ServiceForm({ client, profile, defaultCurrency, location: userLocation, onPosted }: { client: MobileClient | null; profile: UserProfile; defaultCurrency: Currency; location: UserLocation; onPosted?: () => void }) {
+function ServiceForm({ client, profile, defaultCurrency, location: userLocation, onPosted, defaultCategory, defaultSubcategory, scrollRef }: { client: MobileClient | null; profile: UserProfile; defaultCurrency: Currency; location: UserLocation; onPosted?: () => void; defaultCategory?: string; defaultSubcategory?: string; scrollRef?: React.RefObject<ScrollView | null> }) {
   // Service convention: the provider posts their offering; customers respond.
+  // Seed Category/Subcategory from the user's Browse preference when it names a
+  // real service category, falling back to the first category. Subcategory only
+  // carries over if it's valid for the seeded category.
+  const initialCat = defaultCategory && SERVICE_CATEGORIES.includes(defaultCategory) ? defaultCategory : SERVICE_CATEGORIES[0];
+  const initialSub = defaultSubcategory && subcategoriesFor(initialCat).includes(defaultSubcategory)
+    ? defaultSubcategory
+    : (SERVICE_SUBCATEGORIES[initialCat][0] ?? '');
   const [side, setSide] = useState<'request' | 'offer'>('offer');
+  const [postErr, setPostErr] = useState('');
   const [location, setLocation] = useState('');
   const [locationGeohash, setLocationGeohash] = useState<string | null>(null);
   const [service, setService] = useState('');
-  const [category, setCategory] = useState(SERVICE_CATEGORIES[0]);
-  const [subcategory, setSubcategory] = useState(SERVICE_SUBCATEGORIES[SERVICE_CATEGORIES[0]][0] ?? '');
+  const [category, setCategory] = useState(initialCat);
+  const [subcategory, setSubcategory] = useState(initialSub);
   const [time, setTime] = useState<Date>(defaultIntentTime);
   // Provider offers default to flexible (a standing offer); customer requests
   // default to a specific time. Toggling side resets to that side's default.
@@ -2901,10 +2987,16 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
     [client, category, subcategory, payCurrency, durHours, durMinutes],
   );
 
+  const req = useRequiredFields(scrollRef);
+
   const post = async () => {
     if (!client) return;
-    if (!locationGeohash) { Alert.alert(t('Pin the location'), t('Tap “Pin location on map” to set where this is.')); return; }
-    if (!service.trim()) { Alert.alert(t('Missing field'), t('Service / Product is required.')); return; }
+    // Inline error (not Alert.alert, which is a no-op on web/Home-Screen PWA) so
+    // the missing field is reported on every platform; req.focus also scrolls to
+    // and pulses the field.
+    if (!locationGeohash) { req.focus('location'); setPostErr(t('Tap “Pin location on map” to set where this is.')); return; }
+    if (!service.trim()) { req.focus('service'); setPostErr(t('Service / Product is required.')); return; }
+    setPostErr('');
     setPosting(true);
     try {
       const window = timeToWindow(time, flexible);
@@ -2950,13 +3042,15 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
   return (
     <>
       <SideToggle side={side} onChange={(sd) => { setSide(sd); setFlexible(sd === 'offer'); }} requestLabel={t("I'm looking for")} offerLabel={t("I provide this")} />
-      <LocationField
-        label={t("Location *")}
-        address={location}
-        geohash={locationGeohash}
-        onChange={(a, g) => { setLocation(a); setLocationGeohash(g); }}
-        placeholder={t("e.g. Toa Payoh — or tap 📍 to pin")}
-      />
+      <RequiredField ref={req.register('location')} active={req.flag.key === 'location'} nonce={req.flag.n}>
+        <LocationField
+          label={t("Location *")}
+          address={location}
+          geohash={locationGeohash}
+          onChange={(a, g) => { setLocation(a); setLocationGeohash(g); }}
+          placeholder={t("e.g. Toa Payoh — or tap 📍 to pin")}
+        />
+      </RequiredField>
       <Text style={s.label}>{t("Category")}</Text>
       <SelectField
         value={category}
@@ -2980,12 +3074,15 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
           />
         </>
       )}
-      <Field label={t("Service / Product *")} value={service} onChange={setService} placeholder={t("e.g. Plumber, Homemade cakes")} />
+      <RequiredField ref={req.register('service')} active={req.flag.key === 'service'} nonce={req.flag.n}>
+        <Field label={t("Service / Product *")} value={service} onChange={setService} placeholder={t("e.g. Plumber, Homemade cakes")} />
+      </RequiredField>
       <PaymentField amount={payAmount} currency={payCurrency} suggestion={priceSuggestion} onChange={(a, c) => { setPayAmount(a); setPayCurrency(c); }} />
       <TimeField time={time} onChange={setTime} flexible={flexible} onFlexible={setFlexible} />
       <DurationField hours={durHours} minutes={durMinutes} onChange={(h, m) => { setDurHours(h); setDurMinutes(m); }} />
       <Field label={t("Note")} value={notes} onChange={setNotes} placeholder={t("Any details…")} maxLength={100} multiline />
       <ImagePickerField images={images} onChange={setImages} label={t("Photos (optional)")} />
+      {!!postErr && <Text style={s.fieldError}>{postErr}</Text>}
       <PostButton onPress={post} loading={posting} label={t("Publish")} />
     </>
   );
