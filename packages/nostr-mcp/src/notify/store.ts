@@ -13,7 +13,7 @@
  * Content-blind: we keep only the push endpoint/keys (opaque) and coarse filter
  * criteria the user chose. No identity, no message content.
  */
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 export interface PushSubscriptionJSON {
@@ -97,7 +97,12 @@ export class SubStore {
   private flushNow(): void {
     if (this.flushTimer) { clearTimeout(this.flushTimer); this.flushTimer = null; }
     mkdirSync(dirname(this.path), { recursive: true });
-    writeFileSync(this.path, JSON.stringify([...this.map.values()], null, 2));
+    // Write to a temp file then atomically rename over the live file. A crash
+    // mid-write can no longer leave a half-written (corrupt) subscriptions.json,
+    // which the loader would discard on boot — wiping every push subscription.
+    const tmp = `${this.path}.tmp`;
+    writeFileSync(tmp, JSON.stringify([...this.map.values()], null, 2));
+    renameSync(tmp, this.path);
   }
 
   /** Web Push subscription. id derived from the endpoint so re-subscribing updates in place. */
