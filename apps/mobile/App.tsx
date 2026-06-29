@@ -3511,13 +3511,15 @@ function DealsTab({
                         const peerCallable = extractPhone(peerRaw);
                         return (
                           <View style={{ marginTop: 8 }}>
-                            <Text style={s.pendingSub}>{t('Their number')}: {peerRaw}</Text>
                             {peerCallable ? (
+                              // The Call button already shows the number — don't repeat it as text.
                               <Pressable style={[s.callBtn, { marginTop: 6 }]} onPress={() => Linking.openURL('tel:' + peerCallable)}>
                                 <Ionicons name="call" size={14} color="white" />
                                 <Text style={s.callBtnText}>{t('Call')} {peerCallable}</Text>
                               </Pressable>
-                            ) : null}
+                            ) : (
+                              <Text style={s.pendingSub}>{t('Their number')}: {peerRaw}</Text>
+                            )}
                           </View>
                         );
                       })()}
@@ -3784,7 +3786,7 @@ function DealsTab({
               const phone = extractPhone(item.theirContact);
               return (
                 <View style={s.dealBanner}>
-                  <Text style={s.dealContact}>{t('Their contact')}: {item.theirContact}</Text>
+                  <Text style={s.dealContact}>{t('Their contact')}: {phone ? contactWithoutPhone(item.theirContact, phone) : (item.theirContact ?? '—')}</Text>
                   {phone && (
                     <Pressable style={s.callBtn} onPress={() => Linking.openURL('tel:' + phone)}>
                       <Ionicons name="call" size={14} color="white" />
