@@ -2802,13 +2802,22 @@ function useRequiredFields(scrollRef?: React.RefObject<ScrollView | null>) {
   const register = (key: string) => (node: View | null) => { nodes.current[key] = node; };
   const focus = (key: string) => {
     setFlag((f) => ({ key, n: f.n + 1 }));
-    const sv = scrollRef?.current;
     const node = nodes.current[key];
-    if (!sv || !node) return;
-    const handle = findNodeHandle(sv);
-    if (handle == null) return;
+    if (!node) return;
     // Defer a tick so any just-opened section is laid out before measuring.
     setTimeout(() => {
+      // Web (react-native-web): the node handle IS the DOM element, and
+      // scrollIntoView reliably scrolls the form's scroll container. The native
+      // measureLayout+scrollTo path below does not move the page on web, so the
+      // field highlighted but the screen never scrolled up to it.
+      if (Platform.OS === 'web') {
+        const el = findNodeHandle(node) as unknown as { scrollIntoView?: (o?: any) => void } | null;
+        if (el?.scrollIntoView) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      }
+      const sv = scrollRef?.current;
+      if (!sv) return;
+      const handle = findNodeHandle(sv);
+      if (handle == null) return;
       try {
         (node as any).measureLayout?.(
           handle,
