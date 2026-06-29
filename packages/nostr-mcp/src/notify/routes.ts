@@ -43,6 +43,23 @@ export function mountNotify(app: Express, relays: string[], dataDir: string, lim
   const watcher = new Watcher(relays, store);
   watcher.refresh();
 
+  // TTL sweep: prune subscriptions not refreshed within SUB_TTL_DAYS (default
+  // 365). The app re-subscribes on launch, so a stale record is a device that
+  // stopped checking in (e.g. an uninstall the 404/410/DeviceNotRegistered prune
+  // never caught because its filters never matched an event). Set SUB_TTL_DAYS=0
+  // to disable. Daily timer, unref'd so it never holds the process open.
+  const ttlDays = Math.max(0, Number(process.env.SUB_TTL_DAYS ?? 365));
+  if (ttlDays > 0) {
+    const ttlMs = ttlDays * 24 * 60 * 60 * 1000;
+    const sweep = () => {
+      const n = store.sweepStale(ttlMs);
+      if (n) { console.error(`[notify] TTL sweep pruned ${n} subscription(s) idle > ${ttlDays}d`); watcher.refresh(); }
+    };
+    const timer = setInterval(sweep, 24 * 60 * 60 * 1000);
+    timer.unref?.();
+    sweep(); // once on boot
+  }
+
   // Clients fetch this to create a push subscription bound to THIS host.
   app.get('/vapidPublicKey', limiter, (_req, res) => { res.json({ publicKey }); });
 
