@@ -3528,6 +3528,12 @@ function DealsTab({
         {(['active', 'completed'] as const).map((v) => {
           const seg = (
             <Pressable onPress={() => setView(v)} style={[s.seg, view === v && s.segActive, { flex: 1 }]}>
+              <Ionicons
+                name={v === 'active' ? 'pulse-outline' : 'checkmark-done-outline'}
+                size={15}
+                color={view === v ? palette.chipBlueText : palette.dim}
+                style={{ marginRight: 6 }}
+              />
               <Text style={[s.segText, view === v && s.segTextActive]}>
                 {v === 'active' ? t('Active') : t('Completed')}
               </Text>
@@ -5327,6 +5333,12 @@ function SettingsTab({
           <View style={s.segRow}>
             {(['masked', 'full'] as PhoneDisplay[]).map((mode) => (
               <Pressable key={mode} onPress={() => setPhoneDisplay(mode)} style={[s.seg, phoneDisplay === mode && s.segActive]}>
+                <Ionicons
+                  name={mode === 'masked' ? 'eye-off-outline' : 'eye-outline'}
+                  size={15}
+                  color={phoneDisplay === mode ? palette.chipBlueText : palette.dim}
+                  style={{ marginRight: 6 }}
+                />
                 <Text style={[s.segText, phoneDisplay === mode && s.segTextActive]}>
                   {mode === 'masked' ? t('Masked') : t('Full')}
                 </Text>
@@ -5512,6 +5524,12 @@ function SettingsTab({
       <View style={[s.segRow, { marginTop: 8 }]}>
         {(['system', 'dark', 'light'] as const).map((mode) => (
           <Pressable key={mode} onPress={() => onThemeChange(mode)} style={[s.seg, theme === mode && s.segActive]}>
+            <Ionicons
+              name={mode === 'system' ? 'phone-portrait-outline' : mode === 'dark' ? 'moon-outline' : 'sunny-outline'}
+              size={15}
+              color={theme === mode ? palette.chipBlueText : palette.dim}
+              style={{ marginRight: 6 }}
+            />
             <Text style={[s.segText, theme === mode && s.segTextActive]}>
               {mode === 'system' ? t('System') : mode === 'dark' ? t('Dark') : t('Light')}
             </Text>
@@ -5535,6 +5553,12 @@ function SettingsTab({
       <View style={[s.segRow, { marginTop: 8 }]}>
         {(['passenger', 'driver'] as const).map((r) => (
           <Pressable key={r} onPress={() => switchRole(r)} style={[s.seg, role === r && s.segActive]}>
+            <Ionicons
+              name={r === 'passenger' ? 'person-outline' : 'car-outline'}
+              size={15}
+              color={role === r ? palette.chipBlueText : palette.dim}
+              style={{ marginRight: 6 }}
+            />
             <Text style={[s.segText, role === r && s.segTextActive]}>
               {r === 'passenger' ? t('Passenger / Customer') : t('Driver / Provider')}
             </Text>
@@ -5740,6 +5764,12 @@ function SettingsTab({
               <View style={s.segRow}>
                 {(['latest', 'stable'] as UpdateTrack[]).map((tk) => (
                   <Pressable key={tk} disabled={updBusy} onPress={() => { changeTrack(tk); }} style={[s.seg, updTrack === tk && s.segActive]}>
+                    <Ionicons
+                      name={tk === 'latest' ? 'rocket-outline' : 'shield-checkmark-outline'}
+                      size={15}
+                      color={updTrack === tk ? palette.chipBlueText : palette.dim}
+                      style={{ marginRight: 6 }}
+                    />
                     <Text style={[s.segText, updTrack === tk && s.segTextActive]}>{t(tk === 'latest' ? 'Latest' : 'Stable')}</Text>
                   </Pressable>
                 ))}
@@ -5752,7 +5782,8 @@ function SettingsTab({
               📱 {nativeOS === 'ios' ? t('Use the iOS app for the best experience.') : t('Use the Android app for the best experience.')}
             </Text>
           )}
-          <Pressable style={[s.btnDecline, { marginTop: 12 }]} onPress={() => onReplayTour()}>
+          <Pressable style={[s.btnDecline, { marginTop: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }]} onPress={() => onReplayTour()}>
+            <Ionicons name="help-circle-outline" size={16} color="white" />
             <Text style={s.btnText}>{t('Replay guided tour')}</Text>
           </Pressable>
           <Text style={[s.dim, { marginTop: 10 }]}>© Phil T</Text>
@@ -5796,11 +5827,16 @@ function SettingsTab({
                 <Text style={s.dim}>{t("Your account is the above Nostr key — export it so you can restore it on any device.")}</Text>
               )}
               <Pressable
-                style={[s.btnAccept, (backingUp || !secretKey) && { opacity: 0.6 }]}
+                style={[s.btnAccept, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, (backingUp || !secretKey) && { opacity: 0.6 }]}
                 onPress={doBackup}
                 disabled={backingUp || !secretKey}
               >
-                {backingUp ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t("Export Account")}</Text>}
+                {backingUp ? <ActivityIndicator color="white" /> : (
+                  <>
+                    <Ionicons name="cloud-upload-outline" size={16} color="white" />
+                    <Text style={s.btnText}>{t("Export Account")}</Text>
+                  </>
+                )}
               </Pressable>
               <Text style={s.dim}>{t("To restore on another device, sign out and choose Restore on the welcome screen.")}</Text>
               {hasNip07() && (
@@ -5815,7 +5851,8 @@ function SettingsTab({
           )}
 
           {/* Sign out — wipes the identity from this device; needs a backup first */}
-          <Pressable style={[s.btnDecline, { marginTop: 16, backgroundColor: '#7f1d1d' }]} onPress={() => { setBackedUp(false); setSignOutOpen(true); }}>
+          <Pressable style={[s.btnDecline, { marginTop: 16, backgroundColor: '#7f1d1d', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }]} onPress={() => { setBackedUp(false); setSignOutOpen(true); }}>
+            <Ionicons name="log-out-outline" size={16} color="white" />
             <Text style={s.btnText}>{t("Sign out")}</Text>
           </Pressable>
 
@@ -5853,7 +5890,8 @@ function SettingsTab({
           {/* Delete account — permanently erases the identity + all data (Apple
               Guideline 5.1.1(v)). Distinct from Sign out; no backup gate. */}
           <Text style={[s.dim, { marginTop: 20 }]}>{t("Permanently delete your account and all of its data from this device. This is different from signing out and cannot be undone.")}</Text>
-          <Pressable style={[s.btnDecline, { marginTop: 8, backgroundColor: '#b91c1c' }]} onPress={() => { setDeleteConfirm(false); setDeleteOpen(true); }}>
+          <Pressable style={[s.btnDecline, { marginTop: 8, backgroundColor: '#b91c1c', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }]} onPress={() => { setDeleteConfirm(false); setDeleteOpen(true); }}>
+            <Ionicons name="trash-outline" size={16} color="white" />
             <Text style={s.btnText}>{t("Delete account")}</Text>
           </Pressable>
 
@@ -6339,8 +6377,13 @@ function SideToggle({
 
 function PostButton({ onPress, loading = false, label = 'Publish' }: { onPress: () => void; loading?: boolean; label?: string }) {
   return (
-    <Pressable style={[s.btnAccept, { marginTop: 20 }, loading && { opacity: 0.6 }]} onPress={onPress} disabled={loading}>
-      {loading ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{label}</Text>}
+    <Pressable style={[s.btnAccept, { marginTop: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }, loading && { opacity: 0.6 }]} onPress={onPress} disabled={loading}>
+      {loading ? <ActivityIndicator color="white" /> : (
+        <>
+          <Ionicons name="paper-plane-outline" size={16} color="white" />
+          <Text style={s.btnText}>{label}</Text>
+        </>
+      )}
     </Pressable>
   );
 }
@@ -6394,7 +6437,12 @@ function ImagePickerField({
           <Pressable style={s.imageAdd} onPress={pick} disabled={uploading}>
             {uploading
               ? <ActivityIndicator color="#4b5a6e" />
-              : <Text style={s.imageAddText}>{images.length === 0 ? t('+ Add photos') : '+'}</Text>
+              : (
+                <>
+                  <Ionicons name="image-outline" size={20} color={palette.dim} style={{ marginBottom: 2 }} />
+                  <Text style={s.imageAddText}>{images.length === 0 ? t('+ Add photos') : '+'}</Text>
+                </>
+              )
             }
           </Pressable>
         )}
