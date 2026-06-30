@@ -107,12 +107,16 @@ describe('intent events', () => {
     expect(intent).not.toBeNull();
   });
 
-  it('withdraw republishes same d with passed expiry', () => {
+  it('withdraw republishes same d with a short FUTURE expiry (not born-expired)', () => {
     const intent = rideRequest();
     const w = buildWithdrawEvent(intent, skA);
     expect(w.tags.find((t) => t[0] === 'd')?.[1]).toBe(intent.d);
     const parsed = parseIntentEvent(w)!;
-    expect(intentExpired(parsed)).toBe(true);
+    // Must NOT be born-expired — a NIP-40 relay drops expiration<=now, so a
+    // born-now tombstone would never propagate and peers keep seeing the intent.
+    expect(intentExpired(parsed)).toBe(false);
+    const exp = Number(w.tags.find((t) => t[0] === 'expiration')?.[1]);
+    expect(exp).toBeGreaterThan(Math.floor(Date.now() / 1000));
   });
 });
 

@@ -64,9 +64,16 @@ export function buildIntentEvent(input: BuildIntentInput, secretKey: Uint8Array)
   return finalizeEvent(buildIntentTemplate(input), secretKey);
 }
 
+// A withdrawal tombstone needs a SHORT but FUTURE expiration. A NIP-40 relay
+// rejects/instantly drops any event whose `expiration` is <= now, so a born-now
+// (or past) tombstone never propagates and peers keep seeing the filled intent.
+// A few minutes is enough to reach relays while still self-cleaning quickly.
+export const WITHDRAW_TTL_SECONDS = 600;
+
 /**
- * A withdrawal is just a republish under the same d-tag with an
- * already-passed expiration and empty payload — relays replace the old one.
+ * A withdrawal is a republish under the same d-tag with empty payload and a
+ * short FUTURE expiration — relays replace the old event and expire this soon
+ * after. (It must be future, not now: see WITHDRAW_TTL_SECONDS.)
  */
 export function buildWithdrawEvent(intent: Intent, secretKey: Uint8Array): Event {
   const now = Math.floor(Date.now() / 1000);
@@ -77,7 +84,7 @@ export function buildWithdrawEvent(intent: Intent, secretKey: Uint8Array): Event
       schema: intent.content.schema,
       title: '(withdrawn)',
       payload: {},
-      expiresAt: now,
+      expiresAt: now + WITHDRAW_TTL_SECONDS,
       d: intent.d,
       createdAt: now,
     },
