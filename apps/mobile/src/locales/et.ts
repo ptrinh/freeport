@@ -1,5 +1,7 @@
 /** Estonian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} päeva",
+  "All": "Kõik",
   "Block this person": "Blokeeri see inimene",
   "Unblock": "Eemalda blokeering",
   "Block this person?": "Kas blokeerida see inimene?",

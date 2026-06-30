@@ -1,5 +1,7 @@
 /** Albanian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} ditë",
+  "All": "Të gjitha",
   "Block this person": "Blloko këtë person",
   "Unblock": "Zhblloko",
   "Block this person?": "Të bllokohet ky person?",

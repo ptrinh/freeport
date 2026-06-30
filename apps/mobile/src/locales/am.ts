@@ -1,5 +1,7 @@
 /** Amharic translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} ቀናት",
+  "All": "ሁሉም",
   "Block this person": "ይህን ሰው አግድ",
   "Unblock": "እገዳ አንሳ",
   "Block this person?": "ይህን ሰው አግድ?",

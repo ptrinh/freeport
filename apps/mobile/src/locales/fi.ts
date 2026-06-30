@@ -1,5 +1,7 @@
 /** Finnish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} päivää",
+  "All": "Kaikki",
   "Block this person": "Estä tämä henkilö",
   "Unblock": "Poista esto",
   "Block this person?": "Estetäänkö tämä henkilö?",

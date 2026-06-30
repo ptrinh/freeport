@@ -1,5 +1,7 @@
 /** Malay translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} hari",
+  "All": "Semua",
   "Block this person": "Sekat orang ini",
   "Unblock": "Nyahsekat",
   "Block this person?": "Sekat orang ini?",

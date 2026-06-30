@@ -1,5 +1,7 @@
 /** Burmese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} ရက်",
+  "All": "အားလုံး",
   "Block this person": "ဤသူကို ပိတ်ဆို့ရန်",
   "Unblock": "ပြန်ဖွင့်ရန်",
   "Block this person?": "ဤသူကို ပိတ်ဆို့မလား?",

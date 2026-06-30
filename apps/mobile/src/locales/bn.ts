@@ -1,5 +1,7 @@
 /** Bengali translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} দিন",
+  "All": "সব",
   "Block this person": "এই ব্যক্তিকে ব্লক করুন",
   "Unblock": "আনব্লক করুন",
   "Block this person?": "এই ব্যক্তিকে ব্লক করবেন?",

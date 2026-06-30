@@ -1,5 +1,7 @@
 /** Azerbaijani translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} gün",
+  "All": "Hamısı",
   "Block this person": "Bu şəxsi blokla",
   "Unblock": "Bloku aç",
   "Block this person?": "Bu şəxsi bloklamaq?",

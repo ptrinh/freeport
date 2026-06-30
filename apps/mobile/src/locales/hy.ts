@@ -1,5 +1,7 @@
 /** Armenian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} օր",
+  "All": "Բոլորը",
   "Block this person": "Արգելափակել այս անձին",
   "Unblock": "Ապաարգելափակել",
   "Block this person?": "Արգելափակե՞լ այս անձին",

@@ -1,5 +1,7 @@
 /** Ukrainian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} днів",
+  "All": "Усі",
   "Block this person": "Заблокувати цю людину",
   "Unblock": "Розблокувати",
   "Block this person?": "Заблокувати цю людину?",

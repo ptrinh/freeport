@@ -1,5 +1,7 @@
 /** Tamil translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} நாட்கள்",
+  "All": "அனைத்தும்",
   "Block this person": "இந்த நபரைத் தடு",
   "Unblock": "தடையை நீக்கு",
   "Block this person?": "இந்த நபரைத் தடுக்கவா?",

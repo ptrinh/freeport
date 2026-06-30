@@ -1,5 +1,7 @@
 /** Lithuanian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} d.",
+  "All": "Visi",
   "Block this person": "Užblokuoti šį asmenį",
   "Unblock": "Atblokuoti",
   "Block this person?": "Užblokuoti šį asmenį?",

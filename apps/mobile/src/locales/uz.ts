@@ -1,5 +1,7 @@
 /** Uzbek translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} kun",
+  "All": "Hammasi",
   "Block this person": "Bu odamni bloklash",
   "Unblock": "Blokdan chiqarish",
   "Block this person?": "Bu odam bloklansinmi?",

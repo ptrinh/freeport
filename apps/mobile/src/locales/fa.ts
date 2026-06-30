@@ -1,5 +1,7 @@
 /** Persian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} روز",
+  "All": "همه",
   "Block this person": "مسدود کردن این شخص",
   "Unblock": "رفع مسدودیت",
   "Block this person?": "این شخص مسدود شود؟",

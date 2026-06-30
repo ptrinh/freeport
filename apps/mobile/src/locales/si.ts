@@ -1,5 +1,7 @@
 /** Sinhala translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "දින {n}",
+  "All": "සියල්ල",
   "Block this person": "මෙම පුද්ගලයා අවහිර කරන්න",
   "Unblock": "අවහිර කිරීම ඉවත් කරන්න",
   "Block this person?": "මෙම පුද්ගලයා අවහිර කරන්නද?",

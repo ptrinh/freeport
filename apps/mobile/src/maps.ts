@@ -18,6 +18,27 @@ import { getI18nLang } from './i18n';
 export const getCurrentCoords = geoCurrent;
 export { forwardGeocode, locationGranted, requestLocationPermission };
 
+/**
+ * Rewrite one of our Google-Maps https links (built by routeUrl/dirUrl/placeUrl,
+ * always `?api=1` with origin/destination/query params) to the Apple Maps URL
+ * scheme. On an installed iOS PWA an https maps link opens in a system in-app
+ * browser the PWA can't dismiss (it lingers on top); a URL scheme hands off to a
+ * native app instead — like tel: links. Returns null when there's nothing to map.
+ */
+export function appleMapsScheme(httpsUrl: string): string | null {
+  try {
+    const p = new URL(httpsUrl).searchParams;
+    const origin = p.get('origin');
+    const destination = p.get('destination');
+    const query = p.get('query');
+    if (destination) {
+      return 'maps://?' + (origin ? `saddr=${encodeURIComponent(origin)}&` : '') + `daddr=${encodeURIComponent(destination)}&dirflg=d`;
+    }
+    if (query) return `maps://?q=${encodeURIComponent(query)}`;
+  } catch { /* malformed URL — fall back to the https link */ }
+  return null;
+}
+
 export function routeUrl(from: string, to: string): string {
   return (
     'https://www.google.com/maps/dir/?api=1' +

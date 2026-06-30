@@ -1,5 +1,7 @@
 /** Korean translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n}일",
+  "All": "전체",
   "Block this person": "이 사람 차단",
   "Unblock": "차단 해제",
   "Block this person?": "이 사람을 차단할까요?",

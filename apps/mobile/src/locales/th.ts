@@ -1,5 +1,7 @@
 /** Thai translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} วัน",
+  "All": "ทั้งหมด",
   "Block this person": "บล็อกบุคคลนี้",
   "Unblock": "เลิกบล็อก",
   "Block this person?": "บล็อกบุคคลนี้หรือไม่?",

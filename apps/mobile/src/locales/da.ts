@@ -1,5 +1,7 @@
 /** Danish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} dage",
+  "All": "Alle",
   "Block this person": "Blokér denne person",
   "Unblock": "Fjern blokering",
   "Block this person?": "Blokér denne person?",

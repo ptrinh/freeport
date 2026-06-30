@@ -1,5 +1,7 @@
 /** Urdu translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} دن",
+  "All": "تمام",
   "Block this person": "اس شخص کو بلاک کریں",
   "Unblock": "ان بلاک کریں",
   "Block this person?": "اس شخص کو بلاک کریں؟",

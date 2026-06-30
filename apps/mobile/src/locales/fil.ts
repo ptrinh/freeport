@@ -1,5 +1,7 @@
 /** Filipino translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} araw",
+  "All": "Lahat",
   "Block this person": "I-block ang taong ito",
   "Unblock": "I-unblock",
   "Block this person?": "I-block ang taong ito?",

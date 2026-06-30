@@ -1,5 +1,7 @@
 /** Kazakh translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} күн",
+  "All": "Барлығы",
   "Block this person": "Бұл адамды бұғаттау",
   "Unblock": "Бұғаттан шығару",
   "Block this person?": "Бұл адамды бұғаттау керек пе?",

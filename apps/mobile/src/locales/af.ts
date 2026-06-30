@@ -1,5 +1,7 @@
 /** Afrikaans translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} dae",
+  "All": "Alles",
   "Block this person": "Blokkeer hierdie persoon",
   "Unblock": "Deblokkeer",
   "Block this person?": "Blokkeer hierdie persoon?",

@@ -1,5 +1,7 @@
 /** Vietnamese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} ngày",
+  "All": "Tất cả",
   "Block this person": "Chặn người này",
   "Unblock": "Bỏ chặn",
   "Block this person?": "Chặn người này?",

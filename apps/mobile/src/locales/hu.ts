@@ -1,5 +1,7 @@
 /** Hungarian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} nap",
+  "All": "Összes",
   "Block this person": "Személy letiltása",
   "Unblock": "Tiltás feloldása",
   "Block this person?": "Letiltja ezt a személyt?",

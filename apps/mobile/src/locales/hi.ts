@@ -1,5 +1,7 @@
 /** Hindi translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} दिन",
+  "All": "सभी",
   "Block this person": "इस व्यक्ति को ब्लॉक करें",
   "Unblock": "अनब्लॉक करें",
   "Block this person?": "इस व्यक्ति को ब्लॉक करें?",

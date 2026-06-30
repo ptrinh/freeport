@@ -1,5 +1,7 @@
 /** Khmer translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} ថ្ងៃ",
+  "All": "ទាំងអស់",
   "Block this person": "ទប់ស្កាត់មនុស្សនេះ",
   "Unblock": "ដោះទប់ស្កាត់",
   "Block this person?": "ទប់ស្កាត់មនុស្សនេះ?",

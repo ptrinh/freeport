@@ -1,5 +1,7 @@
 /** Japanese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n}日",
+  "All": "すべて",
   "Block this person": "この人をブロック",
   "Unblock": "ブロック解除",
   "Block this person?": "この人をブロックしますか？",

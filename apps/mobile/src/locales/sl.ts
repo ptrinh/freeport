@@ -1,5 +1,7 @@
 /** Slovenian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} dni",
+  "All": "Vse",
   "Block this person": "Blokiraj to osebo",
   "Unblock": "Odblokiraj",
   "Block this person?": "Blokiraj to osebo?",

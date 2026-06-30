@@ -1,5 +1,7 @@
 /** Romanian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} zile",
+  "All": "Toate",
   "Block this person": "Blochează această persoană",
   "Unblock": "Deblochează",
   "Block this person?": "Blochezi această persoană?",

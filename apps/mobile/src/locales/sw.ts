@@ -1,5 +1,7 @@
 /** Swahili translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "Siku {n}",
+  "All": "Zote",
   "Block this person": "Zuia mtu huyu",
   "Unblock": "Ondoa kizuizi",
   "Block this person?": "Zuia mtu huyu?",

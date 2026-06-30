@@ -1,5 +1,7 @@
 /** Georgian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} დღე",
+  "All": "ყველა",
   "Block this person": "ამ პირის დაბლოკვა",
   "Unblock": "განბლოკვა",
   "Block this person?": "დაიბლოკოს ეს პირი?",

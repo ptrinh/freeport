@@ -1,5 +1,7 @@
 /** Chinese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n}天",
+  "All": "全部",
   "Block this person": "屏蔽此人",
   "Unblock": "取消屏蔽",
   "Block this person?": "屏蔽此人？",

@@ -1,5 +1,7 @@
 /** Polish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} dni",
+  "All": "Wszystkie",
   "Block this person": "Zablokuj tę osobę",
   "Unblock": "Odblokuj",
   "Block this person?": "Zablokować tę osobę?",

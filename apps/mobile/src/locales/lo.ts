@@ -1,5 +1,7 @@
 /** Lao translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} ມື້",
+  "All": "ທັງໝົດ",
   "Block this person": "ບລັອກຄົນນີ້",
   "Unblock": "ຍົກເລີກການບລັອກ",
   "Block this person?": "ບລັອກຄົນນີ້ບໍ?",

@@ -1,5 +1,7 @@
 /** Turkish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} gün",
+  "All": "Tümü",
   "Block this person": "Bu kişiyi engelle",
   "Unblock": "Engeli kaldır",
   "Block this person?": "Bu kişi engellensin mi?",

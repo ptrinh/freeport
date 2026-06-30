@@ -67,7 +67,9 @@ import { startRecording, stopRecording, playAudio } from './src/voice';
 import { loadAddressBook, addRecent, togglePinned, isPinned, type AddressBook } from './src/addressbook';
 import { loadProfile, saveProfile, maskPhone, maskPlate, isDisplayablePhone, defaultAvatarUrl, type UserProfile, type PhoneDisplay } from './src/profile';
 import { normalizePhone, detectDialCode, dialForCountry } from './src/phone';
-import { routeUrl, placeUrl, placeParam, dirUrl, geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, locationGranted, requestLocationPermission, reverseGeocode, detectRawLocationGPS, detectRawLocationIP, detectCoordsIP, distanceKmBetweenGeohashes, formatDistance, suggest } from './src/maps';
+import { routeUrl, placeUrl, placeParam, dirUrl, appleMapsScheme, geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, locationGranted, requestLocationPermission, reverseGeocode, detectRawLocationGPS, detectRawLocationIP, detectCoordsIP, distanceKmBetweenGeohashes, formatDistance, suggest } from './src/maps';
+import { parseLocaleAmount } from './src/money';
+import { negoIsDone, messagesViewForNewActivity, searchableText } from './src/deals';
 import { loadPrefs, savePrefs, type Prefs, type UserLocation } from './src/prefs';
 import { LANGUAGE_CODES, languageLabel, systemLanguage, systemCountry } from './src/language';
 import { SERVICE_CATEGORIES, SERVICE_SUBCATEGORIES, RIDESHARE_CATEGORY, RIDESHARE_SUBCATEGORIES, DEFAULT_RIDESHARE_SUBCATEGORY, VEHICLE_ICONS, VEHICLE_SEATERS, CATEGORY_ICONS, SUBCATEGORY_ICONS, categoryIcon, subcategoryIcon, categoryOf, subcategoryOf, subcategoriesFor } from './src/categories';
@@ -130,26 +132,13 @@ function isStandalonePWA(): boolean {
 // (https://www.google.com/maps/...) renders inside a system in-app browser that
 // the PWA cannot dismiss — it lingers on top after the user returns (the stuck
 // "internal browser" screen). A URL *scheme* hands off to a native app instead
-// (exactly like tel: links do), so it app-switches and comes back cleanly.
-// Rewrite our https links to the Apple Maps scheme (always present on iOS) only
-// in that case; native apps, Android, and desktop web get the https link as-is.
+// (exactly like tel: links do), so it app-switches and comes back cleanly. Use
+// the Apple Maps scheme (always present on iOS) only in that case; native apps,
+// Android, and desktop web get the https link as-is.
 function openMaps(httpsUrl: string): void {
   if (isIOSWeb() && isStandalonePWA()) {
-    try {
-      const p = new URL(httpsUrl).searchParams;
-      const origin = p.get('origin');
-      const destination = p.get('destination');
-      const query = p.get('query');
-      let scheme: string | null = null;
-      if (destination) {
-        scheme = 'maps://?'
-          + (origin ? `saddr=${encodeURIComponent(origin)}&` : '')
-          + `daddr=${encodeURIComponent(destination)}&dirflg=d`; // d = driving
-      } else if (query) {
-        scheme = `maps://?q=${encodeURIComponent(query)}`;
-      }
-      if (scheme) { window.location.href = scheme; return; }
-    } catch { /* fall through to the https link */ }
+    const scheme = appleMapsScheme(httpsUrl);
+    if (scheme) { window.location.href = scheme; return; }
   }
   Linking.openURL(httpsUrl).catch(() => {});
 }
@@ -164,15 +153,6 @@ function uiAlert(title: string, body?: string): void {
   }
 }
 
-// A negotiation is "done" (shown under the Messages > Completed sub-tab) when it
-// was cancelled/expired, or confirmed and the deal has completed. Single source
-// of truth, shared by the DealsTab list filter and the auto-selection of which
-// sub-tab to open when a new message arrives.
-function negoIsDone(n: Negotiation): boolean {
-  if (n.state === 'cancelled' || n.state === 'expired') return true;
-  if (n.state === 'confirmed') return n.stage === 'completed';
-  return false;
-}
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
@@ -963,17 +943,7 @@ function AppInner() {
   // When opening Messages (menu tap or notification), jump to the sub-tab where
   // the newest UNREAD activity is: an inbound chat message, or a just-confirmed
   // deal. Returns null when nothing is unread, so a manual sub-tab choice is kept.
-  const pickMessagesView = (): 'active' | 'completed' | null => {
-    let bestTs = chatSeenTs;
-    let bestView: 'active' | 'completed' | null = null;
-    for (const n of negos) {
-      for (const m of n.messages ?? []) {
-        if (m.dir === 'in' && m.ts > bestTs) { bestTs = m.ts; bestView = negoIsDone(n) ? 'completed' : 'active'; }
-      }
-      if (n.state === 'confirmed' && n.updatedAt > bestTs) { bestTs = n.updatedAt; bestView = negoIsDone(n) ? 'completed' : 'active'; }
-    }
-    return bestView;
-  };
+  const pickMessagesView = (): 'active' | 'completed' | null => messagesViewForNewActivity(negos, chatSeenTs);
   const pickMessagesViewRef = useRef(pickMessagesView);
   pickMessagesViewRef.current = pickMessagesView;
   // Open Messages and auto-select the right sub-tab for any new message.
@@ -2450,15 +2420,6 @@ function primaryGeohash(i: Intent): string | undefined {
   return i.content.schema.startsWith('rideshare') ? p.from?.geohash : p.location?.geohash;
 }
 
-function searchableText(i: Intent, client: MobileClient | null): string {
-  const p = i.content.payload as Record<string, any>;
-  const author = client?.profiles.get(i.pubkey)?.name ?? '';
-  return [
-    i.content.title, author, p.from?.name, p.to?.name, p.service,
-    p.location?.name, p.notes, p.payment, p.category, p.subcategory,
-  ].filter(Boolean).join(' ').toLowerCase();
-}
-
 /** Comparator for one sort key. Sensible direction baked in per criterion. */
 function compareBy(key: SortKey, a: Intent, b: Intent, client: MobileClient | null, userGeohash: string | null, distKm?: (gh?: string | null) => number | null): number {
   switch (key) {
@@ -3541,8 +3502,24 @@ function DealsTab({
   // A confirmed deal stays Active until its trip/service is marked completed.
   // Cancelled/expired are always Completed (history).
   const isDone = negoIsDone;
+  // Completed deals accumulate forever, so the Completed tab filters by recency.
+  // null = all time; otherwise show deals updated within the last N days. Active
+  // deals are never date-filtered. Default: last 7 days.
+  const COMPLETED_RANGES = [7, 30, 90, null] as const;
+  const [completedDays, setCompletedDays] = useState<number | null>(7);
+  const completedCutoff = completedDays != null ? Math.floor(Date.now() / 1000) - completedDays * 86400 : 0;
+  // Keyword filter for the Completed tab (same idea as Browse). Deferred so typing
+  // stays responsive. Searches the post text plus the counterpart's contact name.
+  const [completedKeyword, setCompletedKeyword] = useState('');
+  const completedKw = useDeferredValue(completedKeyword.trim().toLowerCase());
+  const negoText = (n: Negotiation) => (searchableText(n.intent, client) + ' ' + (n.theirContact ?? '')).toLowerCase();
   const sorted = [...negos]
-    .filter((n) => (view === 'completed' ? isDone(n) : !isDone(n)))
+    .filter((n) => {
+      if (view !== 'completed') return !isDone(n);
+      if (!isDone(n) || n.updatedAt < completedCutoff) return false;
+      if (completedKw && !negoText(n).includes(completedKw)) return false;
+      return true;
+    })
     .sort((a, b) => b.updatedAt - a.updatedAt);
 
   const header = (
@@ -3583,6 +3560,33 @@ function DealsTab({
           onDismiss={() => onDismissExpired?.(e.d)}
         />
       ))}
+      {view === 'completed' && (
+        <View style={[s.searchInputWrap, { marginHorizontal: 12, marginTop: 8 }]}>
+          <Ionicons name="search" size={16} color="#4b5a6e" />
+          <TextInput
+            style={s.searchInput}
+            value={completedKeyword}
+            onChangeText={setCompletedKeyword}
+            placeholder={t("Filter by keyword")}
+            placeholderTextColor="#4b5563"
+            autoCapitalize="none"
+          />
+          {completedKeyword ? (
+            <Pressable onPress={() => setCompletedKeyword('')}><Ionicons name="close-circle" size={16} color="#4b5a6e" /></Pressable>
+          ) : null}
+        </View>
+      )}
+      {view === 'completed' && (
+        <View style={[s.segRow, { marginHorizontal: 12, marginTop: 8 }]}>
+          {COMPLETED_RANGES.map((d) => (
+            <Pressable key={String(d)} onPress={() => setCompletedDays(d)} style={[s.seg, completedDays === d && s.segActive, { flex: 1 }]}>
+              <Text style={[s.segText, completedDays === d && s.segTextActive]}>
+                {d === null ? t('All') : t('{n} days', { n: d })}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
       {view === 'completed' && client && <KarmaReceived client={client} />}
     </View>
   );
@@ -6320,6 +6324,12 @@ function SideToggle({
     <View style={[s.segRow, { marginTop: 14 }]}>
       {([['request', requestLabel], ['offer', offerLabel]] as const).map(([value, label]) => (
         <Pressable key={value} onPress={() => onChange(value)} style={[s.seg, side === value && s.segActive]}>
+          <Ionicons
+            name={value === 'request' ? 'search-outline' : 'pricetag-outline'}
+            size={15}
+            color={side === value ? palette.chipBlueText : palette.dim}
+            style={{ marginRight: 6 }}
+          />
           <Text style={[s.segText, side === value && s.segTextActive]}>{label}</Text>
         </Pressable>
       ))}
@@ -6602,17 +6612,6 @@ const fmtPayment = fmtMoney;
  * point, unless it's followed by a 3-digit group (then it's thousands, no
  * decimal). Currency symbols and stray marks are ignored.
  */
-function parseLocaleAmount(str: string): number {
-  const s = str.replace(/[^\d.,]/g, '');
-  if (!s) return 0;
-  const lastSep = Math.max(s.lastIndexOf('.'), s.lastIndexOf(','));
-  if (lastSep === -1) return parseInt(s, 10) || 0;
-  const intDigits = s.slice(0, lastSep).replace(/[.,]/g, '');
-  const frac = s.slice(lastSep + 1);
-  if (/^\d{3}$/.test(frac)) return parseInt(intDigits + frac, 10) || 0; // thousands group, not a decimal
-  return parseFloat(`${intDigits || '0'}.${frac}`) || 0;
-}
-
 /** Best-effort parse of a payment string back into amount+currency (for counter-offers). */
 function parsePayment(str: string | undefined, fallbackCurrency: Currency): { amount: number; currency: Currency } {
   if (!str) return { amount: 0, currency: fallbackCurrency };

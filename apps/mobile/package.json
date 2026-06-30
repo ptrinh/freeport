@@ -7,7 +7,8 @@
     "start": "expo start",
     "ios": "expo start --ios",
     "android": "expo start --android",
-    "eas-build-post-install": "cd ../../packages/protocol && npm install --no-audit --no-fund && npm run build"
+    "eas-build-post-install": "cd ../../packages/protocol && npm install --no-audit --no-fund && npm run build",
+    "test": "vitest run"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
@@ -47,6 +48,7 @@
     "typescript": "~5.9.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.0"
+    "@babel/core": "^7.25.0",
+    "vitest": "^2.1.0"
   }
 }

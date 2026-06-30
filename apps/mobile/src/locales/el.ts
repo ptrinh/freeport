@@ -1,5 +1,7 @@
 /** Greek translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} ημέρες",
+  "All": "Όλα",
   "Block this person": "Αποκλεισμός αυτού του ατόμου",
   "Unblock": "Άρση αποκλεισμού",
   "Block this person?": "Αποκλεισμός αυτού του ατόμου;",

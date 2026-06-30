@@ -1,5 +1,7 @@
 /** Hebrew translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} ימים",
+  "All": "הכול",
   "Block this person": "חסום אדם זה",
   "Unblock": "בטל חסימה",
   "Block this person?": "לחסום אדם זה?",

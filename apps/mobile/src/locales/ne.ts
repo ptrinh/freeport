@@ -1,5 +1,7 @@
 /** Nepali translations. English source string → translation. */
 const c: Record<string, string> = {
+  "{n} days": "{n} दिन",
+  "All": "सबै",
   "Block this person": "यो व्यक्तिलाई ब्लक गर्नुहोस्",
   "Unblock": "अनब्लक गर्नुहोस्",
   "Block this person?": "यो व्यक्तिलाई ब्लक गर्ने?",
