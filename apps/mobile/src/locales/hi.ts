@@ -1,5 +1,7 @@
 /** Hindi translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "गुमनाम डायग्नोस्टिक्स साझा करें",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Freeport को बेहतर बनाने में मदद के लिए गुमनाम क्रैश रिपोर्ट और उपयोग आँकड़े भेजें। आपकी कुंजियाँ, संपर्क, स्थान या संदेश कभी नहीं।",
   "{n} days": "{n} दिन",
   "All": "सभी",
   "Block this person": "इस व्यक्ति को ब्लॉक करें",

@@ -1,5 +1,7 @@
 /** Burmese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "အမည်မဖော်ဘဲ ရောဂါရှာဖွေရေးဒေတာ မျှဝေပါ",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Freeport ကို ပိုမိုကောင်းမွန်စေရန် အမည်မဖော်ဘဲ ပျက်စီးမှုအစီရင်ခံစာများနှင့် အသုံးပြုမှုစာရင်းအင်းများ ပို့ပါ။ သင့်သော့များ၊ အဆက်အသွယ်များ၊ တည်နေရာ သို့မဟုတ် မက်ဆေ့ဂျ်များကို ဘယ်တော့မှ မပို့ပါ။",
   "{n} days": "{n} ရက်",
   "All": "အားလုံး",
   "Block this person": "ဤသူကို ပိတ်ဆို့ရန်",

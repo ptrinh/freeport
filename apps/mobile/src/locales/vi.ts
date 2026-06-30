@@ -1,5 +1,7 @@
 /** Vietnamese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Chia sẻ dữ liệu chẩn đoán ẩn danh",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Gửi báo cáo sự cố và thống kê sử dụng ẩn danh để giúp cải thiện Freeport. Không bao giờ gồm khóa, danh bạ, vị trí hay tin nhắn của bạn.",
   "{n} days": "{n} ngày",
   "All": "Tất cả",
   "Block this person": "Chặn người này",

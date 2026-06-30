@@ -1,5 +1,7 @@
 /** Finnish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Jaa nimettömät diagnostiikkatiedot",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Lähetä nimettömiä kaatumisraportteja ja käyttötilastoja Freeportin parantamiseksi. Ei koskaan avaimiasi, yhteystietojasi, sijaintiasi tai viestejäsi.",
   "{n} days": "{n} päivää",
   "All": "Kaikki",
   "Block this person": "Estä tämä henkilö",

@@ -1,5 +1,7 @@
 /** Khmer translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "ចែករំលែកទិន្នន័យវិនិច្ឆ័យអនាមិក",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "ផ្ញើរបាយការណ៍គាំងនិងស្ថិតិការប្រើប្រាស់ដោយអនាមិក ដើម្បីជួយកែលម្អ Freeport។ មិនដែលផ្ញើកូនសោ ទំនាក់ទំនង ទីតាំង ឬសាររបស់អ្នកឡើយ។",
   "{n} days": "{n} ថ្ងៃ",
   "All": "ទាំងអស់",
   "Block this person": "ទប់ស្កាត់មនុស្សនេះ",

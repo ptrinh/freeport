@@ -1,5 +1,7 @@
 /** Hungarian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Névtelen diagnosztika megosztása",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Küldj névtelen összeomlási jelentéseket és használati statisztikákat a Freeport fejlesztéséhez. Soha nem a kulcsaidat, névjegyeidet, helyzetedet vagy üzeneteidet.",
   "{n} days": "{n} nap",
   "All": "Összes",
   "Block this person": "Személy letiltása",

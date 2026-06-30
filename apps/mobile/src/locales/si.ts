@@ -1,5 +1,7 @@
 /** Sinhala translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "නිර්නාමික දෝෂ නිර්ණය බෙදා ගන්න",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Freeport වැඩිදියුණු කිරීමට උදව් වන පරිදි නිර්නාමික බිඳවැටීම් වාර්තා සහ භාවිත සංඛ්‍යාලේඛන එවන්න. ඔබේ යතුරු, සම්බන්ධතා, ස්ථානය හෝ පණිවිඩ කිසිදා නොවේ.",
   "{n} days": "දින {n}",
   "All": "සියල්ල",
   "Block this person": "මෙම පුද්ගලයා අවහිර කරන්න",

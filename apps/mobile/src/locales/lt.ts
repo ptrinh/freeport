@@ -1,5 +1,7 @@
 /** Lithuanian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Bendrinti anoniminę diagnostiką",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Siųskite anoniminius gedimų pranešimus ir naudojimo statistiką, kad padėtumėte tobulinti Freeport. Niekada nesiunčiami jūsų raktai, kontaktai, vietovė ar žinutės.",
   "{n} days": "{n} d.",
   "All": "Visi",
   "Block this person": "Užblokuoti šį asmenį",

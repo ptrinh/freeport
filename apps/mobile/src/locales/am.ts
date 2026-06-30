@@ -1,5 +1,7 @@
 /** Amharic translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "ስም-አልባ ምርመራዎችን አጋራ",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Freeport ን ለማሻሻል ለመርዳት ስም-አልባ የብልሽት ሪፖርቶችን እና የአጠቃቀም ስታቲስቲክስ ላክ። ቁልፎችህን፣ እውቂያዎችህን፣ አካባቢህን ወይም መልዕክቶችህን በፍጹም አይደለም።",
   "{n} days": "{n} ቀናት",
   "All": "ሁሉም",
   "Block this person": "ይህን ሰው አግድ",

@@ -53,6 +53,10 @@ export interface Prefs {
   /** Auto-share your live location to the other party while a deal is active
    *  (until it completes). On by default. */
   sendLocationOnDeal: boolean;
+  /** Send anonymous crash reports + usage analytics to the self-hosted
+   *  GlitchTip/Aptabase. Scrubbed of all identity/contact/location/content.
+   *  On by default; opt out in Settings. */
+  telemetryEnabled: boolean;
 }
 
 const DEFAULTS: Prefs = {
@@ -73,6 +77,7 @@ const DEFAULTS: Prefs = {
   browseAlertNotify: false,
   browseMaxDistance: 100,
   sendLocationOnDeal: true,
+  telemetryEnabled: true,
 };
 
 export async function loadPrefs(): Promise<Prefs> {

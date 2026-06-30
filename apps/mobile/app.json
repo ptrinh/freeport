@@ -3,7 +3,7 @@
     "name": "Freeport",
     "slug": "freeport",
     "owner": "ptrinh",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
@@ -14,7 +14,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "10"
+      "buildNumber": "11"
     },
     "android": {
       "package": "uk.trinh.freeport",
@@ -38,7 +38,7 @@
           "apiKey": "AIzaSyB70aRYEMJlBtl3LgvnBpGe6dkKuJhwJY4"
         }
       },
-      "versionCode": 12
+      "versionCode": 14
     },
     "web": {
       "bundler": "metro",
@@ -72,7 +72,8 @@
         {
           "color": "#3b82f6"
         }
-      ]
+      ],
+      "@sentry/react-native"
     ],
     "extra": {
       "eas": {

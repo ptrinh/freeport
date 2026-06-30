@@ -1,5 +1,7 @@
 /** Filipino translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Magbahagi ng anonymous na diagnostics",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Magpadala ng anonymous na mga ulat ng pag-crash at istatistika ng paggamit para matulungang mapabuti ang Freeport. Hindi kailanman ang iyong mga key, contact, lokasyon, o mensahe.",
   "{n} days": "{n} araw",
   "All": "Lahat",
   "Block this person": "I-block ang taong ito",

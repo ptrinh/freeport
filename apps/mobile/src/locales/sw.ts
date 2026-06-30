@@ -1,5 +1,7 @@
 /** Swahili translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Shiriki taarifa za uchunguzi bila kutambulika",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Tuma ripoti za hitilafu na takwimu za matumizi bila kutambulika ili kusaidia kuboresha Freeport. Kamwe si funguo, anwani, eneo, au ujumbe wako.",
   "{n} days": "Siku {n}",
   "All": "Zote",
   "Block this person": "Zuia mtu huyu",

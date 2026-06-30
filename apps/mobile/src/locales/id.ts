@@ -1,5 +1,7 @@
 /** Indonesian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Bagikan diagnostik anonim",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Kirim laporan kerusakan dan statistik penggunaan secara anonim untuk membantu menyempurnakan Freeport. Tidak pernah kunci, kontak, lokasi, atau pesan Anda.",
   "{n} days": "{n} hari",
   "All": "Semua",
   "Block this person": "Blokir orang ini",

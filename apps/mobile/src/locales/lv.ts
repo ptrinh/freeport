@@ -1,5 +1,7 @@
 /** Latvian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Kopīgot anonīmu diagnostiku",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Sūtiet anonīmus avāriju ziņojumus un lietošanas statistiku, lai palīdzētu uzlabot Freeport. Nekad netiek sūtītas jūsu atslēgas, kontakti, atrašanās vieta vai ziņojumi.",
   "{n} days": "{n} dienas",
   "All": "Visi",
   "Block this person": "Bloķēt šo personu",

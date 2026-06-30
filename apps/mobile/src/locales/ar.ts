@@ -1,5 +1,7 @@
 /** Arabic translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "مشاركة بيانات تشخيصية مجهولة",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "أرسل تقارير الأعطال وإحصاءات الاستخدام بشكل مجهول للمساعدة في تحسين Freeport. لن نرسل أبدًا مفاتيحك أو جهات اتصالك أو موقعك أو رسائلك.",
   "{n} days": "{n} يوم",
   "All": "الكل",
   "Block this person": "حظر هذا الشخص",

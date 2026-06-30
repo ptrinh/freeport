@@ -1,5 +1,7 @@
 /** Polish translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Udostępniaj anonimowe dane diagnostyczne",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Wysyłaj anonimowe raporty o awariach i statystyki użytkowania, aby pomóc ulepszać Freeport. Nigdy Twoich kluczy, kontaktów, lokalizacji ani wiadomości.",
   "{n} days": "{n} dni",
   "All": "Wszystkie",
   "Block this person": "Zablokuj tę osobę",

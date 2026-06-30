@@ -1,5 +1,7 @@
 /** Estonian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Jaga anonüümset diagnostikat",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Saada anonüümseid krahhiaruandeid ja kasutusstatistikat, et aidata Freeporti täiustada. Mitte kunagi sinu võtmeid, kontakte, asukohta ega sõnumeid.",
   "{n} days": "{n} päeva",
   "All": "Kõik",
   "Block this person": "Blokeeri see inimene",

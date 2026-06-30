@@ -1,5 +1,7 @@
 /** Slovenian translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Deli anonimno diagnostiko",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Pošljite anonimna poročila o sesutjih in statistiko uporabe, da pomagate izboljšati Freeport. Nikoli vaših ključev, stikov, lokacije ali sporočil.",
   "{n} days": "{n} dni",
   "All": "Vse",
   "Block this person": "Blokiraj to osebo",

@@ -1,5 +1,7 @@
 /** Tamil translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "அநாமதேய கண்டறிதல் தரவைப் பகிரவும்",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Freeport ஐ மேம்படுத்த உதவ அநாமதேய செயலிழப்பு அறிக்கைகளையும் பயன்பாட்டுப் புள்ளிவிவரங்களையும் அனுப்பவும். உங்கள் சாவிகள், தொடர்புகள், இருப்பிடம் அல்லது செய்திகள் ஒருபோதும் அல்ல.",
   "{n} days": "{n} நாட்கள்",
   "All": "அனைத்தும்",
   "Block this person": "இந்த நபரைத் தடு",

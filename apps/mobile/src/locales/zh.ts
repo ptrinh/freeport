@@ -1,5 +1,7 @@
 /** Chinese translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "分享匿名诊断数据",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "发送匿名崩溃报告和使用统计，帮助改进 Freeport。绝不包含你的密钥、联系人、位置或消息。",
   "{n} days": "{n}天",
   "All": "全部",
   "Block this person": "屏蔽此人",

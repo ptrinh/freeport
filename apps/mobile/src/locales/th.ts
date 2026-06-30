@@ -1,5 +1,7 @@
 /** Thai translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "แชร์ข้อมูลวินิจฉัยแบบไม่ระบุตัวตน",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "ส่งรายงานข้อขัดข้องและสถิติการใช้งานแบบไม่ระบุตัวตนเพื่อช่วยปรับปรุง Freeport ไม่รวมคีย์ รายชื่อผู้ติดต่อ ตำแหน่งที่ตั้ง หรือข้อความของคุณ",
   "{n} days": "{n} วัน",
   "All": "ทั้งหมด",
   "Block this person": "บล็อกบุคคลนี้",

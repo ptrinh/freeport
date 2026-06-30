@@ -1,5 +1,7 @@
 /** Korean translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "익명 진단 정보 공유",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Freeport 개선에 도움이 되도록 익명 충돌 보고서와 사용 통계를 전송합니다. 키, 연락처, 위치, 메시지는 절대 전송되지 않습니다.",
   "{n} days": "{n}일",
   "All": "전체",
   "Block this person": "이 사람 차단",

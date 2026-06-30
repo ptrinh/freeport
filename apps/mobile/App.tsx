@@ -70,6 +70,7 @@ import { normalizePhone, detectDialCode, dialForCountry } from './src/phone';
 import { routeUrl, placeUrl, placeParam, dirUrl, appleMapsScheme, geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, locationGranted, requestLocationPermission, reverseGeocode, detectRawLocationGPS, detectRawLocationIP, detectCoordsIP, distanceKmBetweenGeohashes, formatDistance, suggest } from './src/maps';
 import { parseLocaleAmount } from './src/money';
 import { negoIsDone, messagesViewForNewActivity, searchableText } from './src/deals';
+import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
 import { loadPrefs, savePrefs, type Prefs, type UserLocation } from './src/prefs';
 import { LANGUAGE_CODES, languageLabel, systemLanguage, systemCountry } from './src/language';
 import { SERVICE_CATEGORIES, SERVICE_SUBCATEGORIES, RIDESHARE_CATEGORY, RIDESHARE_SUBCATEGORIES, DEFAULT_RIDESHARE_SUBCATEGORY, VEHICLE_ICONS, VEHICLE_SEATERS, CATEGORY_ICONS, SUBCATEGORY_ICONS, categoryIcon, subcategoryIcon, categoryOf, subcategoryOf, subcategoriesFor } from './src/categories';
@@ -391,6 +392,7 @@ function AppInner() {
   const [browseAlertNotify, setBrowseAlertNotify] = useState(false);
   const [browseMaxDistance, setBrowseMaxDistance] = useState(100);
   const [sendLocationOnDeal, setSendLocationOnDeal] = useState(true);
+  const [telemetryOn, setTelemetryOn] = useState(true);
   const [role, setRole] = useState<'passenger' | 'driver' | ''>('');
   // The onIntent handler is a one-time closure; read live browse-alert prefs via a ref.
   const browseAlertRef = useRef({ category: '', subcategory: '', sound: false, notify: false });
@@ -621,6 +623,8 @@ function AppInner() {
       setBrowseAlertNotify(p.browseAlertNotify);
       setBrowseMaxDistance(p.browseMaxDistance);
       setSendLocationOnDeal(p.sendLocationOnDeal);
+      setTelemetryOn(p.telemetryEnabled);
+      initTelemetry(p.telemetryEnabled).then(() => trackEvent('app_opened')).catch(() => {});
       setRole(p.role);
       setLanguage(p.language || systemLanguage()); // '' pref = follow the device language
       setFareConfigState(p.fareConfig);
@@ -1320,6 +1324,12 @@ function AppInner() {
           onSendLocationOnDealChange={(v) => {
             setSendLocationOnDeal(v);
             savePrefs({ sendLocationOnDeal: v }).catch(() => {});
+          }}
+          telemetryEnabled={telemetryOn}
+          onTelemetryChange={(v) => {
+            setTelemetryOn(v);
+            setTelemetryEnabled(v);
+            savePrefs({ telemetryEnabled: v }).catch(() => {});
           }}
           browseCategory={browseCategory}
           browseSubcategory={browseSubcategory}
@@ -4817,6 +4827,8 @@ function SettingsTab({
   onDistanceUnitChange,
   sendLocationOnDeal,
   onSendLocationOnDealChange,
+  telemetryEnabled,
+  onTelemetryChange,
   browseCategory,
   browseSubcategory,
   browseAlertSound,
@@ -4859,6 +4871,8 @@ function SettingsTab({
   onDistanceUnitChange: (u: 'auto' | 'km' | 'mi') => void;
   sendLocationOnDeal: boolean;
   onSendLocationOnDealChange: (v: boolean) => void;
+  telemetryEnabled: boolean;
+  onTelemetryChange: (v: boolean) => void;
   browseCategory: string;
   browseSubcategory: string;
   browseAlertSound: boolean;
@@ -5494,6 +5508,17 @@ function SettingsTab({
         </View>
         <View style={[s.switchTrack, sendLocationOnDeal && s.switchTrackOn]}>
           <View style={[s.switchThumb, sendLocationOnDeal && s.switchThumbOn]} />
+        </View>
+      </Pressable>
+
+      {/* Anonymous diagnostics — scrubbed of all identity/contact/location/content. */}
+      <Pressable style={s.toggleRow} onPress={() => onTelemetryChange(!telemetryEnabled)}>
+        <View style={{ flex: 1, marginRight: 12 }}>
+          <Text style={s.toggleTitle}>{t("Share anonymous diagnostics")}</Text>
+          <Text style={s.dim}>{t("Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.")}</Text>
+        </View>
+        <View style={[s.switchTrack, telemetryEnabled && s.switchTrackOn]}>
+          <View style={[s.switchThumb, telemetryEnabled && s.switchThumbOn]} />
         </View>
       </Pressable>
       </>

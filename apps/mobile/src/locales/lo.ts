@@ -1,5 +1,7 @@
 /** Lao translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "ແບ່ງປັນຂໍ້ມູນວິນິດໄສແບບບໍ່ລະບຸຕົວຕົນ",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "ສົ່ງລາຍງານການຂັດຂ້ອງ ແລະ ສະຖິຕິການນຳໃຊ້ແບບບໍ່ລະບຸຕົວຕົນເພື່ອຊ່ວຍປັບປຸງ Freeport. ບໍ່ສົ່ງກະແຈ, ລາຍຊື່ຕິດຕໍ່, ທີ່ຕັ້ງ ຫຼື ຂໍ້ຄວາມຂອງທ່ານເລີຍ.",
   "{n} days": "{n} ມື້",
   "All": "ທັງໝົດ",
   "Block this person": "ບລັອກຄົນນີ້",

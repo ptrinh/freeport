@@ -1,5 +1,7 @@
 /** Afrikaans translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "Deel anonieme diagnostiek",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Stuur anonieme ongelukverslae en gebruikstatistieke om Freeport te help verbeter. Nooit jou sleutels, kontakte, ligging of boodskappe nie.",
   "{n} days": "{n} dae",
   "All": "Alles",
   "Block this person": "Blokkeer hierdie persoon",

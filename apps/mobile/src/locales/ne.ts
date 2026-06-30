@@ -1,5 +1,7 @@
 /** Nepali translations. English source string → translation. */
 const c: Record<string, string> = {
+  "Share anonymous diagnostics": "बेनामी डायग्नोस्टिक्स साझा गर्नुहोस्",
+  "Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.": "Freeport सुधार्न मद्दत गर्न बेनामी क्र्यास रिपोर्ट र प्रयोग तथ्याङ्क पठाउनुहोस्। तपाईंका कुञ्जी, सम्पर्क, स्थान वा सन्देशहरू कहिल्यै पठाइँदैन।",
   "{n} days": "{n} दिन",
   "All": "सबै",
   "Block this person": "यो व्यक्तिलाई ब्लक गर्नुहोस्",
