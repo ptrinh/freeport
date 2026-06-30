@@ -95,7 +95,7 @@ export class FreeportAgent {
         this.negotiations.set(nego.id, nego);
         await this.tryAccept(nego, rule);
       } else if (res.counterTerms) {
-        const counter = makeCounter(nego, res.counterTerms);
+        const counter = makeCounter(nego, res.counterTerms, this.contactFor(rule));
         nego = applyOutbound(nego, counter);
         this.negotiations.set(nego.id, nego);
         await this.transport.sendNegotiation(intent.pubkey, counter);
@@ -168,7 +168,7 @@ export class FreeportAgent {
       await this.tryAccept(nego, rule);
     } else if (res.matched && res.counterTerms) {
       try {
-        const counter = makeCounter(nego, res.counterTerms);
+        const counter = makeCounter(nego, res.counterTerms, this.contactFor(rule));
         const updated = applyOutbound(nego, counter);
         this.negotiations.set(updated.id, updated);
         await this.transport.sendNegotiation(updated.peer, counter);
@@ -181,6 +181,11 @@ export class FreeportAgent {
     }
   }
 
+  /** Our contact for a negotiation: the matched rule's, else the first rule's. */
+  private contactFor(rule?: MatchRule): string {
+    return rule?.contact ?? this.config.rules[0]?.contact ?? '';
+  }
+
   /** Gate the final accept on the human unless auto_accept is on. */
   private async tryAccept(nego: Negotiation, rule?: MatchRule): Promise<void> {
     const auto = this.config.auto_accept || rule?.auto_accept;
@@ -191,8 +196,7 @@ export class FreeportAgent {
       await this.cancel(current, 'declined by owner');
       return;
     }
-    const contact = rule?.contact ?? this.config.rules[0]?.contact ?? '';
-    const accept = makeAccept(current, contact);
+    const accept = makeAccept(current, this.contactFor(rule));
     const updated = applyOutbound(current, accept);
     this.negotiations.set(updated.id, updated);
     await this.transport.sendNegotiation(updated.peer || nego.intent.pubkey, accept);
