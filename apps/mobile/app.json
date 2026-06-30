@@ -73,7 +73,14 @@
           "color": "#3b82f6"
         }
       ],
-      "@sentry/react-native"
+      [
+        "@sentry/react-native",
+        {
+          "url": "https://glitchtip.trinh.uk",
+          "organization": "phil-t",
+          "project": "freeport"
+        }
+      ]
     ],
     "extra": {
       "eas": {

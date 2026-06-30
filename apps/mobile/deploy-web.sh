@@ -14,6 +14,23 @@ export CLOUDFLARE_ACCOUNT_ID=2edc401e8f3f074f198d7290691817a3   # Ptrinh@me.com
 echo "▸ Exporting web bundle…"
 npx expo export --platform web
 
+# Upload web source maps to GlitchTip (debug-id based — no release coordination
+# needed) BEFORE they're stripped from the public deploy below. `inject` stamps
+# matching debug ids into the JS we ship and the maps we upload; GlitchTip then
+# symbolicates crashes. Token comes from the env or a gitignored .env; skipped
+# if absent so the deploy still works without it.
+[ -f .env ] && { set -a; . ./.env; set +a; }
+# Note: `expo export --platform web` does not emit .map files by default, so this
+# only runs once web source-map output is enabled (and a token is present).
+if [ -n "${SENTRY_AUTH_TOKEN:-}" ] && [ -n "$(find dist -name '*.map' -print -quit)" ]; then
+  echo "▸ Uploading source maps to GlitchTip…"
+  export SENTRY_URL="https://glitchtip.trinh.uk" SENTRY_ORG="phil-t" SENTRY_PROJECT="freeport"
+  npx @sentry/cli sourcemaps inject dist
+  npx @sentry/cli sourcemaps upload dist
+else
+  echo "▸ Skipping web source-map upload (no maps emitted, or no token)"
+fi
+
 # Strip source maps from the production deploy. Shipping .map files lets anyone
 # reconstruct the original TypeScript (names, comments, structure) — a near-
 # verbatim clone. Delete the maps and remove the //# sourceMappingURL= trailer
