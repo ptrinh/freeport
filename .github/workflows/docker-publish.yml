@@ -93,7 +93,7 @@ jobs:
           images: ${{ env.IMAGE }}
           tags: |
             type=raw,value=latest
-            type=raw,value=0.6.8
+            type=raw,value=0.6.9
 
       - name: Create manifest list and push
         working-directory: /tmp/digests

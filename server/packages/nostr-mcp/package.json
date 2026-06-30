@@ -1,6 +1,6 @@
 {
   "name": "freeport-nostr-mcp",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "description": "MCP server for searching Freeport Nostr events (ride requests, driver/provider offers, service & product posts, reputation) by kind, tag, and geohash radius.",
   "type": "module",
   "mcpName": "io.github.ptrinh/freeport-nostr",
@@ -16,7 +16,8 @@
     "start": "node dist/stdio.js",
     "start:http": "node dist/http.js",
     "dev": "tsx src/stdio.ts",
-    "dev:http": "tsx src/http.ts"
+    "dev:http": "tsx src/http.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
@@ -33,6 +34,7 @@
     "@types/web-push": "^3.6.0",
     "esbuild": "^0.28.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.0"
   }
 }

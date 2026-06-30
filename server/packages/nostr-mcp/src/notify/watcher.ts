@@ -15,6 +15,7 @@ import type { Event } from 'nostr-tools';
 import webpush from 'web-push';
 import { Expo } from 'expo-server-sdk';
 import { matches, unionKinds } from './match.js';
+import { dmCoalesceDue } from './coalesce.js';
 import type { SubStore, SubRecord } from './store.js';
 
 const KIND_DM = 4;
@@ -110,8 +111,7 @@ export class Watcher {
     if (this.seen.size > 50000) this.seen.clear(); // bound memory
     if (coalesceKey && DM_COOLDOWN_MS > 0) {
       const now = Date.now();
-      const last = this.lastDmPush.get(coalesceKey) ?? 0;
-      if (now - last < DM_COOLDOWN_MS) return; // within the window → skip (already notified recently)
+      if (!dmCoalesceDue(this.lastDmPush.get(coalesceKey), now, DM_COOLDOWN_MS)) return; // within the window → skip (already notified recently)
       this.lastDmPush.set(coalesceKey, now);
     }
     if (rec.expoPushToken) await this.pushExpo(rec, body);
