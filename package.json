@@ -9,12 +9,13 @@
   ],
   "scripts": {
     "build": "npm run build -w @freeport/protocol -w @freeport/agent -w freeport-nostr-mcp",
-    "test": "npm run test -w @freeport/protocol -w @freeport/agent",
+    "test": "npm run test -w @freeport/protocol -w @freeport/agent -w freeport-nostr-mcp && npm run test --prefix apps/mobile",
     "demo": "bash demo/run-demo.sh"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.9",
+    "tsx": "^4.19.0",
     "typescript": "^5.5.0",
-    "vitest": "^2.1.0",
-    "tsx": "^4.19.0"
+    "vitest": "^2.1.0"
   }
 }
