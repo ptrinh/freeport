@@ -1526,7 +1526,21 @@ function Onboarding({
 }) {
   const [step, setStep] = useState<'choose' | 'role' | 'location' | 'welcome'>('choose');
   const [busy, setBusy] = useState<'create' | 'restore' | 'cloud' | null>(null);
-  const showCloud = cloudAvailable();
+  // Only offer cloud restore when a backup actually EXISTS on this device's
+  // iCloud Keychain (iOS) / Google Block Store (Android). Both reads are silent
+  // (no account picker), so we check at load and hide the button otherwise —
+  // showing it with no backup dead-ends on "No cloud backup found", which
+  // confused Play review and real new users. `null` = still checking → hidden.
+  const [cloudHasBackup, setCloudHasBackup] = useState<boolean | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    if (!cloudAvailable()) { setCloudHasBackup(false); return; }
+    cloudRestore()
+      .then((v) => { if (!cancelled) setCloudHasBackup(!!v); })
+      .catch(() => { if (!cancelled) setCloudHasBackup(false); });
+    return () => { cancelled = true; };
+  }, []);
+  const showCloud = cloudAvailable() && cloudHasBackup === true;
   // Logo + title animate into place when the welcome screen mounts (picking up
   // from the HTML splash, which shows the same logo/title): fade + rise + a
   // gentle scale-down, so it reads as the splash mark settling into the app.
