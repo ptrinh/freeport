@@ -18,6 +18,18 @@ import { eventGeohash, matches, unionKinds } from './match.js';
 import { dmCoalesceDue } from './coalesce.js';
 import type { SubStore, SubRecord } from './store.js';
 
+/**
+ * Sends a content-blind ping to a linked Telegram chat. Returns 'gone' when the
+ * chat is unreachable (bot blocked / chat not found) so the watcher prunes the
+ * record, mirroring the web-push 404/410 semantics. Injected (via
+ * setTelegramSender) only when the Telegram bridge is mounted; absent → skip.
+ */
+export type TelegramSender = (chatId: number, body: PushBody) => Promise<'ok' | 'gone'>;
+/** Fired for every ingested intent event (with its precomputed geohash) so the
+ *  group-feed can match it against per-chat watches. */
+export type IntentSink = (ev: Event, geohash?: string) => void;
+interface PushBody { body: string; tag: string; data: Record<string, unknown> }
+
 const KIND_DM = 4;
 // Freeport sends negotiation CONTROL messages (offers, accepts, counters, stage
 // updates, contact exchange, the auto-shared trip link) as kind-4 DMs too, not
@@ -44,6 +56,12 @@ export class Watcher {
   private static readonly SEEN_GENERATION_MAX = 25000;
   /** Last DM-notification time per subscriber id, for burst coalescing. */
   private readonly lastDmPush = new Map<string, number>();
+  /** Optional Telegram transport + group-feed sink (set when the bridge mounts). */
+  private tgSend: TelegramSender | null = null;
+  private intentSink: IntentSink | null = null;
+
+  setTelegramSender(sender: TelegramSender | null): void { this.tgSend = sender; }
+  setIntentSink(sink: IntentSink | null): void { this.intentSink = sink; }
 
   private alreadyPushed(key: string): boolean {
     if (this.seen.has(key) || this.seenPrev.has(key)) return true;
@@ -101,6 +119,9 @@ export class Watcher {
     // Geohash once per EVENT; fan pushes out concurrently — serial awaits
     // (~100-300ms each) blocked processing of every subsequent relay event.
     const geohash = eventGeohash(ev);
+    // Group-feed bridge (if mounted) gets every intent to match against its own
+    // per-chat watches — independent of the personal-subscription fan-out below.
+    try { this.intentSink?.(ev, geohash); } catch { /* sink must never break the watcher */ }
     const sends: Promise<void>[] = [];
     for (const rec of this.store.intentCandidates(evTopics)) {
       if (!matches(ev, rec.filters, geohash)) continue;
@@ -137,6 +158,22 @@ export class Watcher {
     }
     if (rec.expoPushToken) await this.pushExpo(rec, body);
     else if (rec.subscription) await this.pushWeb(rec, body);
+    else if (rec.telegramChatId) await this.pushTelegram(rec, body);
+  }
+
+  private async pushTelegram(rec: SubRecord, body: PushBody): Promise<void> {
+    if (!this.tgSend) return; // bridge not mounted → skip silently
+    try {
+      const result = await this.tgSend(rec.telegramChatId!, body);
+      if (result === 'gone') {
+        this.store.remove(rec.id); // bot blocked / chat gone — prune like a dead push endpoint
+        this.refresh();
+      } else {
+        this.store.touch(rec.id); // successful send keeps the record fresh
+      }
+    } catch (err) {
+      console.error(`[notify] telegram push failed for ${rec.id}`, err);
+    }
   }
 
   /** Native push via Expo's service (uses the APNs/FCM key held in EAS). */

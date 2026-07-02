@@ -36,6 +36,8 @@ export interface SubRecord {
   subscription?: PushSubscriptionJSON;
   /** Native transport (Expo Push token, iOS/Android app). */
   expoPushToken?: string;
+  /** Telegram transport (a linked private-chat id). Content-blind pings only. */
+  telegramChatId?: number;
   filters: SubFilters;
   /** Nostr pubkey (hex) to watch for inbound DMs (kind 4). Optional. */
   pubkey?: string;
@@ -121,6 +123,18 @@ export class SubStore {
     return this.put(idForKey(expoPushToken), { expoPushToken, filters, pubkey });
   }
 
+  /** Linked Telegram private chat. id derived from the chat id so re-linking
+   *  updates in place. Content-blind DM pings (usually pubkey-only, no filters). */
+  upsertTelegram(telegramChatId: number, filters: SubFilters, pubkey?: string): SubRecord {
+    return this.put(idForKey('tg:' + telegramChatId), { telegramChatId, filters, pubkey });
+  }
+
+  /** Bump lastSeenAt (called on a successful send so the record stays fresh). */
+  touch(id: string): void {
+    const rec = this.map.get(id);
+    if (rec) { rec.lastSeenAt = Date.now(); this.scheduleFlush(); }
+  }
+
   private put(id: string, partial: Omit<SubRecord, 'id' | 'createdAt' | 'lastSeenAt'>): SubRecord {
     const old = this.map.get(id);
     if (old) this.unindex(old);
@@ -142,7 +156,12 @@ export class SubStore {
   sweepStale(maxAgeMs: number): number {
     const cutoff = Date.now() - maxAgeMs;
     const stale: string[] = [];
-    for (const rec of this.map.values()) if ((rec.lastSeenAt ?? rec.createdAt) < cutoff) stale.push(rec.id);
+    for (const rec of this.map.values()) {
+      // Telegram links have no app heartbeat to refresh lastSeenAt, so TTL would
+      // wrongly evict them; their liveness is send-failure-based (403/400 prune).
+      if (rec.telegramChatId) continue;
+      if ((rec.lastSeenAt ?? rec.createdAt) < cutoff) stale.push(rec.id);
+    }
     for (const id of stale) this.remove(id);
     return stale.length;
   }
@@ -150,6 +169,11 @@ export class SubStore {
   /** Remove by push endpoint URL or Expo token (the app knows these, not the id). */
   removeByKey(key: string): boolean {
     return this.remove(idForKey(key));
+  }
+
+  /** Remove the record for a linked Telegram chat (on /stop or a gone send). */
+  removeByTelegramChat(chatId: number): boolean {
+    return this.remove(idForKey('tg:' + chatId));
   }
 
   remove(id: string): boolean {

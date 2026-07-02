@@ -8,7 +8,7 @@ import type { SubFilters } from './store.js';
 
 export const DEFAULT_KINDS = [KIND_INTENT_OFFER, KIND_INTENT_REQUEST];
 
-function haversineKm(lat: number, lon: number, gh: string): number | null {
+export function haversineKm(lat: number, lon: number, gh: string): number | null {
   let c: { lat: number; lon: number };
   try { c = geohashDecode(gh); } catch { return null; }
   const R = 6371, toRad = (d: number) => (d * Math.PI) / 180;
