@@ -8,7 +8,10 @@
     "freeport-nostr-mcp": "dist/stdio.js"
   },
   "main": "dist/http.js",
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "node build.mjs",
@@ -29,6 +32,7 @@
   },
   "devDependencies": {
     "@freeport/protocol": "*",
+    "@freeport/agent": "*",
     "@types/express": "^5.0.0",
     "@types/node": "^22.0.0",
     "@types/web-push": "^3.6.0",

@@ -54,7 +54,7 @@ if (NOTIFY) notifier = mountNotify(app, sharedPool.relays, DATA_DIR, limiter);
 // and store. Async (calls getMe on boot); errors are logged, not fatal.
 let telegram: TelegramBridge | null = null;
 if (TELEGRAM && notifier) {
-  mountTelegram(app, notifier, DATA_DIR, limiter)
+  mountTelegram(app, notifier, DATA_DIR, limiter, sharedPool)
     .then((b) => { telegram = b; })
     .catch((err) => console.error('[telegram] failed to start bridge', err));
 }
@@ -63,7 +63,9 @@ app.get('/health', (_req, res) => {
   res.json({
     ok: true, name: NAME, version: VERSION, relays: sharedPool.relays,
     notify: notifier ? { enabled: true, subscriptions: notifier.store.size() } : { enabled: false },
-    telegram: telegram ? { enabled: true, groups: telegram.groups.size() } : { enabled: TELEGRAM },
+    telegram: telegram
+      ? { enabled: true, groups: telegram.groups.size(), guests: telegram.guests?.size() ?? 0, guestMode: !!telegram.guests }
+      : { enabled: TELEGRAM },
   });
 });
 

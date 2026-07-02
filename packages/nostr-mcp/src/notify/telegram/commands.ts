@@ -15,6 +15,7 @@ import type { LinkCodes } from './linkcodes.js';
 import type { SendQueue } from './queue.js';
 import type { TelegramApi, TgUpdate, TgMessage } from './api.js';
 import { parseHitch, broadcastUrl } from './listen.js';
+import type { GuestRouter } from './guest.js';
 
 const GROUP_ANON_BOT = 1087968824; // Telegram's anonymous-admin sender id
 
@@ -27,10 +28,12 @@ export interface RouterDeps {
   queue: SendQueue;
   botUsername: string;
   webBase: string;
+  /** Present only when guest mode is enabled (TELEGRAM_GUEST_KEY_PASSPHRASE set). */
+  guest?: GuestRouter;
 }
 
 export function makeCommandRouter(deps: RouterDeps) {
-  const { api, subs, watcher, groups, codes, queue, botUsername, webBase } = deps;
+  const { api, subs, watcher, groups, codes, queue, botUsername, webBase, guest } = deps;
   const adminCache = new Map<string, { ok: boolean; at: number }>(); // `${chat}:${user}` → 5-min cache
   const reply = (chatId: number, text: string, replyTo?: number) =>
     queue.enqueue(chatId, () => api.sendMessage(chatId, text, { parseMode: 'HTML', disablePreview: true, replyToMessageId: replyTo })).catch(() => {});
@@ -65,6 +68,9 @@ export function makeCommandRouter(deps: RouterDeps) {
   }
 
   async function handlePrivate(msg: TgMessage, cmd: string, args: string[]): Promise<void> {
+    // Guest-mode commands (/ride, /myposts, /exportkey, …) take precedence when
+    // guest mode is on; linking commands below still work for app users.
+    if (guest && await guest.command(msg, cmd, args)) return;
     if (cmd === 'start') {
       const pubkey = args[0] ? codes.consume(args[0]) : null;
       if (!pubkey) { reply(msg.chat.id, '⚠️ That link expired or was already used. Open the app and tap “Link Telegram” again.'); return; }
@@ -132,6 +138,7 @@ export function makeCommandRouter(deps: RouterDeps) {
   }
 
   return async function handleUpdate(u: TgUpdate): Promise<void> {
+    if (u.callback_query) { if (guest) await guest.callback(u.callback_query); return; }
     if (u.my_chat_member) {
       const status = u.my_chat_member.new_chat_member.status;
       if (status === 'left' || status === 'kicked') groups.removeChat(u.my_chat_member.chat.id);
@@ -144,7 +151,11 @@ export function makeCommandRouter(deps: RouterDeps) {
     if (parsed) {
       if (isPrivate) await handlePrivate(msg, parsed.cmd, parsed.args);
       else await handleGroup(msg, parsed.cmd, parsed.args);
-    } else if (!isPrivate) {
+    } else if (isPrivate) {
+      // Free text in a private chat drives the guest conversation (contact,
+      // counter amount, export/forget confirmation).
+      if (guest) await guest.freeText(msg);
+    } else {
       handleListen(msg);
     }
   };

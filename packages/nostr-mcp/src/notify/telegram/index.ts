@@ -10,6 +10,7 @@
  * friendly). One bot, one poll loop, shared with the notifier's SubStore.
  */
 import type { Express, RequestHandler } from 'express';
+import type { RelayPool } from '../../pool.js';
 import type { Notifier } from '../routes.js';
 import { TelegramApi, GoneError } from './api.js';
 import { SendQueue } from './queue.js';
@@ -17,24 +18,59 @@ import { LinkCodes } from './linkcodes.js';
 import { GroupStore } from './groups.js';
 import { makeIntentFeed } from './feed.js';
 import { makeCommandRouter } from './commands.js';
+import { GuestStore } from './guests.js';
+import { NegoMap } from './negomap.js';
+import { Geocoder } from './geocode.js';
+import { GuestAgentManager } from './agents.js';
+import { GuestRouter } from './guest.js';
 
-export interface TelegramBridge { groups: GroupStore; stop: () => void; botUsername: string }
+export interface TelegramBridge { groups: GroupStore; guests?: GuestStore; stop: () => void; botUsername: string }
+
+const num = (name: string, def: number): number => {
+  const v = Number(process.env[name]);
+  return Number.isFinite(v) && v > 0 ? v : def;
+};
 
 export async function mountTelegram(
   app: Express,
   notifier: Notifier,
   dataDir: string,
   limiter: RequestHandler,
+  pool: RelayPool, // MCP shared pool (guest publish + reputation queries)
 ): Promise<TelegramBridge> {
   const token = process.env.TELEGRAM_BOT_TOKEN!;
   const webBase = (process.env.TELEGRAM_WEB_BASE ?? 'https://freeport.trinh.uk').replace(/\/$/, '');
   const pollTimeout = Math.max(1, Number(process.env.TELEGRAM_POLL_TIMEOUT_SEC ?? 50));
+  const relays = pool.relays;
 
   const api = new TelegramApi(token);
   const me = await api.getMe();
   const queue = new SendQueue();
   const codes = new LinkCodes();
   const groups = new GroupStore(`${dataDir}/telegram-groups.json`);
+
+  // Guest-agent mode: only when a passphrase for at-rest key encryption is set.
+  const guestPassphrase = process.env.TELEGRAM_GUEST_KEY_PASSPHRASE;
+  let guests: GuestStore | undefined;
+  let guestRouter: GuestRouter | undefined;
+  let agents: GuestAgentManager | undefined;
+  if (guestPassphrase) {
+    guests = new GuestStore(`${dataDir}/guests.json`, guestPassphrase);
+    const negomap = new NegoMap(`${dataDir}/telegram-negomap.json`);
+    agents = new GuestAgentManager({ relays, reputationPool: pool, guests, negomap, api, queue, offerTimeoutMs: num('GUEST_OFFER_TIMEOUT_MIN', 15) * 60_000 });
+    guestRouter = new GuestRouter({
+      api, queue, negomap, agents, guests, pool, relays,
+      geocoder: new Geocoder(),
+      powBits: num('GUEST_POW_BITS', 12),
+      rideExpiryMin: num('GUEST_RIDE_EXPIRY_MIN', 120),
+      maxPerDay: num('GUEST_POSTS_PER_DAY', 10),
+      maxActive: num('GUEST_MAX_ACTIVE_POSTS', 3),
+      countryHint: process.env.GUEST_COUNTRY_HINT,
+    });
+    agents.restoreAll();
+    const idle = setInterval(() => { agents!.sweepIdle(); negomap.gc(3 * 24 * 3600 * 1000); }, 5 * 60_000);
+    idle.unref?.();
+  }
 
   // 1. Personal DM pings: give the watcher a Telegram sender. Content-blind
   //    body; 'gone' prunes the linked record (bot blocked / chat deleted).
@@ -69,7 +105,7 @@ export async function mountTelegram(
   });
 
   // 4. Long-poll loop.
-  const router = makeCommandRouter({ api, subs: notifier.store, watcher: notifier.watcher, groups, codes, queue, botUsername: me.username, webBase });
+  const router = makeCommandRouter({ api, subs: notifier.store, watcher: notifier.watcher, groups, codes, queue, botUsername: me.username, webBase, guest: guestRouter });
   let stopped = false;
   let offset = 0;
   let backoff = 1000;
@@ -91,6 +127,6 @@ export async function mountTelegram(
     }
   })();
 
-  console.error(`[telegram] bridge up as @${me.username} • ${groups.size()} groups`);
-  return { groups, botUsername: me.username, stop: () => { stopped = true; } };
+  console.error(`[telegram] bridge up as @${me.username} • ${groups.size()} groups${guests ? ` • ${guests.size()} guests (guest mode ON)` : ''}`);
+  return { groups, guests, botUsername: me.username, stop: () => { stopped = true; } };
 }

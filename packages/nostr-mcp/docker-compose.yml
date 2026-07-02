@@ -27,6 +27,14 @@ services:
       # - TELEGRAM_BOT_TOKEN=123456:ABC...
       # - TELEGRAM_WEB_BASE=https://freeport.trinh.uk
       # - TELEGRAM_POLL_TIMEOUT_SEC=50
+      # Guest-agent mode (CUSTODIAL — the bridge holds a NIP-49-encrypted key per
+      # Telegram-native user so they can post + deal without the app). Set the
+      # passphrase to enable; unset = guest mode OFF (feed + pings still work).
+      # - TELEGRAM_GUEST_KEY_PASSPHRASE=change-me-long-random
+      # - GUEST_COUNTRY_HINT=sg          # Nominatim bias for guest geocoding
+      # - GUEST_POSTS_PER_DAY=10
+      # - GUEST_MAX_ACTIVE_POSTS=3
+      # - GUEST_RIDE_EXPIRY_MIN=120
     volumes:
       - notify-data:/data
     healthcheck:
