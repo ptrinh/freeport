@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "hakim me pagesë / malware",
   "human trafficking / exploitation": "trafikim njerëzish / shfrytëzim",
   "endangered wildlife": "kafshë të egra të rrezikuara",
-  "violence-for-hire": "dhunë me pagesë"
+  "violence-for-hire": "dhunë me pagesë",
+  "Sending {n}…": "Po dërgohen {n}…",
+  "Could not update the deal": "Marrëveshja nuk u përditësua dot",
+  "Could not send": "Nuk u dërgua dot",
+  "Report not sent": "Raportimi nuk u dërgua",
+  "Could not connect. Check your internet and try again.": "Nuk u lidh dot. Kontrolloni internetin dhe provoni sërish.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Faleminderit — raportimi juaj u regjistrua si karma negative në këtë marrëveshje.",
+  "This backup is encrypted — enter its passphrase.": "Kjo kopje rezervë është e enkriptuar — shkruani frazëkalimin e saj.",
+  "Passphrase": "Frazëkalimi",
+  "Restore": "Rikthe",
+  "Restore failed": "Rikthimi dështoi",
+  "Invalid backup file.": "Skedar kopjeje rezervë i pavlefshëm.",
+  "Wrong passphrase?": "Frazëkalim i gabuar?",
+  "Select a score": "Zgjidhni një vlerësim",
+  "Reported": "U raportua"
 };
 export default c;

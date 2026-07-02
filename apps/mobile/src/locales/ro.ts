@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "hacking la comandă / programe malware",
   "human trafficking / exploitation": "trafic de persoane / exploatare",
   "endangered wildlife": "specii sălbatice pe cale de dispariție",
-  "violence-for-hire": "violență la comandă"
+  "violence-for-hire": "violență la comandă",
+  "Sending {n}…": "Se trimit {n}…",
+  "Could not update the deal": "Acordul nu a putut fi actualizat",
+  "Could not send": "Nu s-a putut trimite",
+  "Report not sent": "Raportul nu a fost trimis",
+  "Could not connect. Check your internet and try again.": "Nu s-a putut conecta. Verifică internetul și încearcă din nou.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Mulțumim — raportul tău a fost înregistrat ca karma negativă la acest acord.",
+  "This backup is encrypted — enter its passphrase.": "Această copie de rezervă este criptată — introdu fraza de acces.",
+  "Passphrase": "Frază de acces",
+  "Restore": "Restaurează",
+  "Restore failed": "Restaurarea a eșuat",
+  "Invalid backup file.": "Fișier de rezervă nevalid.",
+  "Wrong passphrase?": "Frază de acces greșită?",
+  "Select a score": "Alege un scor",
+  "Reported": "Raportat"
 };
 export default c;

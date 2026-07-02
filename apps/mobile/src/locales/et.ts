@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "häkkimisteenus / pahavara",
   "human trafficking / exploitation": "inimkaubandus / ärakasutamine",
   "endangered wildlife": "ohustatud loomaliigid",
-  "violence-for-hire": "palgamõrv"
+  "violence-for-hire": "palgamõrv",
+  "Sending {n}…": "Saadan {n}…",
+  "Could not update the deal": "Tehingut ei õnnestunud uuendada",
+  "Could not send": "Saatmine ebaõnnestus",
+  "Report not sent": "Teadet ei saadetud",
+  "Could not connect. Check your internet and try again.": "Ühendus ebaõnnestus. Kontrolli internetti ja proovi uuesti.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Aitäh — sinu teade salvestati selle tehingu juures negatiivse karmana.",
+  "This backup is encrypted — enter its passphrase.": "See varukoopia on krüpteeritud — sisesta selle paroolifraas.",
+  "Passphrase": "Paroolifraas",
+  "Restore": "Taasta",
+  "Restore failed": "Taastamine ebaõnnestus",
+  "Invalid backup file.": "Vigane varukoopiafail.",
+  "Wrong passphrase?": "Vale paroolifraas?",
+  "Select a score": "Vali hinnang",
+  "Reported": "Teatatud"
 };
 export default c;

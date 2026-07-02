@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "uzlaušana pēc pasūtījuma / ļaunatūra",
   "human trafficking / exploitation": "cilvēku tirdzniecība / ekspluatācija",
   "endangered wildlife": "apdraudētie savvaļas dzīvnieki",
-  "violence-for-hire": "vardarbība pēc pasūtījuma"
+  "violence-for-hire": "vardarbība pēc pasūtījuma",
+  "Sending {n}…": "Sūta {n}…",
+  "Could not update the deal": "Neizdevās atjaunināt darījumu",
+  "Could not send": "Neizdevās nosūtīt",
+  "Report not sent": "Ziņojums netika nosūtīts",
+  "Could not connect. Check your internet and try again.": "Neizdevās izveidot savienojumu. Pārbaudiet internetu un mēģiniet vēlreiz.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Paldies — jūsu ziņojums tika reģistrēts kā negatīva karma šim darījumam.",
+  "This backup is encrypted — enter its passphrase.": "Šī rezerves kopija ir šifrēta — ievadiet tās paroles frāzi.",
+  "Passphrase": "Paroles frāze",
+  "Restore": "Atjaunot",
+  "Restore failed": "Atjaunošana neizdevās",
+  "Invalid backup file.": "Nederīgs rezerves kopijas fails.",
+  "Wrong passphrase?": "Nepareiza paroles frāze?",
+  "Select a score": "Izvēlieties vērtējumu",
+  "Reported": "Ziņots"
 };
 export default c;

@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "sifarişlə haker xidməti / zərərli proqram",
   "human trafficking / exploitation": "insan alveri / istismar",
   "endangered wildlife": "nəsli kəsilməkdə olan vəhşi heyvanlar",
-  "violence-for-hire": "sifarişlə zorakılıq"
+  "violence-for-hire": "sifarişlə zorakılıq",
+  "Sending {n}…": "{n} göndərilir…",
+  "Could not update the deal": "Sövdələşməni yeniləmək olmadı",
+  "Could not send": "Göndərmək olmadı",
+  "Report not sent": "Şikayət göndərilmədi",
+  "Could not connect. Check your internet and try again.": "Qoşulmaq olmadı. İnternetinizi yoxlayın və yenidən cəhd edin.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Təşəkkürlər — şikayətiniz bu sövdələşmədə mənfi karma kimi qeydə alındı.",
+  "This backup is encrypted — enter its passphrase.": "Bu ehtiyat nüsxə şifrələnib — parol ifadəsini daxil edin.",
+  "Passphrase": "Parol ifadəsi",
+  "Restore": "Bərpa et",
+  "Restore failed": "Bərpa alınmadı",
+  "Invalid backup file.": "Yanlış ehtiyat nüsxə faylı.",
+  "Wrong passphrase?": "Yanlış parol ifadəsi?",
+  "Select a score": "Qiymət seçin",
+  "Reported": "Şikayət edildi"
 };
 export default c;

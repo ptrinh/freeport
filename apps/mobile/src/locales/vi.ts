@@ -606,6 +606,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "tấn công mạng thuê / phần mềm độc hại",
   "human trafficking / exploitation": "buôn người / bóc lột",
   "endangered wildlife": "động vật hoang dã nguy cấp",
-  "violence-for-hire": "bạo lực thuê mướn"
+  "violence-for-hire": "bạo lực thuê mướn",
+  "Sending {n}…": "Đang gửi {n}…",
+  "Could not update the deal": "Không thể cập nhật giao dịch",
+  "Could not send": "Không thể gửi",
+  "Report not sent": "Chưa gửi được báo cáo",
+  "Could not connect. Check your internet and try again.": "Không thể kết nối. Kiểm tra internet của bạn và thử lại.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Cảm ơn — báo cáo của bạn đã được ghi nhận là karma tiêu cực cho giao dịch này.",
+  "This backup is encrypted — enter its passphrase.": "Bản sao lưu này được mã hóa — nhập cụm mật khẩu của nó.",
+  "Passphrase": "Cụm mật khẩu",
+  "Restore": "Khôi phục",
+  "Restore failed": "Khôi phục thất bại",
+  "Invalid backup file.": "Tệp sao lưu không hợp lệ.",
+  "Wrong passphrase?": "Sai cụm mật khẩu?",
+  "Select a score": "Chọn một điểm đánh giá",
+  "Reported": "Đã báo cáo"
 };
 export default c;

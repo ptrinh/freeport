@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "inbraak-vir-huur / wankware",
   "human trafficking / exploitation": "mensehandel / uitbuiting",
   "endangered wildlife": "bedreigde wildlewe",
-  "violence-for-hire": "geweld-vir-huur"
+  "violence-for-hire": "geweld-vir-huur",
+  "Sending {n}…": "Stuur {n}…",
+  "Could not update the deal": "Kon nie die transaksie opdateer nie",
+  "Could not send": "Kon nie stuur nie",
+  "Report not sent": "Verslag nie gestuur nie",
+  "Could not connect. Check your internet and try again.": "Kon nie koppel nie. Kontroleer jou internet en probeer weer.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Dankie — jou verslag is as negatiewe karma op hierdie transaksie aangeteken.",
+  "This backup is encrypted — enter its passphrase.": "Hierdie rugsteun is geënkripteer — voer die wagfrase in.",
+  "Passphrase": "Wagfrase",
+  "Restore": "Herstel",
+  "Restore failed": "Herstel het misluk",
+  "Invalid backup file.": "Ongeldige rugsteunlêer.",
+  "Wrong passphrase?": "Verkeerde wagfrase?",
+  "Select a score": "Kies 'n telling",
+  "Reported": "Gerapporteer"
 };
 export default c;

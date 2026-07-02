@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "hacking επί πληρωμή / κακόβουλο λογισμικό",
   "human trafficking / exploitation": "εμπορία ανθρώπων / εκμετάλλευση",
   "endangered wildlife": "απειλούμενα είδη άγριας ζωής",
-  "violence-for-hire": "βία επί πληρωμή"
+  "violence-for-hire": "βία επί πληρωμή",
+  "Sending {n}…": "Αποστολή {n}…",
+  "Could not update the deal": "Δεν ήταν δυνατή η ενημέρωση της συμφωνίας",
+  "Could not send": "Δεν ήταν δυνατή η αποστολή",
+  "Report not sent": "Η αναφορά δεν στάλθηκε",
+  "Could not connect. Check your internet and try again.": "Αδυναμία σύνδεσης. Ελέγξτε το ίντερνετ σας και δοκιμάστε ξανά.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Ευχαριστούμε — η αναφορά σας καταγράφηκε ως αρνητικό κάρμα σε αυτή τη συμφωνία.",
+  "This backup is encrypted — enter its passphrase.": "Αυτό το αντίγραφο ασφαλείας είναι κρυπτογραφημένο — εισαγάγετε τη φράση πρόσβασης.",
+  "Passphrase": "Φράση πρόσβασης",
+  "Restore": "Επαναφορά",
+  "Restore failed": "Η επαναφορά απέτυχε",
+  "Invalid backup file.": "Μη έγκυρο αρχείο αντιγράφου ασφαλείας.",
+  "Wrong passphrase?": "Λάθος φράση πρόσβασης;",
+  "Select a score": "Επιλέξτε βαθμολογία",
+  "Reported": "Αναφέρθηκε"
 };
 export default c;

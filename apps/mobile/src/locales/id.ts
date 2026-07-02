@@ -606,6 +606,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "peretasan bayaran / malware",
   "human trafficking / exploitation": "perdagangan manusia / eksploitasi",
   "endangered wildlife": "satwa liar yang terancam punah",
-  "violence-for-hire": "kekerasan bayaran"
+  "violence-for-hire": "kekerasan bayaran",
+  "Sending {n}…": "Mengirim {n}…",
+  "Could not update the deal": "Tidak dapat memperbarui kesepakatan",
+  "Could not send": "Tidak dapat mengirim",
+  "Report not sent": "Laporan tidak terkirim",
+  "Could not connect. Check your internet and try again.": "Tidak dapat terhubung. Periksa internet Anda dan coba lagi.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Terima kasih — laporan Anda tercatat sebagai karma negatif pada kesepakatan ini.",
+  "This backup is encrypted — enter its passphrase.": "Cadangan ini terenkripsi — masukkan frasa sandinya.",
+  "Passphrase": "Frasa sandi",
+  "Restore": "Pulihkan",
+  "Restore failed": "Pemulihan gagal",
+  "Invalid backup file.": "File cadangan tidak valid.",
+  "Wrong passphrase?": "Frasa sandi salah?",
+  "Select a score": "Pilih skor",
+  "Reported": "Dilaporkan"
 };
 export default c;

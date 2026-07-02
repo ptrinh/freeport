@@ -3700,7 +3700,7 @@ function DealsTab({
             await client?.rateKarma(reportNego.id, reportNego.peer, -1, `Report: ${reason}`, false);
             uiAlert(t('Reported'), t('Thanks — your report was recorded as negative karma on this deal.'));
           } catch {
-            uiAlert(t('Report not sent'), t('Could not reach the network. Check your connection and try again.'));
+            uiAlert(t('Report not sent'), t('Could not connect. Check your internet and try again.'));
           }
         }}
       />
@@ -3974,7 +3974,7 @@ function DealsTab({
                                     ? t('Thank you. This was reported as negative karma on this deal. Do not get in the vehicle.')
                                     : t('Thank you. This was reported as negative karma on this deal. Do not continue with this provider.'));
                                 } catch {
-                                  uiAlert(t('Report not sent'), t('Could not reach the network. Check your connection and try again.') + ' ' + (isRide ? t('Do not get in the vehicle.') : t('Do not continue with this provider.')));
+                                  uiAlert(t('Report not sent'), t('Could not connect. Check your internet and try again.') + ' ' + (isRide ? t('Do not get in the vehicle.') : t('Do not continue with this provider.')));
                                 }
                               }}
                             >

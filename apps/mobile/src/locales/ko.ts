@@ -606,6 +606,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "해킹 청부 / 악성코드",
   "human trafficking / exploitation": "인신매매 / 착취",
   "endangered wildlife": "청부 폭력",
-  "violence-for-hire": "멸종 위기 야생동물"
+  "violence-for-hire": "멸종 위기 야생동물",
+  "Sending {n}…": "{n}건 전송 중…",
+  "Could not update the deal": "거래를 업데이트할 수 없습니다",
+  "Could not send": "전송할 수 없습니다",
+  "Report not sent": "신고가 전송되지 않았습니다",
+  "Could not connect. Check your internet and try again.": "연결할 수 없습니다. 인터넷을 확인하고 다시 시도하세요.",
+  "Thanks — your report was recorded as negative karma on this deal.": "감사합니다 — 신고가 이 거래에 부정적 카르마로 기록되었습니다.",
+  "This backup is encrypted — enter its passphrase.": "이 백업은 암호화되어 있습니다 — 패스프레이즈를 입력하세요.",
+  "Passphrase": "패스프레이즈",
+  "Restore": "복원",
+  "Restore failed": "복원 실패",
+  "Invalid backup file.": "잘못된 백업 파일입니다.",
+  "Wrong passphrase?": "패스프레이즈가 틀렸나요?",
+  "Select a score": "점수를 선택하세요",
+  "Reported": "신고됨"
 };
 export default c;

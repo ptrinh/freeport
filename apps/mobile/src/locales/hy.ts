@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "վարձու հաքերություն / վնասաբեր ծրագրեր",
   "human trafficking / exploitation": "մարդկանց թրաֆիքինգ / շահագործում",
   "endangered wildlife": "անհետացման եզրին գտնվող վայրի կենդանիներ",
-  "violence-for-hire": "վարձու բռնություն"
+  "violence-for-hire": "վարձու բռնություն",
+  "Sending {n}…": "Ուղարկվում է {n}…",
+  "Could not update the deal": "Չհաջողվեց թարմացնել գործարքը",
+  "Could not send": "Չհաջողվեց ուղարկել",
+  "Report not sent": "Հաղորդումը չի ուղարկվել",
+  "Could not connect. Check your internet and try again.": "Չհաջողվեց միանալ։ Ստուգեք ինտերնետը և կրկին փորձեք։",
+  "Thanks — your report was recorded as negative karma on this deal.": "Շնորհակալություն — ձեր հաղորդումը գրանցվեց որպես բացասական կարմա այս գործարքի վրա։",
+  "This backup is encrypted — enter its passphrase.": "Այս պահուստային պատճենը գաղտնագրված է — մուտքագրեք դրա գաղտնաբառ-արտահայտությունը։",
+  "Passphrase": "Գաղտնաբառ-արտահայտություն",
+  "Restore": "Վերականգնել",
+  "Restore failed": "Վերականգնումը ձախողվեց",
+  "Invalid backup file.": "Անվավեր պահուստային ֆայլ։",
+  "Wrong passphrase?": "Սխալ գաղտնաբառ-արտահայտությո՞ւն",
+  "Select a score": "Ընտրեք գնահատական",
+  "Reported": "Հաղորդված է"
 };
 export default c;

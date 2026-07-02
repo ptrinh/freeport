@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "هک اجاره‌ای / بدافزار",
   "human trafficking / exploitation": "قاچاق انسان / بهره‌کشی",
   "endangered wildlife": "حیات‌وحش در خطر انقراض",
-  "violence-for-hire": "خشونت اجاره‌ای"
+  "violence-for-hire": "خشونت اجاره‌ای",
+  "Sending {n}…": "در حال ارسال {n}…",
+  "Could not update the deal": "به‌روزرسانی معامله ممکن نشد",
+  "Could not send": "ارسال ممکن نشد",
+  "Report not sent": "گزارش ارسال نشد",
+  "Could not connect. Check your internet and try again.": "اتصال برقرار نشد. اینترنت خود را بررسی کنید و دوباره تلاش کنید.",
+  "Thanks — your report was recorded as negative karma on this deal.": "سپاسگزاریم — گزارش شما به‌عنوان کارمای منفی روی این معامله ثبت شد.",
+  "This backup is encrypted — enter its passphrase.": "این نسخهٔ پشتیبان رمزگذاری شده است — عبارت عبور آن را وارد کنید.",
+  "Passphrase": "عبارت عبور",
+  "Restore": "بازیابی",
+  "Restore failed": "بازیابی ناموفق بود",
+  "Invalid backup file.": "فایل پشتیبان نامعتبر است.",
+  "Wrong passphrase?": "عبارت عبور اشتباه است؟",
+  "Select a score": "یک امتیاز انتخاب کنید",
+  "Reported": "گزارش شد"
 };
 export default c;

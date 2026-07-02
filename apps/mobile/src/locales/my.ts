@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "ငှားရမ်း ဟက်ကာ / အန္တရာယ်ဆော့ဖ်ဝဲ",
   "human trafficking / exploitation": "လူကုန်ကူးခြင်း / အမြတ်ထုတ်ခြင်း",
   "endangered wildlife": "မျိုးသုဉ်းလုနီးပါး တိရစ္ဆာန်များ",
-  "violence-for-hire": "ငှားရမ်း အကြမ်းဖက်မှု"
+  "violence-for-hire": "ငှားရမ်း အကြမ်းဖက်မှု",
+  "Sending {n}…": "{n} ပို့နေသည်…",
+  "Could not update the deal": "သဘောတူညီချက်ကို အပ်ဒိတ်လုပ်၍မရပါ",
+  "Could not send": "ပို့၍မရပါ",
+  "Report not sent": "တိုင်ကြားချက် မပို့ရသေးပါ",
+  "Could not connect. Check your internet and try again.": "ချိတ်ဆက်၍မရပါ။ အင်တာနက်ကို စစ်ဆေးပြီး ထပ်စမ်းကြည့်ပါ။",
+  "Thanks — your report was recorded as negative karma on this deal.": "ကျေးဇူးတင်ပါသည် — သင့်တိုင်ကြားချက်ကို ဤသဘောတူညီချက်တွင် အနုတ် karma အဖြစ် မှတ်တမ်းတင်ပြီးပါပြီ။",
+  "This backup is encrypted — enter its passphrase.": "ဤအရန်ကူးယူမှုကို စာဝှက်ထားသည် — ၎င်း၏ စကားဝှက်စာပိုဒ်ကို ထည့်ပါ။",
+  "Passphrase": "စကားဝှက်စာပိုဒ်",
+  "Restore": "ပြန်ယူရန်",
+  "Restore failed": "ပြန်ယူမှု မအောင်မြင်ပါ",
+  "Invalid backup file.": "မမှန်ကန်သော အရန်ဖိုင်။",
+  "Wrong passphrase?": "စကားဝှက်စာပိုဒ် မှားနေသလား?",
+  "Select a score": "အမှတ်တစ်ခု ရွေးပါ",
+  "Reported": "တိုင်ကြားပြီးပါပြီ"
 };
 export default c;

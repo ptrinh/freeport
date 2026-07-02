@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "hacking-for-hire / malware",
   "human trafficking / exploitation": "human trafficking / pananamantala",
   "endangered wildlife": "endangered wildlife",
-  "violence-for-hire": "violence-for-hire"
+  "violence-for-hire": "violence-for-hire",
+  "Sending {n}…": "Ipinapadala ang {n}…",
+  "Could not update the deal": "Hindi ma-update ang kasunduan",
+  "Could not send": "Hindi maipadala",
+  "Report not sent": "Hindi naipadala ang report",
+  "Could not connect. Check your internet and try again.": "Hindi makakonekta. Suriin ang iyong internet at subukang muli.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Salamat — naitala ang iyong report bilang negatibong karma sa kasunduang ito.",
+  "This backup is encrypted — enter its passphrase.": "Naka-encrypt ang backup na ito — ilagay ang passphrase nito.",
+  "Passphrase": "Passphrase",
+  "Restore": "I-restore",
+  "Restore failed": "Nabigo ang pag-restore",
+  "Invalid backup file.": "Hindi wastong backup file.",
+  "Wrong passphrase?": "Maling passphrase?",
+  "Select a score": "Pumili ng score",
+  "Reported": "Nai-report na"
 };
 export default c;

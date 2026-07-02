@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "ჰაკერული მომსახურება / მავნე პროგრამები",
   "human trafficking / exploitation": "ადამიანებით ვაჭრობა / ექსპლუატაცია",
   "endangered wildlife": "გადაშენების პირას მყოფი ცხოველები",
-  "violence-for-hire": "ძალადობა შეკვეთით"
+  "violence-for-hire": "ძალადობა შეკვეთით",
+  "Sending {n}…": "იგზავნება {n}…",
+  "Could not update the deal": "გარიგების განახლება ვერ მოხერხდა",
+  "Could not send": "გაგზავნა ვერ მოხერხდა",
+  "Report not sent": "შეტყობინება არ გაიგზავნა",
+  "Could not connect. Check your internet and try again.": "დაკავშირება ვერ მოხერხდა. შეამოწმეთ ინტერნეტი და სცადეთ ხელახლა.",
+  "Thanks — your report was recorded as negative karma on this deal.": "მადლობა — თქვენი შეტყობინება ამ გარიგებაზე უარყოფით კარმად ჩაიწერა.",
+  "This backup is encrypted — enter its passphrase.": "ეს სარეზერვო ასლი დაშიფრულია — შეიყვანეთ მისი საიდუმლო ფრაზა.",
+  "Passphrase": "საიდუმლო ფრაზა",
+  "Restore": "აღდგენა",
+  "Restore failed": "აღდგენა ვერ მოხერხდა",
+  "Invalid backup file.": "არასწორი სარეზერვო ფაილი.",
+  "Wrong passphrase?": "არასწორი საიდუმლო ფრაზა?",
+  "Select a score": "აირჩიეთ შეფასება",
+  "Reported": "შეტყობინებულია"
 };
 export default c;

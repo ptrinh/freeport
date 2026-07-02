@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "ການຮັບຈ້າງແຮັກ / ມັລແວ",
   "human trafficking / exploitation": "ການຄ້າມະນຸດ / ການຂູດຮີດ",
   "endangered wildlife": "ສັດປ່າທີ່ໃກ້ສູນພັນ",
-  "violence-for-hire": "ການຮັບຈ້າງໃຊ້ຄວາມຮຸນແຮງ"
+  "violence-for-hire": "ການຮັບຈ້າງໃຊ້ຄວາມຮຸນແຮງ",
+  "Sending {n}…": "ກຳລັງສົ່ງ {n}…",
+  "Could not update the deal": "ບໍ່ສາມາດອັບເດດຂໍ້ຕົກລົງໄດ້",
+  "Could not send": "ບໍ່ສາມາດສົ່ງໄດ້",
+  "Report not sent": "ບໍ່ໄດ້ສົ່ງລາຍງານ",
+  "Could not connect. Check your internet and try again.": "ເຊື່ອມຕໍ່ບໍ່ໄດ້. ກວດສອບອິນເຕີເນັດຂອງທ່ານ ແລ້ວລອງໃໝ່.",
+  "Thanks — your report was recorded as negative karma on this deal.": "ຂອບໃຈ — ລາຍງານຂອງທ່ານຖືກບັນທຶກເປັນ karma ລົບໃນຂໍ້ຕົກລົງນີ້.",
+  "This backup is encrypted — enter its passphrase.": "ການສຳຮອງນີ້ຖືກເຂົ້າລະຫັດ — ປ້ອນວະລີລັບຂອງມັນ.",
+  "Passphrase": "ວະລີລັບ",
+  "Restore": "ກູ້ຄືນ",
+  "Restore failed": "ການກູ້ຄືນລົ້ມເຫລວ",
+  "Invalid backup file.": "ໄຟລ໌ສຳຮອງບໍ່ຖືກຕ້ອງ.",
+  "Wrong passphrase?": "ວະລີລັບຜິດບໍ?",
+  "Select a score": "ເລືອກຄະແນນ",
+  "Reported": "ລາຍງານແລ້ວ"
 };
 export default c;

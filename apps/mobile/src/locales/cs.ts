@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "hacking na zakázku / malware",
   "human trafficking / exploitation": "obchodování s lidmi / vykořisťování",
   "endangered wildlife": "ohrožené druhy",
-  "violence-for-hire": "násilí na zakázku"
+  "violence-for-hire": "násilí na zakázku",
+  "Sending {n}…": "Odesílání {n}…",
+  "Could not update the deal": "Dohodu se nepodařilo aktualizovat",
+  "Could not send": "Nepodařilo se odeslat",
+  "Report not sent": "Nahlášení nebylo odesláno",
+  "Could not connect. Check your internet and try again.": "Nelze se připojit. Zkontrolujte internet a zkuste to znovu.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Díky — vaše nahlášení bylo zaznamenáno jako negativní karma u této dohody.",
+  "This backup is encrypted — enter its passphrase.": "Tato záloha je šifrovaná — zadejte její heslovou frázi.",
+  "Passphrase": "Heslová fráze",
+  "Restore": "Obnovit",
+  "Restore failed": "Obnovení se nezdařilo",
+  "Invalid backup file.": "Neplatný soubor zálohy.",
+  "Wrong passphrase?": "Špatná heslová fráze?",
+  "Select a score": "Vyberte hodnocení",
+  "Reported": "Nahlášeno"
 };
 export default c;

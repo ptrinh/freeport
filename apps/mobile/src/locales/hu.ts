@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "megrendelhető hackelés / kártevők",
   "human trafficking / exploitation": "emberkereskedelem / kizsákmányolás",
   "endangered wildlife": "veszélyeztetett vadon élő állatok",
-  "violence-for-hire": "bérelt erőszak"
+  "violence-for-hire": "bérelt erőszak",
+  "Sending {n}…": "{n} küldése…",
+  "Could not update the deal": "Nem sikerült frissíteni a megállapodást",
+  "Could not send": "Nem sikerült elküldeni",
+  "Report not sent": "A bejelentés nem lett elküldve",
+  "Could not connect. Check your internet and try again.": "Nem sikerült csatlakozni. Ellenőrizd az internetet, és próbáld újra.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Köszönjük — bejelentésedet negatív karmaként rögzítettük ennél a megállapodásnál.",
+  "This backup is encrypted — enter its passphrase.": "Ez a biztonsági mentés titkosított — add meg a jelmondatát.",
+  "Passphrase": "Jelmondat",
+  "Restore": "Visszaállítás",
+  "Restore failed": "A visszaállítás nem sikerült",
+  "Invalid backup file.": "Érvénytelen biztonságimentés-fájl.",
+  "Wrong passphrase?": "Rossz jelmondat?",
+  "Select a score": "Válassz értékelést",
+  "Reported": "Bejelentve"
 };
 export default c;

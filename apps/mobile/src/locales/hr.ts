@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "hakiranje po narudžbi / zlonamjerni softver",
   "human trafficking / exploitation": "trgovina ljudima / iskorištavanje",
   "endangered wildlife": "ugrožene divlje vrste",
-  "violence-for-hire": "nasilje po narudžbi"
+  "violence-for-hire": "nasilje po narudžbi",
+  "Sending {n}…": "Slanje {n}…",
+  "Could not update the deal": "Dogovor nije bilo moguće ažurirati",
+  "Could not send": "Slanje nije uspjelo",
+  "Report not sent": "Prijava nije poslana",
+  "Could not connect. Check your internet and try again.": "Povezivanje nije uspjelo. Provjerite internet i pokušajte ponovno.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Hvala — vaša je prijava zabilježena kao negativna karma na ovom dogovoru.",
+  "This backup is encrypted — enter its passphrase.": "Ova je sigurnosna kopija šifrirana — unesite njezinu pristupnu frazu.",
+  "Passphrase": "Pristupna fraza",
+  "Restore": "Vrati",
+  "Restore failed": "Vraćanje nije uspjelo",
+  "Invalid backup file.": "Nevažeća datoteka sigurnosne kopije.",
+  "Wrong passphrase?": "Pogrešna pristupna fraza?",
+  "Select a score": "Odaberite ocjenu",
+  "Reported": "Prijavljeno"
 };
 export default c;

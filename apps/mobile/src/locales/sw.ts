@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "uhalifu wa mtandao kwa malipo / programu hasidi",
   "human trafficking / exploitation": "biashara haramu ya binadamu / unyonyaji",
   "endangered wildlife": "wanyamapori walio hatarini kutoweka",
-  "violence-for-hire": "mauaji kwa malipo"
+  "violence-for-hire": "mauaji kwa malipo",
+  "Sending {n}…": "Inatuma {n}…",
+  "Could not update the deal": "Imeshindwa kusasisha makubaliano",
+  "Could not send": "Imeshindwa kutuma",
+  "Report not sent": "Ripoti haikutumwa",
+  "Could not connect. Check your internet and try again.": "Imeshindwa kuunganisha. Angalia intaneti yako kisha ujaribu tena.",
+  "Thanks — your report was recorded as negative karma on this deal.": "Asante — ripoti yako imerekodiwa kama karma hasi kwenye makubaliano haya.",
+  "This backup is encrypted — enter its passphrase.": "Hifadhi rudufu hii imesimbwa — weka kaulisiri yake.",
+  "Passphrase": "Kaulisiri",
+  "Restore": "Rejesha",
+  "Restore failed": "Kurejesha kumeshindikana",
+  "Invalid backup file.": "Faili batili la hifadhi rudufu.",
+  "Wrong passphrase?": "Kaulisiri si sahihi?",
+  "Select a score": "Chagua alama",
+  "Reported": "Imeripotiwa"
 };
 export default c;

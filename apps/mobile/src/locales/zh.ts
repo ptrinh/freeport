@@ -606,6 +606,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "受雇黑客／恶意软件",
   "human trafficking / exploitation": "人口贩卖／剥削",
   "endangered wildlife": "濒危野生动物",
-  "violence-for-hire": "受雇施暴"
+  "violence-for-hire": "受雇施暴",
+  "Sending {n}…": "正在发送 {n} 条…",
+  "Could not update the deal": "无法更新交易",
+  "Could not send": "无法发送",
+  "Report not sent": "举报未发送",
+  "Could not connect. Check your internet and try again.": "无法连接。请检查网络后重试。",
+  "Thanks — your report was recorded as negative karma on this deal.": "谢谢 — 你的举报已作为负面 karma 记录在此交易中。",
+  "This backup is encrypted — enter its passphrase.": "此备份已加密 — 请输入其密码短语。",
+  "Passphrase": "密码短语",
+  "Restore": "恢复",
+  "Restore failed": "恢复失败",
+  "Invalid backup file.": "备份文件无效。",
+  "Wrong passphrase?": "密码短语错误?",
+  "Select a score": "请选择评分",
+  "Reported": "已举报"
 };
 export default c;

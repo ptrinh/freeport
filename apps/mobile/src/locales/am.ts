@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "ሃኪንግ-ለ-ኪራይ / ተንኮል አዘል ሶፍትዌር",
   "human trafficking / exploitation": "የሰዎች ዝውውር / ብዝበዛ",
   "endangered wildlife": "ለአደጋ የተጋለጡ የዱር እንስሳት",
-  "violence-for-hire": "ግድያ-ለ-ኪራይ"
+  "violence-for-hire": "ግድያ-ለ-ኪራይ",
+  "Sending {n}…": "{n} በመላክ ላይ…",
+  "Could not update the deal": "ስምምነቱን ማዘመን አልተቻለም",
+  "Could not send": "መላክ አልተቻለም",
+  "Report not sent": "ሪፖርቱ አልተላከም",
+  "Could not connect. Check your internet and try again.": "መገናኘት አልተቻለም። በይነመረብዎን ያረጋግጡ እና እንደገና ይሞክሩ።",
+  "Thanks — your report was recorded as negative karma on this deal.": "እናመሰግናለን — ሪፖርትዎ በዚህ ስምምነት ላይ እንደ አሉታዊ karma ተመዝግቧል።",
+  "This backup is encrypted — enter its passphrase.": "ይህ ምትኬ የተመሰጠረ ነው — የይለፍ ሐረጉን ያስገቡ።",
+  "Passphrase": "የይለፍ ሐረግ",
+  "Restore": "ወደነበረበት መልስ",
+  "Restore failed": "ወደነበረበት መመለስ አልተሳካም",
+  "Invalid backup file.": "ልክ ያልሆነ የምትኬ ፋይል።",
+  "Wrong passphrase?": "የተሳሳተ የይለፍ ሐረግ?",
+  "Select a score": "ነጥብ ይምረጡ",
+  "Reported": "ሪፖርት ተደርጓል"
 };
 export default c;

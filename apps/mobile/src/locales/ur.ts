@@ -563,6 +563,20 @@ const c: Record<string, string> = {
   "hacking-for-hire / malware": "کرائے پر ہیکنگ / میلویئر",
   "human trafficking / exploitation": "انسانی اسمگلنگ / استحصال",
   "endangered wildlife": "معدومیت کے خطرے سے دوچار جنگلی حیات",
-  "violence-for-hire": "کرائے پر تشدد"
+  "violence-for-hire": "کرائے پر تشدد",
+  "Sending {n}…": "{n} بھیجے جا رہے ہیں…",
+  "Could not update the deal": "معاہدہ اپ ڈیٹ نہیں ہو سکا",
+  "Could not send": "بھیجا نہیں جا سکا",
+  "Report not sent": "رپورٹ نہیں بھیجی گئی",
+  "Could not connect. Check your internet and try again.": "کنیکٹ نہیں ہو سکا۔ اپنا انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں۔",
+  "Thanks — your report was recorded as negative karma on this deal.": "شکریہ — آپ کی رپورٹ اس معاہدے پر منفی کارما کے طور پر درج کر لی گئی۔",
+  "This backup is encrypted — enter its passphrase.": "یہ بیک اپ خفیہ کردہ ہے — اس کا پاس فریز درج کریں۔",
+  "Passphrase": "پاس فریز",
+  "Restore": "بحال کریں",
+  "Restore failed": "بحالی ناکام",
+  "Invalid backup file.": "غلط بیک اپ فائل۔",
+  "Wrong passphrase?": "غلط پاس فریز؟",
+  "Select a score": "اسکور منتخب کریں",
+  "Reported": "رپورٹ ہو گئی"
 };
 export default c;
