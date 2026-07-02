@@ -5336,11 +5336,15 @@ function SettingsTab({
   }, []);
   const myPubkeyHex = client?.pubkey ?? '';
   // Reflect whether Telegram is linked (best-effort; only if the server offers it).
+  // Debounced so editing the Notification-service-URL field doesn't fire a
+  // request per keystroke — it settles, then checks once.
   React.useEffect(() => {
     if (!notifyEndpoint.trim() || !myPubkeyHex) return;
     let cancelled = false;
-    telegramLinkStatus(notifyEndpoint.trim(), myPubkeyHex).then((v) => { if (!cancelled) setTelegramLinked(v); });
-    return () => { cancelled = true; };
+    const id = setTimeout(() => {
+      telegramLinkStatus(notifyEndpoint.trim(), myPubkeyHex).then((v) => { if (!cancelled) setTelegramLinked(v); });
+    }, 600);
+    return () => { cancelled = true; clearTimeout(id); };
   }, [notifyEndpoint, myPubkeyHex, telegramBusy]);
   // Intent-alert filters for push: only when the user opted into Browse alerts.
   // Topic mirrors what Browse subscribes to (area + default category/subcat), so
