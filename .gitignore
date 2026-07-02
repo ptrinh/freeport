@@ -24,3 +24,6 @@ GoogleService-Info.plist
 *.ipa
 *service-account*.json
 play-service-account.json
+
+# Packed artifacts
+*.tgz
