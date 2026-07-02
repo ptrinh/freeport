@@ -4,7 +4,7 @@
  * to service/product listings, which carry free-text service + notes fields.
  */
 import { describe, it, expect } from 'vitest';
-import { screenIntent, screenIntentContent } from '../src/moderation';
+import { screenIntent, screenIntentContent } from '../src/index.js';
 
 describe('screenIntent', () => {
   it('allows a normal service listing', () => {

@@ -10,13 +10,12 @@ import type { Event } from 'nostr-tools';
 import {
   KIND_INTENT_OFFER,
   KIND_INTENT_REQUEST,
-  KIND_KARMA,
-  KIND_DEAL_RECEIPT,
   parseIntentEvent,
 } from '@freeport/protocol';
 import type { RelayPool } from './pool.js';
 import { distanceKmToGeohash, geohashesCovering } from './geo.js';
 import { sanitizeRelays } from './relays.js';
+import { fetchReputationSummary } from './reputation.js';
 
 const KIND_PROFILE = 0; // NIP-01 metadata
 
@@ -153,40 +152,7 @@ export function registerTools(server: McpServer, pool: RelayPool): void {
       limit: z.number().int().min(1).max(1000).default(500),
       relays: relaysField,
     },
-    async (args) => {
-      const relays = sanitizeRelays(args.relays);
-      const [karma, received, authored] = (await Promise.all([
-        pool.query({ kinds: [KIND_KARMA], '#p': [args.pubkey], limit: args.limit }, relays),
-        pool.query({ kinds: [KIND_DEAL_RECEIPT], '#p': [args.pubkey], limit: args.limit }, relays),
-        pool.query({ kinds: [KIND_DEAL_RECEIPT], authors: [args.pubkey], limit: args.limit }, relays),
-      ])).map(latestByAddress);
-
-      // Proven deals: subject authored a receipt whose reciprocal half exists.
-      const half = new Set<string>();
-      for (const ev of [...received, ...authored]) {
-        const d = tagVal(ev, 'd'); const p = tagVal(ev, 'p');
-        if (d && p) half.add(`${d}|${ev.pubkey}|${p}`);
-      }
-      let proven = 0;
-      for (const ev of authored) {
-        const d = tagVal(ev, 'd'); const p = tagVal(ev, 'p');
-        if (d && p && half.has(`${d}|${p}|${args.pubkey}`)) proven++;
-      }
-
-      const ratings = karma.map((ev) => {
-        let score: number | undefined, note: string | undefined;
-        try { const c = JSON.parse(ev.content); score = c.score; note = c.note; } catch { /* skip */ }
-        return { from: ev.pubkey, deal: tagVal(ev, 'd'), score, note, createdAt: ev.created_at };
-      }).filter((r) => typeof r.score === 'number');
-
-      const count = ratings.length;
-      const avg = count ? ratings.reduce((s, r) => s + (r.score as number), 0) / count : 0;
-      return json({
-        pubkey: args.pubkey,
-        provenDeals: proven,
-        karma: { count, average: Math.round(avg * 100) / 100, ratings },
-      });
-    },
+    async (args) => json(await fetchReputationSummary(pool, sanitizeRelays(args.relays), args.pubkey, args.limit)),
   );
 
   // ── nostr_get_event ─────────────────────────────────────────────────────

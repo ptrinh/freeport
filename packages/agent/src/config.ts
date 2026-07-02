@@ -9,6 +9,8 @@ export interface AgentConfig {
   rules: MatchRule[];
   /** Seal deals without a human y/n. Off by default. */
   auto_accept?: boolean;
+  /** Contact string sent on accept when a rule doesn't specify one (guest mode). */
+  contact?: string;
 }
 
 export function loadConfig(path: string): AgentConfig {

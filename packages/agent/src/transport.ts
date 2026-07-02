@@ -13,13 +13,20 @@ import {
 const KIND_DM = 4; // NIP-04. v1 transport; NIP-17 gift wrap is the planned upgrade.
 
 export class Transport {
-  readonly pool = new SimplePool();
+  readonly pool: SimplePool;
   readonly pubkey: string;
+  private readonly ownsPool: boolean;
 
   constructor(
     private sk: Uint8Array,
     readonly relays: string[],
+    // Share one pool across many Transports (e.g. the guest bridge runs an agent
+    // per user) so N agents open relays.length sockets, not N×relays. When we
+    // create the pool we own it (close it); a shared pool is left open.
+    pool?: SimplePool,
   ) {
+    this.pool = pool ?? new SimplePool();
+    this.ownsPool = !pool;
     this.pubkey = getPublicKey(sk);
   }
 
@@ -102,6 +109,8 @@ export class Transport {
   }
 
   close(): void {
-    this.pool.close(this.relays);
+    // Only tear down the relay sockets if this Transport created the pool; a
+    // shared (injected) pool outlives any single Transport.
+    if (this.ownsPool) this.pool.close(this.relays);
   }
 }

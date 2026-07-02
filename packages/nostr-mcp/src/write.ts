@@ -54,7 +54,12 @@ function take(bucket: Bucket, ratePerMin: number, cap: number): boolean {
   return true;
 }
 
-/** Allow a write for this pubkey? Consumes a token from both buckets. */
+/** Allow a write for this pubkey? Consumes a token from both buckets. Exported
+ *  so the Telegram guest bridge shares the same per-pubkey + global write limits
+ *  when it publishes on a guest's behalf. */
+export function allowWrite(pubkey: string): { ok: true } | { ok: false; reason: string } {
+  return allow(pubkey);
+}
 function allow(pubkey: string): { ok: true } | { ok: false; reason: string } {
   if (!take(global, GLOBAL_PER_MIN, GLOBAL_PER_MIN)) {
     return { ok: false, reason: 'Server write rate limit reached — try again shortly.' };

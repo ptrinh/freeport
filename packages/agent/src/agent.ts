@@ -12,9 +12,16 @@ import {
   type MatchRule,
   type Negotiation,
   type NegotiationMessage,
+  type ProposedTerms,
 } from '@freeport/protocol';
 import type { AgentConfig } from './config.js';
 import type { Transport } from './transport.js';
+
+/** A human's verdict on one inbound offer (used by decideOffer). */
+export type OfferDecision =
+  | { action: 'accept' }
+  | { action: 'counter'; terms: ProposedTerms }
+  | { action: 'decline'; reason?: string };
 
 export interface AgentEvents {
   onLog: (line: string) => void;
@@ -24,6 +31,14 @@ export interface AgentEvents {
    */
   confirmDeal: (nego: Negotiation) => Promise<boolean>;
   onDeal: (nego: Negotiation) => void;
+  /**
+   * Optional. When present, EVERY inbound counter on one of OUR posted intents
+   * is routed here instead of the rule-based auto-negotiation in
+   * evaluateCounter — so a UI (e.g. the Telegram guest bridge) can present each
+   * offer and let the human accept / counter / decline. A driver's bare accept
+   * of our as-posted terms still confirms directly (nothing to decide).
+   */
+  decideOffer?: (nego: Negotiation) => Promise<OfferDecision>;
 }
 
 /**
@@ -48,11 +63,16 @@ export class FreeportAgent {
   }
 
   start(): void {
-    this.subs.push(
-      this.transport.subscribeIntents(this.config.markets, (intent) => {
-        void this.handleIntent(intent);
-      }),
-    );
+    // Only watch the market for matchable intents when we actually have rules.
+    // A rule-less agent (e.g. a guest bridge that only publishes and fields
+    // offers on its own posts) would otherwise subscribe with an empty `#t`.
+    if (this.config.rules.length > 0) {
+      this.subs.push(
+        this.transport.subscribeIntents(this.config.markets, (intent) => {
+          void this.handleIntent(intent);
+        }),
+      );
+    }
     this.subs.push(
       this.transport.subscribeNegotiations((msg, from, eventId) => {
         void this.handleNegotiationMessage(msg, from, eventId);
@@ -123,6 +143,12 @@ export class FreeportAgent {
     this.negotiations.set(updated.id, updated);
     this.events.onLog(`recv ${msg.type} from ${from.slice(0, 8)}… (state: ${updated.state})`);
 
+    // Guest-bridge mode: a human decides each offer on our own posted intents.
+    if (this.events.decideOffer && !updated.weInitiated) {
+      if (msg.type === 'negotiate.counter') { await this.decideGuestOffer(updated); return; }
+      if (msg.type === 'negotiate.accept' && updated.state === 'confirmed') { await this.sealGuestDeal(updated); return; }
+    }
+
     if (msg.type === 'negotiate.counter') {
       await this.evaluateCounter(updated);
     } else if (msg.type === 'negotiate.accept') {
@@ -131,6 +157,55 @@ export class FreeportAgent {
       } else if (updated.state === 'accepted_by_them') {
         await this.tryAccept(updated, this.ruleFor(updated));
       }
+    }
+  }
+
+  /** Route one inbound offer to the human (decideOffer) and act on the verdict. */
+  private async decideGuestOffer(nego: Negotiation): Promise<void> {
+    let decision: OfferDecision;
+    try { decision = await this.events.decideOffer!(nego); }
+    catch (e) { this.events.onLog(`decideOffer error: ${(e as Error).message}`); return; }
+    const current = this.negotiations.get(nego.id);
+    if (!current || isTerminal(current)) return; // resolved elsewhere while the human decided
+    if (decision.action === 'decline') { await this.cancel(current, decision.reason ?? 'declined'); return; }
+    if (decision.action === 'counter') {
+      try {
+        const counter = makeCounter(current, decision.terms, this.contactFor());
+        const updated = applyOutbound(current, counter);
+        this.negotiations.set(updated.id, updated);
+        await this.transport.sendNegotiation(updated.peer, counter);
+        this.events.onLog(`guest countered ${nego.peer.slice(0, 8)}…`);
+      } catch (e) { await this.cancel(current, `counter failed: ${(e as Error).message}`); }
+      return;
+    }
+    // accept
+    const accept = makeAccept(current, this.contactFor());
+    const updated = applyOutbound(current, accept);
+    this.negotiations.set(updated.id, updated);
+    await this.transport.sendNegotiation(updated.peer, accept);
+    if (updated.state === 'confirmed') await this.sealGuestDeal(updated);
+  }
+
+  /** A guest's posted intent got a confirmed deal: send our contact back (if the
+   *  peer's one-tap accept confirmed before we replied), notify, and sweep the
+   *  other still-open bids so a second driver can't also think they won. */
+  private async sealGuestDeal(nego: Negotiation): Promise<void> {
+    let current = this.negotiations.get(nego.id) ?? nego;
+    if (!current.ourContact) {
+      // Back-flow: the peer accepted our as-posted terms; reply with our contact.
+      try {
+        const accept = makeAccept(current, this.contactFor());
+        current = applyOutbound(current, accept);
+        this.negotiations.set(current.id, current);
+        await this.transport.sendNegotiation(current.peer, accept);
+      } catch { /* already had contact / terminal */ }
+    }
+    this.events.onDeal(current);
+    // Filled — cancel every other open negotiation on the same intent.
+    for (const other of this.negotiations.values()) {
+      if (other.id === current.id || other.intent.id !== current.intent.id) continue;
+      if (isTerminal(other) || other.state === 'confirmed') continue;
+      await this.cancel(other, 'Filled — taken by another offer');
     }
   }
 
@@ -181,9 +256,10 @@ export class FreeportAgent {
     }
   }
 
-  /** Our contact for a negotiation: the matched rule's, else the first rule's. */
+  /** Our contact for a negotiation: the matched rule's, else the config-level
+   *  contact (guest mode has no rules), else the first rule's. */
   private contactFor(rule?: MatchRule): string {
-    return rule?.contact ?? this.config.rules[0]?.contact ?? '';
+    return rule?.contact ?? this.config.contact ?? this.config.rules[0]?.contact ?? '';
   }
 
   /** Gate the final accept on the human unless auto_accept is on. */
