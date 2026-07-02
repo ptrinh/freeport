@@ -22,6 +22,7 @@ import {
   KIND_INTENT_OFFER,
   KIND_INTENT_REQUEST,
   buildIntentEvent,
+  geohashPrefixes,
   type BuildIntentInput,
 } from '@freeport/protocol';
 import type { RelayPool } from './pool.js';
@@ -103,7 +104,7 @@ export function registerWriteTools(server: McpServer, pool: RelayPool): void {
       expiresInMinutes: z.number().int().min(5).max(MAX_EXPIRY_DAYS * 24 * 60).optional()
         .describe(`How long the post stays live (default 720). Max ${MAX_EXPIRY_DAYS} days.`),
       window: z.object({ start: z.number().int(), end: z.number().int() }).optional(),
-      geohashes: z.array(z.string()).max(8).optional().describe('Geohash tags for location-scoped discovery.'),
+      geohashes: z.array(z.string()).max(8).optional().describe('Geohashes for location-scoped discovery. Each is expanded into all its prefixes (precision 1-6) so radius searches at any precision match.'),
       topics: z.array(z.string()).max(8).optional().describe('Topic `t` tags (area/category), e.g. ["vn_hanoi","vn_hanoi_ridesharing"].'),
       d: z.string().optional().describe('Stable id to republish/replace an existing post; defaults to random.'),
       // Pre-signed mode:
@@ -133,7 +134,11 @@ export function registerWriteTools(server: McpServer, pool: RelayPool): void {
         const input: BuildIntentInput = {
           side: args.side, market: args.market, schema: args.schema, title: args.title,
           payload: args.payload as Record<string, unknown>, expiresAt,
-          window: args.window, geohashes: args.geohashes, topics: args.topics, d: args.d,
+          window: args.window,
+          // Relay #g filters are exact-match — expand each geohash into its
+          // prefixes so covers at any precision (1-6) find this intent.
+          geohashes: args.geohashes ? [...new Set(args.geohashes.flatMap((g) => geohashPrefixes(g)))] : undefined,
+          topics: args.topics, d: args.d,
         };
         event = buildIntentEvent(input, sk);
       }

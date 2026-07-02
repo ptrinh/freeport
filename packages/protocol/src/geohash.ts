@@ -49,6 +49,19 @@ export function geohashDecode(hash: string): { lat: number; lon: number } {
 }
 
 /**
+ * All prefixes of a geohash from precision 1 up to `maxPrecision`, for `g`
+ * tags. Relay `#g` filters match tag values EXACTLY (no prefix operator), so
+ * an intent must carry every precision a radius query might pick — a single
+ * precision-5 tag is invisible to a precision-4 cover and vice versa.
+ */
+export function geohashPrefixes(geohash: string, maxPrecision = 6): string[] {
+  const g = geohash.toLowerCase();
+  const out: string[] = [];
+  for (let p = 1; p <= Math.min(g.length, maxPrecision); p++) out.push(g.slice(0, p));
+  return out;
+}
+
+/**
  * Proximity by shared prefix length. 5 shared chars ≈ within ~2.4km,
  * 4 ≈ ~20km. Good enough for "same neighborhood" matching in v1.
  */

@@ -20,12 +20,16 @@ const CELL_KM: Record<number, { w: number; h: number }> = {
 };
 
 /** Pick the coarsest precision whose cell is comfortably smaller than the
- *  radius, so the cover is a handful of cells rather than thousands. */
+ *  radius, so the cover is a handful of cells rather than thousands.
+ *  (Coarsest = LOWEST precision, so scan 1 → 7 and take the first hit;
+ *  scanning 7 → 1 returns the finest instead, which for a 100 km radius
+ *  meant ~50k precision-6 cells — the cap then kept only one edge of the
+ *  bounding box and the search missed nearly the whole circle.) */
 function precisionForRadius(radiusKm: number): number {
-  for (let p = 7; p >= 1; p--) {
+  for (let p = 1; p <= 7; p++) {
     if (CELL_KM[p].h <= radiusKm) return Math.min(p, 6);
   }
-  return 1;
+  return 6; // radius smaller than the finest cell — one fine cell covers it
 }
 
 /**
@@ -41,21 +45,31 @@ export function geohashesCovering(
   precision?: number,
   cap = 64,
 ): string[] {
-  const p = precision ?? precisionForRadius(radiusKm);
+  let p = precision ?? precisionForRadius(radiusKm);
+  // Coarsen until the whole grid fits the cap: hitting the cap mid-walk would
+  // truncate the cover to one edge of the bounding box, silently excluding the
+  // centre and most of the circle.
+  while (!precision && p > 1) {
+    const c = CELL_KM[p];
+    const nLat = Math.ceil((2 * radiusKm) / c.h) + 1;
+    const nLon = Math.ceil((2 * radiusKm) / c.w) + 1;
+    if (nLat * nLon <= cap) break;
+    p--;
+  }
   const cell = CELL_KM[p] ?? CELL_KM[6];
   const latDeg = radiusKm / 111; // 1° lat ≈ 111 km
   const lonDeg = radiusKm / (111 * Math.max(0.01, Math.cos((lat * Math.PI) / 180)));
   const stepLat = cell.h / 111;
   const stepLon = cell.w / (111 * Math.max(0.01, Math.cos((lat * Math.PI) / 180)));
   const out = new Set<string>();
+  // Centre cell first, so even a cap-truncated cover contains the point itself.
+  out.add(geohashEncode(lat, lon, p));
   for (let dy = -latDeg; dy <= latDeg + 1e-9; dy += stepLat) {
     for (let dx = -lonDeg; dx <= lonDeg + 1e-9; dx += stepLon) {
       out.add(geohashEncode(lat + dy, lon + dx, p));
       if (out.size >= cap) return [...out];
     }
   }
-  // Always include the centre cell itself.
-  out.add(geohashEncode(lat, lon, p));
   return [...out];
 }
 
