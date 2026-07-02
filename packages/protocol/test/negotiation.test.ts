@@ -538,3 +538,20 @@ describe('expireNegotiation cancel_requested guard', () => {
     expect(expireNegotiation(owner).state).toBe('cancel_requested');
   });
 });
+
+describe('cancel-request replay dedupe is direction-aware', () => {
+  it("our own outbound cancel-request does not suppress the peer's same-second request", () => {
+    const { nego } = confirmedWith(); // owner side, confirmed with pkB
+    // We request a cancel (outbound), peer declines → back to confirmed.
+    const ourReq = makeCancelRequest(nego);
+    let n = applyOutbound(nego, ourReq);
+    n = applyInbound(n, makeCancelDecline({ ...n, peer: pkB }), pkB, 'ev-decline')!;
+    expect(n.state).toBe('confirmed');
+    // Within the SAME second, the peer sends their own cancel-request. Same
+    // (type, ts) as our outbound one — but it is not a replay and must apply.
+    const theirReq = { ...makeCancelRequest(n), ts: ourReq.ts };
+    const after = applyInbound(n, theirReq, pkB, 'ev-their-req');
+    expect(after?.state).toBe('cancel_requested');
+    expect(after?.cancelRequestedBy).toBe('them');
+  });
+});

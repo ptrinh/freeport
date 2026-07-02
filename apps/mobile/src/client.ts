@@ -35,6 +35,7 @@ import {
   makeStatus,
   openNegotiation,
   MSG_ACCEPT,
+  MSG_COUNTER,
   type BuildIntentInput,
   type Intent,
   type Negotiation,
@@ -700,10 +701,12 @@ export class MobileClient {
       nego = openNegotiation(intent, this.pubkey, intent.pubkey !== this.pubkey, from);
       if (nego.id !== msg.nego) return;
     }
-    // Our intent is already filled? Reject a late/racing accept from a losing
-    // bidder instead of opening a second deal — cancel them.
+    // Our intent is already filled? Reject a late/racing accept OR counter
+    // from a losing bidder instead of opening a second deal (accept) or a
+    // dangling open negotiation the sweep already missed (counter — the sweep
+    // runs at confirm time, so a bid arriving after it was never cancelled).
     if (
-      msg.type === MSG_ACCEPT &&
+      (msg.type === MSG_ACCEPT || msg.type === MSG_COUNTER) &&
       nego.intent.pubkey === this.pubkey &&
       nego.state !== 'confirmed' &&
       [...this.negotiations.values()].some(

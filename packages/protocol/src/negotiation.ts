@@ -312,7 +312,9 @@ function applyInboundUnchecked(
       // request the user already DECLINED resurrects the cancel prompt on a deal
       // that long since continued. Dedupe by (type, ts) rather than timestamp
       // ordering, since ts is only second-granular.
-      if (nego.log.some((e) => e.msg?.type === MSG_CANCEL_REQUEST && e.msg?.ts === msg.ts)) return null;
+      // Only INBOUND entries count as replays — our own outbound request in
+      // the same second must not suppress the peer's legitimate one.
+      if (nego.log.some((e) => e.dir === 'in' && e.msg?.type === MSG_CANCEL_REQUEST && e.msg?.ts === msg.ts)) return null;
       return { ...base, state: 'cancel_requested', cancelRequestedBy: 'them' };
     }
     if (nego.state !== 'cancel_requested') return null;
@@ -330,7 +332,7 @@ function applyInboundUnchecked(
   if (msg.type === MSG_CANCEL) {
     if (nego.state === 'cancelled' || nego.state === 'expired') return null;
     if (nego.stage === 'completed') return null;
-    if (nego.log.some((e) => e.msg?.type === MSG_CANCEL && e.msg?.ts === msg.ts)) return null;
+    if (nego.log.some((e) => e.dir === 'in' && e.msg?.type === MSG_CANCEL && e.msg?.ts === msg.ts)) return null;
     return {
       ...nego,
       peer: nego.peer || peerPubkey,
