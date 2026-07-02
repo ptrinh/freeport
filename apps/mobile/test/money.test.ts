@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseLocaleAmount } from '../src/money';
+import { parseLocaleAmount, parseAmountWithK } from '../src/money';
 
 describe('parseLocaleAmount', () => {
   // Regression: a Vietnamese-formatted "5,50" was read as 550 by parseFloat,
@@ -33,5 +33,32 @@ describe('parseLocaleAmount', () => {
   it('returns 0 for empty or non-numeric input', () => {
     expect(parseLocaleAmount('')).toBe(0);
     expect(parseLocaleAmount('abc')).toBe(0);
+  });
+});
+
+describe('parseLocaleAmount with fractionDigits', () => {
+  it('keeps 3-decimal minor units for KWD-style currencies', () => {
+    expect(parseLocaleAmount('5.500', 3)).toBe(5.5);
+    expect(parseLocaleAmount('KWD 1.250', 3)).toBe(1.25);
+  });
+
+  it('still treats a trailing 3-digit group as thousands for 0/2-digit currencies', () => {
+    expect(parseLocaleAmount('5.500', 0)).toBe(5500);
+    expect(parseLocaleAmount('5.500', 2)).toBe(5500);
+  });
+});
+
+describe('parseAmountWithK', () => {
+  it('multiplies the locale-parsed number, not its bare digits', () => {
+    // Regression: "12.5k" was read as digits "125" × 1000 = 125,000.
+    expect(parseAmountWithK('12.5k', 0)).toBe(12500);
+    expect(parseAmountWithK('12,5k', 0)).toBe(12500);
+    expect(parseAmountWithK('50k', 0)).toBe(50000);
+  });
+
+  it('falls through to parseLocaleAmount without a k suffix', () => {
+    expect(parseAmountWithK('5,50', 2)).toBe(5.5);
+    expect(parseAmountWithK('50.000₫', 0)).toBe(50000);
+    expect(parseAmountWithK('5.500', 3)).toBe(5.5);
   });
 });

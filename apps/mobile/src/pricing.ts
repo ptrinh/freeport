@@ -17,6 +17,7 @@ import type { Intent } from '@freeport/protocol';
 import type { Reputation } from './reputation';
 import type { Currency } from './locations';
 import { currencyFractionDigits, currencySymbol } from './locations';
+import { parseAmountWithK } from './money';
 import { categoryOf, subcategoryOf } from './categories';
 
 /**
@@ -138,16 +139,20 @@ const MIN_N = 3;
 /** Does a payment string belong to the given currency? (symbol/code match). */
 function paymentInCurrency(s: string, cur: Currency): boolean {
   if (cur === 'VND') return /₫|đ|vnd/i.test(s);
+  if (new RegExp(`\\b${cur}\\b`, 'i').test(s)) return true;
   const sym = currencySymbol(cur);
-  return s.includes(sym) || new RegExp(`\\b${cur}\\b`, 'i').test(s);
+  if (!sym || sym === cur) return false;
+  // A bare "$" must not claim "S$"/"A$"/"HK$" asks from other dollar
+  // currencies — that mixed USD medians with SGD/AUD asks. Require the symbol
+  // not be the tail of a longer, letter-prefixed symbol.
+  const esc = sym.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^A-Za-z])${esc}`).test(s);
 }
 
+// Locale-aware: "5,50" is five-and-a-half (not 550), "12.5k" is 12,500, and
+// KWD-style 3-decimal amounts keep their fraction. See money.ts.
 function parseAmount(s: string, cur: Currency): number {
-  if (currencyFractionDigits(cur) === 0) {
-    const digits = parseInt(s.replace(/\D/g, ''), 10) || 0;
-    return /\d+\s*k\b/i.test(s) ? digits * 1000 : digits;
-  }
-  return parseFloat(s.replace(/[^\d.]/g, '')) || 0;
+  return parseAmountWithK(s, currencyFractionDigits(cur));
 }
 
 function weightFor(pubkey: string, reps: Map<string, Reputation>): number {
