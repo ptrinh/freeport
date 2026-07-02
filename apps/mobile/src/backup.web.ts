@@ -49,7 +49,9 @@ export async function backupToFile(sk: Uint8Array, passphrase: string): Promise<
   URL.revokeObjectURL(url);
 }
 
-export async function restoreFromFile(passphrase: string): Promise<Uint8Array | null> {
+/** Pick a backup file and return its raw text, or null on cancel — split from
+ *  the restore so the UI can ask for a passphrase before attempting it. */
+export async function pickBackupText(): Promise<string | null> {
   return new Promise((resolve, reject) => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -61,9 +63,7 @@ export async function restoreFromFile(passphrase: string): Promise<Uint8Array | 
       const file = input.files?.[0];
       if (!file) return resolve(null);
       try {
-        const { sk, ...extras } = await parseBackupBundle(await file.text(), passphrase);
-        await applyExtras(extras);
-        resolve(sk);
+        resolve(await file.text());
       } catch (e) {
         reject(e);
       }
@@ -81,4 +81,14 @@ export async function restoreFromFile(passphrase: string): Promise<Uint8Array | 
 
     input.click();
   });
+}
+
+/**
+ * Restore from backup text (key + settings + address book). Throws with a
+ * friendly message for a wrong file / missing or bad passphrase.
+ */
+export async function restoreBackupText(text: string, passphrase: string): Promise<Uint8Array> {
+  const { sk, ...extras } = await parseBackupBundle(text, passphrase);
+  await applyExtras(extras);
+  return sk;
 }

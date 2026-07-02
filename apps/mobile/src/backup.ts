@@ -105,11 +105,11 @@ export async function backupToFile(sk: Uint8Array, passphrase: string): Promise<
 }
 
 /**
- * Pick a backup file and restore from it (key + settings + address book).
- * Returns the secret key, or null if the user cancelled the picker.
- * Throws with a friendly message for wrong file / missing or bad passphrase.
+ * Pick a backup file and return its raw text, or null if the user cancelled.
+ * Split from the restore so the UI can inspect the text (does it need a
+ * passphrase?) and collect one BEFORE attempting the restore.
  */
-export async function restoreFromFile(passphrase: string): Promise<Uint8Array | null> {
+export async function pickBackupText(): Promise<string | null> {
   const result = await DocumentPicker.getDocumentAsync({
     type: ['application/json', 'text/plain', '*/*'],
     copyToCacheDirectory: true,
@@ -117,11 +117,18 @@ export async function restoreFromFile(passphrase: string): Promise<Uint8Array | 
   if (result.canceled || !result.assets[0]) return null;
   const uri = result.assets[0].uri;
   try {
-    const text = await FileSystem.readAsStringAsync(uri);
-    const { sk, ...extras } = await parseBackupBundle(text, passphrase);
-    await applyExtras(extras);
-    return sk;
+    return await FileSystem.readAsStringAsync(uri);
   } finally {
     await FileSystem.deleteAsync(uri, { idempotent: true }).catch(() => {});
   }
+}
+
+/**
+ * Restore from backup text (key + settings + address book). Throws with a
+ * friendly message for a wrong file / missing or bad passphrase.
+ */
+export async function restoreBackupText(text: string, passphrase: string): Promise<Uint8Array> {
+  const { sk, ...extras } = await parseBackupBundle(text, passphrase);
+  await applyExtras(extras);
+  return sk;
 }

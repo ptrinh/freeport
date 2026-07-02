@@ -61,6 +61,10 @@ const NEGO_STORE_KEY = 'freeport.negotiations';
 /** Persisted own posts, so a deal can be rebuilt from an inbound accept even
  *  after the post's NIP-40 expiry makes relays stop serving it. */
 const PUBLISHED_STORE_KEY = 'freeport.published';
+/** Signed-but-undelivered DMs (all relays down / offline), retried on reconnect. */
+const OUTBOX_STORE_KEY = 'freeport.outbox';
+/** Outbox entries older than this are dropped on load — the deal has moved on. */
+const OUTBOX_MAX_AGE_SECONDS = 7 * 24 * 3600;
 
 export class MobileClient {
   // enableReconnect: SimplePool transparently re-opens a dropped relay socket
@@ -94,6 +98,14 @@ export class MobileClient {
   private pendingMsgs = new Map<string, Array<{ msg: NegotiationMessage; from: string; ts: number; eventId?: string }>>();
   /** Peer pubkeys (hex) the user has blocked — inbound DMs from them are dropped. */
   private blocked = new Set<string>();
+  /**
+   * Signed DMs that could not reach ANY relay (offline, all relays down).
+   * Local negotiation state commits optimistically, so these MUST eventually
+   * deliver or the two parties diverge — a deal card reading "Confirmed" while
+   * the counterparty never heard the accept. Persisted; flushed on reconnect.
+   */
+  private outbox: Array<{ event: Event }> = [];
+  private flushingOutbox = false;
   onIntent?: (intent: Intent) => void;
   /** Fires for our own intents — both freshly posted and echoed back from relays on startup. */
   onOwnIntent?: (intent: Intent) => void;
@@ -102,6 +114,8 @@ export class MobileClient {
   onIncomingMessage?: (nego: Negotiation, msg: NegotiationMessage) => void;
   onProfileFetched?: (pubkey: string) => void;
   onReputationFetched?: (pubkey: string) => void;
+  /** Fires whenever the undelivered-DM count changes — drives the "unsent" UI hint. */
+  onOutboxChange?: (pending: number) => void;
   /** Unix seconds when watchDMs started — used to skip notifying for backfilled history. */
   private watchStartTs = 0;
 
@@ -132,6 +146,64 @@ export class MobileClient {
     await Promise.allSettled(
       this.relays.map((url) => this.pool.ensureRelay(url).catch(() => {})),
     );
+    void this.flushOutbox();
+  }
+
+  /** Number of signed DMs still waiting for a relay to take them. */
+  outboxPending(): number {
+    return this.outbox.length;
+  }
+
+  /** Retry every queued DM. Failures re-queue; safe to call repeatedly. */
+  async flushOutbox(): Promise<void> {
+    if (this.flushingOutbox || !this.outbox.length) return;
+    this.flushingOutbox = true;
+    try {
+      const items = this.outbox;
+      this.outbox = [];
+      for (const it of items) await this.publishDM(it.event);
+    } finally {
+      this.flushingOutbox = false;
+      void this.persistOutbox();
+      this.onOutboxChange?.(this.outbox.length);
+    }
+  }
+
+  private async persistOutbox(): Promise<void> {
+    try {
+      await kvSet(OUTBOX_STORE_KEY, JSON.stringify(this.outbox));
+    } catch { /* best-effort */ }
+  }
+
+  private async loadOutbox(): Promise<void> {
+    try {
+      const raw = await kvGet(OUTBOX_STORE_KEY);
+      if (!raw) return;
+      const cutoff = Math.floor(Date.now() / 1000) - OUTBOX_MAX_AGE_SECONDS;
+      this.outbox = (JSON.parse(raw) as Array<{ event: Event }>).filter(
+        (it) => it?.event?.id && it.event.created_at >= cutoff,
+      );
+      if (this.outbox.length) {
+        this.onOutboxChange?.(this.outbox.length);
+        void this.flushOutbox();
+      }
+    } catch { /* corrupt/absent → start empty */ }
+  }
+
+  /**
+   * Publish a signed DM, queueing it for retry when no relay accepts it.
+   * Returns true when at least one relay took the event now, false when queued.
+   */
+  private async publishDM(ev: Event): Promise<boolean> {
+    try {
+      await Promise.any(this.pool.publish(this.relays, ev));
+      return true;
+    } catch {
+      this.outbox.push({ event: ev });
+      void this.persistOutbox();
+      this.onOutboxChange?.(this.outbox.length);
+      return false;
+    }
   }
 
   /**
@@ -190,9 +262,11 @@ export class MobileClient {
   static async clearStoredNegotiations(): Promise<void> {
     try { await kvDelete(NEGO_STORE_KEY); } catch { /* best-effort */ }
     try { await kvDelete(PUBLISHED_STORE_KEY); } catch { /* best-effort */ }
+    try { await kvDelete(OUTBOX_STORE_KEY); } catch { /* best-effort */ }
   }
 
   async loadNegotiations(): Promise<void> {
+    await this.loadOutbox(); // undelivered DMs from the previous session retry first
     await this.loadPublished(); // restore own posts first so inbound accepts can match
     try {
       const raw = await kvGet(NEGO_STORE_KEY);
@@ -706,7 +780,13 @@ export class MobileClient {
   /** Decline the cancellation request → deal reverts to confirmed. */
   keepDeal(negoId: string) { return this.sendCancelStep(negoId, makeCancelDecline); }
 
-  private async sendDM(to: string, plaintext: string): Promise<void> {
+  /**
+   * Encrypt, sign and send a negotiation DM. Never rejects on relay failure:
+   * the signed event lands in the persisted outbox and is retried on
+   * reconnect, so an optimistically-committed local state can't silently
+   * diverge from the counterparty. Encryption/signing errors still throw.
+   */
+  private async sendDM(to: string, plaintext: string): Promise<boolean> {
     const ciphertext = await this.signer.nip04Encrypt(to, plaintext);
     const ev = await this.signer.signEvent({
       kind: 4,
@@ -714,6 +794,6 @@ export class MobileClient {
       tags: [['p', to]],
       content: ciphertext,
     });
-    await Promise.any(this.pool.publish(this.relays, ev));
+    return this.publishDM(ev);
   }
 }

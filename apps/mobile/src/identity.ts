@@ -53,7 +53,7 @@ export async function clearKey(): Promise<void> {
 export async function wipeAllLocalData(): Promise<void> {
   const KEYS = [
     'freeport.nsec', 'freeport.profile', 'freeport.prefs', 'freeport.negotiations',
-    'freeport.published', 'freeport.addressbook', 'freeport.created', 'freeport.rated',
+    'freeport.published', 'freeport.outbox', 'freeport.addressbook', 'freeport.created', 'freeport.rated',
     'freeport.celebrated', 'freeport.expiredLog', 'freeport.expiredSeen',
     'freeport.expoPushToken', 'freeport.geoOk', 'freeport.guidanceSeen', 'freeport.notifDismiss',
     'freeport.pushOn', 'freeport.autoContactSent', 'freeport.suspendNotifiedAt',
@@ -135,6 +135,20 @@ export async function parseBackupBundle(
     // not JSON → fall through to bare-key handling
   }
   return { sk: await restoreFromText(t, passphrase) };
+}
+
+/**
+ * Does this backup text (JSON bundle or bare key) need a passphrase to
+ * restore? Lets the UI collect one BEFORE attempting the restore, instead of
+ * failing with "enter its passphrase" and nowhere to enter it.
+ */
+export function bundleNeedsPassphrase(text: string): boolean {
+  const t = text.trim();
+  try {
+    const o = JSON.parse(t);
+    if (o && typeof o === 'object' && typeof o.key === 'string') return backupKind(o.key) === 'encrypted';
+  } catch { /* not JSON → bare key */ }
+  return backupKind(t) === 'encrypted';
 }
 
 /** Restore from backup-file text (either ncryptsec or plain nsec). */

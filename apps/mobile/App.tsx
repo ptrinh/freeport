@@ -40,6 +40,7 @@ import {
   SERVICE_MARKET,
   SERVICE_SCHEMA,
   KIND_KARMA,
+  geohashPrefixes,
   MSG_COUNTER,
   MSG_ACCEPT,
   MSG_CHAT,
@@ -47,8 +48,8 @@ import {
   type Negotiation,
   type ProposedTerms,
 } from '@freeport/protocol';
-import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, getStoredNsec } from './src/identity';
-import { backupToFile, restoreFromFile, buildCloudBundle, restoreFromBundleText } from './src/backup';
+import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, getStoredNsec, bundleNeedsPassphrase } from './src/identity';
+import { backupToFile, pickBackupText, restoreBackupText, buildCloudBundle, restoreFromBundleText } from './src/backup';
 import { cloudAvailable, cloudSave, cloudRestore, cloudClear, cloudName } from './src/cloudBackup';
 import { LocalSigner, Nip07Signer, hasNip07, type Signer } from './src/signer';
 import { karmaLabel, type KarmaScore } from './src/karma';
@@ -68,7 +69,7 @@ import { loadAddressBook, addRecent, togglePinned, isPinned, type AddressBook } 
 import { loadProfile, saveProfile, maskPhone, maskPlate, isDisplayablePhone, defaultAvatarUrl, type UserProfile, type PhoneDisplay } from './src/profile';
 import { normalizePhone, detectDialCode, dialForCountry } from './src/phone';
 import { routeUrl, placeUrl, placeParam, dirUrl, appleMapsScheme, geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, locationGranted, requestLocationPermission, reverseGeocode, detectRawLocationGPS, detectRawLocationIP, detectCoordsIP, distanceKmBetweenGeohashes, formatDistance, suggest } from './src/maps';
-import { parseLocaleAmount } from './src/money';
+import { parseAmountWithK } from './src/money';
 import { negoIsDone, messagesViewForNewActivity, searchableText } from './src/deals';
 import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
 import { loadPrefs, savePrefs, type Prefs, type UserLocation } from './src/prefs';
@@ -152,6 +153,14 @@ function uiAlert(title: string, body?: string): void {
   } else {
     Alert.alert(title, body);
   }
+}
+
+// Run a deal action and SURFACE a failure instead of swallowing it. Relay
+// outages never reject (the client outbox queues and retries those) — a
+// rejection here is a real state error (e.g. the deal changed underneath the
+// tap) that the user must see, or their card silently diverges from reality.
+function runDealAction(p: Promise<unknown> | undefined, failTitle: string): void {
+  p?.catch((e) => uiAlert(failTitle, e instanceof Error ? e.message : undefined));
 }
 
 
@@ -520,6 +529,9 @@ function AppInner() {
 
   // Live relay connectivity for the header status pill.
   const [netStatus, setNetStatus] = useState<'connecting' | 'online' | 'offline'>('connecting');
+  // Signed DMs waiting for a relay (offline sends). Surfaced in the status pill
+  // so a "Confirmed" card the counterparty hasn't received yet is never silent.
+  const [outboxPending, setOutboxPending] = useState(0);
   const { updating } = useUpdateState();
   const webUpdate = useWebUpdateAvailable();
   useEffect(() => {
@@ -785,6 +797,7 @@ function AppInner() {
           return [i, ...prev.filter((p) => p.d !== i.d)];
         });
       c.onNegotiationUpdate = () => setNegos([...c.negotiations.values()]);
+      c.onOutboxChange = (n) => setOutboxPending(n);
       // Local notification for a new inbound DM. Only when backgrounded — the
       // in-app Messages badge already covers the foreground. Content-blind body.
       c.onIncomingMessage = (_nego, msg) => {
@@ -1197,9 +1210,9 @@ function AppInner() {
               }
             }}
             onFinish={finishOnboarding}
-            onRestore={async (passphrase) => {
-              const sk = await restoreFromFile(passphrase); // throws on bad file/passphrase
-              if (sk) finishOnboarding(); // null = user cancelled the file picker
+            onRestore={async (text, passphrase) => {
+              await restoreBackupText(text, passphrase); // throws on bad file/passphrase
+              finishOnboarding();
             }}
             onCloudRestore={async () => {
               const data = await cloudRestore();
@@ -1248,13 +1261,16 @@ function AppInner() {
           <View style={s.headerStatus}>
             <StatusDot
               blink={updating}
-              pulsing={!(netStatus === 'online' && netSteady)}
-              color={updating ? palette.warn : netStatus === 'online' ? palette.success : netStatus === 'offline' ? palette.danger : palette.warn}
+              pulsing={!(netStatus === 'online' && netSteady) || outboxPending > 0}
+              color={updating || outboxPending > 0 ? palette.warn : netStatus === 'online' ? palette.success : netStatus === 'offline' ? palette.danger : palette.warn}
             />
             <Animated.Text
               style={[s.headerSub, { opacity: anim.subOpacity, maxWidth: anim.subWidth, flexShrink: 0, overflow: 'hidden' }]}
               numberOfLines={1}
-            >{updating ? t('Updating…') : netStatus === 'online' ? t('Connected') : netStatus === 'offline' ? t('No network') : t('Connecting…')}</Animated.Text>
+            >{updating ? t('Updating…')
+              : outboxPending > 0 ? t('Sending {n}…').replace('{n}', String(outboxPending))
+              : netStatus === 'online' ? t('Connected')
+              : netStatus === 'offline' ? t('No network') : t('Connecting…')}</Animated.Text>
             {location.country ? (
               <Text style={s.headerFlag} numberOfLines={1}>{flagEmoji(location.country)}</Text>
             ) : null}
@@ -1517,7 +1533,7 @@ function Onboarding({
 }: {
   onCreate: (role: 'passenger' | 'driver', services: boolean, name: string, phone: string, vehicleModel: string, plateNumber: string) => Promise<void>;
   onFinish: () => void;
-  onRestore: (passphrase: string) => Promise<void>;
+  onRestore: (text: string, passphrase: string) => Promise<void>;
   onCloudRestore: () => Promise<boolean>;
   language: string;
   onLanguageChange: (l: string) => void;
@@ -1605,12 +1621,37 @@ function Onboarding({
     return () => { cancelled = true; };
   }, [location.country]);
 
+  // An encrypted (ncryptsec) backup needs its passphrase; the file is held
+  // here while the passphrase field is shown, then restored on confirm.
+  const [pendingRestore, setPendingRestore] = useState<string | null>(null);
+  const [restorePass, setRestorePass] = useState('');
+
   const restore = async () => {
     setBusy('restore');
     try {
-      await onRestore('');
+      const text = await pickBackupText();
+      if (!text) return; // user cancelled the picker
+      if (bundleNeedsPassphrase(text)) {
+        setPendingRestore(text); // ask for the passphrase first
+        return;
+      }
+      await onRestore(text, '');
     } catch (e: any) {
-      Alert.alert('Restore failed', e?.message ?? 'Invalid backup file.');
+      uiAlert(t('Restore failed'), e?.message ?? t('Invalid backup file.'));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const restoreWithPassphrase = async () => {
+    if (!pendingRestore) return;
+    setBusy('restore');
+    try {
+      await onRestore(pendingRestore, restorePass);
+      setPendingRestore(null);
+      setRestorePass('');
+    } catch (e: any) {
+      uiAlert(t('Restore failed'), e?.message ?? t('Wrong passphrase?'));
     } finally {
       setBusy(null);
     }
@@ -1699,9 +1740,31 @@ function Onboarding({
               {busy === 'cloud' ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t("Restore account from {name}", { name: cloudName() })}</Text>}
             </Pressable>
           )}
-          <Pressable style={[s.btnCounter, { marginTop: 12 }, busy === 'restore' && { opacity: 0.6 }]} onPress={restore} disabled={busy !== null}>
-            {busy === 'restore' ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t("Restore from backup file")}</Text>}
-          </Pressable>
+          {pendingRestore ? (
+            <>
+              <Text style={[s.dim, { marginTop: 12 }]}>{t('This backup is encrypted — enter its passphrase.')}</Text>
+              <TextInput
+                style={s.input}
+                value={restorePass}
+                onChangeText={setRestorePass}
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                placeholder={t('Passphrase')}
+                placeholderTextColor={palette.placeholder}
+              />
+              <Pressable style={[s.btnAccept, { marginTop: 8 }, busy === 'restore' && { opacity: 0.6 }]} onPress={restoreWithPassphrase} disabled={busy !== null || !restorePass}>
+                {busy === 'restore' ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Restore')}</Text>}
+              </Pressable>
+              <Pressable style={s.btnTextOnly} onPress={() => { setPendingRestore(null); setRestorePass(''); }} disabled={busy !== null}>
+                <Text style={s.dim}>{t('Cancel')}</Text>
+              </Pressable>
+            </>
+          ) : (
+            <Pressable style={[s.btnCounter, { marginTop: 12 }, busy === 'restore' && { opacity: 0.6 }]} onPress={restore} disabled={busy !== null}>
+              {busy === 'restore' ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t("Restore from backup file")}</Text>}
+            </Pressable>
+          )}
         </>
       ) : step === 'role' ? (
         <>
@@ -3009,7 +3072,7 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
         window,
         flexMinutes: 30,
         expiresAt,
-        geohashes: [fromGh.slice(0, 5)],
+        geohashes: geohashPrefixes(fromGh.slice(0, 5)),
         topics: intentTopics(location, RIDESHARE_CATEGORY, category),
       }, profile);
       addRecent(to).catch(() => {}); // remember this destination for next time
@@ -3124,7 +3187,7 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
         window,
         flexMinutes: 30,
         expiresAt,
-        geohashes: [locationGeohash.slice(0, 5)],
+        geohashes: geohashPrefixes(locationGeohash.slice(0, 5)),
         topics: intentTopics(userLocation, category, subcategory),
       }, profile);
       // Clear content fields so a second tap can't re-post the same listing.
@@ -3628,10 +3691,17 @@ function DealsTab({
     {reportNego && (
       <ReportModal
         onClose={() => setReportingId(null)}
-        onSubmit={(reason) => {
-          client?.rateKarma(reportNego.id, reportNego.peer, -1, `Report: ${reason}`, false).catch(() => {});
+        onSubmit={async (reason) => {
           setReportingId(null);
-          Alert.alert('Reported', 'Thanks — your report was recorded as negative karma on this deal.');
+          // Await the publish and be honest about the outcome — telling a user
+          // in a bad situation "reported" while nothing left the device is
+          // worse than asking them to retry.
+          try {
+            await client?.rateKarma(reportNego.id, reportNego.peer, -1, `Report: ${reason}`, false);
+            uiAlert(t('Reported'), t('Thanks — your report was recorded as negative karma on this deal.'));
+          } catch {
+            uiAlert(t('Report not sent'), t('Could not reach the network. Check your connection and try again.'));
+          }
         }}
       />
     )}
@@ -3878,7 +3948,7 @@ function DealsTab({
                         // seller side (driver / provider) keeps the plain start button.
                         role === 'passenger' ? (
                           <View style={{ gap: 8 }}>
-                            <Pressable style={s.btnAccept} onPress={() => client?.setStage(item.id, 'picked_up')}>
+                            <Pressable style={s.btnAccept} onPress={() => runDealAction(client?.setStage(item.id, 'picked_up'), t('Could not update the deal'))}>
                               <Text style={s.btnText}>{isRide ? t('I entered the correct vehicle') : t('Met the correct provider')}</Text>
                             </Pressable>
                             <Pressable
@@ -3895,21 +3965,28 @@ function DealsTab({
                                 const reason = isRide
                                   ? 'Report: Incorrect licence plate or phone number — vehicle did not match the listing'
                                   : 'Report: Incorrect phone number — provider did not match the listing';
-                                client?.rateKarma(item.id, item.peer, -1, reason, false).catch(() => {});
-                                uiAlert(t('Reported — stay safe'), isRide
-                                  ? t('Thank you. This was reported as negative karma on this deal. Do not get in the vehicle.')
-                                  : t('Thank you. This was reported as negative karma on this deal. Do not continue with this provider.'));
+                                // Await + honest outcome: never claim "reported"
+                                // when the publish failed — the user is making a
+                                // safety decision on that information.
+                                try {
+                                  await client?.rateKarma(item.id, item.peer, -1, reason, false);
+                                  uiAlert(t('Reported — stay safe'), isRide
+                                    ? t('Thank you. This was reported as negative karma on this deal. Do not get in the vehicle.')
+                                    : t('Thank you. This was reported as negative karma on this deal. Do not continue with this provider.'));
+                                } catch {
+                                  uiAlert(t('Report not sent'), t('Could not reach the network. Check your connection and try again.') + ' ' + (isRide ? t('Do not get in the vehicle.') : t('Do not continue with this provider.')));
+                                }
                               }}
                             >
                               <Text style={s.btnDangerOutlineText}>{'⚠️ ' + (isRide ? t('Incorrect plate number or phone number') : t('Incorrect phone number from provider'))}</Text>
                             </Pressable>
                           </View>
                         ) : (
-                          <SlideToConfirm label={startLabel} onConfirm={() => client?.setStage(item.id, 'picked_up')} />
+                          <SlideToConfirm label={startLabel} onConfirm={() => runDealAction(client?.setStage(item.id, 'picked_up'), t('Could not update the deal'))} />
                         )
                       )}
                       {st === 'picked_up' && (
-                        <SlideToConfirm label={doneLabel} onConfirm={() => client?.setStage(item.id, 'completed')} />
+                        <SlideToConfirm label={doneLabel} onConfirm={() => runDealAction(client?.setStage(item.id, 'completed'), t('Could not update the deal'))} />
                       )}
                       {/* Trip done → the rater opens automatically. Skipping shows a
                           button to reopen it; once submitted it's locked. */}
@@ -3999,7 +4076,7 @@ function DealsTab({
                           <Pressable style={[s.btnAccept, { flex: 1 }]} onPress={() => setConfirmCancelId(null)}>
                             <Text style={s.btnText}>{t("Keep")}</Text>
                           </Pressable>
-                          <Pressable style={[s.btnDecline, { flex: 1 }]} onPress={() => { client?.decline(item.id); setConfirmCancelId(null); }}>
+                          <Pressable style={[s.btnDecline, { flex: 1 }]} onPress={() => { runDealAction(client?.decline(item.id), t('Could not update the deal')); setConfirmCancelId(null); }}>
                             <Text style={s.btnText}>{t("Cancel offer")}</Text>
                           </Pressable>
                         </View>
@@ -4017,7 +4094,7 @@ function DealsTab({
                         <Pressable style={[s.btnAccept, { flex: 1 }]} onPress={() => setConfirmCancelId(null)}>
                           <Text style={s.btnText}>{t("Keep deal")}</Text>
                         </Pressable>
-                        <Pressable style={[s.btnDecline, { flex: 1 }]} onPress={() => { client?.requestCancel(item.id); setConfirmCancelId(null); }}>
+                        <Pressable style={[s.btnDecline, { flex: 1 }]} onPress={() => { runDealAction(client?.requestCancel(item.id), t('Could not update the deal')); setConfirmCancelId(null); }}>
                           <Text style={s.btnText}>{t("Request cancellation")}</Text>
                         </Pressable>
                       </View>
@@ -4033,10 +4110,10 @@ function DealsTab({
                   <View style={s.cancelBox}>
                     <Text style={s.cancelBoxText}>{t("The other party requested to cancel this deal. Agreeing cancels it (no karma impact).")}</Text>
                     <View style={s.btnRow}>
-                      <Pressable style={[s.btnDecline, { flex: 1 }]} onPress={() => client?.agreeCancel(item.id)}>
+                      <Pressable style={[s.btnDecline, { flex: 1 }]} onPress={() => runDealAction(client?.agreeCancel(item.id), t('Could not update the deal'))}>
                         <Text style={s.btnText}>{t("Agree to cancel")}</Text>
                       </Pressable>
-                      <Pressable style={[s.btnAccept, { flex: 1 }]} onPress={() => client?.keepDeal(item.id)}>
+                      <Pressable style={[s.btnAccept, { flex: 1 }]} onPress={() => runDealAction(client?.keepDeal(item.id), t('Could not update the deal'))}>
                         <Text style={s.btnText}>{t("Keep deal")}</Text>
                       </Pressable>
                     </View>
@@ -4120,7 +4197,7 @@ function DealsTab({
                       const parts = [profile.name, profile.phone];
                       if (iAmDriver) parts.push(`🚗 ${profile.vehicleModel.trim()} • ${profile.plateNumber.trim()}`);
                       const contact = parts.filter(Boolean).join(' · ') || client!.pubkey.slice(0, 12);
-                      client?.accept(item.id, contact);
+                      runDealAction(client?.accept(item.id, contact), t('Could not update the deal'));
                     }}
                   >
                     <Text style={s.btnText}>{item.state === 'accepted_by_them' ? t('Confirm deal') : t('Accept')}</Text>
@@ -4131,7 +4208,7 @@ function DealsTab({
                     <Text style={s.btnGhostText}>{t("Counter")}</Text>
                   </Pressable>
                 )}
-                <Pressable style={s.btnTextOnly} onPress={() => { client?.decline(item.id); setCounteringId(null); }}>
+                <Pressable style={s.btnTextOnly} onPress={() => { runDealAction(client?.decline(item.id), t('Could not update the deal')); setCounteringId(null); }}>
                   <Text style={s.btnTextDanger}>{t("Decline")}</Text>
                 </Pressable>
               </View>
@@ -4366,7 +4443,11 @@ function CounterEditor({
       const dur = durHours * 60 + durMinutes;
       if (dur > 0) terms.duration_minutes = dur;
     }
-    await onSend(terms);
+    try {
+      await onSend(terms);
+    } catch (e) {
+      uiAlert(t('Could not send'), e instanceof Error ? e.message : undefined);
+    }
   };
 
   return (
@@ -4494,7 +4575,13 @@ function RespondEditor({
       if (dur > 0) terms.duration_minutes = dur;
     }
     setSending(true);
-    try { await onSend(terms, accepting); } finally { setSending(false); }
+    try {
+      await onSend(terms, accepting);
+    } catch (e) {
+      // Without this, a driver's offer can vanish silently and they wait for a
+      // reply that was never sent.
+      uiAlert(t('Could not send'), e instanceof Error ? e.message : undefined);
+    } finally { setSending(false); }
   };
 
   // If the responder leaves the requested time AND amount exactly as posted,
@@ -4629,10 +4716,15 @@ function ChatThread({ nego, onSend }: { nego: Negotiation; onSend: (text: string
   };
 
   const send = async () => {
-    const t = text.trim();
-    if (!t) return;
+    const msg = text.trim();
+    if (!msg) return;
     setSending(true);
-    try { await onSend(t); setText(''); } finally { setSending(false); }
+    try {
+      await onSend(msg);
+      setText('');
+    } catch (e) {
+      uiAlert(t('Could not send'), e instanceof Error ? e.message : undefined);
+    } finally { setSending(false); }
   };
 
   const attach = async () => {
@@ -4760,9 +4852,13 @@ function KarmaRater({
   ];
 
   const submit = async () => {
-    if (score === null) { Alert.alert('Select a score'); return; }
+    if (score === null) { uiAlert(t('Select a score')); return; }
     setSubmitting(true);
-    try { await onSubmit(score, note || undefined, contactVerified); } finally { setSubmitting(false); }
+    try {
+      await onSubmit(score, note || undefined, contactVerified);
+    } catch (e) {
+      uiAlert(t('Could not send'), e instanceof Error ? e.message : undefined);
+    } finally { setSubmitting(false); }
   };
 
   return (
@@ -4972,7 +5068,6 @@ function SettingsTab({
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [backingUp, setBackingUp] = useState(false);
-  const [restoring, setRestoring] = useState(false);
   // Cloud backup (iCloud Keychain / Google Block Store). When available, it's
   // the default; "Back up to a file instead" switches to the file flow.
   const cloudOn = cloudAvailable();
@@ -5268,19 +5363,9 @@ function SettingsTab({
     } finally { setBackingUp(false); }
   };
 
-  const doRestore = async () => {
-    setRestoring(true);
-    try {
-      const restored = await restoreFromFile(''); // plain nsec — no password
-      if (!restored) return; // user cancelled the picker
-      // The reload IS the confirmation. On web the Alert's OK onPress never fires,
-      // so trigger the reload directly; native shows a brief notice first.
-      if (Platform.OS === 'web') onRestore();
-      else Alert.alert('Restored', 'Identity restored. Reloading…', [{ text: 'OK', onPress: onRestore }]);
-    } catch (e: any) {
-      Alert.alert('Restore failed', e?.message ?? 'Wrong file or password.');
-    } finally { setRestoring(false); }
-  };
+  // NOTE: restore-from-file lives only in onboarding ("sign out and choose
+  // Restore on the welcome screen") — Settings deliberately has no restore
+  // button, so there is no restore handler here.
 
   return (
     <ScrollView ref={settingsScroll} contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
@@ -6706,13 +6791,7 @@ function parsePayment(str: string | undefined, fallbackCurrency: Currency): { am
   // (fallbackCurrency) is the right frame; we only special-case VND's distinct
   // formatting since its amounts have no decimals and use dot grouping.
   const currency: Currency = /₫|đ|vnd/i.test(str) ? 'VND' : fallbackCurrency;
-  let amount: number;
-  if (currencyFractionDigits(currency) === 0) {
-    amount = parseInt(str.replace(/\D/g, ''), 10) || 0;
-    if (/\d+\s*k\b/i.test(str)) amount = (parseInt(str.replace(/\D/g, ''), 10) || 0) * 1000;
-  } else {
-    amount = parseLocaleAmount(str);
-  }
+  const amount = parseAmountWithK(str, currencyFractionDigits(currency));
   return { amount: snapToStep(amount, currency), currency };
 }
 
