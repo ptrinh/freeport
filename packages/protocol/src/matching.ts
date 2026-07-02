@@ -90,6 +90,12 @@ export function matchIntent(intent: Intent, rule: MatchRule, nowSec = Math.floor
   if (c.schema !== rule.schema) return { matched: false, reason: 'schema mismatch' };
   if (c.side === rule.side) return { matched: false, reason: 'same side' };
   if (c.expires_at <= nowSec) return { matched: false, reason: 'expired' };
+  // A withdrawal republishes the intent with an EMPTY payload (a short-TTL
+  // tombstone) — nothing to match, and the generic fallback below would
+  // otherwise auto-accept it.
+  if (!c.payload || Object.keys(c.payload).length === 0) {
+    return { matched: false, reason: 'withdrawn (empty payload)' };
+  }
 
   if (rule.schema.startsWith('rideshare/')) return matchRideshare(intent, rule);
   if (rule.schema.startsWith('service/')) return matchService(intent, rule);

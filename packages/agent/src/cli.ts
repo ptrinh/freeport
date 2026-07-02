@@ -51,7 +51,7 @@ function printDeal(nego: Negotiation): void {
       `  window : ${new Date(nego.terms.window.start * 1000).toLocaleString()} → ${new Date(nego.terms.window.end * 1000).toLocaleTimeString()}`,
     );
   }
-  if (nego.terms?.price) console.log(`  price  : ${nego.terms.price}`);
+  if (nego.terms?.payment) console.log(`  payment: ${nego.terms.payment}`);
   console.log(`  peer   : ${nego.peer}`);
   console.log(`  contact: ${nego.theirContact ?? '(pending)'}`);
   console.log('════════════════════════════════\n');
@@ -141,7 +141,7 @@ async function main(): Promise<void> {
             console.log(
               `  proposed time: ${new Date(nego.terms.window.start * 1000).toLocaleString()} → ${new Date(nego.terms.window.end * 1000).toLocaleTimeString()}`,
             );
-          if (nego.terms?.price) console.log(`  price: ${nego.terms.price}`);
+          if (nego.terms?.payment) console.log(`  payment: ${nego.terms.payment}`);
           if (nego.terms?.note) console.log(`  note: ${nego.terms.note}`);
           const a = await rl.question('accept? [y/N] ');
           return a.trim().toLowerCase().startsWith('y');

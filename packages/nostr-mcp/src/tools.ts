@@ -31,6 +31,23 @@ const tagVals = (ev: Event, name: string): string[] =>
 
 const json = (data: unknown) => ({ content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] });
 
+/**
+ * Collapse addressable events to the LATEST version per (kind, pubkey, d).
+ * Different relays hold different versions of the same replaceable event, so
+ * a raw multi-relay query returns duplicates: an edited intent listed twice,
+ * a withdrawn intent's pre-withdraw version shown as live, duplicate receipt
+ * halves double-counting proven deals.
+ */
+export function latestByAddress(events: Event[]): Event[] {
+  const best = new Map<string, Event>();
+  for (const ev of events) {
+    const key = `${ev.kind}:${ev.pubkey}:${tagVal(ev, 'd') ?? ''}`;
+    const cur = best.get(key);
+    if (!cur || ev.created_at > cur.created_at) best.set(key, ev);
+  }
+  return [...best.values()];
+}
+
 /** Best geohash for an intent: the published `g` tag, else the payload pin. */
 function intentGeohash(ev: Event, payload: any): string | undefined {
   return (
@@ -79,13 +96,16 @@ export function registerTools(server: McpServer, pool: RelayPool): void {
         filter['#g'] = geohashesCovering(args.near.lat, args.near.lon, args.near.radiusKm);
       }
 
-      const events = await pool.query(filter, relays);
+      const events = latestByAddress(await pool.query(filter, relays));
       const now = Math.floor(Date.now() / 1000);
       const rows = events
         .map((ev) => {
           const intent = parseIntentEvent(ev);
           if (!intent) return null;
           const payload = intent.content.payload as any;
+          // Withdrawal tombstone (latest version has an empty payload) — the
+          // listing is gone; don't surface it.
+          if (!payload || Object.keys(payload).length === 0) return null;
           const geohash = intentGeohash(ev, payload);
           const distanceKm = args.near && geohash
             ? distanceKmToGeohash(args.near.lat, args.near.lon, geohash)
@@ -135,11 +155,11 @@ export function registerTools(server: McpServer, pool: RelayPool): void {
     },
     async (args) => {
       const relays = sanitizeRelays(args.relays);
-      const [karma, received, authored] = await Promise.all([
+      const [karma, received, authored] = (await Promise.all([
         pool.query({ kinds: [KIND_KARMA], '#p': [args.pubkey], limit: args.limit }, relays),
         pool.query({ kinds: [KIND_DEAL_RECEIPT], '#p': [args.pubkey], limit: args.limit }, relays),
         pool.query({ kinds: [KIND_DEAL_RECEIPT], authors: [args.pubkey], limit: args.limit }, relays),
-      ]);
+      ])).map(latestByAddress);
 
       // Proven deals: subject authored a receipt whose reciprocal half exists.
       const half = new Set<string>();

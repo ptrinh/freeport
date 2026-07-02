@@ -406,3 +406,20 @@ describe('negotiation state machine', () => {
     expect(parseNegotiationMessage(JSON.stringify(msg))?.type).toBe('negotiate.counter');
   });
 });
+
+describe('matchIntent withdrawal tombstones', () => {
+  it('never matches an intent whose payload is empty (withdrawn)', () => {
+    const now = Math.floor(Date.now() / 1000);
+    const intent = {
+      id: 'x', pubkey: 'p'.repeat(64), d: 'd1', createdAt: now,
+      content: {
+        v: 1, side: 'request' as const, market: 'anything', schema: 'custom/1',
+        title: '', payload: {}, expires_at: now + 300,
+      },
+    };
+    const rule = { schema: 'custom/1', side: 'offer' as const, market: 'anything' };
+    const res = matchIntent(intent as any, rule as any);
+    expect(res.matched).toBe(false);
+    expect(res.reason).toMatch(/withdrawn/);
+  });
+});
