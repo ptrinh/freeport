@@ -67,7 +67,16 @@ freeport listen --market <topic>         watch a market
 freeport run --config <agent.json>       full agent loop [--post intent.json] [--yes]
 ```
 
+## Status
+
+- **Distribution**: live on the Apple App Store; Google Play in review.
+- **Reputation**: implemented — karma ratings (PoW-backed, `apps/mobile/src/karma.ts`),
+  deal receipts, proven-deal counts, per-viewer web-of-trust weighting, and a
+  `nostr_search_reputation` MCP tool. What remains open is *sybil resistance*:
+  a new keypair is free, so zero-history identities should be treated with
+  visible caution by clients.
+
 ## Non-goals (v1)
 
-Payments/escrow, reputation/anti-sybil, dispute resolution, vetting, Telegram
-bridge, App Store distribution — all deliberately deferred.
+Payments/escrow, dispute resolution, vetting, anti-sybil, Telegram bridge —
+all deliberately deferred.
