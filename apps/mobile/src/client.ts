@@ -52,6 +52,10 @@ const POW_DIFFICULTY = 12;
 const MIN_INTENT_POW = 0;
 /** Max distinct listings (d-tags) shown per author — caps single-key flooding. */
 const MAX_LISTINGS_PER_AUTHOR = 5;
+/** Session-cache bounds (see pruneSessionCaches). */
+const MAX_MARKET_INTENTS = 10000;
+const MAX_PEER_CACHE = 2000;
+const PRUNE_EVERY_INTENTS = 200;
 /** How far in the future a withdrawal's NIP-40 expiration is set. Must be > 0 so
  *  relays accept the event (a born-expired event is dropped and never relayed);
  *  kept short so the withdrawn tombstone purges network-wide soon after. */
@@ -364,6 +368,7 @@ export class MobileClient {
           this.onIntent?.(intent);
           this.fetchProfile(intent.pubkey);
           this.fetchReputation(intent.pubkey);
+          if (++this.intentsSincePrune >= PRUNE_EVERY_INTENTS) this.pruneSessionCaches();
         },
       },
     );
@@ -377,6 +382,42 @@ export class MobileClient {
    * queries queue or get dropped, delaying the feed itself. Collect unknown
    * pubkeys for a beat and issue a single `{kinds:[0], authors:[…]}` REQ.
    */
+  /**
+   * Session caches grew monotonically: on a web/PWA session left open for
+   * days on a busy market, marketIntents retained every full parsed payload
+   * ever seen, profiles/reputations never evicted, and the per-author listing
+   * cap kept counting expired d-tags — silently hiding an active poster's
+   * NEWER listings once five old ones had ever been seen. Prune periodically.
+   */
+  private intentsSincePrune = 0;
+
+  private pruneSessionCaches(): void {
+    this.intentsSincePrune = 0;
+    const now = Math.floor(Date.now() / 1000);
+    for (const [id, intent] of this.marketIntents) {
+      if (intent.content.expires_at <= now) this.marketIntents.delete(id);
+    }
+    // Cap what's left (oldest-inserted evicted first — Map preserves order).
+    for (const id of this.marketIntents.keys()) {
+      if (this.marketIntents.size <= MAX_MARKET_INTENTS) break;
+      this.marketIntents.delete(id);
+    }
+    // Rebuild the per-author listing cap from LIVE intents only, so expired/
+    // withdrawn listings stop occupying an author's five slots.
+    this.authorListings.clear();
+    for (const intent of this.marketIntents.values()) {
+      let seen = this.authorListings.get(intent.pubkey);
+      if (!seen) { seen = new Set(); this.authorListings.set(intent.pubkey, seen); }
+      seen.add(intent.d);
+    }
+    for (const cache of [this.profiles, this.reputations, this.profileTs] as Map<string, unknown>[]) {
+      for (const k of cache.keys()) {
+        if (cache.size <= MAX_PEER_CACHE) break;
+        cache.delete(k);
+      }
+    }
+  }
+
   private profileFetchQueue = new Set<string>();
   private profileFetchTimer: ReturnType<typeof setTimeout> | null = null;
   /** created_at of the applied kind-0 per pubkey — relays echo old versions. */

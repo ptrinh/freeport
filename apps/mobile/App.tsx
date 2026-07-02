@@ -28,7 +28,7 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AreaMap, PickerMap } from './src/Map';
-import { t, setI18nLang, getI18nLang, ensureI18nLang, onI18nLoaded } from './src/i18n';
+import { t, tn, setI18nLang, getI18nLang, ensureI18nLang, onI18nLoaded } from './src/i18n';
 import { TimeSpinner } from './src/TimeSpinner';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -575,17 +575,32 @@ function AppInner() {
     return () => clearTimeout(id);
   }, [netStatus]);
 
-  // Continuous scroll-driven collapse: the header + tab bar shrink smoothly as
-  // you scroll down (over the first ~60px) and grow back as you return to top,
-  // instead of snapping between two states. Tied to scrollY via Animated.
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const onContentScroll = useRef(
-    Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false }),
-  ).current;
+  // Scroll-driven collapse of the header + tab bar. These are LAYOUT props
+  // (padding/size/font), which the native animation driver can't touch — the
+  // old continuous binding (Animated.event on every scrolled frame,
+  // useNativeDriver:false) re-laid-out the header and all four tab items on
+  // the JS thread 60×/s while scrolling, the app's hottest interaction.
+  // Instead, a threshold with hysteresis flips a single 0→1 value and one
+  // 180ms timing drives the same interpolations — per-frame cost is now a
+  // trivial number comparison.
+  const collapse = useRef(new Animated.Value(0)).current;
+  const collapsedRef = useRef(false);
+  const onContentScroll = useRef((e: { nativeEvent: { contentOffset: { y: number } } }) => {
+    const y = e.nativeEvent.contentOffset.y;
+    const want = collapsedRef.current ? y > 14 : y > 52; // hysteresis — no flutter at the boundary
+    if (want === collapsedRef.current) return;
+    collapsedRef.current = want;
+    Animated.timing(collapse, {
+      toValue: want ? 1 : 0,
+      duration: 180,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: false, // layout props; runs only on the two transitions
+    }).start();
+  }).current;
   const anim = useRef(
     (() => {
       const p = (a: number, b: number) =>
-        scrollY.interpolate({ inputRange: [0, 60], outputRange: [a, b], extrapolate: 'clamp' });
+        collapse.interpolate({ inputRange: [0, 1], outputRange: [a, b], extrapolate: 'clamp' });
       return {
         logo: p(26, 16), logoR: p(6, 4),
         titlePadT: p(6, 3), titlePadB: p(8, 3),
@@ -628,7 +643,7 @@ function AppInner() {
   }, [effectiveTheme, npub]);
 
   // Reset the collapse when switching tabs (the new tab starts at the top).
-  useEffect(() => { scrollY.setValue(0); }, [tab, scrollY]);
+  useEffect(() => { collapsedRef.current = false; collapse.setValue(0); }, [tab, collapse]);
 
   useEffect(() => {
     (async () => {
@@ -2315,7 +2330,7 @@ function MarketTab({
       ListFooterComponent={
         shown.length > 0 ? (
           <Text style={[s.dim, { textAlign: 'center', padding: 12 }]}>
-            {hasMore ? t('Showing {n} of {m} — scroll for more', { n: paged.length, m: shown.length }) : t('{n} results', { n: shown.length })}
+            {hasMore ? t('Showing {n} of {m} — scroll for more', { n: paged.length, m: shown.length }) : tn(shown.length, '{n} result', '{n} results')}
           </Text>
         ) : null
       }
@@ -2774,7 +2789,7 @@ function shortPlace(name: string, maxParts = 2): string {
 function vehicleLabel(v: string): string {
   const n = VEHICLE_SEATERS[v];
   if (!n) return t(v);
-  return t(n === 1 ? '{vehicle} · {n} seater' : '{vehicle} · {n} seaters', { vehicle: t(v), n });
+  return tn(n, '{vehicle} · {n} seater', '{vehicle} · {n} seaters', { vehicle: t(v) });
 }
 
 /**
@@ -2870,7 +2885,7 @@ function MyPostCard({ intent, negos, client }: { intent: Intent; negos: Negotiat
       <Text style={s.meta}>
         {related.length === 0
           ? t('No responses yet')
-          : t('{n} responses', { n: related.length }) +
+          : tn(related.length, '{n} response', '{n} responses') +
             (active > 0 ? t(' · {n} negotiating', { n: active }) : '') +
             (confirmed > 0 ? t(' · {n} confirmed', { n: confirmed }) : '') +
             t(' — see Messages tab')}
@@ -3728,7 +3743,7 @@ function DealsTab({
           {COMPLETED_RANGES.map((d) => (
             <Pressable key={String(d)} onPress={() => setCompletedDays(d)} style={[s.seg, completedDays === d && s.segActive, { flex: 1 }]}>
               <Text style={[s.segText, completedDays === d && s.segTextActive]}>
-                {d === null ? t('All') : t('{n} days', { n: d })}
+                {d === null ? t('All') : tn(d, '{n} day', '{n} days')}
               </Text>
             </Pressable>
           ))}
@@ -5229,7 +5244,11 @@ function SettingsTab({
     setVehicleGlow(true);
     setTimeout(() => settingsScroll.current?.scrollTo({ y: Math.max(0, vehicleY.current - 16), animated: true }), 200);
   };
-  const hasRequiredActions = !requiredLocOk || !requiredNotifOk || vehicleMissing;
+  // Key loss is permanent (identity + karma). The backup UI lives inside the
+  // collapsed "Account & Backup" section, so an un-backed-up key gets a spot
+  // in the Required-actions box — the one place users actually look.
+  const backupMissing = cloudOn && !cloudBackedUp;
+  const hasRequiredActions = !requiredLocOk || !requiredNotifOk || vehicleMissing || backupMissing;
   const [fareOpen, setFareOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
@@ -5444,6 +5463,17 @@ function SettingsTab({
           {vehicleMissing && (
             <Pressable style={s.requiredBtn} onPress={fillVehicle}>
               <Text style={s.requiredBtnText}>{t("Fill in vehicle information")}</Text>
+            </Pressable>
+          )}
+          {backupMissing && (
+            <Pressable
+              style={s.requiredBtn}
+              onPress={() => {
+                setIdentityOpen(true);
+                setTimeout(() => settingsScroll.current?.scrollToEnd({ animated: true }), 120);
+              }}
+            >
+              <Text style={s.requiredBtnText}>{t("Back up your account — without it, losing this device loses your identity")}</Text>
             </Pressable>
           )}
         </View>
