@@ -83,8 +83,12 @@ describe('two agents over a relay', () => {
     const driverDeal = deferred<Negotiation>();
     const riderAsked = deferred<Negotiation>();
 
+    // Collected agent logs — dumped into the timeout error so a CI failure
+    // shows how far the flow got instead of just "timeout".
+    const logs: string[] = [];
+
     const riderAgent = new FreeportAgent(tRider, riderConfig, {
-      onLog: () => {},
+      onLog: (m) => logs.push(`rider: ${m}`),
       confirmDeal: async (nego) => {
         riderAsked.resolve(nego); // the human was consulted
         return true;
@@ -92,7 +96,7 @@ describe('two agents over a relay', () => {
       onDeal: (n) => riderDeal.resolve(n),
     });
     const driverAgent = new FreeportAgent(tDriver, driverConfig, {
-      onLog: () => {},
+      onLog: (m) => logs.push(`driver: ${m}`),
       confirmDeal: async () => true,
       onDeal: (n) => driverDeal.resolve(n),
     });
@@ -123,10 +127,12 @@ describe('two agents over a relay', () => {
     riderAgent.registerPublishedIntent(parseIntentEvent(ev)!);
     await tRider.publish(ev);
 
+    // Generous budget: CI runners pay cold-start costs (websocket setup,
+    // nip04 crypto) that a warm dev machine doesn't.
     const [riderResult, driverResult, consulted] = await Promise.all([
-      withTimeout(riderDeal.promise, 10_000, 'rider deal'),
-      withTimeout(driverDeal.promise, 10_000, 'driver deal'),
-      withTimeout(riderAsked.promise, 10_000, 'rider human confirm'),
+      withTimeout(riderDeal.promise, 30_000, 'rider deal', logs),
+      withTimeout(driverDeal.promise, 30_000, 'driver deal', logs),
+      withTimeout(riderAsked.promise, 30_000, 'rider human confirm', logs),
     ]);
 
     // Both sides confirmed, contacts crossed, time landed at driver's 16:00.
@@ -142,12 +148,14 @@ describe('two agents over a relay', () => {
     driverAgent.stop();
     tRider.close();
     tDriver.close();
-  }, 20_000);
+  }, 60_000);
 });
 
-function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+function withTimeout<T>(p: Promise<T>, ms: number, label: string, logs?: string[]): Promise<T> {
   return Promise.race([
     p,
-    new Promise<T>((_, rej) => setTimeout(() => rej(new Error(`timeout: ${label}`)), ms)),
+    new Promise<T>((_, rej) =>
+      setTimeout(() => rej(new Error(`timeout: ${label}\nagent log:\n${logs?.join('\n') || '(empty)'}`)), ms),
+    ),
   ]);
 }
