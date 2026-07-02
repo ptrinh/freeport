@@ -54,8 +54,8 @@ export class FreeportAgent {
       }),
     );
     this.subs.push(
-      this.transport.subscribeNegotiations((msg, from) => {
-        void this.handleNegotiationMessage(msg, from);
+      this.transport.subscribeNegotiations((msg, from, eventId) => {
+        void this.handleNegotiationMessage(msg, from, eventId);
       }),
     );
     this.events.onLog(
@@ -105,7 +105,7 @@ export class FreeportAgent {
     }
   }
 
-  private async handleNegotiationMessage(msg: NegotiationMessage, from: string): Promise<void> {
+  private async handleNegotiationMessage(msg: NegotiationMessage, from: string, eventId?: string): Promise<void> {
     let nego = this.negotiations.get(msg.nego);
 
     // First inbound message about one of OUR intents opens the negotiation.
@@ -118,7 +118,7 @@ export class FreeportAgent {
     }
     if (isTerminal(nego)) return;
 
-    const updated = applyInbound(nego, msg, from);
+    const updated = applyInbound(nego, msg, from, eventId);
     if (!updated) return;
     this.negotiations.set(updated.id, updated);
     this.events.onLog(`recv ${msg.type} from ${from.slice(0, 8)}… (state: ${updated.state})`);

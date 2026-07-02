@@ -435,3 +435,106 @@ describe('isTerminal / expireNegotiation / dedupeNegotiationMessages', () => {
     expect(dedupeNegotiationMessages(dup).messages).toHaveLength(1);
   });
 });
+
+describe('applyInbound event-id replay guard (all message types)', () => {
+  it('a replayed COUNTER (same event id) does not inflate rounds or overwrite terms', () => {
+    const intent = ride();
+    const driver = openNegotiation(intent, pkB, true);
+    let owner = openNegotiation(intent, pkA, false, pkB);
+    const c1 = makeCounter(driver, { payment: 'SGD 20' });
+    owner = applyInbound(owner, c1, pkB, 'ev-c1')!;
+    expect(owner.rounds).toBe(1);
+    expect(owner.seenEventIds).toContain('ev-c1');
+    // Newer counter supersedes it…
+    const c2 = makeCounter({ ...driver, rounds: 1 }, { payment: 'SGD 25' });
+    owner = applyInbound(owner, c2, pkB, 'ev-c2')!;
+    expect(owner.terms?.payment).toBe('SGD 25');
+    expect(owner.rounds).toBe(2);
+    // …then the backfill replays the OLD counter: must be a no-op.
+    expect(applyInbound(owner, c1, pkB, 'ev-c1')).toBeNull();
+    expect(owner.terms?.payment).toBe('SGD 25');
+  });
+
+  it('replayed counters cannot brick the negotiation at MAX_ROUNDS', () => {
+    const intent = ride();
+    const driver = openNegotiation(intent, pkB, true);
+    let owner = openNegotiation(intent, pkA, false, pkB);
+    const c = makeCounter(driver, { payment: 'SGD 20' });
+    owner = applyInbound(owner, c, pkB, 'ev-x')!;
+    for (let i = 0; i < 20; i++) expect(applyInbound(owner, c, pkB, 'ev-x')).toBeNull();
+    expect(owner.rounds).toBe(1);
+  });
+
+  it('a replayed ACCEPT does not dismiss a pending cancel-request', () => {
+    const intent = ride();
+    const driver = openNegotiation(intent, pkB, true);
+    let owner = openNegotiation(intent, pkA, false, pkB);
+    const c = makeCounter(driver, { payment: 'SGD 20' });
+    owner = applyInbound(owner, c, pkB, 'ev-c')!;
+    const acc = makeAccept({ ...driver, terms: { payment: 'SGD 20' } }, 'tg:@driver');
+    owner = applyInbound(owner, acc, pkB, 'ev-acc')!;
+    expect(owner.state).toBe('confirmed');
+    const req = makeCancelRequest({ ...driver, state: 'confirmed' });
+    owner = applyInbound(owner, req, pkB, 'ev-req')!;
+    expect(owner.state).toBe('cancel_requested');
+    // Backfill replays the original accept — must not flip back to confirmed.
+    expect(applyInbound(owner, acc, pkB, 'ev-acc')).toBeNull();
+  });
+
+  it('a NEW accept (fresh event id) during cancel_requested records contact but keeps state', () => {
+    const intent = ride();
+    const driver = openNegotiation(intent, pkB, true);
+    let owner = openNegotiation(intent, pkA, false, pkB);
+    const c = makeCounter(driver, { payment: 'SGD 20' });
+    owner = applyInbound(owner, c, pkB, 'ev-c')!;
+    const acc = makeAccept({ ...driver, terms: { payment: 'SGD 20' } }, 'tg:@driver');
+    owner = applyInbound(owner, acc, pkB, 'ev-acc')!;
+    const req = makeCancelRequest({ ...driver, state: 'confirmed' });
+    owner = applyInbound(owner, req, pkB, 'ev-req')!;
+    const acc2 = makeAccept({ ...driver, terms: { payment: 'SGD 20' } }, 'tg:@driver2');
+    const after = applyInbound(owner, acc2, pkB, 'ev-acc2')!;
+    expect(after.state).toBe('cancel_requested');
+    expect(after.theirContact).toBe('tg:@driver2');
+  });
+
+  it('messages without an event id still apply (agent/legacy path)', () => {
+    const intent = ride();
+    const driver = openNegotiation(intent, pkB, true);
+    const owner = openNegotiation(intent, pkA, false, pkB);
+    const c = makeCounter(driver, { payment: 'SGD 20' });
+    const after = applyInbound(owner, c, pkB)!;
+    expect(after.rounds).toBe(1);
+    expect(after.seenEventIds).toBeUndefined();
+  });
+
+  it('seenEventIds is bounded at 500', () => {
+    const intent = ride();
+    const driver = openNegotiation(intent, pkB, true);
+    let owner = openNegotiation(intent, pkA, false, pkB);
+    const c = makeCounter(driver, { payment: 'SGD 20' });
+    owner = applyInbound(owner, c, pkB, 'ev-c')!;
+    const acc = makeAccept({ ...driver, terms: { payment: 'SGD 20' } }, 'tg:@driver');
+    owner = applyInbound(owner, acc, pkB, 'ev-acc')!;
+    for (let i = 0; i < 600; i++) {
+      const chat = makeChat({ ...driver, state: 'confirmed' }, `m${i}`);
+      owner = applyInbound(owner, chat, pkB, `ev-chat-${i}`)!;
+    }
+    expect(owner.seenEventIds!.length).toBeLessThanOrEqual(500);
+    expect(owner.seenEventIds).toContain('ev-chat-599');
+  });
+});
+
+describe('expireNegotiation cancel_requested guard', () => {
+  it('does not expire a confirmed deal with a pending cancel-request', () => {
+    const intent = ride();
+    const driver = openNegotiation(intent, pkB, true);
+    let owner = openNegotiation(intent, pkA, false, pkB);
+    const c = makeCounter(driver, { payment: 'SGD 20' });
+    owner = applyInbound(owner, c, pkB, 'ev-c')!;
+    const acc = makeAccept({ ...driver, terms: { payment: 'SGD 20' } }, 'tg:@driver');
+    owner = applyInbound(owner, acc, pkB, 'ev-acc')!;
+    const req = makeCancelRequest({ ...driver, state: 'confirmed' });
+    owner = applyInbound(owner, req, pkB, 'ev-req')!;
+    expect(expireNegotiation(owner).state).toBe('cancel_requested');
+  });
+});

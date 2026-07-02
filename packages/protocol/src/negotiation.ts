@@ -203,11 +203,35 @@ export function applyOutbound(nego: Negotiation, msg: NegotiationMessage): Negot
   }
 }
 
+/** How many applied event ids each negotiation remembers (replay guard). */
+const SEEN_EVENT_IDS_MAX = 500;
+
 /**
  * Apply an inbound message from the peer. Returns the updated negotiation,
  * or null if the message is invalid for the current state (ignore it).
+ *
+ * Replay guard: relays redeliver the same kind:4 event once per connected
+ * relay, and the startup backfill replays the whole window on every reload.
+ * Every applied event id is recorded on the negotiation; a message whose id
+ * was already applied is a no-op regardless of type. Without this, replayed
+ * COUNTERs inflate `rounds` until the negotiation bricks at MAX_ROUNDS and
+ * overwrite live terms with stale ones, and a replayed ACCEPT flips a pending
+ * cancel-request back to `confirmed`.
  */
 export function applyInbound(
+  nego: Negotiation,
+  msg: NegotiationMessage,
+  peerPubkey: string,
+  eventId?: string,
+): Negotiation | null {
+  if (eventId && nego.seenEventIds?.includes(eventId)) return null;
+  const next = applyInboundUnchecked(nego, msg, peerPubkey, eventId);
+  if (!next || !eventId) return next;
+  const seen = nego.seenEventIds ?? [];
+  return { ...next, seenEventIds: [...seen.slice(1 - SEEN_EVENT_IDS_MAX), eventId] };
+}
+
+function applyInboundUnchecked(
   nego: Negotiation,
   msg: NegotiationMessage,
   peerPubkey: string,
@@ -270,7 +294,10 @@ export function applyInbound(
       // The accept echoes the full agreed terms; layer them over our local view
       // so a confirm never drops a field we'd already negotiated.
       terms: msg.terms ? mergeTerms(nego.terms, msg.terms) : nego.terms,
-      state: 'confirmed',
+      // An accept must not resolve a pending mutual-cancel — only an explicit
+      // CANCEL_AGREE/DECLINE does. Otherwise a late/duplicate accept silently
+      // dismisses the cancel prompt on the other side.
+      state: nego.state === 'cancel_requested' ? nego.state : 'confirmed',
     };
   }
   // Mutual cancellation of a confirmed deal (cooperative; no karma involved).
@@ -364,7 +391,9 @@ export function dedupeNegotiationMessages(nego: Negotiation): Negotiation {
 }
 
 export function expireNegotiation(nego: Negotiation): Negotiation {
-  if (nego.state === 'confirmed' || nego.state === 'cancelled') return nego;
+  // `cancel_requested` IS a confirmed deal (one side asked to mutually cancel);
+  // expiring it would strand the deal — AGREE/DECLINE are rejected once expired.
+  if (nego.state === 'confirmed' || nego.state === 'cancelled' || nego.state === 'cancel_requested') return nego;
   return { ...nego, state: 'expired', updatedAt: now() };
 }
 

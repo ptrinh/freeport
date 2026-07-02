@@ -150,4 +150,11 @@ export interface Negotiation {
    * undefined → not started; 'picked_up' → in transit; 'completed' → done.
    */
   stage?: 'picked_up' | 'completed';
+  /**
+   * Source DM event ids already applied to this negotiation. Relays redeliver
+   * the same kind:4 event (once per connected relay, and again on every
+   * startup backfill); any inbound message whose event id is here is a replay
+   * and must be a no-op. Bounded (most recent 500).
+   */
+  seenEventIds?: string[];
 }

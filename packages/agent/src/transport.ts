@@ -76,7 +76,7 @@ export class Transport {
 
   /** Listen for inbound negotiation DMs addressed to us. */
   subscribeNegotiations(
-    onMessage: (msg: NegotiationMessage, from: string) => void,
+    onMessage: (msg: NegotiationMessage, from: string, eventId?: string) => void,
     sinceSec?: number,
   ): { close: () => void } {
     const sub = this.pool.subscribeMany(
@@ -91,7 +91,7 @@ export class Transport {
           try {
             const plaintext = await nip04.decrypt(this.sk, ev.pubkey, ev.content);
             const msg = parseNegotiationMessage(plaintext);
-            if (msg) onMessage(msg, ev.pubkey);
+            if (msg) onMessage(msg, ev.pubkey, ev.id);
           } catch {
             // Not for us / not a Freeport envelope — ignore.
           }
