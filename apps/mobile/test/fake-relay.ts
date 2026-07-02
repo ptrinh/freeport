@@ -31,9 +31,16 @@ function matches(f: Filter, ev: Event): boolean {
 export class FakeRelay {
   private events: Event[] = [];
   private subs = new Set<Sub>();
+  /** Simulate a total outage: publishes reject (drives the client's outbox). */
+  down = false;
 
   /** SimplePool.publish shape: returns one promise per relay. */
   publish(_relays: string[], ev: Event): Promise<string>[] {
+    if (this.down) {
+      const p = Promise.reject(new Error('relay down'));
+      p.catch(() => {}); // pre-observe so an un-awaited slot can't be an unhandled rejection
+      return [p];
+    }
     this.events.push(ev);
     for (const s of this.subs) {
       if (s.closed) continue;
