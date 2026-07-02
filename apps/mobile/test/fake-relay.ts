@@ -49,7 +49,10 @@ export class FakeRelay {
     for (const ev of this.events) {
       if (sub.filters.some((f) => matches(f, ev))) sub.onevent(ev);
     }
-    handlers.oneose?.();
+    // A real relay sends EOSE asynchronously — deferring matters because
+    // callers do `const sub = subscribeMany(...)` with `oneose: () =>
+    // sub.close()`; firing it synchronously hits `sub` in its TDZ.
+    queueMicrotask(() => { if (!sub.closed) handlers.oneose?.(); });
     return { close: () => { sub.closed = true; this.subs.delete(sub); } };
   }
 
