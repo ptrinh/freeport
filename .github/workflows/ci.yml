@@ -12,7 +12,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # 22+: nostr-tools needs the global WebSocket, which Node 20 lacks —
+          # on 20 the agent e2e's relay connections silently never open.
+          node-version: 22
           cache: npm
           cache-dependency-path: |
             package-lock.json
