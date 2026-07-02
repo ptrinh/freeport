@@ -63,6 +63,13 @@ const NEGO_STORE_KEY = 'freeport.negotiations';
 const PUBLISHED_STORE_KEY = 'freeport.published';
 /** Signed-but-undelivered DMs (all relays down / offline), retried on reconnect. */
 const OUTBOX_STORE_KEY = 'freeport.outbox';
+/** created_at of the newest DM ever processed — bounds the startup backfill. */
+const DM_LAST_SEEN_KEY = 'freeport.dmLastSeen';
+/** Re-fetch this far behind lastSeen: relays deliver out of order, and an
+ *  offline counterparty's DM can be published long after it was written. */
+const DM_BACKFILL_MARGIN_SECONDS = 24 * 3600;
+/** Absolute backfill floor (first launch / stale lastSeen). */
+const DM_BACKFILL_MAX_SECONDS = 7 * 24 * 3600;
 /** Outbox entries older than this are dropped on load — the deal has moved on. */
 const OUTBOX_MAX_AGE_SECONDS = 7 * 24 * 3600;
 
@@ -106,6 +113,8 @@ export class MobileClient {
    */
   private outbox: Array<{ event: Event }> = [];
   private flushingOutbox = false;
+  /** Newest kind-4 created_at seen for us — bounds the next startup backfill. */
+  private dmLastSeenTs = 0;
   onIntent?: (intent: Intent) => void;
   /** Fires for our own intents — both freshly posted and echoed back from relays on startup. */
   onOwnIntent?: (intent: Intent) => void;
@@ -218,9 +227,26 @@ export class MobileClient {
     void this.persistNegotiations();
   }
 
+  /**
+   * Persist is DEBOUNCED (trailing): it serializes the entire store, and the
+   * startup DM backfill applies hundreds of messages in a burst — one write
+   * per message meant hundreds of full-store JSON.stringify + KV writes at
+   * every launch. One trailing write captures the same final state.
+   */
+  private persistTimer: ReturnType<typeof setTimeout> | null = null;
+
   private async persistNegotiations(): Promise<void> {
+    if (this.persistTimer) return;
+    this.persistTimer = setTimeout(() => {
+      this.persistTimer = null;
+      void this.persistNegotiationsNow();
+    }, 250);
+  }
+
+  private async persistNegotiationsNow(): Promise<void> {
     try {
       await kvSet(NEGO_STORE_KEY, JSON.stringify([...this.negotiations.values()]));
+      if (this.dmLastSeenTs > 0) await kvSet(DM_LAST_SEEN_KEY, String(this.dmLastSeenTs));
     } catch {
       /* best-effort; a failed write just means this change isn't cached */
     }
@@ -263,9 +289,14 @@ export class MobileClient {
     try { await kvDelete(NEGO_STORE_KEY); } catch { /* best-effort */ }
     try { await kvDelete(PUBLISHED_STORE_KEY); } catch { /* best-effort */ }
     try { await kvDelete(OUTBOX_STORE_KEY); } catch { /* best-effort */ }
+    try { await kvDelete(DM_LAST_SEEN_KEY); } catch { /* best-effort */ }
   }
 
   async loadNegotiations(): Promise<void> {
+    try {
+      const ts = Number(await kvGet(DM_LAST_SEEN_KEY));
+      if (Number.isFinite(ts) && ts > 0) this.dmLastSeenTs = ts;
+    } catch { /* first launch */ }
     await this.loadOutbox(); // undelivered DMs from the previous session retry first
     await this.loadPublished(); // restore own posts first so inbound accepts can match
     try {
@@ -339,30 +370,70 @@ export class MobileClient {
     return () => sub.close();
   }
 
-  /** Fetch and cache a counterparty's kind:0 profile. No-op if already cached. */
+  /**
+   * Profile fetches are BATCHED: the startup backfill delivers a burst of
+   * intents from many distinct authors, and one REQ per author (the old
+   * behavior) blows through relays' per-socket subscription caps — most
+   * queries queue or get dropped, delaying the feed itself. Collect unknown
+   * pubkeys for a beat and issue a single `{kinds:[0], authors:[…]}` REQ.
+   */
+  private profileFetchQueue = new Set<string>();
+  private profileFetchTimer: ReturnType<typeof setTimeout> | null = null;
+  /** created_at of the applied kind-0 per pubkey — relays echo old versions. */
+  private profileTs = new Map<string, number>();
+
   private fetchProfile(pubkey: string): void {
     if (this.profiles.has(pubkey)) return;
     this.profiles.set(pubkey, {}); // mark as in-flight
-    const sub = this.pool.subscribeMany(
-      this.relays,
-      { kinds: [0], authors: [pubkey], limit: 1 },
-      {
-        onevent: (ev: Event) => {
-          try {
-            const meta = JSON.parse(ev.content);
-            this.profiles.set(pubkey, { name: meta.name, picture: meta.picture, about: meta.about, phone: meta.phone, vehicleModel: meta.vehicle_model, plate: meta.plate });
-            this.onProfileFetched?.(pubkey);
-          } catch {}
+    this.profileFetchQueue.add(pubkey);
+    if (this.profileFetchTimer) return;
+    this.profileFetchTimer = setTimeout(() => {
+      this.profileFetchTimer = null;
+      const authors = [...this.profileFetchQueue];
+      this.profileFetchQueue.clear();
+      if (!authors.length) return;
+      const sub = this.pool.subscribeMany(
+        this.relays,
+        { kinds: [0], authors },
+        {
+          onevent: (ev: Event) => {
+            // Keep only the NEWEST kind-0 per author — with several relays in
+            // the pool, stale profile versions arrive in arbitrary order.
+            if ((this.profileTs.get(ev.pubkey) ?? 0) >= ev.created_at) return;
+            try {
+              const meta = JSON.parse(ev.content);
+              this.profileTs.set(ev.pubkey, ev.created_at);
+              this.profiles.set(ev.pubkey, { name: meta.name, picture: meta.picture, about: meta.about, phone: meta.phone, vehicleModel: meta.vehicle_model, plate: meta.plate });
+              this.onProfileFetched?.(ev.pubkey);
+            } catch {}
+          },
+          oneose: () => sub.close(),
         },
-        oneose: () => sub.close(),
-      },
-    );
+      );
+    }, 400);
   }
 
+  /**
+   * Reputation fetches are THROTTLED, not batched: each one is ~6 relay
+   * queries (receipts both directions, karma, activity, partner receipts), so
+   * a backfill burst of N authors used to fire ~6×N REQs at once. A small
+   * concurrency gate keeps the relay connections responsive; the feed's
+   * karma sort updates progressively as results land (as it already did).
+   */
   private reputationInFlight = new Set<string>();
+  private reputationWaiting: string[] = [];
+  private static readonly REPUTATION_CONCURRENCY = 3;
 
   fetchReputation(pubkey: string): void {
-    if (this.reputations.has(pubkey) || this.reputationInFlight.has(pubkey)) return;
+    if (this.reputations.has(pubkey) || this.reputationInFlight.has(pubkey) || this.reputationWaiting.includes(pubkey)) return;
+    if (this.reputationInFlight.size >= MobileClient.REPUTATION_CONCURRENCY) {
+      this.reputationWaiting.push(pubkey);
+      return;
+    }
+    this.runReputationFetch(pubkey);
+  }
+
+  private runReputationFetch(pubkey: string): void {
     this.reputationInFlight.add(pubkey);
     this.trust()
       .then((trust) => fetchReputation(this.pool, this.relays, pubkey, trust))
@@ -371,7 +442,11 @@ export class MobileClient {
         this.onReputationFetched?.(pubkey);
       })
       .catch(() => {})
-      .finally(() => this.reputationInFlight.delete(pubkey));
+      .finally(() => {
+        this.reputationInFlight.delete(pubkey);
+        const next = this.reputationWaiting.shift();
+        if (next) this.runReputationFetch(next);
+      });
   }
 
   async rateKarma(
@@ -527,11 +602,21 @@ export class MobileClient {
 
   watchDMs(): () => void {
     this.watchStartTs = Math.floor(Date.now() / 1000);
+    // Backfill from just behind the newest DM we've already processed (with a
+    // reorder margin) instead of always 7 days — for a daily user that's ~7×
+    // fewer NIP-04 decrypts and replays per launch/resume. The event-id replay
+    // guard makes any overlap harmless.
+    const floor = Math.floor(Date.now() / 1000) - DM_BACKFILL_MAX_SECONDS;
+    const since = Math.max(floor, this.dmLastSeenTs - DM_BACKFILL_MARGIN_SECONDS);
     const sub = this.pool.subscribeMany(
       this.relays,
-      { kinds: [4], '#p': [this.pubkey], since: Math.floor(Date.now() / 1000) - 7 * 24 * 3600 },
+      { kinds: [4], '#p': [this.pubkey], since },
       {
         onevent: async (ev: Event) => {
+          if (ev.created_at > this.dmLastSeenTs && ev.created_at <= this.watchStartTs + 300) {
+            this.dmLastSeenTs = ev.created_at;
+            void this.persistNegotiations(); // debounced; also writes dmLastSeen
+          }
           if (this.blocked.has(ev.pubkey)) return; // blocked peer — drop without decrypting
           try {
             const plain = await this.signer.nip04Decrypt(ev.pubkey, ev.content);

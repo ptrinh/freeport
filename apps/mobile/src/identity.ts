@@ -53,7 +53,7 @@ export async function clearKey(): Promise<void> {
 export async function wipeAllLocalData(): Promise<void> {
   const KEYS = [
     'freeport.nsec', 'freeport.profile', 'freeport.prefs', 'freeport.negotiations',
-    'freeport.published', 'freeport.outbox', 'freeport.addressbook', 'freeport.created', 'freeport.rated',
+    'freeport.published', 'freeport.outbox', 'freeport.dmLastSeen', 'freeport.addressbook', 'freeport.created', 'freeport.rated',
     'freeport.celebrated', 'freeport.expiredLog', 'freeport.expiredSeen',
     'freeport.expoPushToken', 'freeport.geoOk', 'freeport.guidanceSeen', 'freeport.notifDismiss',
     'freeport.pushOn', 'freeport.autoContactSent', 'freeport.suspendNotifiedAt',
