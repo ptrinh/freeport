@@ -196,6 +196,14 @@ export class FreeportAgent {
       await this.cancel(current, 'declined by owner');
       return;
     }
+    // The accept is built from CURRENT terms, but the human confirmed the
+    // SNAPSHOT they were shown. If a peer counter landed mid-prompt, sealing
+    // current terms would commit the owner to a price/time they never saw —
+    // re-prompt on the new terms instead.
+    if (!auto && JSON.stringify(current.terms) !== JSON.stringify(nego.terms)) {
+      this.events.onLog('terms changed while awaiting confirmation — asking again');
+      return this.tryAccept(current, rule);
+    }
     const accept = makeAccept(current, this.contactFor(rule));
     const updated = applyOutbound(current, accept);
     this.negotiations.set(updated.id, updated);

@@ -17,7 +17,9 @@ function haversineKm(lat: number, lon: number, gh: string): number | null {
   return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
 
-function eventGeohash(ev: Event): string | undefined {
+/** Exported so callers compute this ONCE per event (the payload JSON.parse
+ *  fallback is the costly part) instead of once per subscriber. */
+export function eventGeohash(ev: Event): string | undefined {
   const g = ev.tags.find((t) => t[0] === 'g')?.[1];
   if (g) return g;
   const intent = parseIntentEvent(ev);
@@ -25,7 +27,7 @@ function eventGeohash(ev: Event): string | undefined {
   return p?.from?.geohash || p?.location?.geohash || undefined;
 }
 
-export function matches(ev: Event, f: SubFilters): boolean {
+export function matches(ev: Event, f: SubFilters, geohash?: string): boolean {
   const kinds = f.kinds?.length ? f.kinds : DEFAULT_KINDS;
   if (!kinds.includes(ev.kind)) return false;
 
@@ -40,7 +42,7 @@ export function matches(ev: Event, f: SubFilters): boolean {
   }
 
   if (f.near) {
-    const gh = eventGeohash(ev);
+    const gh = geohash ?? eventGeohash(ev);
     if (!gh) return false;
     const km = haversineKm(f.near.lat, f.near.lon, gh);
     if (km === null || km > f.near.radiusKm) return false;

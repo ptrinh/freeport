@@ -9,6 +9,7 @@ import {
   geohashDecode,
   geohashNear,
   matchIntent,
+  ruleWindowOn,
   openNegotiation,
   makeCounter,
   makeAccept,
@@ -421,5 +422,48 @@ describe('matchIntent withdrawal tombstones', () => {
     const res = matchIntent(intent as any, rule as any);
     expect(res.matched).toBe(false);
     expect(res.reason).toMatch(/withdrawn/);
+  });
+});
+
+describe('ruleWindowOn overnight windows', () => {
+  const rule = (extra: any = {}) => ({
+    schema: 'rideshare/1', side: 'offer' as const, market: 'm',
+    daily_window: { start: '22:00', end: '02:00' }, ...extra,
+  });
+
+  it('spills past midnight instead of producing an empty interval', () => {
+    const d = new Date(); d.setHours(23, 0, 0, 0); // 23:00 tonight
+    const w = ruleWindowOn(d, rule() as any)!;
+    expect(w).toBeTruthy();
+    expect(w.end).toBeGreaterThan(w.start);
+    expect((w.end - w.start) / 3600).toBe(4); // 22:00 → 02:00 next day
+    expect(d.getTime() / 1000).toBeGreaterThanOrEqual(w.start);
+    expect(d.getTime() / 1000).toBeLessThanOrEqual(w.end);
+  });
+
+  it("covers small-hours times via the PREVIOUS day's window", () => {
+    const d = new Date(); d.setHours(1, 0, 0, 0); // 01:00 today
+    const w = ruleWindowOn(d, rule() as any)!;
+    const ts = Math.floor(d.getTime() / 1000);
+    expect(ts).toBeGreaterThanOrEqual(w.start);
+    expect(ts).toBeLessThanOrEqual(w.end);
+  });
+
+  it('respects the day-of-week gate on the window START day', () => {
+    const d = new Date(); d.setHours(1, 0, 0, 0); // 01:00 today → yesterday's window
+    const yesterdayKey = ['sun','mon','tue','wed','thu','fri','sat'][(d.getDay() + 6) % 7];
+    // Rule runs ONLY on yesterday's weekday → 01:00 today is inside its spill.
+    expect(ruleWindowOn(d, rule({ days: [yesterdayKey] }) as any)).toBeTruthy();
+    // Rule runs only on today's weekday → yesterday's spill doesn't apply, and
+    // today's own 22:00-02:00 window (starting tonight) is returned instead.
+    const todayKey = ['sun','mon','tue','wed','thu','fri','sat'][d.getDay()];
+    const w = ruleWindowOn(d, rule({ days: [todayKey] }) as any)!;
+    expect(Math.floor(d.getTime() / 1000)).toBeLessThan(w.start); // tonight, not now
+  });
+
+  it('normal (non-overnight) windows behave as before', () => {
+    const d = new Date(); d.setHours(12, 0, 0, 0);
+    const w = ruleWindowOn(d, { ...rule(), daily_window: { start: '09:00', end: '17:00' } } as any)!;
+    expect((w.end - w.start) / 3600).toBe(8);
   });
 });

@@ -14,7 +14,7 @@ import { SimplePool } from 'nostr-tools/pool';
 import type { Event } from 'nostr-tools';
 import webpush from 'web-push';
 import { Expo } from 'expo-server-sdk';
-import { matches, unionKinds } from './match.js';
+import { eventGeohash, matches, unionKinds } from './match.js';
 import { dmCoalesceDue } from './coalesce.js';
 import type { SubStore, SubRecord } from './store.js';
 
@@ -33,10 +33,27 @@ export class Watcher {
   private dmSub: { close: () => void } | null = null;
   private intentKinds: number[] = [];
   private pubkeys: string[] = [];
-  /** Bounded dedupe of (subId|eventId) already pushed. */
+  /**
+   * Bounded dedupe of (subId|eventId) already pushed — two generations
+   * instead of a single set that clear()s: a wholesale clear mid-burst
+   * re-allowed duplicate pushes for everything in flight. Rotating keeps the
+   * most recent half-window always intact.
+   */
   private seen = new Set<string>();
+  private seenPrev = new Set<string>();
+  private static readonly SEEN_GENERATION_MAX = 25000;
   /** Last DM-notification time per subscriber id, for burst coalescing. */
   private readonly lastDmPush = new Map<string, number>();
+
+  private alreadyPushed(key: string): boolean {
+    if (this.seen.has(key) || this.seenPrev.has(key)) return true;
+    this.seen.add(key);
+    if (this.seen.size > Watcher.SEEN_GENERATION_MAX) {
+      this.seenPrev = this.seen;
+      this.seen = new Set();
+    }
+    return false;
+  }
 
   constructor(private readonly relays: string[], private readonly store: SubStore) {}
 
@@ -50,7 +67,7 @@ export class Watcher {
       this.intentSub?.close();
       this.intentSub = this.pool.subscribeMany(
         this.relays,
-        { kinds: this.intentKinds, since: Math.floor(Date.now() / 1000) } as any,
+        { kinds: this.intentKinds, since: Math.floor(Date.now() / 1000) - 60 } as any, // 60s overlap: a re-subscribe must not drop events published in the gap (dedupe absorbs the replays)
         { onevent: (ev: Event) => this.onIntent(ev) },
       );
     }
@@ -63,7 +80,7 @@ export class Watcher {
       if (this.pubkeys.length) {
         this.dmSub = this.pool.subscribeMany(
           this.relays,
-          { kinds: [KIND_DM], '#p': this.pubkeys, since: Math.floor(Date.now() / 1000) } as any,
+          { kinds: [KIND_DM], '#p': this.pubkeys, since: Math.floor(Date.now() / 1000) - 60 } as any, // 60s overlap: a re-subscribe must not drop events published in the gap (dedupe absorbs the replays)
           { onevent: (ev: Event) => this.onDM(ev) },
         );
       }
@@ -81,23 +98,30 @@ export class Watcher {
     // Index lookup: only subs watching a matching topic (or with no topic
     // filter) are candidates; `matches()` still does the precise kinds+geohash test.
     const evTopics = ev.tags.filter((t) => t[0] === 't').map((t) => t[1]);
+    // Geohash once per EVENT; fan pushes out concurrently — serial awaits
+    // (~100-300ms each) blocked processing of every subsequent relay event.
+    const geohash = eventGeohash(ev);
+    const sends: Promise<void>[] = [];
     for (const rec of this.store.intentCandidates(evTopics)) {
-      if (!matches(ev, rec.filters)) continue;
-      await this.maybePush(rec, ev.id, {
+      if (!matches(ev, rec.filters, geohash)) continue;
+      sends.push(this.maybePush(rec, ev.id, {
         body,
         tag: 'freeport-intent',
         // Tapping it should land on Browse (where nearby posts live).
         data: { kind: ev.kind, id: ev.id, tab: 'browse', url: '/?tab=browse' },
-      });
+      }));
     }
+    await Promise.allSettled(sends);
   }
 
   private async onDM(ev: Event): Promise<void> {
     const recipients = ev.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
     // Index lookup by recipient pubkey — O(recipients), not O(all subscribers).
-    for (const rec of this.store.subsForPubkeys(recipients)) {
-      await this.maybePush(rec, ev.id, { body: 'New message', tag: 'freeport-dm', data: { tab: 'messages', url: '/?tab=messages' } }, rec.id);
-    }
+    await Promise.allSettled(
+      this.store.subsForPubkeys(recipients).map((rec) =>
+        this.maybePush(rec, ev.id, { body: 'New message', tag: 'freeport-dm', data: { tab: 'messages', url: '/?tab=messages' } }, rec.id),
+      ),
+    );
   }
 
   /**
@@ -105,10 +129,7 @@ export class Watcher {
    *   DM_COOLDOWN_MS (used for DMs, which include bursty control traffic).
    */
   private async maybePush(rec: SubRecord, eventId: string, body: { body: string; tag: string; data: Record<string, unknown> }, coalesceKey?: string): Promise<void> {
-    const key = `${rec.id}|${eventId}`;
-    if (this.seen.has(key)) return;
-    this.seen.add(key);
-    if (this.seen.size > 50000) this.seen.clear(); // bound memory
+    if (this.alreadyPushed(`${rec.id}|${eventId}`)) return;
     if (coalesceKey && DM_COOLDOWN_MS > 0) {
       const now = Date.now();
       if (!dmCoalesceDue(this.lastDmPush.get(coalesceKey), now, DM_COOLDOWN_MS)) return; // within the window → skip (already notified recently)

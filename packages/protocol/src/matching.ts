@@ -42,19 +42,42 @@ function parseHHMM(s: string): number {
   return h * 60 + m;
 }
 
-/** Convert a rule's daily window to an absolute window on the intent's day. */
+/**
+ * Convert a rule's daily window to an absolute window on the intent's day.
+ * An overnight window (start > end, e.g. 22:00–02:00) spills past midnight:
+ * the end lands on the NEXT day. Without this, 22:00–02:00 produced an empty
+ * (inverted) interval that never overlapped anything. When the intent falls
+ * in the small hours covered by the PREVIOUS day's overnight window (e.g. a
+ * 01:00 ride against 22:00–02:00), that previous-day window applies —
+ * day-of-week gating included.
+ */
 export function ruleWindowOn(date: Date, rule: MatchRule): TimeWindow | null {
   if (!rule.daily_window) return null;
-  const day = DAY_KEYS[date.getDay()];
-  if (rule.days && !rule.days.includes(day as any)) return null;
-  const base = new Date(date);
-  base.setHours(0, 0, 0, 0);
   const startMin = parseHHMM(rule.daily_window.start);
   const endMin = parseHHMM(rule.daily_window.end);
-  return {
-    start: Math.floor(base.getTime() / 1000) + startMin * 60,
-    end: Math.floor(base.getTime() / 1000) + endMin * 60,
+  const overnight = endMin < startMin;
+
+  const windowFor = (d: Date): TimeWindow | null => {
+    const day = DAY_KEYS[d.getDay()];
+    if (rule.days && !rule.days.includes(day as any)) return null;
+    const base = new Date(d);
+    base.setHours(0, 0, 0, 0);
+    const t0 = Math.floor(base.getTime() / 1000);
+    return {
+      start: t0 + startMin * 60,
+      end: t0 + (overnight ? endMin + 24 * 60 : endMin) * 60,
+    };
   };
+
+  const today = windowFor(date);
+  if (!overnight) return today;
+  // Overnight: the intent may sit in yesterday's spill-over (00:00–end).
+  const prevDay = new Date(date);
+  prevDay.setDate(prevDay.getDate() - 1);
+  const yesterday = windowFor(prevDay);
+  const ts = Math.floor(date.getTime() / 1000);
+  if (yesterday && ts <= yesterday.end) return yesterday;
+  return today;
 }
 
 function windowsOverlap(a: TimeWindow, b: TimeWindow, slackSec = 0): boolean {
