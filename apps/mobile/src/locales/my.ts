@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "မမှန်ကန်သော အရန်ဖိုင်။",
   "Wrong passphrase?": "စကားဝှက်စာပိုဒ် မှားနေသလား?",
   "Select a score": "အမှတ်တစ်ခု ရွေးပါ",
-  "Reported": "တိုင်ကြားပြီးပါပြီ"
+  "Reported": "တိုင်ကြားပြီးပါပြီ",
+  "Double-tap to confirm": "အတည်ပြုရန် နှစ်ချက်တို့ပါ",
+  "Clear search": "ရှာဖွေမှုကို ရှင်းပါ",
+  "Attach photo": "ဓာတ်ပုံ ပူးတွဲပါ",
+  "Stop recording": "အသံသွင်းခြင်း ရပ်ပါ",
+  "Record voice memo": "အသံမှတ်စု သွင်းပါ",
+  "Send message": "စာ ပို့ပါ",
+  "Close image": "ပုံကို ပိတ်ပါ",
+  "Open address book": "လိပ်စာစာအုပ် ဖွင့်ပါ",
+  "Live location sharing is off for this deal.": "ဤသဘောတူညီချက်အတွက် တိုက်ရိုက်တည်နေရာ မျှဝေမှု ပိတ်ထားသည်။",
+  "Resume": "ပြန်စပါ",
+  "Stop": "ရပ်ပါ",
+  "Resume live location sharing": "တိုက်ရိုက်တည်နေရာ မျှဝေမှုကို ပြန်စပါ",
+  "Stop sharing live location": "တိုက်ရိုက်တည်နေရာ မျှဝေမှုကို ရပ်ပါ"
 };
 export default c;

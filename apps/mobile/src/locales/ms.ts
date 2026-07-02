@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Fail sandaran tidak sah.",
   "Wrong passphrase?": "Frasa laluan salah?",
   "Select a score": "Pilih skor",
-  "Reported": "Dilaporkan"
+  "Reported": "Dilaporkan",
+  "Double-tap to confirm": "Ketik dua kali untuk mengesahkan",
+  "Clear search": "Kosongkan carian",
+  "Attach photo": "Lampirkan foto",
+  "Stop recording": "Hentikan rakaman",
+  "Record voice memo": "Rakam memo suara",
+  "Send message": "Hantar mesej",
+  "Close image": "Tutup imej",
+  "Open address book": "Buka buku alamat",
+  "Live location sharing is off for this deal.": "Perkongsian lokasi langsung dimatikan untuk perjanjian ini.",
+  "Resume": "Sambung semula",
+  "Stop": "Henti",
+  "Resume live location sharing": "Sambung semula perkongsian lokasi langsung",
+  "Stop sharing live location": "Hentikan perkongsian lokasi langsung"
 };
 export default c;

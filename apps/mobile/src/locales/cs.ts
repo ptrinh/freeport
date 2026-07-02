@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Neplatný soubor zálohy.",
   "Wrong passphrase?": "Špatná heslová fráze?",
   "Select a score": "Vyberte hodnocení",
-  "Reported": "Nahlášeno"
+  "Reported": "Nahlášeno",
+  "Double-tap to confirm": "Potvrďte dvojitým klepnutím",
+  "Clear search": "Vymazat hledání",
+  "Attach photo": "Přiložit fotku",
+  "Stop recording": "Zastavit nahrávání",
+  "Record voice memo": "Nahrát hlasovou zprávu",
+  "Send message": "Odeslat zprávu",
+  "Close image": "Zavřít obrázek",
+  "Open address book": "Otevřít adresář",
+  "Live location sharing is off for this deal.": "Sdílení polohy naživo je pro tuto dohodu vypnuté.",
+  "Resume": "Pokračovat",
+  "Stop": "Zastavit",
+  "Resume live location sharing": "Obnovit sdílení polohy naživo",
+  "Stop sharing live location": "Zastavit sdílení polohy naživo"
 };
 export default c;

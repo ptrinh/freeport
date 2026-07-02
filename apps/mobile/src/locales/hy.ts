@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Անվավեր պահուստային ֆայլ։",
   "Wrong passphrase?": "Սխալ գաղտնաբառ-արտահայտությո՞ւն",
   "Select a score": "Ընտրեք գնահատական",
-  "Reported": "Հաղորդված է"
+  "Reported": "Հաղորդված է",
+  "Double-tap to confirm": "Կրկնակի հպեք հաստատելու համար",
+  "Clear search": "Մաքրել որոնումը",
+  "Attach photo": "Կցել լուսանկար",
+  "Stop recording": "Դադարեցնել ձայնագրումը",
+  "Record voice memo": "Ձայնագրել ձայնային նշում",
+  "Send message": "Ուղարկել հաղորդագրություն",
+  "Close image": "Փակել պատկերը",
+  "Open address book": "Բացել հասցեների գիրքը",
+  "Live location sharing is off for this deal.": "Կենդանի տեղադրության կիսումն անջատված է այս գործարքի համար։",
+  "Resume": "Շարունակել",
+  "Stop": "Դադարեցնել",
+  "Resume live location sharing": "Շարունակել կենդանի տեղադրության կիսումը",
+  "Stop sharing live location": "Դադարեցնել կենդանի տեղադրության կիսումը"
 };
 export default c;

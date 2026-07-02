@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Érvénytelen biztonságimentés-fájl.",
   "Wrong passphrase?": "Rossz jelmondat?",
   "Select a score": "Válassz értékelést",
-  "Reported": "Bejelentve"
+  "Reported": "Bejelentve",
+  "Double-tap to confirm": "Koppints duplán a megerősítéshez",
+  "Clear search": "Keresés törlése",
+  "Attach photo": "Fotó csatolása",
+  "Stop recording": "Felvétel leállítása",
+  "Record voice memo": "Hangjegyzet rögzítése",
+  "Send message": "Üzenet küldése",
+  "Close image": "Kép bezárása",
+  "Open address book": "Címjegyzék megnyitása",
+  "Live location sharing is off for this deal.": "Az élő helymegosztás ki van kapcsolva ennél a megállapodásnál.",
+  "Resume": "Folytatás",
+  "Stop": "Leállítás",
+  "Resume live location sharing": "Élő helymegosztás folytatása",
+  "Stop sharing live location": "Élő helymegosztás leállítása"
 };
 export default c;

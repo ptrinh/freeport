@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Fișier de rezervă nevalid.",
   "Wrong passphrase?": "Frază de acces greșită?",
   "Select a score": "Alege un scor",
-  "Reported": "Raportat"
+  "Reported": "Raportat",
+  "Double-tap to confirm": "Atinge de două ori pentru a confirma",
+  "Clear search": "Șterge căutarea",
+  "Attach photo": "Atașează o fotografie",
+  "Stop recording": "Oprește înregistrarea",
+  "Record voice memo": "Înregistrează un memo vocal",
+  "Send message": "Trimite mesajul",
+  "Close image": "Închide imaginea",
+  "Open address book": "Deschide agenda de adrese",
+  "Live location sharing is off for this deal.": "Partajarea locației în timp real este oprită pentru acest acord.",
+  "Resume": "Reia",
+  "Stop": "Oprește",
+  "Resume live location sharing": "Reia partajarea locației în timp real",
+  "Stop sharing live location": "Oprește partajarea locației în timp real"
 };
 export default c;

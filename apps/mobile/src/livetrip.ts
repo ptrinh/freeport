@@ -125,6 +125,11 @@ export async function publishTripLocation(pool: SimplePool, session: TripSession
 
 /** Viewer side: subscribe to the rider's updates, decrypting each. */
 export function subscribeTrip(pool: SimplePool, view: TripView, onUpdate: (u: TripUpdate) => void): () => void {
+  // Multiple relays + async decrypt deliver updates in arbitrary order: an
+  // older position arriving after a fresh one would snap the marker backwards,
+  // and a replayed `live` after `ended` would resurrect a finished trip.
+  // Only ever move FORWARD in the sender's own timeline.
+  let latestTs = 0;
   const sub = pool.subscribeMany(
     view.relays,
     { kinds: [TRIP_KIND], authors: [view.pk], '#d': [view.id] },
@@ -132,7 +137,11 @@ export function subscribeTrip(pool: SimplePool, view: TripView, onUpdate: (u: Tr
       onevent: async (ev: any) => {
         try {
           const u = JSON.parse(await nip04.decrypt(view.sk, view.pk, ev.content));
-          if (typeof u?.lat === 'number' && typeof u?.lon === 'number') onUpdate(u);
+          if (typeof u?.lat !== 'number' || typeof u?.lon !== 'number') return;
+          const ts = typeof u.ts === 'number' ? u.ts : 0;
+          if (ts < latestTs) return; // stale — a newer update already applied
+          latestTs = ts;
+          onUpdate(u);
         } catch { /* not ours / undecryptable */ }
       },
     },

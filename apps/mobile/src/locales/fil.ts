@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Hindi wastong backup file.",
   "Wrong passphrase?": "Maling passphrase?",
   "Select a score": "Pumili ng score",
-  "Reported": "Nai-report na"
+  "Reported": "Nai-report na",
+  "Double-tap to confirm": "I-double-tap para kumpirmahin",
+  "Clear search": "I-clear ang paghahanap",
+  "Attach photo": "Mag-attach ng litrato",
+  "Stop recording": "Itigil ang pag-record",
+  "Record voice memo": "Mag-record ng voice memo",
+  "Send message": "Magpadala ng mensahe",
+  "Close image": "Isara ang larawan",
+  "Open address book": "Buksan ang address book",
+  "Live location sharing is off for this deal.": "Naka-off ang live na pagbabahagi ng lokasyon para sa kasunduang ito.",
+  "Resume": "Ituloy",
+  "Stop": "Itigil",
+  "Resume live location sharing": "Ituloy ang live na pagbabahagi ng lokasyon",
+  "Stop sharing live location": "Itigil ang live na pagbabahagi ng lokasyon"
 };
 export default c;

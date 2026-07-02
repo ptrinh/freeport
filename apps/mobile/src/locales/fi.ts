@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Virheellinen varmuuskopiotiedosto.",
   "Wrong passphrase?": "Väärä salasanalause?",
   "Select a score": "Valitse arvosana",
-  "Reported": "Ilmoitettu"
+  "Reported": "Ilmoitettu",
+  "Double-tap to confirm": "Vahvista kaksoisnapauttamalla",
+  "Clear search": "Tyhjennä haku",
+  "Attach photo": "Liitä kuva",
+  "Stop recording": "Lopeta tallennus",
+  "Record voice memo": "Tallenna äänimuistio",
+  "Send message": "Lähetä viesti",
+  "Close image": "Sulje kuva",
+  "Open address book": "Avaa osoitekirja",
+  "Live location sharing is off for this deal.": "Reaaliaikainen sijainnin jako on pois päältä tässä sopimuksessa.",
+  "Resume": "Jatka",
+  "Stop": "Lopeta",
+  "Resume live location sharing": "Jatka reaaliaikaista sijainnin jakoa",
+  "Stop sharing live location": "Lopeta reaaliaikainen sijainnin jako"
 };
 export default c;

@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "غلط بیک اپ فائل۔",
   "Wrong passphrase?": "غلط پاس فریز؟",
   "Select a score": "اسکور منتخب کریں",
-  "Reported": "رپورٹ ہو گئی"
+  "Reported": "رپورٹ ہو گئی",
+  "Double-tap to confirm": "تصدیق کے لیے دو بار تھپتھپائیں",
+  "Clear search": "تلاش صاف کریں",
+  "Attach photo": "تصویر منسلک کریں",
+  "Stop recording": "ریکارڈنگ روکیں",
+  "Record voice memo": "صوتی میمو ریکارڈ کریں",
+  "Send message": "پیغام بھیجیں",
+  "Close image": "تصویر بند کریں",
+  "Open address book": "ایڈریس بک کھولیں",
+  "Live location sharing is off for this deal.": "اس معاہدے کے لیے لائیو مقام کا اشتراک بند ہے۔",
+  "Resume": "دوبارہ شروع کریں",
+  "Stop": "روکیں",
+  "Resume live location sharing": "لائیو مقام کا اشتراک دوبارہ شروع کریں",
+  "Stop sharing live location": "لائیو مقام کا اشتراک روکیں"
 };
 export default c;

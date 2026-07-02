@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "ልክ ያልሆነ የምትኬ ፋይል።",
   "Wrong passphrase?": "የተሳሳተ የይለፍ ሐረግ?",
   "Select a score": "ነጥብ ይምረጡ",
-  "Reported": "ሪፖርት ተደርጓል"
+  "Reported": "ሪፖርት ተደርጓል",
+  "Double-tap to confirm": "ለማረጋገጥ ሁለት ጊዜ ይንኩ",
+  "Clear search": "ፍለጋን አጽዳ",
+  "Attach photo": "ፎቶ አያይዝ",
+  "Stop recording": "ቀረጻን አቁም",
+  "Record voice memo": "የድምፅ ማስታወሻ ቅረጽ",
+  "Send message": "መልእክት ላክ",
+  "Close image": "ምስሉን ዝጋ",
+  "Open address book": "የአድራሻ ደብተር ክፈት",
+  "Live location sharing is off for this deal.": "ለዚህ ስምምነት የቀጥታ አካባቢ ማጋራት ጠፍቷል።",
+  "Resume": "ቀጥል",
+  "Stop": "አቁም",
+  "Resume live location sharing": "የቀጥታ አካባቢ ማጋራትን ቀጥል",
+  "Stop sharing live location": "የቀጥታ አካባቢ ማጋራትን አቁም"
 };
 export default c;

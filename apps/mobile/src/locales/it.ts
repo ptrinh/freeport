@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "File di backup non valido.",
   "Wrong passphrase?": "Passphrase errata?",
   "Select a score": "Scegli un punteggio",
-  "Reported": "Segnalato"
+  "Reported": "Segnalato",
+  "Double-tap to confirm": "Tocca due volte per confermare",
+  "Clear search": "Cancella ricerca",
+  "Attach photo": "Allega foto",
+  "Stop recording": "Interrompi registrazione",
+  "Record voice memo": "Registra memo vocale",
+  "Send message": "Invia messaggio",
+  "Close image": "Chiudi immagine",
+  "Open address book": "Apri rubrica",
+  "Live location sharing is off for this deal.": "La condivisione della posizione in tempo reale è disattivata per questo accordo.",
+  "Resume": "Riprendi",
+  "Stop": "Interrompi",
+  "Resume live location sharing": "Riprendi la condivisione della posizione in tempo reale",
+  "Stop sharing live location": "Interrompi la condivisione della posizione in tempo reale"
 };
 export default c;

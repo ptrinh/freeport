@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Faili batili la hifadhi rudufu.",
   "Wrong passphrase?": "Kaulisiri si sahihi?",
   "Select a score": "Chagua alama",
-  "Reported": "Imeripotiwa"
+  "Reported": "Imeripotiwa",
+  "Double-tap to confirm": "Gusa mara mbili kuthibitisha",
+  "Clear search": "Futa utafutaji",
+  "Attach photo": "Ambatisha picha",
+  "Stop recording": "Simamisha kurekodi",
+  "Record voice memo": "Rekodi ujumbe wa sauti",
+  "Send message": "Tuma ujumbe",
+  "Close image": "Funga picha",
+  "Open address book": "Fungua kitabu cha anwani",
+  "Live location sharing is off for this deal.": "Kushiriki mahali papo hapo kumezimwa kwa makubaliano haya.",
+  "Resume": "Endelea",
+  "Stop": "Simamisha",
+  "Resume live location sharing": "Endelea kushiriki mahali papo hapo",
+  "Stop sharing live location": "Simamisha kushiriki mahali papo hapo"
 };
 export default c;

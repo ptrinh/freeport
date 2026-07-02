@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Недійсний файл резервної копії.",
   "Wrong passphrase?": "Хибна парольна фраза?",
   "Select a score": "Виберіть оцінку",
-  "Reported": "Скаргу подано"
+  "Reported": "Скаргу подано",
+  "Double-tap to confirm": "Двічі торкніться, щоб підтвердити",
+  "Clear search": "Очистити пошук",
+  "Attach photo": "Прикріпити фото",
+  "Stop recording": "Зупинити запис",
+  "Record voice memo": "Записати голосову нотатку",
+  "Send message": "Надіслати повідомлення",
+  "Close image": "Закрити зображення",
+  "Open address book": "Відкрити адресну книгу",
+  "Live location sharing is off for this deal.": "Трансляцію геопозиції для цієї угоди вимкнено.",
+  "Resume": "Відновити",
+  "Stop": "Зупинити",
+  "Resume live location sharing": "Відновити трансляцію геопозиції",
+  "Stop sharing live location": "Зупинити трансляцію геопозиції"
 };
 export default c;

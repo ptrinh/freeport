@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "தவறான காப்புப்பிரதி கோப்பு.",
   "Wrong passphrase?": "தவறான கடவுச்சொற்றொடரா?",
   "Select a score": "மதிப்பெண்ணைத் தேர்ந்தெடுக்கவும்",
-  "Reported": "புகாரளிக்கப்பட்டது"
+  "Reported": "புகாரளிக்கப்பட்டது",
+  "Double-tap to confirm": "உறுதிப்படுத்த இருமுறை தட்டவும்",
+  "Clear search": "தேடலை அழிக்கவும்",
+  "Attach photo": "புகைப்படத்தை இணைக்கவும்",
+  "Stop recording": "பதிவை நிறுத்தவும்",
+  "Record voice memo": "குரல் குறிப்பை பதிவு செய்யவும்",
+  "Send message": "செய்தி அனுப்பவும்",
+  "Close image": "படத்தை மூடவும்",
+  "Open address book": "முகவரி புத்தகத்தைத் திறக்கவும்",
+  "Live location sharing is off for this deal.": "இந்த ஒப்பந்தத்திற்கு நேரடி இருப்பிடப் பகிர்வு முடக்கப்பட்டுள்ளது.",
+  "Resume": "மீண்டும் தொடங்கவும்",
+  "Stop": "நிறுத்தவும்",
+  "Resume live location sharing": "நேரடி இருப்பிடப் பகிர்வை மீண்டும் தொடங்கவும்",
+  "Stop sharing live location": "நேரடி இருப்பிடப் பகிர்வை நிறுத்தவும்"
 };
 export default c;

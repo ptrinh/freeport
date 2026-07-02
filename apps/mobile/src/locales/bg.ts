@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Невалиден файл с резервно копие.",
   "Wrong passphrase?": "Грешна паролна фраза?",
   "Select a score": "Изберете оценка",
-  "Reported": "Сигналът е подаден"
+  "Reported": "Сигналът е подаден",
+  "Double-tap to confirm": "Докоснете двукратно за потвърждение",
+  "Clear search": "Изчисти търсенето",
+  "Attach photo": "Прикачи снимка",
+  "Stop recording": "Спри записа",
+  "Record voice memo": "Запиши гласова бележка",
+  "Send message": "Изпрати съобщение",
+  "Close image": "Затвори изображението",
+  "Open address book": "Отвори адресната книга",
+  "Live location sharing is off for this deal.": "Споделянето на местоположение на живо е изключено за тази сделка.",
+  "Resume": "Възобнови",
+  "Stop": "Спри",
+  "Resume live location sharing": "Възобнови споделянето на местоположение на живо",
+  "Stop sharing live location": "Спри споделянето на местоположение на живо"
 };
 export default c;

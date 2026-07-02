@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Ugyldig sikkerhetskopifil.",
   "Wrong passphrase?": "Feil passfrase?",
   "Select a score": "Velg en vurdering",
-  "Reported": "Rapportert"
+  "Reported": "Rapportert",
+  "Double-tap to confirm": "Dobbelttrykk for å bekrefte",
+  "Clear search": "Tøm søket",
+  "Attach photo": "Legg ved bilde",
+  "Stop recording": "Stopp opptak",
+  "Record voice memo": "Ta opp talenotat",
+  "Send message": "Send melding",
+  "Close image": "Lukk bilde",
+  "Open address book": "Åpne adressebok",
+  "Live location sharing is off for this deal.": "Deling av posisjon i sanntid er av for denne avtalen.",
+  "Resume": "Fortsett",
+  "Stop": "Stopp",
+  "Resume live location sharing": "Fortsett deling av posisjon i sanntid",
+  "Stop sharing live location": "Stopp deling av posisjon i sanntid"
 };
 export default c;

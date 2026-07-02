@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Μη έγκυρο αρχείο αντιγράφου ασφαλείας.",
   "Wrong passphrase?": "Λάθος φράση πρόσβασης;",
   "Select a score": "Επιλέξτε βαθμολογία",
-  "Reported": "Αναφέρθηκε"
+  "Reported": "Αναφέρθηκε",
+  "Double-tap to confirm": "Διπλό πάτημα για επιβεβαίωση",
+  "Clear search": "Καθαρισμός αναζήτησης",
+  "Attach photo": "Επισύναψη φωτογραφίας",
+  "Stop recording": "Διακοπή εγγραφής",
+  "Record voice memo": "Εγγραφή φωνητικού σημειώματος",
+  "Send message": "Αποστολή μηνύματος",
+  "Close image": "Κλείσιμο εικόνας",
+  "Open address book": "Άνοιγμα ευρετηρίου διευθύνσεων",
+  "Live location sharing is off for this deal.": "Η ζωντανή κοινοποίηση τοποθεσίας είναι κλειστή για αυτή τη συμφωνία.",
+  "Resume": "Συνέχιση",
+  "Stop": "Διακοπή",
+  "Resume live location sharing": "Συνέχιση ζωντανής κοινοποίησης τοποθεσίας",
+  "Stop sharing live location": "Διακοπή ζωντανής κοινοποίησης τοποθεσίας"
 };
 export default c;

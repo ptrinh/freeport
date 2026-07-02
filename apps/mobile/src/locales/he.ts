@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "קובץ גיבוי לא תקין.",
   "Wrong passphrase?": "ביטוי סיסמה שגוי?",
   "Select a score": "בחרו ציון",
-  "Reported": "דווח"
+  "Reported": "דווח",
+  "Double-tap to confirm": "הקישו פעמיים לאישור",
+  "Clear search": "נקו את החיפוש",
+  "Attach photo": "צרפו תמונה",
+  "Stop recording": "עצרו הקלטה",
+  "Record voice memo": "הקליטו תזכיר קולי",
+  "Send message": "שלחו הודעה",
+  "Close image": "סגרו את התמונה",
+  "Open address book": "פתחו את פנקס הכתובות",
+  "Live location sharing is off for this deal.": "שיתוף מיקום חי כבוי לעסקה זו.",
+  "Resume": "המשך",
+  "Stop": "עצור",
+  "Resume live location sharing": "המשיכו בשיתוף מיקום חי",
+  "Stop sharing live location": "עצרו שיתוף מיקום חי"
 };
 export default c;

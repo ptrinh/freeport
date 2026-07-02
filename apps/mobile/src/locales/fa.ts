@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "فایل پشتیبان نامعتبر است.",
   "Wrong passphrase?": "عبارت عبور اشتباه است؟",
   "Select a score": "یک امتیاز انتخاب کنید",
-  "Reported": "گزارش شد"
+  "Reported": "گزارش شد",
+  "Double-tap to confirm": "برای تأیید دوبار ضربه بزنید",
+  "Clear search": "پاک کردن جستجو",
+  "Attach photo": "پیوست عکس",
+  "Stop recording": "توقف ضبط",
+  "Record voice memo": "ضبط یادداشت صوتی",
+  "Send message": "ارسال پیام",
+  "Close image": "بستن تصویر",
+  "Open address book": "باز کردن دفترچه نشانی‌ها",
+  "Live location sharing is off for this deal.": "اشتراک‌گذاری موقعیت زنده برای این معامله خاموش است.",
+  "Resume": "ازسرگیری",
+  "Stop": "توقف",
+  "Resume live location sharing": "ازسرگیری اشتراک‌گذاری موقعیت زنده",
+  "Stop sharing live location": "توقف اشتراک‌گذاری موقعیت زنده"
 };
 export default c;

@@ -620,6 +620,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Tệp sao lưu không hợp lệ.",
   "Wrong passphrase?": "Sai cụm mật khẩu?",
   "Select a score": "Chọn một điểm đánh giá",
-  "Reported": "Đã báo cáo"
+  "Reported": "Đã báo cáo",
+  "Double-tap to confirm": "Chạm hai lần để xác nhận",
+  "Clear search": "Xóa tìm kiếm",
+  "Attach photo": "Đính kèm ảnh",
+  "Stop recording": "Dừng ghi âm",
+  "Record voice memo": "Ghi âm lời nhắn",
+  "Send message": "Gửi tin nhắn",
+  "Close image": "Đóng ảnh",
+  "Open address book": "Mở sổ địa chỉ",
+  "Live location sharing is off for this deal.": "Chia sẻ vị trí trực tiếp đang tắt cho giao dịch này.",
+  "Resume": "Tiếp tục",
+  "Stop": "Dừng",
+  "Resume live location sharing": "Tiếp tục chia sẻ vị trí trực tiếp",
+  "Stop sharing live location": "Dừng chia sẻ vị trí trực tiếp"
 };
 export default c;

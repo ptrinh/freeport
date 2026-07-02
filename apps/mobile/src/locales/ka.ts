@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "არასწორი სარეზერვო ფაილი.",
   "Wrong passphrase?": "არასწორი საიდუმლო ფრაზა?",
   "Select a score": "აირჩიეთ შეფასება",
-  "Reported": "შეტყობინებულია"
+  "Reported": "შეტყობინებულია",
+  "Double-tap to confirm": "დასადასტურებლად ორჯერ შეეხეთ",
+  "Clear search": "ძიების გასუფთავება",
+  "Attach photo": "ფოტოს მიმაგრება",
+  "Stop recording": "ჩაწერის შეჩერება",
+  "Record voice memo": "ხმოვანი შენიშვნის ჩაწერა",
+  "Send message": "შეტყობინების გაგზავნა",
+  "Close image": "სურათის დახურვა",
+  "Open address book": "მისამართების წიგნის გახსნა",
+  "Live location sharing is off for this deal.": "ცოცხალი მდებარეობის გაზიარება გამორთულია ამ გარიგებისთვის.",
+  "Resume": "გაგრძელება",
+  "Stop": "შეჩერება",
+  "Resume live location sharing": "ცოცხალი მდებარეობის გაზიარების გაგრძელება",
+  "Stop sharing live location": "ცოცხალი მდებარეობის გაზიარების შეჩერება"
 };
 export default c;

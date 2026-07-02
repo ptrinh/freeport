@@ -620,6 +620,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "ملف نسخة احتياطية غير صالح.",
   "Wrong passphrase?": "عبارة مرور خاطئة؟",
   "Select a score": "اختر تقييمًا",
-  "Reported": "تم الإبلاغ"
+  "Reported": "تم الإبلاغ",
+  "Double-tap to confirm": "انقر مرتين للتأكيد",
+  "Clear search": "مسح البحث",
+  "Attach photo": "إرفاق صورة",
+  "Stop recording": "إيقاف التسجيل",
+  "Record voice memo": "تسجيل مذكرة صوتية",
+  "Send message": "إرسال رسالة",
+  "Close image": "إغلاق الصورة",
+  "Open address book": "فتح دفتر العناوين",
+  "Live location sharing is off for this deal.": "مشاركة الموقع المباشر متوقفة لهذا الاتفاق.",
+  "Resume": "استئناف",
+  "Stop": "إيقاف",
+  "Resume live location sharing": "استئناف مشاركة الموقع المباشر",
+  "Stop sharing live location": "إيقاف مشاركة الموقع المباشر"
 };
 export default c;

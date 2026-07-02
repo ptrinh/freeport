@@ -620,6 +620,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "备份文件无效。",
   "Wrong passphrase?": "密码短语错误?",
   "Select a score": "请选择评分",
-  "Reported": "已举报"
+  "Reported": "已举报",
+  "Double-tap to confirm": "双击以确认",
+  "Clear search": "清除搜索",
+  "Attach photo": "附加照片",
+  "Stop recording": "停止录音",
+  "Record voice memo": "录制语音备忘",
+  "Send message": "发送消息",
+  "Close image": "关闭图片",
+  "Open address book": "打开地址簿",
+  "Live location sharing is off for this deal.": "此交易的实时位置共享已关闭。",
+  "Resume": "继续",
+  "Stop": "停止",
+  "Resume live location sharing": "继续共享实时位置",
+  "Stop sharing live location": "停止共享实时位置"
 };
 export default c;

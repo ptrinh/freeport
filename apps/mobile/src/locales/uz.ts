@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Yaroqsiz zaxira fayli.",
   "Wrong passphrase?": "Parol ibora noto'g'rimi?",
   "Select a score": "Baho tanlang",
-  "Reported": "Shikoyat qilindi"
+  "Reported": "Shikoyat qilindi",
+  "Double-tap to confirm": "Tasdiqlash uchun ikki marta bosing",
+  "Clear search": "Qidiruvni tozalash",
+  "Attach photo": "Rasm biriktirish",
+  "Stop recording": "Yozishni to'xtatish",
+  "Record voice memo": "Ovozli eslatma yozish",
+  "Send message": "Xabar yuborish",
+  "Close image": "Rasmni yopish",
+  "Open address book": "Manzillar kitobini ochish",
+  "Live location sharing is off for this deal.": "Bu bitim uchun jonli joylashuv ulashish o'chirilgan.",
+  "Resume": "Davom ettirish",
+  "Stop": "To'xtatish",
+  "Resume live location sharing": "Jonli joylashuv ulashishni davom ettirish",
+  "Stop sharing live location": "Jonli joylashuv ulashishni to'xtatish"
 };
 export default c;

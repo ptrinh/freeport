@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "ໄຟລ໌ສຳຮອງບໍ່ຖືກຕ້ອງ.",
   "Wrong passphrase?": "ວະລີລັບຜິດບໍ?",
   "Select a score": "ເລືອກຄະແນນ",
-  "Reported": "ລາຍງານແລ້ວ"
+  "Reported": "ລາຍງານແລ້ວ",
+  "Double-tap to confirm": "ແຕະສອງຄັ້ງເພື່ອຢືນຢັນ",
+  "Clear search": "ລ້າງການຄົ້ນຫາ",
+  "Attach photo": "ແນບຮູບ",
+  "Stop recording": "ຢຸດການບັນທຶກ",
+  "Record voice memo": "ບັນທຶກສຽງ",
+  "Send message": "ສົ່ງຂໍ້ຄວາມ",
+  "Close image": "ປິດຮູບ",
+  "Open address book": "ເປີດປຶ້ມທີ່ຢູ່",
+  "Live location sharing is off for this deal.": "ການແບ່ງປັນທີ່ຕັ້ງສົດຖືກປິດສຳລັບຂໍ້ຕົກລົງນີ້.",
+  "Resume": "ສືບຕໍ່",
+  "Stop": "ຢຸດ",
+  "Resume live location sharing": "ສືບຕໍ່ການແບ່ງປັນທີ່ຕັ້ງສົດ",
+  "Stop sharing live location": "ຢຸດການແບ່ງປັນທີ່ຕັ້ງສົດ"
 };
 export default c;

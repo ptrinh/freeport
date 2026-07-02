@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Nederīgs rezerves kopijas fails.",
   "Wrong passphrase?": "Nepareiza paroles frāze?",
   "Select a score": "Izvēlieties vērtējumu",
-  "Reported": "Ziņots"
+  "Reported": "Ziņots",
+  "Double-tap to confirm": "Dubultskāriens, lai apstiprinātu",
+  "Clear search": "Notīrīt meklēšanu",
+  "Attach photo": "Pievienot foto",
+  "Stop recording": "Apturēt ierakstu",
+  "Record voice memo": "Ierakstīt balss piezīmi",
+  "Send message": "Sūtīt ziņu",
+  "Close image": "Aizvērt attēlu",
+  "Open address book": "Atvērt adrešu grāmatu",
+  "Live location sharing is off for this deal.": "Tiešraides atrašanās vietas kopīgošana šim darījumam ir izslēgta.",
+  "Resume": "Atsākt",
+  "Stop": "Apturēt",
+  "Resume live location sharing": "Atsākt tiešraides atrašanās vietas kopīgošanu",
+  "Stop sharing live location": "Apturēt tiešraides atrašanās vietas kopīgošanu"
 };
 export default c;

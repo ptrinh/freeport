@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Netinkamas atsarginės kopijos failas.",
   "Wrong passphrase?": "Neteisinga slaptafrazė?",
   "Select a score": "Pasirinkite įvertinimą",
-  "Reported": "Pranešta"
+  "Reported": "Pranešta",
+  "Double-tap to confirm": "Dukart bakstelėkite, kad patvirtintumėte",
+  "Clear search": "Išvalyti paiešką",
+  "Attach photo": "Pridėti nuotrauką",
+  "Stop recording": "Sustabdyti įrašymą",
+  "Record voice memo": "Įrašyti balso žinutę",
+  "Send message": "Siųsti žinutę",
+  "Close image": "Uždaryti vaizdą",
+  "Open address book": "Atidaryti adresų knygą",
+  "Live location sharing is off for this deal.": "Tiesioginis vietos bendrinimas šiam susitarimui išjungtas.",
+  "Resume": "Tęsti",
+  "Stop": "Sustabdyti",
+  "Resume live location sharing": "Tęsti tiesioginį vietos bendrinimą",
+  "Stop sharing live location": "Sustabdyti tiesioginį vietos bendrinimą"
 };
 export default c;

@@ -620,6 +620,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Geçersiz yedek dosyası.",
   "Wrong passphrase?": "Yanlış parola ifadesi?",
   "Select a score": "Bir puan seçin",
-  "Reported": "Bildirildi"
+  "Reported": "Bildirildi",
+  "Double-tap to confirm": "Onaylamak için iki kez dokunun",
+  "Clear search": "Aramayı temizle",
+  "Attach photo": "Fotoğraf ekle",
+  "Stop recording": "Kaydı durdur",
+  "Record voice memo": "Sesli not kaydet",
+  "Send message": "Mesaj gönder",
+  "Close image": "Görseli kapat",
+  "Open address book": "Adres defterini aç",
+  "Live location sharing is off for this deal.": "Bu anlaşma için canlı konum paylaşımı kapalı.",
+  "Resume": "Devam et",
+  "Stop": "Durdur",
+  "Resume live location sharing": "Canlı konum paylaşımına devam et",
+  "Stop sharing live location": "Canlı konum paylaşımını durdur"
 };
 export default c;

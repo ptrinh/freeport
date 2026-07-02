@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Ongeldig back-upbestand.",
   "Wrong passphrase?": "Verkeerde wachtwoordzin?",
   "Select a score": "Kies een score",
-  "Reported": "Gemeld"
+  "Reported": "Gemeld",
+  "Double-tap to confirm": "Dubbeltik om te bevestigen",
+  "Clear search": "Zoekopdracht wissen",
+  "Attach photo": "Foto bijvoegen",
+  "Stop recording": "Opname stoppen",
+  "Record voice memo": "Spraakmemo opnemen",
+  "Send message": "Bericht verzenden",
+  "Close image": "Afbeelding sluiten",
+  "Open address book": "Adresboek openen",
+  "Live location sharing is off for this deal.": "Live locatie delen staat uit voor deze afspraak.",
+  "Resume": "Hervatten",
+  "Stop": "Stoppen",
+  "Resume live location sharing": "Live locatie delen hervatten",
+  "Stop sharing live location": "Live locatie delen stoppen"
 };
 export default c;

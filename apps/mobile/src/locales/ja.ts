@@ -620,6 +620,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "無効なバックアップファイルです。",
   "Wrong passphrase?": "パスフレーズが違いますか?",
   "Select a score": "評価を選択してください",
-  "Reported": "通報しました"
+  "Reported": "通報しました",
+  "Double-tap to confirm": "ダブルタップで確定",
+  "Clear search": "検索をクリア",
+  "Attach photo": "写真を添付",
+  "Stop recording": "録音を停止",
+  "Record voice memo": "ボイスメモを録音",
+  "Send message": "メッセージを送信",
+  "Close image": "画像を閉じる",
+  "Open address book": "アドレス帳を開く",
+  "Live location sharing is off for this deal.": "この取引ではライブ位置情報の共有はオフです。",
+  "Resume": "再開",
+  "Stop": "停止",
+  "Resume live location sharing": "ライブ位置情報の共有を再開",
+  "Stop sharing live location": "ライブ位置情報の共有を停止"
 };
 export default c;

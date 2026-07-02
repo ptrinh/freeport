@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Жарамсыз сақтық көшірме файлы.",
   "Wrong passphrase?": "Құпия фраза қате ме?",
   "Select a score": "Баға таңдаңыз",
-  "Reported": "Шағым жіберілді"
+  "Reported": "Шағым жіберілді",
+  "Double-tap to confirm": "Растау үшін екі рет түртіңіз",
+  "Clear search": "Іздеуді тазалау",
+  "Attach photo": "Фото тіркеу",
+  "Stop recording": "Жазуды тоқтату",
+  "Record voice memo": "Дауыстық жазба жазу",
+  "Send message": "Хабарлама жіберу",
+  "Close image": "Суретті жабу",
+  "Open address book": "Мекенжай кітапшасын ашу",
+  "Live location sharing is off for this deal.": "Осы келісім үшін тікелей орынды бөлісу өшірулі.",
+  "Resume": "Жалғастыру",
+  "Stop": "Тоқтату",
+  "Resume live location sharing": "Тікелей орынды бөлісуді жалғастыру",
+  "Stop sharing live location": "Тікелей орынды бөлісуді тоқтату"
 };
 export default c;

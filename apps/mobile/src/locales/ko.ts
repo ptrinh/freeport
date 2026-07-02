@@ -620,6 +620,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "잘못된 백업 파일입니다.",
   "Wrong passphrase?": "패스프레이즈가 틀렸나요?",
   "Select a score": "점수를 선택하세요",
-  "Reported": "신고됨"
+  "Reported": "신고됨",
+  "Double-tap to confirm": "두 번 탭하여 확인",
+  "Clear search": "검색 지우기",
+  "Attach photo": "사진 첨부",
+  "Stop recording": "녹음 중지",
+  "Record voice memo": "음성 메모 녹음",
+  "Send message": "메시지 보내기",
+  "Close image": "이미지 닫기",
+  "Open address book": "주소록 열기",
+  "Live location sharing is off for this deal.": "이 거래에서는 실시간 위치 공유가 꺼져 있습니다.",
+  "Resume": "재개",
+  "Stop": "중지",
+  "Resume live location sharing": "실시간 위치 공유 재개",
+  "Stop sharing live location": "실시간 위치 공유 중지"
 };
 export default c;

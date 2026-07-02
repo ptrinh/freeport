@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Vigane varukoopiafail.",
   "Wrong passphrase?": "Vale paroolifraas?",
   "Select a score": "Vali hinnang",
-  "Reported": "Teatatud"
+  "Reported": "Teatatud",
+  "Double-tap to confirm": "Kinnitamiseks topeltpuudutus",
+  "Clear search": "Tühjenda otsing",
+  "Attach photo": "Lisa foto",
+  "Stop recording": "Peata salvestus",
+  "Record voice memo": "Salvesta häälmemo",
+  "Send message": "Saada sõnum",
+  "Close image": "Sulge pilt",
+  "Open address book": "Ava aadressiraamat",
+  "Live location sharing is off for this deal.": "Reaalajas asukoha jagamine on selle tehingu puhul väljas.",
+  "Resume": "Jätka",
+  "Stop": "Peata",
+  "Resume live location sharing": "Jätka reaalajas asukoha jagamist",
+  "Stop sharing live location": "Peata reaalajas asukoha jagamine"
 };
 export default c;

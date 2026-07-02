@@ -577,6 +577,19 @@ const c: Record<string, string> = {
   "Invalid backup file.": "Skedar kopjeje rezervë i pavlefshëm.",
   "Wrong passphrase?": "Frazëkalim i gabuar?",
   "Select a score": "Zgjidhni një vlerësim",
-  "Reported": "U raportua"
+  "Reported": "U raportua",
+  "Double-tap to confirm": "Prekni dy herë për të konfirmuar",
+  "Clear search": "Pastro kërkimin",
+  "Attach photo": "Bashkëngjit foto",
+  "Stop recording": "Ndalo regjistrimin",
+  "Record voice memo": "Regjistro shënim zanor",
+  "Send message": "Dërgo mesazh",
+  "Close image": "Mbyll imazhin",
+  "Open address book": "Hap librin e adresave",
+  "Live location sharing is off for this deal.": "Ndarja e vendndodhjes drejtpërdrejt është e fikur për këtë marrëveshje.",
+  "Resume": "Rifillo",
+  "Stop": "Ndalo",
+  "Resume live location sharing": "Rifillo ndarjen e vendndodhjes drejtpërdrejt",
+  "Stop sharing live location": "Ndalo ndarjen e vendndodhjes drejtpërdrejt"
 };
 export default c;

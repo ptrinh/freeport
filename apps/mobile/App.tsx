@@ -538,14 +538,23 @@ function AppInner() {
     if (!client) { setNetStatus('connecting'); return; }
     let everUp = false;
     let t0 = Date.now();
+    // Exponential backoff between reconnect dials while offline: redialing all
+    // relays every 2.5s drains the battery on a dead network. Resets the
+    // moment a socket comes back (and on resume, since this effect re-runs).
+    let nextDialAt = 0;
+    let dialDelay = 2500;
     const tick = () => {
       const n = client.connectedRelayCount();
-      if (n > 0) { everUp = true; setNetStatus('online'); }
+      if (n > 0) { everUp = true; dialDelay = 2500; nextDialAt = 0; setNetStatus('online'); }
       else {
         // No live socket: surface offline and actively try to re-open it,
         // rather than sitting on a stale "No network" forever.
         setNetStatus(everUp || Date.now() - t0 > 5000 ? 'offline' : 'connecting');
-        client.reconnect().catch(() => {});
+        if (Date.now() >= nextDialAt) {
+          nextDialAt = Date.now() + dialDelay;
+          dialDelay = Math.min(dialDelay * 2, 60_000);
+          client.reconnect().catch(() => {});
+        }
       }
     };
     tick();
@@ -2182,17 +2191,17 @@ function MarketTab({
     <View style={{ flex: 1 }}>
       <View style={s.searchBar}>
         <View style={s.searchInputWrap}>
-          <Ionicons name="search" size={16} color="#4b5a6e" />
+          <Ionicons name="search" size={16} color={palette.dim} />
           <TextInput
             style={s.searchInput}
             value={keyword}
             onChangeText={setKeyword}
             placeholder={t("Filter by keyword")}
-            placeholderTextColor="#4b5563"
+            placeholderTextColor={palette.placeholder}
             autoCapitalize="none"
           />
           {keyword ? (
-            <Pressable onPress={() => setKeyword('')}><Ionicons name="close-circle" size={16} color="#4b5a6e" /></Pressable>
+            <Pressable onPress={() => setKeyword('')} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Clear search')}><Ionicons name="close-circle" size={16} color={palette.dim} /></Pressable>
           ) : null}
         </View>
         <Pressable style={s.sortBtn} onPress={() => setSortOpen(true)}>
@@ -2473,7 +2482,7 @@ function MarketTab({
         >
           {cardViewerUri ? <Image source={{ uri: cardViewerUri }} style={s.imgViewerImage} resizeMode="contain" /> : null}
         </ScrollView>
-        <Pressable style={s.imgViewerClose} onPress={() => setCardViewerUri(null)} hitSlop={12}>
+        <Pressable style={s.imgViewerClose} onPress={() => setCardViewerUri(null)} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('Close image')}>
           <Ionicons name="close" size={26} color="#fff" />
         </Pressable>
       </View>
@@ -3296,10 +3305,26 @@ function SlideToConfirm({ label, onConfirm }: { label: string; onConfirm: () => 
       },
     }),
   ).current;
+  // Screen readers can't perform a drag gesture, so without this a blind
+  // driver literally cannot mark a trip picked-up/completed. Expose the slider
+  // as a button whose activate action (double-tap in VoiceOver/TalkBack)
+  // confirms directly.
+  const confirmAccessibly = () => {
+    if (doneRef.current || maxRef.current <= 0) return;
+    doneRef.current = true;
+    Animated.timing(x, { toValue: maxRef.current, duration: 100, useNativeDriver: false }).start(() => onConfirm());
+  };
   return (
     <View
       style={s.slideTrack}
       onLayout={(e) => { maxRef.current = Math.max(0, e.nativeEvent.layout.width - THUMB - 6); }}
+      accessible
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint={t('Double-tap to confirm')}
+      onAccessibilityTap={confirmAccessibly}
+      accessibilityActions={[{ name: 'activate' }]}
+      onAccessibilityAction={(e) => { if (e.nativeEvent.actionName === 'activate') confirmAccessibly(); }}
     >
       <Text style={s.slideLabel} numberOfLines={1}>{label}</Text>
       <Animated.View style={[s.slideThumb, { transform: [{ translateX: x }] }]} {...pan.panHandlers}>
@@ -3360,6 +3385,12 @@ function LiveTripShare({ client, info, onShare, auto, dealId, alreadyShared }: {
   // across remounts/restarts, and only post it to chat the first time.
   const autoBegin = async () => {
     if (!client || !dealId) return;
+    // Respect a per-deal opt-out: the user tapped "Stop" and a remount/restart
+    // must not silently restart the broadcast.
+    if ((await kvGet(`freeport.tripStop.${kvId}`).catch(() => null)) === '1') {
+      setOptedOut(true);
+      return;
+    }
     const saved = await kvGet(`freeport.trip.${kvId}`);
     let sess = saved ? restoreTripSession(saved, info) : null;
     if (!sess) { sess = createTripSession(info); await kvSet(`freeport.trip.${kvId}`, tripSecret(sess)).catch(() => {}); }
@@ -3412,7 +3443,14 @@ function LiveTripShare({ client, info, onShare, auto, dealId, alreadyShared }: {
     try { await Share.share({ message: link }); } catch {}
   };
 
-  useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
+  useEffect(() => () => {
+    if (timer.current) clearInterval(timer.current);
+    // The deal card unmounts this component the moment the trip completes, so
+    // stop() never runs in auto mode — publish `ended` here or link-holders
+    // keep seeing a stale "live" pin forever.
+    if (session.current) { push('ended').catch(() => {}); session.current = null; }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Kick off automatic sharing for the travelling party once the deal is live.
   // Shared by default — there's no UI to stop it, so we don't gate on a stored
@@ -3426,8 +3464,21 @@ function LiveTripShare({ client, info, onShare, auto, dealId, alreadyShared }: {
   }, [auto, dealId, client]);
 
   if (auto) {
-    // Shared automatically — the driver/provider doesn't manage it. Passive
-    // status only (no controls); the link is auto-posted to the other party's chat.
+    // Shared automatically — but the user must be able to stop a broadcast of
+    // their own position without digging through Settings.
+    if (optedOut) {
+      return (
+        <View style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Ionicons name="navigate-outline" size={14} color={c.muted} />
+          <Text style={{ color: c.muted, fontSize: 12, flex: 1 }}>
+            {t('Live location sharing is off for this deal.')}
+          </Text>
+          <Pressable onPress={() => { resume().catch(() => {}); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Resume live location sharing')}>
+            <Text style={{ color: c.link, fontSize: 12, fontWeight: '600' }}>{t('Resume')}</Text>
+          </Pressable>
+        </View>
+      );
+    }
     return (
       <View style={{ marginTop: 8 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -3435,6 +3486,9 @@ function LiveTripShare({ client, info, onShare, auto, dealId, alreadyShared }: {
           <Text style={{ color: c.text3, fontSize: 12, flex: 1 }}>
             🛰 {t('Sharing live location — anyone with the link can see this trip while the app is open.')}
           </Text>
+          <Pressable onPress={() => { stop().catch(() => {}); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Stop sharing live location')}>
+            <Text style={{ color: c.link, fontSize: 12, fontWeight: '600' }}>{t('Stop')}</Text>
+          </Pressable>
         </View>
         {sharing && !located && (
           <Text style={{ color: c.warn, fontSize: 12, marginTop: 4 }}>
@@ -3655,17 +3709,17 @@ function DealsTab({
       ))}
       {view === 'completed' && (
         <View style={[s.searchInputWrap, { marginHorizontal: 12, marginTop: 8 }]}>
-          <Ionicons name="search" size={16} color="#4b5a6e" />
+          <Ionicons name="search" size={16} color={palette.dim} />
           <TextInput
             style={s.searchInput}
             value={completedKeyword}
             onChangeText={setCompletedKeyword}
             placeholder={t("Filter by keyword")}
-            placeholderTextColor="#4b5563"
+            placeholderTextColor={palette.placeholder}
             autoCapitalize="none"
           />
           {completedKeyword ? (
-            <Pressable onPress={() => setCompletedKeyword('')}><Ionicons name="close-circle" size={16} color="#4b5a6e" /></Pressable>
+            <Pressable onPress={() => setCompletedKeyword('')} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Clear search')}><Ionicons name="close-circle" size={16} color={palette.dim} /></Pressable>
           ) : null}
         </View>
       )}
@@ -4769,17 +4823,17 @@ function ChatThread({ nego, onSend }: { nego: Negotiation; onSend: (text: string
           value={text}
           onChangeText={setText}
           placeholder={t("Message…")}
-          placeholderTextColor="#4b5563"
+          placeholderTextColor={palette.placeholder}
           onSubmitEditing={send}
           returnKeyType="send"
         />
-        <Pressable style={[s.chatAttach, uploading && { opacity: 0.6 }]} onPress={attach} disabled={uploading || recording}>
+        <Pressable style={[s.chatAttach, uploading && { opacity: 0.6 }]} onPress={attach} disabled={uploading || recording} accessibilityRole="button" accessibilityLabel={t('Attach photo')}>
           {uploading ? <ActivityIndicator color="#93c5fd" /> : <Ionicons name="image" size={18} color="#93c5fd" />}
         </Pressable>
-        <Pressable style={[s.chatAttach, recording && s.chatAttachRec]} onPress={toggleRecord} disabled={uploading}>
+        <Pressable style={[s.chatAttach, recording && s.chatAttachRec]} onPress={toggleRecord} disabled={uploading} accessibilityRole="button" accessibilityLabel={recording ? t('Stop recording') : t('Record voice memo')}>
           <Ionicons name={recording ? 'stop' : 'mic'} size={18} color={recording ? '#fff' : '#93c5fd'} />
         </Pressable>
-        <Pressable style={[s.pinBtn, sending && { opacity: 0.6 }]} onPress={send} disabled={sending}>
+        <Pressable style={[s.pinBtn, sending && { opacity: 0.6 }]} onPress={send} disabled={sending} accessibilityRole="button" accessibilityLabel={t('Send message')}>
           {sending ? <ActivityIndicator color="white" /> : <Ionicons name="send" size={18} color="white" />}
         </Pressable>
       </View>
@@ -4796,7 +4850,7 @@ function ChatThread({ nego, onSend }: { nego: Negotiation; onSend: (text: string
           >
             {viewerUri ? <Image source={{ uri: viewerUri }} style={s.imgViewerImage} resizeMode="contain" /> : null}
           </ScrollView>
-          <Pressable style={s.imgViewerClose} onPress={() => setViewerUri(null)} hitSlop={12}>
+          <Pressable style={s.imgViewerClose} onPress={() => setViewerUri(null)} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('Close image')}>
             <Ionicons name="close" size={26} color="#fff" />
           </Pressable>
         </View>
@@ -5414,7 +5468,7 @@ function SettingsTab({
         </Pressable>
         <View style={{ flex: 1, marginLeft: 14 }}>
           <Text style={s.label}>{t("Display Name")}</Text>
-          <TextInput style={s.input} value={name} onChangeText={setName} placeholder={t("How others see you")} placeholderTextColor="#4b5563" autoCapitalize="words" />
+          <TextInput style={s.input} value={name} onChangeText={setName} placeholder={t("How others see you")} placeholderTextColor={palette.placeholder} autoCapitalize="words" />
         </View>
       </View>
 
@@ -5600,7 +5654,7 @@ function SettingsTab({
       ) : null}
 
       {/* Live-location sharing while a deal is active (auto-stops on completion). */}
-      <Pressable style={s.toggleRow} onPress={() => onSendLocationOnDealChange(!sendLocationOnDeal)}>
+      <Pressable accessibilityRole="switch" accessibilityState={{ checked: sendLocationOnDeal }} style={s.toggleRow} onPress={() => onSendLocationOnDealChange(!sendLocationOnDeal)}>
         <View style={{ flex: 1, marginRight: 12 }}>
           <Text style={s.toggleTitle}>{t("Send location on active deal")}</Text>
           <Text style={s.dim}>{t("Share your live location with the other party while a deal is active. Sharing stops when the deal completes.")}</Text>
@@ -5611,7 +5665,7 @@ function SettingsTab({
       </Pressable>
 
       {/* Anonymous diagnostics — scrubbed of all identity/contact/location/content. */}
-      <Pressable style={s.toggleRow} onPress={() => onTelemetryChange(!telemetryEnabled)}>
+      <Pressable accessibilityRole="switch" accessibilityState={{ checked: telemetryEnabled }} style={s.toggleRow} onPress={() => onTelemetryChange(!telemetryEnabled)}>
         <View style={{ flex: 1, marginRight: 12 }}>
           <Text style={s.toggleTitle}>{t("Share anonymous diagnostics")}</Text>
           <Text style={s.dim}>{t("Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.")}</Text>
@@ -5633,7 +5687,7 @@ function SettingsTab({
       </Pressable>
       {featuresOpen && (
       <>
-      <Pressable style={s.toggleRow} onPress={() => onServicesEnabledChange(!servicesEnabled)}>
+      <Pressable accessibilityRole="switch" accessibilityState={{ checked: servicesEnabled }} style={s.toggleRow} onPress={() => onServicesEnabledChange(!servicesEnabled)}>
         <View style={{ flex: 1, marginRight: 12 }}>
           <Text style={s.toggleTitle}>{t("Service / Product marketplace")}</Text>
           <Text style={s.dim}>{t("Buy and sell products & services beyond rideshare. Turn off for a leaner UI.")}</Text>
@@ -5749,7 +5803,7 @@ function SettingsTab({
                   onCommit={(n) => onBrowsePrefChange({ browseMaxDistance: Math.max(1, Math.round(n)) })}
                 />
               </View>
-              <Pressable style={s.toggleRow} onPress={() => onBrowsePrefChange({ browseAlertSound: !browseAlertSound })}>
+              <Pressable accessibilityRole="switch" accessibilityState={{ checked: browseAlertSound }} style={s.toggleRow} onPress={() => onBrowsePrefChange({ browseAlertSound: !browseAlertSound })}>
                 <View style={{ flex: 1, marginRight: 12 }}>
                   <Text style={s.toggleTitle}>{t("Sound on new matching post")}</Text>
                   <Text style={s.dim}>{t("Play a sound when a new post appears in your subcategory.")}</Text>
@@ -5758,7 +5812,7 @@ function SettingsTab({
                   <View style={[s.switchThumb, browseAlertSound && s.switchThumbOn]} />
                 </View>
               </Pressable>
-              <Pressable style={s.toggleRow} onPress={() => onBrowsePrefChange({ browseAlertNotify: !browseAlertNotify })}>
+              <Pressable accessibilityRole="switch" accessibilityState={{ checked: browseAlertNotify }} style={s.toggleRow} onPress={() => onBrowsePrefChange({ browseAlertNotify: !browseAlertNotify })}>
                 <View style={{ flex: 1, marginRight: 12 }}>
                   <Text style={s.toggleTitle}>{t("Notify on new matching post")}</Text>
                   <Text style={s.dim}>{t("Send a notification when a new post appears in your subcategory.")}</Text>
@@ -6308,7 +6362,7 @@ function AddressBookField({
           placeholderTextColor={palette.placeholder}
           autoCapitalize="words"
         />
-        <Pressable style={s.addrBtn} onPress={openSheet}>
+        <Pressable style={s.addrBtn} onPress={openSheet} accessibilityRole="button" accessibilityLabel={t('Open address book')}>
           <Ionicons name="book-outline" size={20} color={palette.link} />
         </Pressable>
       </View>
@@ -6418,7 +6472,7 @@ function LocationField({
               value={address}
               onChangeText={(t) => onChange(t, geohash)}
               placeholder={t("Address (auto-filled, editable)")}
-              placeholderTextColor="#4b5563"
+              placeholderTextColor={palette.placeholder}
               autoCapitalize="words"
             />
             <Pressable style={s.pinBtn} onPress={openPicker}>
@@ -6560,7 +6614,7 @@ function ImagePickerField({
         {images.length < 4 && (
           <Pressable style={s.imageAdd} onPress={pick} disabled={uploading}>
             {uploading
-              ? <ActivityIndicator color="#4b5a6e" />
+              ? <ActivityIndicator color={palette.dim} />
               : (
                 <>
                   <Ionicons name="image-outline" size={20} color={palette.dim} style={{ marginBottom: 2 }} />
@@ -7367,7 +7421,7 @@ function makeStyles(c: Palette) {
     pendingText: { color: c.warn, fontWeight: '700' },
     pendingSub: { color: c.warn, fontSize: 13, marginTop: 2, opacity: 0.9 },
     stageLine: { color: c.text2, fontSize: 13, fontWeight: '600', marginTop: 10, marginBottom: 6 },
-    cancelLink: { color: '#fca5a5', fontSize: 12, marginTop: 10, textAlign: 'center' },
+    cancelLink: { color: c.danger, fontSize: 12, marginTop: 10, textAlign: 'center' },
     blockBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 10, marginTop: 6, marginBottom: 2 },
     blockBtnText: { color: c.danger, fontSize: 12, fontWeight: '600' },
     cancelBtn: { marginTop: 12, borderWidth: 1, borderColor: '#ef4444', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 16, alignItems: 'center', alignSelf: 'stretch' },
@@ -7379,7 +7433,7 @@ function makeStyles(c: Palette) {
     callLink: { color: c.link, textDecorationLine: 'underline' },
     callBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', backgroundColor: c.accentBtn, borderRadius: 999, paddingVertical: 7, paddingHorizontal: 14, marginTop: 8 },
     callBtnText: { color: 'white', fontSize: 13, fontWeight: '600' },
-    reportLink: { color: '#fca5a5', fontSize: 12, fontWeight: '600' },
+    reportLink: { color: c.danger, fontSize: 12, fontWeight: '600' },
     reportReason: { flexDirection: 'row', alignItems: 'center', paddingVertical: 9 },
     reportReasonText: { color: c.text2, fontSize: 14, marginLeft: 10 },
     radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 1.5, borderColor: c.borderStrong, alignItems: 'center', justifyContent: 'center' },
