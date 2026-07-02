@@ -14,10 +14,12 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { createServer, sharedPool, NAME, VERSION } from './server.js';
 import { rateLimit } from './ratelimit.js';
 import { mountNotify, type Notifier } from './notify/routes.js';
+import { mountTelegram, type TelegramBridge } from './notify/telegram/index.js';
 
 const PORT = Number(process.env.PORT ?? 8788);
 const HOST = process.env.HOST ?? '127.0.0.1';
 const NOTIFY = process.env.ENABLE_NOTIFY !== '0';
+const TELEGRAM = process.env.ENABLE_TELEGRAM !== '0' && !!process.env.TELEGRAM_BOT_TOKEN;
 const DATA_DIR = process.env.DATA_DIR ?? './data';
 
 const app = express();
@@ -48,10 +50,20 @@ const limiter = rateLimit();
 let notifier: Notifier | null = null;
 if (NOTIFY) notifier = mountNotify(app, sharedPool.relays, DATA_DIR, limiter);
 
+// Telegram bridge (group feed + personal pings) — needs the notifier's watcher
+// and store. Async (calls getMe on boot); errors are logged, not fatal.
+let telegram: TelegramBridge | null = null;
+if (TELEGRAM && notifier) {
+  mountTelegram(app, notifier, DATA_DIR, limiter)
+    .then((b) => { telegram = b; })
+    .catch((err) => console.error('[telegram] failed to start bridge', err));
+}
+
 app.get('/health', (_req, res) => {
   res.json({
     ok: true, name: NAME, version: VERSION, relays: sharedPool.relays,
     notify: notifier ? { enabled: true, subscriptions: notifier.store.size() } : { enabled: false },
+    telegram: telegram ? { enabled: true, groups: telegram.groups.size() } : { enabled: TELEGRAM },
   });
 });
 
