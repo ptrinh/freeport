@@ -590,6 +590,9 @@ const c: Record<string, string> = {
   "Resume": "Rifillo",
   "Stop": "Ndalo",
   "Resume live location sharing": "Rifillo ndarjen e vendndodhjes drejtpërdrejt",
-  "Stop sharing live location": "Ndalo ndarjen e vendndodhjes drejtpërdrejt"
+  "Stop sharing live location": "Ndalo ndarjen e vendndodhjes drejtpërdrejt",
+  "{n} day": "{n} ditë",
+  "{n} result": "{n} rezultat",
+  "{n} response": "{n} përgjigje"
 };
 export default c;

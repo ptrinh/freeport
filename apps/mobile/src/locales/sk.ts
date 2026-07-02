@@ -590,6 +590,12 @@ const c: Record<string, string> = {
   "Resume": "Pokračovať",
   "Stop": "Zastaviť",
   "Resume live location sharing": "Obnoviť zdieľanie polohy naživo",
-  "Stop sharing live location": "Zastaviť zdieľanie polohy naživo"
+  "Stop sharing live location": "Zastaviť zdieľanie polohy naživo",
+  "{n} day": "{n} deň",
+  "{n} result": "{n} výsledok",
+  "{n} response": "{n} odpoveď",
+  "{n} days|few": "{n} dni",
+  "{n} results|few": "{n} výsledky",
+  "{n} responses|few": "{n} odpovede"
 };
 export default c;

@@ -633,6 +633,9 @@ const c: Record<string, string> = {
   "Resume": "Fortsetzen",
   "Stop": "Stopp",
   "Resume live location sharing": "Live-Standortfreigabe fortsetzen",
-  "Stop sharing live location": "Live-Standortfreigabe stoppen"
+  "Stop sharing live location": "Live-Standortfreigabe stoppen",
+  "{n} day": "{n} Tag",
+  "{n} result": "{n} Ergebnis",
+  "{n} response": "{n} Antwort"
 };
 export default c;

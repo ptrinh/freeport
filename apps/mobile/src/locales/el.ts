@@ -590,6 +590,9 @@ const c: Record<string, string> = {
   "Resume": "Συνέχιση",
   "Stop": "Διακοπή",
   "Resume live location sharing": "Συνέχιση ζωντανής κοινοποίησης τοποθεσίας",
-  "Stop sharing live location": "Διακοπή ζωντανής κοινοποίησης τοποθεσίας"
+  "Stop sharing live location": "Διακοπή ζωντανής κοινοποίησης τοποθεσίας",
+  "{n} day": "{n} ημέρα",
+  "{n} result": "{n} αποτέλεσμα",
+  "{n} response": "{n} απάντηση"
 };
 export default c;

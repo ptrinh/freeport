@@ -633,6 +633,9 @@ const c: Record<string, string> = {
   "Resume": "استئناف",
   "Stop": "إيقاف",
   "Resume live location sharing": "استئناف مشاركة الموقع المباشر",
-  "Stop sharing live location": "إيقاف مشاركة الموقع المباشر"
+  "Stop sharing live location": "إيقاف مشاركة الموقع المباشر",
+  "{n} day": "يوم واحد ({n})",
+  "{n} result": "نتيجة واحدة ({n})",
+  "{n} response": "رد واحد ({n})"
 };
 export default c;

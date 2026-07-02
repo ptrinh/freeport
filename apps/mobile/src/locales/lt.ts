@@ -590,6 +590,10 @@ const c: Record<string, string> = {
   "Resume": "Tęsti",
   "Stop": "Sustabdyti",
   "Resume live location sharing": "Tęsti tiesioginį vietos bendrinimą",
-  "Stop sharing live location": "Sustabdyti tiesioginį vietos bendrinimą"
+  "Stop sharing live location": "Sustabdyti tiesioginį vietos bendrinimą",
+  "{n} result": "{n} rezultatas",
+  "{n} response": "{n} atsakymas",
+  "{n} results|few": "{n} rezultatai",
+  "{n} responses|few": "{n} atsakymai"
 };
 export default c;

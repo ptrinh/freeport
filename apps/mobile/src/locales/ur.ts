@@ -590,6 +590,9 @@ const c: Record<string, string> = {
   "Resume": "دوبارہ شروع کریں",
   "Stop": "روکیں",
   "Resume live location sharing": "لائیو مقام کا اشتراک دوبارہ شروع کریں",
-  "Stop sharing live location": "لائیو مقام کا اشتراک روکیں"
+  "Stop sharing live location": "لائیو مقام کا اشتراک روکیں",
+  "{n} day": "{n} دن",
+  "{n} result": "{n} نتیجہ",
+  "{n} response": "{n} جواب"
 };
 export default c;

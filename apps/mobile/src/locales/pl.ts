@@ -590,6 +590,11 @@ const c: Record<string, string> = {
   "Resume": "Wznów",
   "Stop": "Zatrzymaj",
   "Resume live location sharing": "Wznów udostępnianie lokalizacji na żywo",
-  "Stop sharing live location": "Zatrzymaj udostępnianie lokalizacji na żywo"
+  "Stop sharing live location": "Zatrzymaj udostępnianie lokalizacji na żywo",
+  "{n} day": "{n} dzień",
+  "{n} result": "{n} wynik",
+  "{n} response": "{n} odpowiedź",
+  "{n} results|few": "{n} wyniki",
+  "{n} responses|few": "{n} odpowiedzi"
 };
 export default c;

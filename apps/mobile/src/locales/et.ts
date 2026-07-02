@@ -590,6 +590,9 @@ const c: Record<string, string> = {
   "Resume": "Jätka",
   "Stop": "Peata",
   "Resume live location sharing": "Jätka reaalajas asukoha jagamist",
-  "Stop sharing live location": "Peata reaalajas asukoha jagamine"
+  "Stop sharing live location": "Peata reaalajas asukoha jagamine",
+  "{n} day": "{n} päev",
+  "{n} result": "{n} tulemus",
+  "{n} response": "{n} vastus"
 };
 export default c;

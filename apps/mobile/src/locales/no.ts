@@ -590,6 +590,9 @@ const c: Record<string, string> = {
   "Resume": "Fortsett",
   "Stop": "Stopp",
   "Resume live location sharing": "Fortsett deling av posisjon i sanntid",
-  "Stop sharing live location": "Stopp deling av posisjon i sanntid"
+  "Stop sharing live location": "Stopp deling av posisjon i sanntid",
+  "{n} day": "{n} dag",
+  "{n} result": "{n} resultat",
+  "{n} response": "{n} svar"
 };
 export default c;

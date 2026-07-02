@@ -590,6 +590,9 @@ const c: Record<string, string> = {
   "Resume": "Reia",
   "Stop": "Oprește",
   "Resume live location sharing": "Reia partajarea locației în timp real",
-  "Stop sharing live location": "Oprește partajarea locației în timp real"
+  "Stop sharing live location": "Oprește partajarea locației în timp real",
+  "{n} day": "{n} zi",
+  "{n} result": "{n} rezultat",
+  "{n} response": "{n} răspuns"
 };
 export default c;

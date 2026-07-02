@@ -633,6 +633,9 @@ const c: Record<string, string> = {
   "Resume": "Devam et",
   "Stop": "Durdur",
   "Resume live location sharing": "Canlı konum paylaşımına devam et",
-  "Stop sharing live location": "Canlı konum paylaşımını durdur"
+  "Stop sharing live location": "Canlı konum paylaşımını durdur",
+  "{n} day": "{n} gün",
+  "{n} result": "{n} sonuç",
+  "{n} response": "{n} yanıt"
 };
 export default c;

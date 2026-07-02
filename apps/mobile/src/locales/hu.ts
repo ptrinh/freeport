@@ -590,6 +590,9 @@ const c: Record<string, string> = {
   "Resume": "Folytatás",
   "Stop": "Leállítás",
   "Resume live location sharing": "Élő helymegosztás folytatása",
-  "Stop sharing live location": "Élő helymegosztás leállítása"
+  "Stop sharing live location": "Élő helymegosztás leállítása",
+  "{n} day": "{n} nap",
+  "{n} result": "{n} találat",
+  "{n} response": "{n} válasz"
 };
 export default c;
