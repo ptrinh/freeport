@@ -23,6 +23,7 @@ import {
   KIND_INTENT_REQUEST,
   buildIntentEvent,
   geohashPrefixes,
+  parseIntentEvent,
   type BuildIntentInput,
 } from '@freeport/protocol';
 import type { RelayPool } from './pool.js';
@@ -85,6 +86,39 @@ function decodeSecret(secret: string): Uint8Array {
   throw new Error('secretKey must be an nsec or 64-char hex private key.');
 }
 
+/** Max serialized size for a pre-signed event (relays commonly cap ~64-128KB). */
+const MAX_EVENT_BYTES = 64 * 1024;
+/** How far in the future a created_at may claim to be (clock skew allowance). */
+const MAX_FUTURE_SKEW_SECONDS = 15 * 60;
+
+/**
+ * Enforce the tool's documented invariants on a pre-signed event — build mode
+ * gets them for free from buildIntentEvent + zod, this path must check them
+ * explicitly. Returns an error string, or null when the event is acceptable.
+ */
+export function validatePreSigned(ev: Event): string | null {
+  if (JSON.stringify(ev).length > MAX_EVENT_BYTES) {
+    return `event too large (max ${MAX_EVENT_BYTES / 1024}KB).`;
+  }
+  const now = Math.floor(Date.now() / 1000);
+  if (ev.created_at > now + MAX_FUTURE_SKEW_SECONDS) {
+    return 'event.created_at is in the future.';
+  }
+  if (!parseIntentEvent(ev)) {
+    return 'event is not a valid Freeport intent (content shape / d tag / kind-side mismatch).';
+  }
+  const expTag = ev.tags.find((t) => t[0] === 'expiration')?.[1];
+  const exp = Number(expTag);
+  if (!expTag || !Number.isFinite(exp)) {
+    return 'event must carry a NIP-40 expiration tag.';
+  }
+  if (exp <= now) return 'event is already expired.';
+  if (exp > now + MAX_EXPIRY_DAYS * 24 * 3600) {
+    return `expiration exceeds the ${MAX_EXPIRY_DAYS}-day maximum.`;
+  }
+  return null;
+}
+
 export function registerWriteTools(server: McpServer, pool: RelayPool): void {
   server.tool(
     'freeport_create_post',
@@ -123,6 +157,12 @@ export function registerWriteTools(server: McpServer, pool: RelayPool): void {
         let valid = false;
         try { valid = verifyEvent(event); } catch { valid = false; }
         if (!valid) return json({ ok: false, error: 'event signature is invalid.' });
+        // The pre-signed path must uphold the SAME anti-spam guarantees as
+        // build mode, or it's a generic relay-spam proxy for anyone who signs
+        // locally: a well-formed intent body, a bounded NIP-40 expiry, and a
+        // sane timestamp/size.
+        const err = validatePreSigned(event);
+        if (err) return json({ ok: false, error: err });
       } else {
         if (!args.secretKey) return json({ ok: false, error: 'Provide either secretKey (+ fields) or a signed event.' });
         if (!args.side || !args.market || !args.schema || !args.title || !args.payload) {
