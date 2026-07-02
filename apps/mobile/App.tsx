@@ -79,6 +79,7 @@ import { intentTopics, browseTopic } from './src/topics';
 import { applySideBackdrop } from './src/sideBackdrop';
 import { suggestPrice, estimateFare, setFareConfig, defaultFareConfig, type PriceSuggestion, type FareConfig } from './src/pricing';
 import { pushSupported, enablePush, updatePush, disablePush, pushStatus, type PushStatus, type PushFilters } from './src/push';
+import { requestTelegramLink, telegramLinkStatus } from './src/telegramLink';
 import { createTripSession, tripLink, tripSecret, restoreTripSession, decodeTripHash, publishTripLocation, subscribeTrip, type TripStatic, type TripSession, type TripView, type TripUpdate } from './src/livetrip';
 import { webBase } from './src/webBase';
 import { versionLabel, checkForUpdate, applyUpdate, useUpdateState, getTrack, applyTrack, setTrack, trackSupported, reloadApp, type UpdateTrack } from './src/updates';
@@ -2994,6 +2995,19 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
   const [fromGeohash, setFromGeohash] = useState<string | null>(null);
   const [to, setTo] = useState('');
   const [category, setCategory] = useState(DEFAULT_RIDESHARE_SUBCATEGORY);
+  // Prefill from a Telegram "broadcast to Freeport" deep link (web only):
+  // ?tab=post&from=…&to=… fills the route text (the user still pins the map to
+  // set the geohash). Time/pax are left to the form — free-text "now" parsing
+  // is unreliable and better chosen explicitly.
+  React.useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined' || !window.location) return;
+    const q = new URLSearchParams(window.location.search);
+    if (q.get('tab') !== 'post') return;
+    const qf = q.get('from'); const qt = q.get('to');
+    if (qf) setFrom(qf);
+    if (qt) setTo(qt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [time, setTime] = useState<Date>(defaultIntentTime);
   const [flexible, setFlexible] = useState(false);
   const [payAmount, setPayAmount] = useState(0);
@@ -5283,6 +5297,8 @@ function SettingsTab({
   const [notifyEndpoint, setNotifyEndpoint] = useState('');
   const [pushState, setPushState] = useState<PushStatus>('off');
   const [pushBusy, setPushBusy] = useState(false);
+  const [telegramLinked, setTelegramLinked] = useState(false);
+  const [telegramBusy, setTelegramBusy] = useState(false);
   // Android background service toggle.
   const [updBusy, setUpdBusy] = useState(false);
   const [updMsg, setUpdMsg] = useState('');
@@ -5319,6 +5335,13 @@ function SettingsTab({
     getTrack().then(setUpdTrack).catch(() => {});
   }, []);
   const myPubkeyHex = client?.pubkey ?? '';
+  // Reflect whether Telegram is linked (best-effort; only if the server offers it).
+  React.useEffect(() => {
+    if (!notifyEndpoint.trim() || !myPubkeyHex) return;
+    let cancelled = false;
+    telegramLinkStatus(notifyEndpoint.trim(), myPubkeyHex).then((v) => { if (!cancelled) setTelegramLinked(v); });
+    return () => { cancelled = true; };
+  }, [notifyEndpoint, myPubkeyHex, telegramBusy]);
   // Intent-alert filters for push: only when the user opted into Browse alerts.
   // Topic mirrors what Browse subscribes to (area + default category/subcat), so
   // pushes track new posts in the slice they care about.
@@ -5897,6 +5920,25 @@ function SettingsTab({
               {pushState === 'on' && <Text style={s.dim}>{t("Notifications enabled.")}</Text>}
               {pushState === 'denied' && <Text style={s.fieldError}>{t("Notifications are blocked — enable them in your device/browser settings.")}</Text>}
               {pushState === 'error' && <Text style={s.fieldError}>{t("Couldn't reach the notification service — check the URL.")}</Text>}
+
+              {/* Telegram: content-blind activity pings via the same server. Useful
+                  where push is flaky (iOS PWA) or the user just prefers Telegram. */}
+              <Text style={[s.toggleTitle, { marginTop: 16 }]}>{t("Telegram alerts")}</Text>
+              <Text style={s.dim}>{telegramLinked
+                ? t("Telegram is linked. Send /stop to the bot to unlink.")
+                : t("Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.")}</Text>
+              <Pressable
+                style={[s.btnCounter, { marginTop: 6 }, (telegramBusy || !notifyEndpoint.trim() || !myPubkeyHex) && { opacity: 0.6 }]}
+                disabled={telegramBusy || !notifyEndpoint.trim() || !myPubkeyHex}
+                onPress={async () => {
+                  setTelegramBusy(true);
+                  const ok = await requestTelegramLink(notifyEndpoint.trim(), myPubkeyHex);
+                  if (!ok) uiAlert(t("Telegram alerts unavailable"), t("This notification server doesn't offer Telegram alerts."));
+                  setTelegramBusy(false);
+                }}
+              >
+                {telegramBusy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{telegramLinked ? t("Re-link Telegram") : t("Link Telegram")}</Text>}
+              </Pressable>
             </>
           )}
         </>
