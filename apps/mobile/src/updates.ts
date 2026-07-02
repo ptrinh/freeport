@@ -109,3 +109,13 @@ export async function checkForUpdate(): Promise<UpdateResult> {
 export async function applyUpdate(): Promise<void> {
   await Updates.reloadAsync();
 }
+
+/** Reload the app (used to apply a layout-direction / RTL change on native,
+ *  which I18nManager.forceRTL only takes effect after a restart). */
+export async function reloadApp(): Promise<void> {
+  try {
+    if (Updates.isEnabled) { await Updates.reloadAsync(); return; }
+  } catch { /* fall through */ }
+  // Dev / no-updates build: nudge the user, since we can't self-restart.
+  // (Callers surface a "restart to apply" message when this returns.)
+}

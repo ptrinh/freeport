@@ -21,15 +21,15 @@ export interface Language {
  * Bolt/inDrive markets) so the device language matches for ≥90% of the list.
  */
 /**
- * RTL languages (ar, he, fa, ur) are NOT offered even though their catalogs
- * exist: the app has no RTL layout support (no I18nManager wiring, physical
- * left/right styles throughout), so they'd render translated strings in
- * mirrored-wrong LTR layouts. Re-add them here once RTL is done properly.
+ * The app has full RTL layout support (see src/rtl.ts): selecting a
+ * right-to-left language flips the layout direction and reloads. So ar/he/fa/ur
+ * are offered here alongside the LTR languages.
  */
 export const LANGUAGES: Language[] = [
   { code: 'af', name: 'Afrikaans', native: 'Afrikaans' },
   { code: 'sq', name: 'Albanian', native: 'Shqip' },
   { code: 'am', name: 'Amharic', native: 'አማርኛ' },
+  { code: 'ar', name: 'Arabic', native: 'العربية' },
   { code: 'hy', name: 'Armenian', native: 'Հայերեն' },
   { code: 'az', name: 'Azerbaijani', native: 'Azərbaycan' },
   { code: 'bn', name: 'Bengali', native: 'বাংলা' },
@@ -48,6 +48,7 @@ export const LANGUAGES: Language[] = [
   { code: 'ka', name: 'Georgian', native: 'ქართული' },
   { code: 'de', name: 'German', native: 'Deutsch' },
   { code: 'el', name: 'Greek', native: 'Ελληνικά' },
+  { code: 'he', name: 'Hebrew', native: 'עברית' },
   { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
   { code: 'hu', name: 'Hungarian', native: 'Magyar' },
   { code: 'id', name: 'Indonesian', native: 'Bahasa Indonesia' },
@@ -63,6 +64,7 @@ export const LANGUAGES: Language[] = [
   { code: 'ms', name: 'Malay', native: 'Bahasa Melayu' },
   { code: 'ne', name: 'Nepali', native: 'नेपाली' },
   { code: 'no', name: 'Norwegian', native: 'Norsk' },
+  { code: 'fa', name: 'Persian', native: 'فارسی' },
   { code: 'pl', name: 'Polish', native: 'Polski' },
   { code: 'pt', name: 'Portuguese', native: 'Português' },
   { code: 'ro', name: 'Romanian', native: 'Română' },
@@ -78,6 +80,7 @@ export const LANGUAGES: Language[] = [
   { code: 'th', name: 'Thai', native: 'ไทย' },
   { code: 'tr', name: 'Turkish', native: 'Türkçe' },
   { code: 'uk', name: 'Ukrainian', native: 'Українська' },
+  { code: 'ur', name: 'Urdu', native: 'اردو' },
   { code: 'uz', name: 'Uzbek', native: 'Oʻzbekcha' },
   { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt' },
 ];

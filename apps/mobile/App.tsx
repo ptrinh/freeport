@@ -81,7 +81,8 @@ import { suggestPrice, estimateFare, setFareConfig, defaultFareConfig, type Pric
 import { pushSupported, enablePush, updatePush, disablePush, pushStatus, type PushStatus, type PushFilters } from './src/push';
 import { createTripSession, tripLink, tripSecret, restoreTripSession, decodeTripHash, publishTripLocation, subscribeTrip, type TripStatic, type TripSession, type TripView, type TripUpdate } from './src/livetrip';
 import { webBase } from './src/webBase';
-import { versionLabel, checkForUpdate, applyUpdate, useUpdateState, getTrack, applyTrack, setTrack, trackSupported, type UpdateTrack } from './src/updates';
+import { versionLabel, checkForUpdate, applyUpdate, useUpdateState, getTrack, applyTrack, setTrack, trackSupported, reloadApp, type UpdateTrack } from './src/updates';
+import { initLayoutDirection, applyLayoutDirection, dirIcon } from './src/rtl';
 import { useWebUpdateAvailable } from './src/webUpdate';
 import { SimplePool } from 'nostr-tools/pool';
 import { getPow } from 'nostr-tools/nip13';
@@ -163,6 +164,11 @@ function runDealAction(p: Promise<unknown> | undefined, failTitle: string): void
   p?.catch((e) => uiAlert(failTitle, e instanceof Error ? e.message : undefined));
 }
 
+
+// Apply the RTL/LTR layout direction before the tree renders (see rtl.ts).
+// Runs once at module load; on web it reads a sync hint so the first paint is
+// already in the right direction.
+initLayoutDirection(systemLanguage());
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
@@ -440,6 +446,16 @@ function AppInner() {
   const [, bumpI18n] = useReducer((n: number) => n + 1, 0);
   useEffect(() => onI18nLoaded(bumpI18n), []);
   useEffect(() => { void ensureI18nLang(language); }, [language]);
+  // Language picker → set + persist. If the new language flips the layout
+  // direction (LTR↔RTL), the app must reload for it to take effect (see
+  // rtl.ts), so persist first, then reload; otherwise switch in place.
+  const changeLanguage = React.useCallback((l: string) => {
+    const needsReload = applyLayoutDirection(l);
+    setLanguage(l);
+    savePrefs({ language: l })
+      .catch(() => {})
+      .finally(() => { if (needsReload) void reloadApp(); });
+  }, []);
   // Custom fare-estimator coefficients (null = built-in defaults).
   const [fareConfig, setFareConfigState] = useState<FareConfig | null>(null);
   const [onboarding, setOnboarding] = useState(false);
@@ -1246,10 +1262,7 @@ function AppInner() {
               return true;
             }}
             language={language}
-            onLanguageChange={(l) => {
-              setLanguage(l);
-              savePrefs({ language: l }).catch(() => {});
-            }}
+            onLanguageChange={changeLanguage}
             location={location}
             onLocationChange={(loc) => {
               setLocation(loc);
@@ -1390,10 +1403,7 @@ function AppInner() {
             savePrefs({ role: r }).catch(() => {});
           }}
           language={language}
-          onLanguageChange={(l) => {
-            setLanguage(l);
-            savePrefs({ language: l }).catch(() => {});
-          }}
+          onLanguageChange={changeLanguage}
           fareConfig={fareConfig}
           fareDefaults={defaultFareConfig(defaultCurrency, location.country)}
           fareCurrency={defaultCurrency}
@@ -2258,7 +2268,7 @@ function MarketTab({
           {drillCategory ? (
             <>
               <Pressable style={s.catBack} onPress={() => setDrillCategory(null)}>
-                <Ionicons name="chevron-back" size={14} color={palette.chipBlueText} />
+                <Ionicons name={dirIcon('chevron-back', 'chevron-forward')} size={14} color={palette.chipBlueText} />
                 <Text style={s.catBackText}>{t("Back")}</Text>
               </Pressable>
               {subcategoriesFor(drillCategory).map((sub) => (
@@ -2347,7 +2357,7 @@ function MarketTab({
               </Text>
               {isRide && p.category ? (
                 <View style={s.vehicleChip}>
-                  <MaterialCommunityIcons name={(VEHICLE_ICONS[p.category] ?? 'car') as any} size={13} color={palette.chipText} style={{ marginRight: 4 }} />
+                  <MaterialCommunityIcons name={(VEHICLE_ICONS[p.category] ?? 'car') as any} size={13} color={palette.chipText} style={{ marginEnd: 4 }} />
                   <Text style={s.vehicleChipText}>{t(p.category)}</Text>
                 </View>
               ) : p.category ? <Text style={s.chip}>{t(p.category)}</Text> : null}
@@ -2753,7 +2763,7 @@ function PostTab({
                       name={pt === 'rideshare' ? 'car-outline' : 'pricetags-outline'}
                       size={16}
                       color={type === pt ? palette.chipBlueText : palette.dim}
-                      style={{ marginRight: 6 }}
+                      style={{ marginEnd: 6 }}
                     />
                     <Text style={[s.segText, type === pt && s.segTextActive]}>{t(pt === 'rideshare' ? 'Rideshare' : 'Service/Product')}</Text>
                   </Pressable>
@@ -3688,7 +3698,7 @@ function DealsTab({
                 name={v === 'active' ? 'pulse-outline' : 'checkmark-done-outline'}
                 size={15}
                 color={view === v ? palette.chipBlueText : palette.dim}
-                style={{ marginRight: 6 }}
+                style={{ marginEnd: 6 }}
               />
               <Text style={[s.segText, view === v && s.segTextActive]}>
                 {v === 'active' ? t('Active') : t('Completed')}
@@ -4389,7 +4399,7 @@ function SelfStats({ client, onPress }: { client: MobileClient; onPress: () => v
         <Text style={s.statValue}>{age}</Text>
         <Text style={s.statLabel}>{t("Account age")}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={16} color={palette.dim} />
+      <Ionicons name={dirIcon('chevron-forward', 'chevron-back')} size={16} color={palette.dim} />
     </Pressable>
   );
 }
@@ -4449,12 +4459,12 @@ function KarmaReceived({ client }: { client: MobileClient }) {
         <Text style={s.dim}>{t("No ratings yet. Complete deals to build karma.")}</Text>
       ) : (
         <>
-          <Text style={[s.repLine, { marginLeft: 0 }]}>
+          <Text style={[s.repLine, { marginStart: 0 }]}>
             {karmaLabel(avg, count)} · {t('{count} ratings', { count })} · avg {avg.toFixed(1)}
           </Text>
           {ratings.map((r, i) => (
             <View key={i} style={[s.row, { marginTop: 6, alignItems: 'flex-start' }]}>
-              <Text style={{ fontSize: 14, marginRight: 6 }}>{emoji(r.score)}</Text>
+              <Text style={{ fontSize: 14, marginEnd: 6 }}>{emoji(r.score)}</Text>
               <Text style={s.rowValue}>
                 {r.note || t('(no note)')} <Text style={s.meta}>· {r.from.slice(0, 8)}…</Text>
               </Text>
@@ -5496,7 +5506,7 @@ function SettingsTab({
           }
           {uploading && <ActivityIndicator style={StyleSheet.absoluteFillObject} color="#3b82f6" />}
         </Pressable>
-        <View style={{ flex: 1, marginLeft: 14 }}>
+        <View style={{ flex: 1, marginStart: 14 }}>
           <Text style={s.label}>{t("Display Name")}</Text>
           <TextInput style={s.input} value={name} onChangeText={setName} placeholder={t("How others see you")} placeholderTextColor={palette.placeholder} autoCapitalize="words" />
         </View>
@@ -5534,7 +5544,7 @@ function SettingsTab({
                   name={mode === 'masked' ? 'eye-off-outline' : 'eye-outline'}
                   size={15}
                   color={phoneDisplay === mode ? palette.chipBlueText : palette.dim}
-                  style={{ marginRight: 6 }}
+                  style={{ marginEnd: 6 }}
                 />
                 <Text style={[s.segText, phoneDisplay === mode && s.segTextActive]}>
                   {mode === 'masked' ? t('Masked') : t('Full')}
@@ -5685,7 +5695,7 @@ function SettingsTab({
 
       {/* Live-location sharing while a deal is active (auto-stops on completion). */}
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: sendLocationOnDeal }} style={s.toggleRow} onPress={() => onSendLocationOnDealChange(!sendLocationOnDeal)}>
-        <View style={{ flex: 1, marginRight: 12 }}>
+        <View style={{ flex: 1, marginEnd: 12 }}>
           <Text style={s.toggleTitle}>{t("Send location on active deal")}</Text>
           <Text style={s.dim}>{t("Share your live location with the other party while a deal is active. Sharing stops when the deal completes.")}</Text>
         </View>
@@ -5696,7 +5706,7 @@ function SettingsTab({
 
       {/* Anonymous diagnostics — scrubbed of all identity/contact/location/content. */}
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: telemetryEnabled }} style={s.toggleRow} onPress={() => onTelemetryChange(!telemetryEnabled)}>
-        <View style={{ flex: 1, marginRight: 12 }}>
+        <View style={{ flex: 1, marginEnd: 12 }}>
           <Text style={s.toggleTitle}>{t("Share anonymous diagnostics")}</Text>
           <Text style={s.dim}>{t("Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.")}</Text>
         </View>
@@ -5718,7 +5728,7 @@ function SettingsTab({
       {featuresOpen && (
       <>
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: servicesEnabled }} style={s.toggleRow} onPress={() => onServicesEnabledChange(!servicesEnabled)}>
-        <View style={{ flex: 1, marginRight: 12 }}>
+        <View style={{ flex: 1, marginEnd: 12 }}>
           <Text style={s.toggleTitle}>{t("Service / Product marketplace")}</Text>
           <Text style={s.dim}>{t("Buy and sell products & services beyond rideshare. Turn off for a leaner UI.")}</Text>
         </View>
@@ -5736,7 +5746,7 @@ function SettingsTab({
               name={mode === 'system' ? 'phone-portrait-outline' : mode === 'dark' ? 'moon-outline' : 'sunny-outline'}
               size={15}
               color={theme === mode ? palette.chipBlueText : palette.dim}
-              style={{ marginRight: 6 }}
+              style={{ marginEnd: 6 }}
             />
             <Text style={[s.segText, theme === mode && s.segTextActive]}>
               {mode === 'system' ? t('System') : mode === 'dark' ? t('Dark') : t('Light')}
@@ -5765,7 +5775,7 @@ function SettingsTab({
               name={r === 'passenger' ? 'person-outline' : 'car-outline'}
               size={15}
               color={role === r ? palette.chipBlueText : palette.dim}
-              style={{ marginRight: 6 }}
+              style={{ marginEnd: 6 }}
             />
             <Text style={[s.segText, role === r && s.segTextActive]}>
               {r === 'passenger' ? t('Passenger / Customer') : t('Driver / Provider')}
@@ -5834,7 +5844,7 @@ function SettingsTab({
                 />
               </View>
               <Pressable accessibilityRole="switch" accessibilityState={{ checked: browseAlertSound }} style={s.toggleRow} onPress={() => onBrowsePrefChange({ browseAlertSound: !browseAlertSound })}>
-                <View style={{ flex: 1, marginRight: 12 }}>
+                <View style={{ flex: 1, marginEnd: 12 }}>
                   <Text style={s.toggleTitle}>{t("Sound on new matching post")}</Text>
                   <Text style={s.dim}>{t("Play a sound when a new post appears in your subcategory.")}</Text>
                 </View>
@@ -5843,7 +5853,7 @@ function SettingsTab({
                 </View>
               </Pressable>
               <Pressable accessibilityRole="switch" accessibilityState={{ checked: browseAlertNotify }} style={s.toggleRow} onPress={() => onBrowsePrefChange({ browseAlertNotify: !browseAlertNotify })}>
-                <View style={{ flex: 1, marginRight: 12 }}>
+                <View style={{ flex: 1, marginEnd: 12 }}>
                   <Text style={s.toggleTitle}>{t("Notify on new matching post")}</Text>
                   <Text style={s.dim}>{t("Send a notification when a new post appears in your subcategory.")}</Text>
                 </View>
@@ -5976,7 +5986,7 @@ function SettingsTab({
                       name={tk === 'latest' ? 'rocket-outline' : 'shield-checkmark-outline'}
                       size={15}
                       color={updTrack === tk ? palette.chipBlueText : palette.dim}
-                      style={{ marginRight: 6 }}
+                      style={{ marginEnd: 6 }}
                     />
                     <Text style={[s.segText, updTrack === tk && s.segTextActive]}>{t(tk === 'latest' ? 'Latest' : 'Stable')}</Text>
                   </Pressable>
@@ -6186,7 +6196,7 @@ function SelectField({ value, options, onChange, icons, iconFor, labelFor, place
       {options.map((o) => (
         <Pressable key={o} style={s.selectOption} onPress={() => { onChange(o); setOpen(false); }}>
           <View style={s.row}>
-            {glyph(o) ? <MaterialCommunityIcons name={glyph(o) as any} size={20} color={o === value ? palette.accent : palette.text3} style={{ marginRight: 10 }} /> : null}
+            {glyph(o) ? <MaterialCommunityIcons name={glyph(o) as any} size={20} color={o === value ? palette.accent : palette.text3} style={{ marginEnd: 10 }} /> : null}
             <Text style={[s.selectOptionText, o === value && s.selectOptionOn]}>{labelOf(o)}</Text>
           </View>
           {o === value && <Ionicons name="checkmark" size={18} color={palette.accent} />}
@@ -6198,7 +6208,7 @@ function SelectField({ value, options, onChange, icons, iconFor, labelFor, place
     <>
       <Pressable style={s.selectField} onPress={() => setOpen(true)}>
         <View style={s.row}>
-          {glyph(value) ? <MaterialCommunityIcons name={glyph(value) as any} size={18} color={palette.text2} style={{ marginRight: 8 }} /> : null}
+          {glyph(value) ? <MaterialCommunityIcons name={glyph(value) as any} size={18} color={palette.text2} style={{ marginEnd: 8 }} /> : null}
           <Text style={[s.selectValue, !value && { color: palette.placeholder }]}>{value ? labelOf(value) : (placeholder ?? 'Select…')}</Text>
         </View>
         <Ionicons name="chevron-down" size={16} color={palette.text3} />
@@ -6404,7 +6414,7 @@ function AddressBookField({
               style={[s.suggestRow, i > 0 && s.suggestRowDiv]}
               onPress={() => { pickedRef.current = sg.label; onChange(sg.label); onSelectCoords?.({ latitude: sg.latitude, longitude: sg.longitude }); setSugs([]); setFocused(false); }}
             >
-              <Ionicons name="location-outline" size={15} color={palette.dim} style={{ marginRight: 8 }} />
+              <Ionicons name="location-outline" size={15} color={palette.dim} style={{ marginEnd: 8 }} />
               <Text style={s.suggestText} numberOfLines={1}>{sg.label}</Text>
             </Pressable>
           ))}
@@ -6574,7 +6584,7 @@ function SideToggle({
             name={value === 'request' ? 'search-outline' : 'pricetag-outline'}
             size={15}
             color={side === value ? palette.chipBlueText : palette.dim}
-            style={{ marginRight: 6 }}
+            style={{ marginEnd: 6 }}
           />
           <Text style={[s.segText, side === value && s.segTextActive]}>{label}</Text>
         </Pressable>
@@ -7179,8 +7189,8 @@ function PaymentField({
             keyboardType="numeric"
           />
         </View>
-        {suffix && <Text style={[s.amountReadoutSym, { marginRight: 0, marginLeft: 6 }]}>{sym}</Text>}
-        <MaterialCommunityIcons name="pencil" size={18} color={palette.accent} style={{ marginLeft: 8 }} />
+        {suffix && <Text style={[s.amountReadoutSym, { marginEnd: 0, marginStart: 6 }]}>{sym}</Text>}
+        <MaterialCommunityIcons name="pencil" size={18} color={palette.accent} style={{ marginStart: 8 }} />
       </View>
       {/* Horizontal wheel picker */}
       <AmountWheel amount={amount} currency={currency} onChange={(n) => { onChange(n, currency); }} />
@@ -7324,7 +7334,7 @@ function makeStyles(c: Palette) {
     header: { color: c.text, fontSize: 20, fontWeight: '800', letterSpacing: 0.5 },
     headerTitleWrap: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
     headerSub: { color: c.dim, fontSize: 11 },
-    headerStatus: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 8 },
+    headerStatus: { flexDirection: 'row', alignItems: 'center', gap: 4, marginStart: 8 },
     statusDot: { width: 7, height: 7, borderRadius: 4 },
     statusDotWrap: { width: 10, height: 10, alignItems: 'center', justifyContent: 'center' },
     statusHalo: { position: 'absolute', width: 10, height: 10, borderRadius: 5 },
@@ -7333,7 +7343,7 @@ function makeStyles(c: Palette) {
       shadowOpacity: 0.9, shadowRadius: 4, shadowOffset: { width: 0, height: 0 }, elevation: 4,
     },
     headerFlag: { fontSize: 13 },
-    headerRoleWrap: { marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 5 },
+    headerRoleWrap: { marginStart: 'auto', flexDirection: 'row', alignItems: 'center', gap: 5 },
     headerRoleText: { color: c.text2, fontSize: 13, fontWeight: '700' },
     roleBtnInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     sectionTitle: { color: c.text, fontSize: 20, fontWeight: '700', letterSpacing: -0.3, marginTop: 16, marginBottom: 4 },
@@ -7370,7 +7380,7 @@ function makeStyles(c: Palette) {
     tourFinalWelcome: { color: c.text, fontSize: 19, fontWeight: '800', textAlign: 'center', marginTop: 18 },
     tourFinalBtn: { backgroundColor: c.accentBtn, borderRadius: 12, paddingVertical: 13, paddingHorizontal: 36, alignItems: 'center', marginTop: 22, alignSelf: 'stretch' },
     tourFinalBtnText: { color: 'white', fontWeight: '700', fontSize: 15.5 },
-    badge: { position: 'absolute', top: -6, right: -12, backgroundColor: '#ef4444', borderRadius: 8, minWidth: 16, height: 16, paddingHorizontal: 3, alignItems: 'center', justifyContent: 'center' },
+    badge: { position: 'absolute', top: -6, end: -12, backgroundColor: '#ef4444', borderRadius: 8, minWidth: 16, height: 16, paddingHorizontal: 3, alignItems: 'center', justifyContent: 'center' },
     badgeText: { color: 'white', fontSize: 10, fontWeight: '700' },
     card: { backgroundColor: c.card, marginHorizontal: 12, marginVertical: 8, padding: 14, borderRadius: 14, borderWidth: 1, borderColor: c.border, shadowColor: c.shadow, shadowOpacity: c.shadowOpacity, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: c.shadowOpacity ? 2 : 0 },
     cardHighlight: { borderColor: c.accent },
@@ -7410,8 +7420,8 @@ function makeStyles(c: Palette) {
     roleCardOn: { borderColor: c.accent, backgroundColor: c.chipBlueBg },
     roleCardTitle: { color: c.text, fontSize: 16, fontWeight: '700' },
     roleCardDesc: { color: c.muted, fontSize: 13, marginTop: 2 },
-    chip: { backgroundColor: c.chipBg, borderRadius: 6, paddingHorizontal: 9, paddingVertical: 4, fontSize: 12, color: c.chipText, marginRight: 6, marginBottom: 4 },
-    vehicleChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.chipBg, borderRadius: 6, paddingHorizontal: 9, paddingVertical: 4, marginRight: 6, marginBottom: 4 },
+    chip: { backgroundColor: c.chipBg, borderRadius: 6, paddingHorizontal: 9, paddingVertical: 4, fontSize: 12, color: c.chipText, marginEnd: 6, marginBottom: 4 },
+    vehicleChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.chipBg, borderRadius: 6, paddingHorizontal: 9, paddingVertical: 4, marginEnd: 6, marginBottom: 4 },
     vehicleChipText: { fontSize: 12, color: c.chipText },
     distChip: { backgroundColor: c.chipBlueBg, color: c.chipBlueText },
     chipGreen: { backgroundColor: c.successBg, color: c.success },
@@ -7465,7 +7475,7 @@ function makeStyles(c: Palette) {
     callBtnText: { color: 'white', fontSize: 13, fontWeight: '600' },
     reportLink: { color: c.danger, fontSize: 12, fontWeight: '600' },
     reportReason: { flexDirection: 'row', alignItems: 'center', paddingVertical: 9 },
-    reportReasonText: { color: c.text2, fontSize: 14, marginLeft: 10 },
+    reportReasonText: { color: c.text2, fontSize: 14, marginStart: 10 },
     radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 1.5, borderColor: c.borderStrong, alignItems: 'center', justifyContent: 'center' },
     radioOn: { borderColor: c.accent },
     radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: c.accent },
@@ -7474,12 +7484,12 @@ function makeStyles(c: Palette) {
     imgViewerScroll: { flex: 1 },
     imgViewerContent: { flexGrow: 1, justifyContent: 'center', alignItems: 'center' },
     imgViewerImage: { width: '100%', height: '100%', flex: 1, alignSelf: 'stretch' },
-    imgViewerClose: { position: 'absolute', top: 44, right: 20, width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
-    chatAttach: { backgroundColor: c.chipBg, borderRadius: 8, paddingHorizontal: 12, justifyContent: 'center', alignItems: 'center', marginLeft: 8 },
+    imgViewerClose: { position: 'absolute', top: 44, end: 20, width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+    chatAttach: { backgroundColor: c.chipBg, borderRadius: 8, paddingHorizontal: 12, justifyContent: 'center', alignItems: 'center', marginStart: 8 },
     chatAttachRec: { backgroundColor: c.danger },
     voiceMsg: { flexDirection: 'row', alignItems: 'center', paddingVertical: 4, paddingHorizontal: 4 },
-    voiceMsgText: { color: c.text, fontSize: 14, marginLeft: 8 },
-    addrBtn: { backgroundColor: c.card, borderWidth: 1, borderColor: c.border, borderRadius: 8, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center', marginLeft: 8 },
+    voiceMsgText: { color: c.text, fontSize: 14, marginStart: 8 },
+    addrBtn: { backgroundColor: c.card, borderWidth: 1, borderColor: c.border, borderRadius: 8, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center', marginStart: 8 },
     abRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.border },
     abText: { color: c.text2, fontSize: 14 },
     suggestBox: { marginTop: 4, backgroundColor: c.card, borderWidth: 1, borderColor: c.border, borderRadius: 8, overflow: 'hidden' },
@@ -7487,7 +7497,7 @@ function makeStyles(c: Palette) {
     suggestRowDiv: { borderTopWidth: 1, borderTopColor: c.border },
     suggestText: { color: c.text2, fontSize: 14, flex: 1 },
     counterBox: { marginTop: 12, padding: 12, backgroundColor: c.panel, borderRadius: 10, borderWidth: 1, borderColor: c.accentBorder },
-    authorAvatar: { width: 22, height: 22, borderRadius: 11, backgroundColor: c.inset, marginRight: 6 },
+    authorAvatar: { width: 22, height: 22, borderRadius: 11, backgroundColor: c.inset, marginEnd: 6 },
     authorName: { color: c.dim, fontSize: 12 },
     avatarRow: { flexDirection: 'row', alignItems: 'center', marginTop: 12 },
     statsRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 12, backgroundColor: c.panel, borderRadius: 10, borderWidth: 1, borderColor: c.border },
@@ -7500,7 +7510,7 @@ function makeStyles(c: Palette) {
     imageGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
     imageThumbWrap: { position: 'relative' },
     imageThumb: { width: 80, height: 80, borderRadius: 8, backgroundColor: c.inset },
-    imageRemove: { position: 'absolute', top: -6, right: -6, backgroundColor: '#374151', borderRadius: 10, width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
+    imageRemove: { position: 'absolute', top: -6, end: -6, backgroundColor: '#374151', borderRadius: 10, width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
     imageRemoveText: { color: 'white', fontSize: 10, fontWeight: '700' },
     imageAdd: { width: 80, height: 80, borderRadius: 8, borderWidth: 1, borderColor: c.border, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', backgroundColor: c.card },
     imageAddText: { color: c.dim, fontSize: 13, textAlign: 'center' },
@@ -7509,8 +7519,8 @@ function makeStyles(c: Palette) {
     segActive: { backgroundColor: c.chipBlueBg },
     segText: { color: c.dim, fontWeight: '600' },
     segTextActive: { color: c.chipBlueText },
-    karmaLabel: { color: c.warn, fontSize: 11, marginLeft: 6 },
-    authorPhone: { color: c.dim, fontSize: 11, marginLeft: 6 },
+    karmaLabel: { color: c.warn, fontSize: 11, marginStart: 6 },
+    authorPhone: { color: c.dim, fontSize: 11, marginStart: 6 },
     authorVehicle: { color: c.text3, fontSize: 12, marginTop: 3 },
     waitTrack: { height: 3, borderRadius: 2, backgroundColor: c.inset, overflow: 'hidden', marginBottom: 8 },
     waitFill: { height: 3, borderRadius: 2, backgroundColor: c.accent },
@@ -7519,13 +7529,13 @@ function makeStyles(c: Palette) {
     sysSender: { color: c.accent, fontWeight: '700', fontSize: 13 },
     sysText: { color: c.text2, fontSize: 13, marginTop: 2 },
     sysDetail: { color: c.text3, fontSize: 12, marginTop: 4 },
-    repLine: { color: c.warn, fontSize: 11, marginTop: 3, marginLeft: 28 },
-    newBadge: { backgroundColor: c.warnBg, color: c.warn, fontSize: 10, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1, marginLeft: 6, overflow: 'hidden' },
+    repLine: { color: c.warn, fontSize: 11, marginTop: 3, marginStart: 28 },
+    newBadge: { backgroundColor: c.warnBg, color: c.warn, fontSize: 10, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1, marginStart: 6, overflow: 'hidden' },
     checkRow: { flexDirection: 'row', alignItems: 'center', marginTop: 14 },
     checkbox: { width: 20, height: 20, borderRadius: 4, borderWidth: 1, borderColor: c.borderStrong, backgroundColor: c.card, alignItems: 'center', justifyContent: 'center' },
     checkboxOn: { backgroundColor: c.accentBtn, borderColor: c.accent },
     checkboxTick: { color: 'white', fontSize: 12, fontWeight: '700' },
-    checkLabel: { color: c.text2, fontSize: 13, marginLeft: 8, flex: 1 },
+    checkLabel: { color: c.text2, fontSize: 13, marginStart: 8, flex: 1 },
     fieldError: { color: c.danger, fontSize: 12, marginTop: 4 },
     warnNote: { color: c.warn, fontSize: 12, marginTop: 6 },
     requiredBox: { backgroundColor: c.warnBg, borderRadius: 12, borderWidth: 1, borderColor: c.warn, padding: 12, marginBottom: 16, gap: 8 },
@@ -7537,13 +7547,13 @@ function makeStyles(c: Palette) {
     requiredDismissText: { color: c.text2, fontSize: 14, fontWeight: '700' },
     collapseHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, marginTop: 12, borderTopWidth: 1, borderTopColor: c.border },
     collapseLeft: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
-    collapseIcon: { marginRight: 12, width: 22, textAlign: 'center' },
+    collapseIcon: { marginEnd: 12, width: 22, textAlign: 'center' },
     collapseTitle: { color: c.text, fontSize: 18, fontWeight: '700', letterSpacing: 0.2 },
     searchBar: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 },
     searchInputWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: c.card, borderRadius: 8, borderWidth: 1, borderColor: c.border, paddingHorizontal: 10 },
     searchInput: { flex: 1, color: c.text, fontSize: 14, paddingVertical: 9 },
     sortBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: c.panel, borderRadius: 8, borderWidth: 1, borderColor: c.accentBorder, paddingHorizontal: 10, paddingVertical: 9, maxWidth: 150 },
-    sortBtnText: { color: c.linkSoft, fontSize: 12, fontWeight: '600', marginLeft: 3 },
+    sortBtnText: { color: c.linkSoft, fontSize: 12, fontWeight: '600', marginStart: 3 },
     sortBtnContent: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', flexShrink: 1 },
     sortChipItem: { flexDirection: 'row', alignItems: 'center' },
     sortBtnSep: { color: c.linkSoft, fontSize: 12, fontWeight: '600', marginHorizontal: 3 },
@@ -7553,7 +7563,7 @@ function makeStyles(c: Palette) {
     catBackText: { color: c.chipBlueText, fontSize: 12, fontWeight: '600' },
     catChip: { backgroundColor: c.card, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: c.border },
     catChipRow: { flexDirection: 'row', alignItems: 'center' },
-    catChipIcon: { marginRight: 5 },
+    catChipIcon: { marginEnd: 5 },
     catChipOn: { backgroundColor: c.accentBtn, borderColor: c.accent },
     catChipText: { color: c.chipText, fontSize: 12 },
     catChipTextOn: { color: 'white', fontWeight: '600' },
@@ -7565,7 +7575,7 @@ function makeStyles(c: Palette) {
     sortChipOn: { backgroundColor: c.accentBtn, borderColor: c.accent },
     sortChipText: { color: c.muted, fontSize: 13 },
     sortChipTextOn: { color: 'white', fontWeight: '600' },
-    pinBtn: { backgroundColor: c.accentBtn, borderRadius: 8, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center', marginLeft: 8 },
+    pinBtn: { backgroundColor: c.accentBtn, borderRadius: 8, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center', marginStart: 8 },
     pinnedHint: { color: c.success, fontSize: 12, marginTop: 4 },
     pinPrompt: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: c.accentBtn, borderRadius: 8, paddingVertical: 12, marginTop: 4 },
     pinPromptText: { color: 'white', fontWeight: '600', fontSize: 14 },
@@ -7589,20 +7599,20 @@ function makeStyles(c: Palette) {
     map: { height: 160, borderRadius: 10, marginTop: 8, overflow: 'hidden' },
     timeBtn: { flex: 1, backgroundColor: c.card, borderRadius: 8, padding: 11, borderWidth: 1, borderColor: c.border, flexDirection: 'row', alignItems: 'baseline' },
     timeBtnText: { color: c.text, fontSize: 16, fontWeight: '600' },
-    timeBtnHint: { color: c.dim, fontSize: 12, marginLeft: 8 },
-    stepBtn: { backgroundColor: c.chipBg, borderRadius: 8, paddingVertical: 11, paddingHorizontal: 14, marginLeft: 8, alignItems: 'center', justifyContent: 'center' },
+    timeBtnHint: { color: c.dim, fontSize: 12, marginStart: 8 },
+    stepBtn: { backgroundColor: c.chipBg, borderRadius: 8, paddingVertical: 11, paddingHorizontal: 14, marginStart: 8, alignItems: 'center', justifyContent: 'center' },
     stepBtnText: { color: c.chipBlueText, fontSize: 14, fontWeight: '700' },
     wheelRow: { flexDirection: 'row', backgroundColor: c.card, borderRadius: 8, borderWidth: 1, borderColor: c.border, overflow: 'hidden' },
     wheel: { flex: 1, color: c.text, backgroundColor: c.card, borderWidth: 0, height: Platform.OS === 'ios' ? 130 : 50 },
     wheelItem: { color: c.text, fontSize: 17, height: 130 },
-    amountField: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginLeft: 8 },
-    amountSymbol: { color: c.text3, fontSize: 15, fontWeight: '700', marginRight: 4 },
+    amountField: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginStart: 8 },
+    amountSymbol: { color: c.text3, fontSize: 15, fontWeight: '700', marginEnd: 4 },
     amountInputInner: { color: c.text, fontSize: 15, textAlign: 'center', padding: 0, minWidth: 60 },
-    curChip: { backgroundColor: c.card, borderRadius: 8, paddingVertical: 11, paddingHorizontal: 14, borderWidth: 1, borderColor: c.border, marginRight: 8 },
+    curChip: { backgroundColor: c.card, borderRadius: 8, paddingVertical: 11, paddingHorizontal: 14, borderWidth: 1, borderColor: c.border, marginEnd: 8 },
     curChipActive: { backgroundColor: c.chipBlueBg, borderColor: c.accent },
     curChipText: { color: c.dim, fontSize: 14, fontWeight: '700' },
     curChipTextActive: { color: c.chipBlueText },
-    amountInput: { flex: 1, marginLeft: 8, textAlign: 'center' },
+    amountInput: { flex: 1, marginStart: 8, textAlign: 'center' },
     // Amount readout + horizontal wheel picker
     // Bounded + centered so on wide (web/desktop) viewports the field underline
     // doesn't stretch full-width and push the "Amount" label off the left edge.
@@ -7611,9 +7621,9 @@ function makeStyles(c: Palette) {
     // "Amount" label and currency symbol out to the two edges). maxWidth caps it
     // on wide/desktop viewports; the value field shrinks if it ever overflows.
     amountReadout: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 6, alignSelf: 'center', maxWidth: 360 },
-    amountReadoutLabel: { color: c.text3, fontSize: 13, fontWeight: '600', marginRight: 8, flexShrink: 0 },
+    amountReadoutLabel: { color: c.text3, fontSize: 13, fontWeight: '600', marginEnd: 8, flexShrink: 0 },
     amountReadoutField: { borderBottomWidth: 2, borderBottomColor: c.accentBorder, flexShrink: 1 },
-    amountReadoutSym: { color: c.text3, fontSize: 20, fontWeight: '700', marginRight: 6, flexShrink: 0 },
+    amountReadoutSym: { color: c.text3, fontSize: 20, fontWeight: '700', marginEnd: 6, flexShrink: 0 },
     amountReadoutInput: { color: c.text, fontSize: 30, fontWeight: '800', textAlign: 'center', padding: 0, minWidth: 80, letterSpacing: 0.5 },
     amountBtnRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
     amountBtn: { flex: 1, paddingVertical: 9, paddingHorizontal: 10, borderRadius: 8, borderWidth: 1, borderColor: c.accentBorder, backgroundColor: c.panel, alignItems: 'center' },

@@ -36,3 +36,8 @@ export async function applyUpdate(): Promise<void> {
   } catch { /* ignore */ }
   if (typeof window !== 'undefined') window.location.reload();
 }
+
+/** Reload the app to apply a layout-direction / RTL change. */
+export async function reloadApp(): Promise<void> {
+  if (typeof window !== 'undefined') window.location.reload();
+}
