@@ -80,3 +80,11 @@ freeport run --config <agent.json>       full agent loop [--post intent.json] [-
 
 Payments/escrow, dispute resolution, vetting, anti-sybil, Telegram bridge —
 all deliberately deferred.
+
+## License & forking
+
+MIT ([LICENSE](LICENSE)). Freeport exists to be forked: any community can
+stand up its own market — own name, city, vertical, relays and services — by
+changing configuration, not architecture. **[FORKING.md](FORKING.md)** lists
+every deployment-specific value; [CONTRIBUTING.md](CONTRIBUTING.md) covers
+dev setup and style.
