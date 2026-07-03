@@ -13,8 +13,8 @@ market keys (or their own relays) and coexist without touching each other.
 ## The 10-minute fork (protocol + agent only)
 
 ```sh
-git clone https://github.com/ptrinh/freeport-app.git
-cd freeport-app
+git clone https://github.com/ptrinh/freeport.git
+cd freeport
 npm install && npm run build && npm test
 ```
 

@@ -8,6 +8,10 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 > Naming: "Freeport" pending trademark/domain check — all naming is held in
 > `packages/protocol/src/constants.ts` (`APP_NAME`).
 
+- **App:** https://freeport.trinh.uk (web/PWA) · [iOS](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901) · Android
+- **Whitepaper:** [English](docs/whitepaper.pdf) · [Tiếng Việt](docs/whitepaper.vi.pdf)
+- **Self-host the server:** [`packages/nostr-mcp`](packages/nostr-mcp) — `docker compose up -d` (MCP + push notifier + optional Telegram bridge)
+
 ## Layout
 
 | Path | What |
