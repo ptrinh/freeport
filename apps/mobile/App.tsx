@@ -5958,10 +5958,10 @@ function SettingsTab({
               <Text style={[s.dim, { marginTop: 10 }]}>{t("It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.")}</Text>
               <Text style={[s.dim, { marginTop: 10 }]}>{t("Use the public one (the default URL), or run your own in one command and point the URL above at it:")}</Text>
               <View style={s.codeBox}>
-                <Text style={s.codeText} selectable>{'git clone https://github.com/ptrinh/freeport-app.git\ncd freeport-app/packages/nostr-mcp\ndocker compose up -d'}</Text>
+                <Text style={s.codeText} selectable>{'git clone https://github.com/ptrinh/freeport.git\ncd freeport/server\ndocker compose up -d'}</Text>
               </View>
               <Text style={[s.dim, { marginTop: 10 }]}>{t("Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.")}</Text>
-              <Pressable style={[s.mapLink, { marginTop: 12 }]} onPress={() => Linking.openURL('https://github.com/ptrinh/freeport-app/tree/master/packages/nostr-mcp')}>
+              <Pressable style={[s.mapLink, { marginTop: 12 }]} onPress={() => Linking.openURL('https://github.com/ptrinh/freeport/tree/main/server')}>
                 <Text style={s.mapLinkText}>{'🔗 ' + t("Self-hosting guide on GitHub")}</Text>
               </Pressable>
               <Pressable style={[s.btnAccept, { marginTop: 12 }]} onPress={() => setNotifyHelpOpen(false)}>
