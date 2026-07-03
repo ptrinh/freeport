@@ -633,6 +633,13 @@ const c: Record<string, string> = {
   "Resume": "继续",
   "Stop": "停止",
   "Resume live location sharing": "继续共享实时位置",
-  "Stop sharing live location": "停止共享实时位置"
+  "Stop sharing live location": "停止共享实时位置",
+  "Telegram alerts": "Telegram 提醒",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram 已关联。向机器人发送 /stop 以解除关联。",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "以 Telegram 消息形式获得同样的内容保密提醒。打开机器人以关联你的账户。",
+  "Link Telegram": "关联 Telegram",
+  "Re-link Telegram": "重新关联 Telegram",
+  "Telegram alerts unavailable": "Telegram 提醒不可用",
+  "This notification server doesn't offer Telegram alerts.": "此通知服务器不提供 Telegram 提醒。"
 };
 export default c;

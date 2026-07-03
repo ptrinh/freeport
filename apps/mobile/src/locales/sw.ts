@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "Endelea",
   "Stop": "Simamisha",
   "Resume live location sharing": "Endelea kushiriki mahali papo hapo",
-  "Stop sharing live location": "Simamisha kushiriki mahali papo hapo"
+  "Stop sharing live location": "Simamisha kushiriki mahali papo hapo",
+  "Telegram alerts": "Arifa za Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram imeunganishwa. Tuma /stop kwa boti ili kuondoa muunganisho.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Pata arifa zilezile zisizoona maudhui kama ujumbe wa Telegram. Hufungua boti ili kuunganisha akaunti yako.",
+  "Link Telegram": "Unganisha Telegram",
+  "Re-link Telegram": "Unganisha tena Telegram",
+  "Telegram alerts unavailable": "Arifa za Telegram hazipatikani",
+  "This notification server doesn't offer Telegram alerts.": "Seva hii ya arifa haitoi arifa za Telegram."
 };
 export default c;

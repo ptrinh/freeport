@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "توقف اشتراک‌گذاری موقعیت زنده",
   "{n} day": "{n} روز",
   "{n} result": "{n} نتیجه",
-  "{n} response": "{n} پاسخ"
+  "{n} response": "{n} پاسخ",
+  "Telegram alerts": "هشدارهای Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram متصل شد. برای قطع اتصال به ربات /stop بفرستید.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "همان هشدارهای محتوا-نابینا را به‌صورت پیام Telegram دریافت کنید. ربات را برای اتصال حساب شما باز می‌کند.",
+  "Link Telegram": "اتصال Telegram",
+  "Re-link Telegram": "اتصال دوبارهٔ Telegram",
+  "Telegram alerts unavailable": "هشدارهای Telegram در دسترس نیست",
+  "This notification server doesn't offer Telegram alerts.": "این سرور اعلان‌ها هشدارهای Telegram ارائه نمی‌دهد."
 };
 export default c;

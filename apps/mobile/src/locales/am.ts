@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "ቀጥል",
   "Stop": "አቁም",
   "Resume live location sharing": "የቀጥታ አካባቢ ማጋራትን ቀጥል",
-  "Stop sharing live location": "የቀጥታ አካባቢ ማጋራትን አቁም"
+  "Stop sharing live location": "የቀጥታ አካባቢ ማጋራትን አቁም",
+  "Telegram alerts": "የTelegram ማንቂያዎች",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram ተገናኝቷል። ለማላቀቅ ለቦቱ /stop ይላኩ።",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "እንደ Telegram መልእክት ተመሳሳይ ይዘት-ዕውር ማንቂያዎችን ያግኙ። መለያዎን ለማገናኘት ቦቱን ይክፈቱ።",
+  "Link Telegram": "Telegram አገናኝ",
+  "Re-link Telegram": "Telegram እንደገና አገናኝ",
+  "Telegram alerts unavailable": "የTelegram ማንቂያዎች አይገኙም",
+  "This notification server doesn't offer Telegram alerts.": "ይህ የማሳወቂያ አገልጋይ የTelegram ማንቂያዎችን አይሰጥም።"
 };
 export default c;

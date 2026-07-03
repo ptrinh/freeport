@@ -595,6 +595,13 @@ const c: Record<string, string> = {
   "{n} result": "{n} wynik",
   "{n} response": "{n} odpowiedź",
   "{n} results|few": "{n} wyniki",
-  "{n} responses|few": "{n} odpowiedzi"
+  "{n} responses|few": "{n} odpowiedzi",
+  "Telegram alerts": "Powiadomienia Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram jest połączony. Wyślij /stop do bota, aby odłączyć.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Otrzymuj te same powiadomienia bez treści jako wiadomość Telegram. Otwiera bota, aby połączyć Twoje konto.",
+  "Link Telegram": "Połącz Telegram",
+  "Re-link Telegram": "Połącz Telegram ponownie",
+  "Telegram alerts unavailable": "Powiadomienia Telegram niedostępne",
+  "This notification server doesn't offer Telegram alerts.": "Ten serwer powiadomień nie oferuje powiadomień Telegram."
 };
 export default c;

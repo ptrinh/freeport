@@ -599,6 +599,13 @@ const c: Record<string, string> = {
   "{n} responses|two": "{n} odziva",
   "{n} days|few": "{n} dnevi",
   "{n} results|few": "{n} rezultati",
-  "{n} responses|few": "{n} odzivi"
+  "{n} responses|few": "{n} odzivi",
+  "Telegram alerts": "Obvestila Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram je povezan. Za prekinitev povezave botu pošljite /stop.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Prejemajte enaka vsebinsko slepa obvestila kot sporočilo v Telegramu. Odpre bota za povezavo vašega računa.",
+  "Link Telegram": "Poveži Telegram",
+  "Re-link Telegram": "Znova poveži Telegram",
+  "Telegram alerts unavailable": "Obvestila Telegram niso na voljo",
+  "This notification server doesn't offer Telegram alerts.": "Ta strežnik obvestil ne ponuja obvestil Telegram."
 };
 export default c;

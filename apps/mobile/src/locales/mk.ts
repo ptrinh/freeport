@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "Запри споделување локација во живо",
   "{n} day": "{n} ден",
   "{n} result": "{n} резултат",
-  "{n} response": "{n} одговор"
+  "{n} response": "{n} одговор",
+  "Telegram alerts": "Telegram известувања",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram е поврзан. Испратете /stop до ботот за да прекинете.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Добивајте исти известувања без содржина како Telegram порака. Го отвора ботот за поврзување на вашата сметка.",
+  "Link Telegram": "Поврзи Telegram",
+  "Re-link Telegram": "Повторно поврзи Telegram",
+  "Telegram alerts unavailable": "Telegram известувањата не се достапни",
+  "This notification server doesn't offer Telegram alerts.": "Овој сервер за известувања не нуди Telegram известувања."
 };
 export default c;

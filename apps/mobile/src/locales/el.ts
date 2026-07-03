@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "Διακοπή ζωντανής κοινοποίησης τοποθεσίας",
   "{n} day": "{n} ημέρα",
   "{n} result": "{n} αποτέλεσμα",
-  "{n} response": "{n} απάντηση"
+  "{n} response": "{n} απάντηση",
+  "Telegram alerts": "Ειδοποιήσεις Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Το Telegram συνδέθηκε. Στείλτε /stop στο bot για αποσύνδεση.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Λάβετε τις ίδιες ειδοποιήσεις χωρίς περιεχόμενο ως μήνυμα Telegram. Ανοίγει το bot για σύνδεση του λογαριασμού σας.",
+  "Link Telegram": "Σύνδεση Telegram",
+  "Re-link Telegram": "Επανασύνδεση Telegram",
+  "Telegram alerts unavailable": "Οι ειδοποιήσεις Telegram δεν είναι διαθέσιμες",
+  "This notification server doesn't offer Telegram alerts.": "Αυτός ο διακομιστής ειδοποιήσεων δεν προσφέρει ειδοποιήσεις Telegram."
 };
 export default c;

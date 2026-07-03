@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "Stopp deling av posisjon i sanntid",
   "{n} day": "{n} dag",
   "{n} result": "{n} resultat",
-  "{n} response": "{n} svar"
+  "{n} response": "{n} svar",
+  "Telegram alerts": "Telegram-varsler",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram er tilkoblet. Send /stop til boten for å koble fra.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Få de samme innholdsblinde varslene som en Telegram-melding. Åpner boten for å koble til kontoen din.",
+  "Link Telegram": "Koble til Telegram",
+  "Re-link Telegram": "Koble til Telegram på nytt",
+  "Telegram alerts unavailable": "Telegram-varsler er ikke tilgjengelige",
+  "This notification server doesn't offer Telegram alerts.": "Denne varselserveren tilbyr ikke Telegram-varsler."
 };
 export default c;

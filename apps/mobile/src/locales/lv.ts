@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "Apturēt tiešraides atrašanās vietas kopīgošanu",
   "{n} day": "{n} diena",
   "{n} result": "{n} rezultāts",
-  "{n} response": "{n} atbilde"
+  "{n} response": "{n} atbilde",
+  "Telegram alerts": "Telegram brīdinājumi",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram ir saistīts. Lai atsaistītu, nosūtiet botam /stop.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Saņemiet tos pašus satura neredzošos brīdinājumus kā Telegram ziņu. Atver botu, lai saistītu jūsu kontu.",
+  "Link Telegram": "Saistīt Telegram",
+  "Re-link Telegram": "Atkārtoti saistīt Telegram",
+  "Telegram alerts unavailable": "Telegram brīdinājumi nav pieejami",
+  "This notification server doesn't offer Telegram alerts.": "Šis paziņojumu serveris nepiedāvā Telegram brīdinājumus."
 };
 export default c;

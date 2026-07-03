@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "Stop deling van lewende ligging",
   "{n} day": "{n} dag",
   "{n} result": "{n} resultaat",
-  "{n} response": "{n} reaksie"
+  "{n} response": "{n} reaksie",
+  "Telegram alerts": "Telegram-waarskuwings",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram is gekoppel. Stuur /stop aan die bot om te ontkoppel.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Kry dieselfde inhoud-blinde waarskuwings as 'n Telegram-boodskap. Maak die bot oop om jou rekening te koppel.",
+  "Link Telegram": "Koppel Telegram",
+  "Re-link Telegram": "Herkoppel Telegram",
+  "Telegram alerts unavailable": "Telegram-waarskuwings nie beskikbaar nie",
+  "This notification server doesn't offer Telegram alerts.": "Hierdie kennisgewingbediener bied nie Telegram-waarskuwings nie."
 };
 export default c;

@@ -594,6 +594,13 @@ const c: Record<string, string> = {
   "{n} result": "{n} rezultatas",
   "{n} response": "{n} atsakymas",
   "{n} results|few": "{n} rezultatai",
-  "{n} responses|few": "{n} atsakymai"
+  "{n} responses|few": "{n} atsakymai",
+  "Telegram alerts": "Telegram įspėjimai",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram susietas. Norėdami atsieti, botui siųskite /stop.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Gaukite tuos pačius turinio nematančius įspėjimus kaip Telegram žinutę. Atidaro botą jūsų paskyrai susieti.",
+  "Link Telegram": "Susieti Telegram",
+  "Re-link Telegram": "Iš naujo susieti Telegram",
+  "Telegram alerts unavailable": "Telegram įspėjimai nepasiekiami",
+  "This notification server doesn't offer Telegram alerts.": "Šis pranešimų serveris nesiūlo Telegram įspėjimų."
 };
 export default c;

@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "ສືບຕໍ່",
   "Stop": "ຢຸດ",
   "Resume live location sharing": "ສືບຕໍ່ການແບ່ງປັນທີ່ຕັ້ງສົດ",
-  "Stop sharing live location": "ຢຸດການແບ່ງປັນທີ່ຕັ້ງສົດ"
+  "Stop sharing live location": "ຢຸດການແບ່ງປັນທີ່ຕັ້ງສົດ",
+  "Telegram alerts": "ການແຈ້ງເຕືອນ Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram ເຊື່ອມຕໍ່ແລ້ວ. ສົ່ງ /stop ໄປຫາບອດເພື່ອຍົກເລີກການເຊື່ອມຕໍ່.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "ຮັບການແຈ້ງເຕືອນທີ່ບໍ່ເປີດເນື້ອຫາອັນດຽວກັນເປັນຂໍ້ຄວາມ Telegram. ເປີດບອດເພື່ອເຊື່ອມຕໍ່ບັນຊີຂອງທ່ານ.",
+  "Link Telegram": "ເຊື່ອມຕໍ່ Telegram",
+  "Re-link Telegram": "ເຊື່ອມຕໍ່ Telegram ໃໝ່",
+  "Telegram alerts unavailable": "ການແຈ້ງເຕືອນ Telegram ບໍ່ພ້ອມໃຊ້ງານ",
+  "This notification server doesn't offer Telegram alerts.": "ເຊີບເວີການແຈ້ງເຕືອນນີ້ບໍ່ໃຫ້ບໍລິການການແຈ້ງເຕືອນ Telegram."
 };
 export default c;

@@ -636,6 +636,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "Canlı konum paylaşımını durdur",
   "{n} day": "{n} gün",
   "{n} result": "{n} sonuç",
-  "{n} response": "{n} yanıt"
+  "{n} response": "{n} yanıt",
+  "Telegram alerts": "Telegram uyarıları",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram bağlı. Bağlantıyı kaldırmak için bota /stop gönderin.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Telegram mesajı olarak aynı içerik-kör uyarıları alın. Hesabınızı bağlamak için botu açar.",
+  "Link Telegram": "Telegram'ı bağla",
+  "Re-link Telegram": "Telegram'ı yeniden bağla",
+  "Telegram alerts unavailable": "Telegram uyarıları kullanılamıyor",
+  "This notification server doesn't offer Telegram alerts.": "Bu bildirim sunucusu Telegram uyarıları sunmuyor."
 };
 export default c;

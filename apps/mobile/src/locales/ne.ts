@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "पुनः सुरु गर्नुहोस्",
   "Stop": "रोक्नुहोस्",
   "Resume live location sharing": "प्रत्यक्ष स्थान साझेदारी पुनः सुरु गर्नुहोस्",
-  "Stop sharing live location": "प्रत्यक्ष स्थान साझेदारी रोक्नुहोस्"
+  "Stop sharing live location": "प्रत्यक्ष स्थान साझेदारी रोक्नुहोस्",
+  "Telegram alerts": "Telegram सतर्कता",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram लिङ्क भयो। अनलिङ्क गर्न बटलाई /stop पठाउनुहोस्।",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Telegram सन्देशको रूपमा उही सामग्री-अन्धो सतर्कता प्राप्त गर्नुहोस्। तपाईंको खाता लिङ्क गर्न बट खोल्छ।",
+  "Link Telegram": "Telegram लिङ्क गर्नुहोस्",
+  "Re-link Telegram": "Telegram पुनः लिङ्क गर्नुहोस्",
+  "Telegram alerts unavailable": "Telegram सतर्कता उपलब्ध छैन",
+  "This notification server doesn't offer Telegram alerts.": "यो सूचना सर्भरले Telegram सतर्कता प्रदान गर्दैन।"
 };
 export default c;

@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "Lopeta reaaliaikainen sijainnin jako",
   "{n} day": "{n} päivä",
   "{n} result": "{n} tulos",
-  "{n} response": "{n} vastaus"
+  "{n} response": "{n} vastaus",
+  "Telegram alerts": "Telegram-ilmoitukset",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram on linkitetty. Poista linkitys lähettämällä botille /stop.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Saa samat sisältösokeat ilmoitukset Telegram-viestinä. Avaa botin tilisi linkittämistä varten.",
+  "Link Telegram": "Linkitä Telegram",
+  "Re-link Telegram": "Linkitä Telegram uudelleen",
+  "Telegram alerts unavailable": "Telegram-ilmoitukset eivät ole käytettävissä",
+  "This notification server doesn't offer Telegram alerts.": "Tämä ilmoituspalvelin ei tarjoa Telegram-ilmoituksia."
 };
 export default c;

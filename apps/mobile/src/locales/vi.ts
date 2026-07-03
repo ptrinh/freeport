@@ -633,6 +633,13 @@ const c: Record<string, string> = {
   "Resume": "Tiếp tục",
   "Stop": "Dừng",
   "Resume live location sharing": "Tiếp tục chia sẻ vị trí trực tiếp",
-  "Stop sharing live location": "Dừng chia sẻ vị trí trực tiếp"
+  "Stop sharing live location": "Dừng chia sẻ vị trí trực tiếp",
+  "Telegram alerts": "Thông báo Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram đã được liên kết. Gửi /stop cho bot để hủy liên kết.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Nhận cùng loại thông báo ẩn nội dung dưới dạng tin nhắn Telegram. Mở bot để liên kết tài khoản của bạn.",
+  "Link Telegram": "Liên kết Telegram",
+  "Re-link Telegram": "Liên kết lại Telegram",
+  "Telegram alerts unavailable": "Thông báo Telegram không khả dụng",
+  "This notification server doesn't offer Telegram alerts.": "Máy chủ thông báo này không cung cấp thông báo Telegram."
 };
 export default c;

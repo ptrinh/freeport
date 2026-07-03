@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "Sambung semula",
   "Stop": "Henti",
   "Resume live location sharing": "Sambung semula perkongsian lokasi langsung",
-  "Stop sharing live location": "Hentikan perkongsian lokasi langsung"
+  "Stop sharing live location": "Hentikan perkongsian lokasi langsung",
+  "Telegram alerts": "Amaran Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram dipautkan. Hantar /stop kepada bot untuk menyahpaut.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Dapatkan amaran buta-kandungan yang sama sebagai mesej Telegram. Membuka bot untuk memaut akaun anda.",
+  "Link Telegram": "Paut Telegram",
+  "Re-link Telegram": "Paut semula Telegram",
+  "Telegram alerts unavailable": "Amaran Telegram tidak tersedia",
+  "This notification server doesn't offer Telegram alerts.": "Pelayan pemberitahuan ini tidak menawarkan amaran Telegram."
 };
 export default c;

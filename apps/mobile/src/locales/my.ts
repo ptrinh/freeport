@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "ပြန်စပါ",
   "Stop": "ရပ်ပါ",
   "Resume live location sharing": "တိုက်ရိုက်တည်နေရာ မျှဝေမှုကို ပြန်စပါ",
-  "Stop sharing live location": "တိုက်ရိုက်တည်နေရာ မျှဝေမှုကို ရပ်ပါ"
+  "Stop sharing live location": "တိုက်ရိုက်တည်နေရာ မျှဝေမှုကို ရပ်ပါ",
+  "Telegram alerts": "Telegram သတိပေးချက်များ",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram ချိတ်ဆက်ထားသည်။ ချိတ်ဆက်မှုဖြုတ်ရန် ဘော့တ်သို့ /stop ပို့ပါ။",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Telegram မက်ဆေ့ခ်ျအဖြစ် အကြောင်းအရာမမြင်ရသော သတိပေးချက်များကို ရယူပါ။ သင့်အကောင့်ချိတ်ဆက်ရန် ဘော့တ်ကို ဖွင့်သည်။",
+  "Link Telegram": "Telegram ချိတ်ဆက်ရန်",
+  "Re-link Telegram": "Telegram ပြန်ချိတ်ဆက်ရန်",
+  "Telegram alerts unavailable": "Telegram သတိပေးချက်များ မရရှိနိုင်ပါ",
+  "This notification server doesn't offer Telegram alerts.": "ဤအကြောင်းကြားချက်ဆာဗာသည် Telegram သတိပေးချက်များ မပေးပါ။"
 };
 export default c;

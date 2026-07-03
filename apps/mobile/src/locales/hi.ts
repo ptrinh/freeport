@@ -633,6 +633,13 @@ const c: Record<string, string> = {
   "Resume": "फिर शुरू करें",
   "Stop": "रोकें",
   "Resume live location sharing": "लाइव स्थान साझाकरण फिर शुरू करें",
-  "Stop sharing live location": "लाइव स्थान साझाकरण रोकें"
+  "Stop sharing live location": "लाइव स्थान साझाकरण रोकें",
+  "Telegram alerts": "Telegram अलर्ट",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram लिंक है। अनलिंक करने के लिए बॉट को /stop भेजें।",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Telegram संदेश के रूप में वही सामग्री-रहित अलर्ट पाएँ। आपका खाता लिंक करने के लिए बॉट खोलता है।",
+  "Link Telegram": "Telegram लिंक करें",
+  "Re-link Telegram": "Telegram फिर से लिंक करें",
+  "Telegram alerts unavailable": "Telegram अलर्ट उपलब्ध नहीं",
+  "This notification server doesn't offer Telegram alerts.": "यह सूचना सर्वर Telegram अलर्ट प्रदान नहीं करता।"
 };
 export default c;

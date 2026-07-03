@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "Élő helymegosztás leállítása",
   "{n} day": "{n} nap",
   "{n} result": "{n} találat",
-  "{n} response": "{n} válasz"
+  "{n} response": "{n} válasz",
+  "Telegram alerts": "Telegram-értesítések",
+  "Telegram is linked. Send /stop to the bot to unlink.": "A Telegram össze van kapcsolva. Küldj /stop parancsot a botnak a leválasztáshoz.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Kapd meg ugyanazokat a tartalomvak értesítéseket Telegram-üzenetként. Megnyitja a botot a fiókod összekapcsolásához.",
+  "Link Telegram": "Telegram összekapcsolása",
+  "Re-link Telegram": "Telegram újbóli összekapcsolása",
+  "Telegram alerts unavailable": "A Telegram-értesítések nem érhetők el",
+  "This notification server doesn't offer Telegram alerts.": "Ez az értesítési kiszolgáló nem kínál Telegram-értesítéseket."
 };
 export default c;

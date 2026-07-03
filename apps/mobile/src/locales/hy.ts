@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "Շարունակել",
   "Stop": "Դադարեցնել",
   "Resume live location sharing": "Շարունակել կենդանի տեղադրության կիսումը",
-  "Stop sharing live location": "Դադարեցնել կենդանի տեղադրության կիսումը"
+  "Stop sharing live location": "Դադարեցնել կենդանի տեղադրության կիսումը",
+  "Telegram alerts": "Telegram-ի ծանուցումներ",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram-ը կապակցված է։ Անջատելու համար ուղարկեք /stop բոտին։",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Ստացեք նույն բովանդակություն-կույր ծանուցումները որպես Telegram հաղորդագրություն։ Բացում է բոտը՝ ձեր հաշիվը կապակցելու համար։",
+  "Link Telegram": "Կապակցել Telegram",
+  "Re-link Telegram": "Կրկին կապակցել Telegram",
+  "Telegram alerts unavailable": "Telegram-ի ծանուցումներն անհասանելի են",
+  "This notification server doesn't offer Telegram alerts.": "Այս ծանուցումների սերվերը Telegram-ի ծանուցումներ չի առաջարկում։"
 };
 export default c;

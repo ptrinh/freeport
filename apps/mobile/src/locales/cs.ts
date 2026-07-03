@@ -596,6 +596,13 @@ const c: Record<string, string> = {
   "{n} response": "{n} odpověď",
   "{n} days|few": "{n} dny",
   "{n} results|few": "{n} výsledky",
-  "{n} responses|few": "{n} odpovědi"
+  "{n} responses|few": "{n} odpovědi",
+  "Telegram alerts": "Upozornění Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram je propojen. Odešlete botovi /stop pro odpojení.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Získejte stejná upozornění bez obsahu jako zpráva na Telegramu. Otevře bota pro propojení účtu.",
+  "Link Telegram": "Propojit Telegram",
+  "Re-link Telegram": "Znovu propojit Telegram",
+  "Telegram alerts unavailable": "Upozornění Telegram nejsou dostupná",
+  "This notification server doesn't offer Telegram alerts.": "Tento server oznámení nenabízí upozornění Telegram."
 };
 export default c;

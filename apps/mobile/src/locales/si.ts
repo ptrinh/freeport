@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "නැවත අරඹන්න",
   "Stop": "නවත්වන්න",
   "Resume live location sharing": "සජීවී ස්ථාන බෙදාගැනීම නැවත අරඹන්න",
-  "Stop sharing live location": "සජීවී ස්ථාන බෙදාගැනීම නවත්වන්න"
+  "Stop sharing live location": "සජීවී ස්ථාන බෙදාගැනීම නවත්වන්න",
+  "Telegram alerts": "Telegram ඇඟවීම්",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram සම්බන්ධයි. විසන්ධි කිරීමට බොට් වෙත /stop යවන්න.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Telegram පණිවිඩයක් ලෙස එම අන්තර්ගත-අන්ධ ඇඟවීම් ලබා ගන්න. ඔබේ ගිණුම සම්බන්ධ කිරීමට බොට් විවෘත කරයි.",
+  "Link Telegram": "Telegram සම්බන්ධ කරන්න",
+  "Re-link Telegram": "Telegram යළි සම්බන්ධ කරන්න",
+  "Telegram alerts unavailable": "Telegram ඇඟවීම් නොමැත",
+  "This notification server doesn't offer Telegram alerts.": "මෙම දැනුම්දීම් සේවාදායකය Telegram ඇඟවීම් සපයන්නේ නැත."
 };
 export default c;

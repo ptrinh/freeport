@@ -633,6 +633,13 @@ const c: Record<string, string> = {
   "Resume": "재개",
   "Stop": "중지",
   "Resume live location sharing": "실시간 위치 공유 재개",
-  "Stop sharing live location": "실시간 위치 공유 중지"
+  "Stop sharing live location": "실시간 위치 공유 중지",
+  "Telegram alerts": "Telegram 알림",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram이 연결되었습니다. 연결을 해제하려면 봇에 /stop을 보내세요.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Telegram 메시지로 동일한 내용 비공개 알림을 받으세요. 계정을 연결하기 위해 봇을 엽니다.",
+  "Link Telegram": "Telegram 연결",
+  "Re-link Telegram": "Telegram 다시 연결",
+  "Telegram alerts unavailable": "Telegram 알림을 사용할 수 없음",
+  "This notification server doesn't offer Telegram alerts.": "이 알림 서버는 Telegram 알림을 제공하지 않습니다."
 };
 export default c;

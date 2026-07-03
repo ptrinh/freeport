@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "עצרו שיתוף מיקום חי",
   "{n} day": "יום {n}",
   "{n} result": "תוצאה {n}",
-  "{n} response": "תגובה {n}"
+  "{n} response": "תגובה {n}",
+  "Telegram alerts": "התראות Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram מקושר. שלחו /stop לבוט כדי לבטל את הקישור.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "קבלו את אותן התראות עיוורות-תוכן כהודעת Telegram. פותח את הבוט כדי לקשר את החשבון שלכם.",
+  "Link Telegram": "קשר Telegram",
+  "Re-link Telegram": "קשר מחדש את Telegram",
+  "Telegram alerts unavailable": "התראות Telegram אינן זמינות",
+  "This notification server doesn't offer Telegram alerts.": "שרת ההתראות הזה אינו מציע התראות Telegram."
 };
 export default c;

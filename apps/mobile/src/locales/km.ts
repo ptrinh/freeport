@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "បន្ត",
   "Stop": "បញ្ឈប់",
   "Resume live location sharing": "បន្តការចែករំលែកទីតាំងផ្ទាល់",
-  "Stop sharing live location": "បញ្ឈប់ការចែករំលែកទីតាំងផ្ទាល់"
+  "Stop sharing live location": "បញ្ឈប់ការចែករំលែកទីតាំងផ្ទាល់",
+  "Telegram alerts": "ការជូនដំណឹង Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram ត្រូវបានភ្ជាប់។ ផ្ញើ /stop ទៅបូតដើម្បីផ្ដាច់។",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "ទទួលបានការជូនដំណឹងគ្មានខ្លឹមសារដូចគ្នាជាសារ Telegram។ បើកបូតដើម្បីភ្ជាប់គណនីរបស់អ្នក។",
+  "Link Telegram": "ភ្ជាប់ Telegram",
+  "Re-link Telegram": "ភ្ជាប់ Telegram ឡើងវិញ",
+  "Telegram alerts unavailable": "ការជូនដំណឹង Telegram មិនមាន",
+  "This notification server doesn't offer Telegram alerts.": "ម៉ាស៊ីនមេជូនដំណឹងនេះមិនផ្ដល់ការជូនដំណឹង Telegram ទេ។"
 };
 export default c;

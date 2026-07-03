@@ -633,6 +633,13 @@ const c: Record<string, string> = {
   "Resume": "ทำต่อ",
   "Stop": "หยุด",
   "Resume live location sharing": "แชร์ตำแหน่งสดต่อ",
-  "Stop sharing live location": "หยุดแชร์ตำแหน่งสด"
+  "Stop sharing live location": "หยุดแชร์ตำแหน่งสด",
+  "Telegram alerts": "การแจ้งเตือน Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram เชื่อมโยงแล้ว ส่ง /stop ไปยังบอทเพื่อยกเลิกการเชื่อมโยง",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "รับการแจ้งเตือนแบบไม่เห็นเนื้อหาแบบเดียวกันเป็นข้อความ Telegram เปิดบอทเพื่อเชื่อมโยงบัญชีของคุณ",
+  "Link Telegram": "เชื่อมโยง Telegram",
+  "Re-link Telegram": "เชื่อมโยง Telegram ใหม่",
+  "Telegram alerts unavailable": "การแจ้งเตือน Telegram ไม่พร้อมใช้งาน",
+  "This notification server doesn't offer Telegram alerts.": "เซิร์ฟเวอร์การแจ้งเตือนนี้ไม่มีการแจ้งเตือน Telegram"
 };
 export default c;

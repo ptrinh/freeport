@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "Oprește partajarea locației în timp real",
   "{n} day": "{n} zi",
   "{n} result": "{n} rezultat",
-  "{n} response": "{n} răspuns"
+  "{n} response": "{n} răspuns",
+  "Telegram alerts": "Alerte Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram este conectat. Trimite /stop botului pentru a deconecta.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Primește aceleași alerte fără conținut ca un mesaj Telegram. Deschide botul pentru a-ți conecta contul.",
+  "Link Telegram": "Conectează Telegram",
+  "Re-link Telegram": "Reconectează Telegram",
+  "Telegram alerts unavailable": "Alertele Telegram nu sunt disponibile",
+  "This notification server doesn't offer Telegram alerts.": "Acest server de notificări nu oferă alerte Telegram."
 };
 export default c;

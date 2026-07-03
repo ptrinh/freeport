@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "நேரடி இருப்பிடப் பகிர்வை நிறுத்தவும்",
   "{n} day": "{n} நாள்",
   "{n} result": "{n} முடிவு",
-  "{n} response": "{n} பதில்"
+  "{n} response": "{n} பதில்",
+  "Telegram alerts": "Telegram எச்சரிக்கைகள்",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram இணைக்கப்பட்டது. இணைப்பை நீக்க பாட்டுக்கு /stop அனுப்பவும்.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Telegram செய்தியாக அதே உள்ளடக்கம்-அறியா எச்சரிக்கைகளைப் பெறுங்கள். உங்கள் கணக்கை இணைக்க பாட்டைத் திறக்கிறது.",
+  "Link Telegram": "Telegram இணைக்க",
+  "Re-link Telegram": "Telegram மீண்டும் இணைக்க",
+  "Telegram alerts unavailable": "Telegram எச்சரிக்கைகள் கிடைக்கவில்லை",
+  "This notification server doesn't offer Telegram alerts.": "இந்த அறிவிப்பு சேவையகம் Telegram எச்சரிக்கைகளை வழங்கவில்லை."
 };
 export default c;

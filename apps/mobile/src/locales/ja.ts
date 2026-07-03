@@ -633,6 +633,13 @@ const c: Record<string, string> = {
   "Resume": "再開",
   "Stop": "停止",
   "Resume live location sharing": "ライブ位置情報の共有を再開",
-  "Stop sharing live location": "ライブ位置情報の共有を停止"
+  "Stop sharing live location": "ライブ位置情報の共有を停止",
+  "Telegram alerts": "Telegram通知",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegramが連携されています。連携を解除するにはボットに /stop を送信してください。",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Telegramメッセージとして同じ内容非公開の通知を受け取れます。アカウントを連携するためにボットを開きます。",
+  "Link Telegram": "Telegramを連携",
+  "Re-link Telegram": "Telegramを再連携",
+  "Telegram alerts unavailable": "Telegram通知は利用できません",
+  "This notification server doesn't offer Telegram alerts.": "この通知サーバーはTelegram通知を提供していません。"
 };
 export default c;

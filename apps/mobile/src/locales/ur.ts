@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "لائیو مقام کا اشتراک روکیں",
   "{n} day": "{n} دن",
   "{n} result": "{n} نتیجہ",
-  "{n} response": "{n} جواب"
+  "{n} response": "{n} جواب",
+  "Telegram alerts": "Telegram الرٹس",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram منسلک ہے۔ منقطع کرنے کے لیے بوٹ کو /stop بھیجیں۔",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Telegram پیغام کے طور پر وہی مواد سے بے خبر الرٹس حاصل کریں۔ آپ کا اکاؤنٹ منسلک کرنے کے لیے بوٹ کھولتا ہے۔",
+  "Link Telegram": "Telegram منسلک کریں",
+  "Re-link Telegram": "Telegram دوبارہ منسلک کریں",
+  "Telegram alerts unavailable": "Telegram الرٹس دستیاب نہیں",
+  "This notification server doesn't offer Telegram alerts.": "یہ نوٹیفکیشن سرور Telegram الرٹس پیش نہیں کرتا۔"
 };
 export default c;

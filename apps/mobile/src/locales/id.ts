@@ -633,6 +633,13 @@ const c: Record<string, string> = {
   "Resume": "Lanjutkan",
   "Stop": "Hentikan",
   "Resume live location sharing": "Lanjutkan berbagi lokasi langsung",
-  "Stop sharing live location": "Hentikan berbagi lokasi langsung"
+  "Stop sharing live location": "Hentikan berbagi lokasi langsung",
+  "Telegram alerts": "Peringatan Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram tertaut. Kirim /stop ke bot untuk memutus tautan.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Dapatkan peringatan buta-konten yang sama sebagai pesan Telegram. Membuka bot untuk menautkan akun Anda.",
+  "Link Telegram": "Tautkan Telegram",
+  "Re-link Telegram": "Tautkan ulang Telegram",
+  "Telegram alerts unavailable": "Peringatan Telegram tidak tersedia",
+  "This notification server doesn't offer Telegram alerts.": "Server notifikasi ini tidak menyediakan peringatan Telegram."
 };
 export default c;

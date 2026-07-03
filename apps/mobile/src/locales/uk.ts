@@ -599,6 +599,13 @@ const c: Record<string, string> = {
   "{n} responses|few": "{n} відповіді",
   "{n} days|many": "{n} днів",
   "{n} results|many": "{n} результатів",
-  "{n} responses|many": "{n} відповідей"
+  "{n} responses|many": "{n} відповідей",
+  "Telegram alerts": "Сповіщення Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram прив'язано. Надішліть боту /stop, щоб відв'язати.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Отримуйте ті самі сповіщення без вмісту як повідомлення Telegram. Відкриває бота для прив'язки вашого облікового запису.",
+  "Link Telegram": "Прив'язати Telegram",
+  "Re-link Telegram": "Переприв'язати Telegram",
+  "Telegram alerts unavailable": "Сповіщення Telegram недоступні",
+  "This notification server doesn't offer Telegram alerts.": "Цей сервер сповіщень не пропонує сповіщення Telegram."
 };
 export default c;

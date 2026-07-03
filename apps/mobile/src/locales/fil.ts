@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "Ituloy",
   "Stop": "Itigil",
   "Resume live location sharing": "Ituloy ang live na pagbabahagi ng lokasyon",
-  "Stop sharing live location": "Itigil ang live na pagbabahagi ng lokasyon"
+  "Stop sharing live location": "Itigil ang live na pagbabahagi ng lokasyon",
+  "Telegram alerts": "Mga alerto sa Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Naka-link ang Telegram. Magpadala ng /stop sa bot para mag-unlink.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Kunin ang parehong content-blind na alerto bilang mensahe sa Telegram. Binubuksan ang bot para i-link ang iyong account.",
+  "Link Telegram": "I-link ang Telegram",
+  "Re-link Telegram": "I-relink ang Telegram",
+  "Telegram alerts unavailable": "Hindi available ang mga alerto sa Telegram",
+  "This notification server doesn't offer Telegram alerts.": "Hindi nag-aalok ang notification server na ito ng mga alerto sa Telegram."
 };
 export default c;

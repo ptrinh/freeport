@@ -636,6 +636,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "إيقاف مشاركة الموقع المباشر",
   "{n} day": "يوم واحد ({n})",
   "{n} result": "نتيجة واحدة ({n})",
-  "{n} response": "رد واحد ({n})"
+  "{n} response": "رد واحد ({n})",
+  "Telegram alerts": "تنبيهات Telegram",
+  "Telegram is linked. Send /stop to the bot to unlink.": "تم ربط Telegram. أرسل /stop إلى البوت لإلغاء الربط.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "احصل على نفس التنبيهات المحجوبة المحتوى كرسالة Telegram. يفتح البوت لربط حسابك.",
+  "Link Telegram": "ربط Telegram",
+  "Re-link Telegram": "إعادة ربط Telegram",
+  "Telegram alerts unavailable": "تنبيهات Telegram غير متاحة",
+  "This notification server doesn't offer Telegram alerts.": "خادم الإشعارات هذا لا يوفّر تنبيهات Telegram."
 };
 export default c;

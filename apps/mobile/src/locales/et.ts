@@ -593,6 +593,13 @@ const c: Record<string, string> = {
   "Stop sharing live location": "Peata reaalajas asukoha jagamine",
   "{n} day": "{n} päev",
   "{n} result": "{n} tulemus",
-  "{n} response": "{n} vastus"
+  "{n} response": "{n} vastus",
+  "Telegram alerts": "Telegrami teavitused",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram on ühendatud. Lahtiühendamiseks saada botile /stop.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "Saa samad sisupimedad teavitused Telegrami sõnumina. Avab boti konto ühendamiseks.",
+  "Link Telegram": "Ühenda Telegram",
+  "Re-link Telegram": "Ühenda Telegram uuesti",
+  "Telegram alerts unavailable": "Telegrami teavitused pole saadaval",
+  "This notification server doesn't offer Telegram alerts.": "See teavitusserver ei paku Telegrami teavitusi."
 };
 export default c;

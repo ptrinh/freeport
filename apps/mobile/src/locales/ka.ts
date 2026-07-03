@@ -590,6 +590,13 @@ const c: Record<string, string> = {
   "Resume": "გაგრძელება",
   "Stop": "შეჩერება",
   "Resume live location sharing": "ცოცხალი მდებარეობის გაზიარების გაგრძელება",
-  "Stop sharing live location": "ცოცხალი მდებარეობის გაზიარების შეჩერება"
+  "Stop sharing live location": "ცოცხალი მდებარეობის გაზიარების შეჩერება",
+  "Telegram alerts": "Telegram-ის შეტყობინებები",
+  "Telegram is linked. Send /stop to the bot to unlink.": "Telegram დაკავშირებულია. გასათიშად გაუგზავნეთ ბოტს /stop.",
+  "Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.": "მიიღეთ იგივე შიგთავს-ბრმა შეტყობინებები Telegram-ის მესიჯად. ხსნის ბოტს თქვენი ანგარიშის დასაკავშირებლად.",
+  "Link Telegram": "Telegram-ის დაკავშირება",
+  "Re-link Telegram": "Telegram-ის ხელახლა დაკავშირება",
+  "Telegram alerts unavailable": "Telegram-ის შეტყობინებები მიუწვდომელია",
+  "This notification server doesn't offer Telegram alerts.": "ეს შეტყობინებების სერვერი არ გთავაზობთ Telegram-ის შეტყობინებებს."
 };
 export default c;
