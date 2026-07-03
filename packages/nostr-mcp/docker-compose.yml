@@ -7,6 +7,12 @@ services:
     # matching the host's other services (Hestia holds 80/443).
     ports:
       - "127.0.0.1:8788:8788"
+    # Secrets (bot token, guest passphrase) live in a gitignored .env beside this
+    # file — NEVER in this committed file. Compose REQUIRES this .env to exist:
+    # create it from the template in the Telegram section below (an empty .env is
+    # fine — the bridge stays off until TELEGRAM_BOT_TOKEN is set).
+    env_file:
+      - .env
     environment:
       - HOST=0.0.0.0
       - PORT=8788
