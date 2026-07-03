@@ -69,6 +69,59 @@ What actually scales:
 
 For most self-hosters the constraint is bandwidth and uptime, not the box.
 
+## Telegram bridge (optional)
+
+The same server can run a Telegram bot that meets communities where they already
+coordinate (e.g. rideshare groups). Long-poll based — **no public webhook
+needed**, so it works behind a Cloudflare/Tailscale tunnel. Set
+`TELEGRAM_BOT_TOKEN` (from [@BotFather](https://t.me/BotFather)) to enable;
+`ENABLE_TELEGRAM=0` force-disables. Zero extra npm dependencies.
+
+Three layers, from least to most involved:
+
+1. **Group feed + listen mode** *(token only — no custody)*. A group admin
+   `/watch <market-or-topic>` or `/near <geohash|lat,lon> <km>` and matching
+   intents post as cards (collapsed + edited per listing, struck through on
+   withdrawal). `/listen on` makes the bot parse organic "Pick up: … / Drop off:
+   …" posts and offer a one-tap **Broadcast to Freeport** button that deep-links
+   to the web post form, prefilled.
+   - For listen mode, disable the bot's privacy in BotFather (`/setprivacy` →
+     your bot → **Disable**) so it can read non-command group posts, or make it
+     a group admin.
+2. **Personal pings** *(token only)*. The app's Settings → *Link Telegram*
+   binds a chat to a pubkey (`POST /telegram/link`); the bot then sends
+   content-blind "new activity" DMs (same coalescing/prune path as Web Push).
+3. **Guest-agent mode** *(CUSTODIAL — opt-in)*. Set
+   `TELEGRAM_GUEST_KEY_PASSPHRASE` and Telegram-native users can `/ride A -> B
+   for 20`, receive offer cards with driver reputation, and Accept / Counter /
+   Decline entirely in chat. The bridge holds one **NIP-49-encrypted** key per
+   guest and runs a `FreeportAgent` on their behalf. `/exportkey` graduates a
+   guest to the sovereign app; `/forgetme` deletes them. This makes the operator
+   a key custodian for guest users — a deliberate zero-install trade-off over
+   low-value, freshly-minted keys. Leave the passphrase unset to run layers 1–2
+   only.
+
+| Env | Default | Purpose |
+|-----|---------|---------|
+| `TELEGRAM_BOT_TOKEN` | — | Enables the bridge (feed + pings). |
+| `TELEGRAM_WEB_BASE` | `https://freeport.trinh.uk` | Deep-link origin for buttons. |
+| `TELEGRAM_POLL_TIMEOUT_SEC` | `50` | Long-poll timeout. |
+| `TELEGRAM_GUEST_KEY_PASSPHRASE` | — | Enables guest mode; NIP-49 at-rest key encryption. **Secret.** |
+| `GUEST_COUNTRY_HINT` | — | Nominatim country bias for guest geocoding (e.g. `sg`). |
+| `GUEST_POSTS_PER_DAY` / `GUEST_MAX_ACTIVE_POSTS` | `10` / `3` | Per-guest quotas. |
+| `GUEST_RIDE_EXPIRY_MIN` / `GUEST_OFFER_TIMEOUT_MIN` | `120` / `15` | Post lifetime / offer-decision timeout. |
+
+Secrets belong in a gitignored `.env` (Compose `env_file`), **never** in a
+committed `docker-compose.yml`. Verify after enabling:
+
+```bash
+curl -s http://127.0.0.1:8788/health | jq .telegram
+# → { "enabled": true, "groups": N, "guests": N, "guestMode": true|false }
+```
+
+Bot commands: `/watch /near /unwatch /listen /status` (groups), `/start /stop`
+(linking), `/ride /myposts /cancelpost /exportkey /forgetme` (guest mode).
+
 ## Geohash radius note
 
 Nostr relay filters match tag values **exactly** — no prefix/radius operator. `nostr_search_intents` filters by topic (`#t`) at the relay and refines distance **client-side** via haversine on each post's `g` tag. To push radius filtering to the relay (`relaySideGeohash: true`), posts must carry **multi-precision geohash prefix tags**; today they carry a single precision-6 `g`, so relay-side geohash is opt-in and a no-op until publishers add prefix tags.

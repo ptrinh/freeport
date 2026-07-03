@@ -15,7 +15,8 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 | `docs/protocol.md` | Protocol spec: intent event kinds (32101/32102), negotiation envelopes, state machine |
 | `packages/protocol` | Spec as code: event build/parse, negotiation state machine, matching, geohash |
 | `packages/agent` | CLI personal agent (`freeport run`): subscribe, auto-match, negotiate, human confirm |
-| `apps/mobile` | Minimal Expo/React Native client (post intent, confirm deals, key backup) |
+| `packages/nostr-mcp` | Read-only MCP server for agents + self-hostable notifier: Web Push / Expo push and the **Telegram bridge** (feed, listen mode, pings, guest mode) |
+| `apps/mobile` | Expo/React Native + PWA client (post intent, negotiate, confirm deals, key backup, 55 locales incl. RTL) |
 | `relay/` | Self-hosted strfry relay (docker-compose, Proxmox-LXC-sized, Uptime-Kuma health) |
 | `demo/` | Two-agent rideshare demo configs + script |
 
@@ -75,11 +76,18 @@ freeport run --config <agent.json>       full agent loop [--post intent.json] [-
   `nostr_search_reputation` MCP tool. What remains open is *sybil resistance*:
   a new keypair is free, so zero-history identities should be treated with
   visible caution by clients.
+- **Notifications & Telegram**: content-blind Web Push / Expo push, plus a
+  **Telegram bridge** — relay a market feed into groups, parse organic "hitcher"
+  posts into a one-tap broadcast, send personal activity pings, and (optional,
+  custodial) let Telegram-native users post and deal without the app. All
+  self-hostable in `packages/nostr-mcp` — see its README to enable.
+- **Localization**: 55 languages with plural-aware strings and full RTL
+  (Arabic, Hebrew, Persian, Urdu).
 
 ## Non-goals (v1)
 
-Payments/escrow, dispute resolution, vetting, anti-sybil, Telegram bridge —
-all deliberately deferred.
+Payments/escrow, dispute resolution, vetting, anti-sybil — all deliberately
+deferred.
 
 ## License & forking
 

@@ -62,10 +62,11 @@ production` for OTA JS updates, `bash deploy-web.sh` for the web PWA (set
 |---|---|---|
 | Relay | `relay/` | `docker compose up -d` — strfry with a Freeport-tuned config + write policy |
 | Notification server + MCP | `packages/nostr-mcp/` | `docker compose up -d` — content-blind Web Push/Expo push watcher (`ENABLE_NOTIFY=1`) and a read-only MCP endpoint for agents; point the app's "Notification service URL" at it |
+| Telegram bridge | `packages/nostr-mcp/` | Same service — set `TELEGRAM_BOT_TOKEN` to relay a market feed into groups + send content-blind pings; add `TELEGRAM_GUEST_KEY_PASSPHRASE` for custodial guest-agent mode. Secrets go in a gitignored `.env`, never the committed compose. See the nostr-mcp README. |
 | CLI agent | `packages/agent/` | `npx tsx src/cli.ts run --config your-agent.json` — see `demo/` for two-agent configs |
 
 None are required to exist for the market to function — they add push
-notifications and agent tooling on top of the public relays.
+notifications, a Telegram bridge, and agent tooling on top of the public relays.
 
 ## Names to search for
 
