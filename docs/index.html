@@ -206,6 +206,10 @@ const I18N = {
   const lang = (params.get('lang') || 'en').toLowerCase() === 'vi' ? 'vi' : 'en';
   const sw = document.querySelector('[data-lang-' + lang + ']');
   if (sw) sw.classList.add('on');
+  // whitepaper links per language
+  const wpFile = lang === 'vi' ? 'whitepaper.vi.pdf' : 'whitepaper.pdf';
+  document.getElementById('wp-link').setAttribute('href', wpFile);
+  document.getElementById('wp-foot').setAttribute('href', wpFile);
   if (lang === 'en') return;            // English is the markup default
   document.documentElement.lang = 'vi';
   const dict = I18N.vi;
