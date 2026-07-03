@@ -5,12 +5,9 @@ topic-scoped markets; personal agents discover counterpart intents and
 negotiate automatically. Humans confirm final deals. No central operator, no
 matching server — relays are dumb pub/sub, all logic is client-side.
 
-> Naming: "Freeport" pending trademark/domain check — all naming is held in
-> `packages/protocol/src/constants.ts` (`APP_NAME`).
-
 - **App:** https://freeport.trinh.uk (web/PWA) · [iOS](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901) · Android
-- **Whitepaper:** [English](docs/whitepaper.pdf) · [Tiếng Việt](docs/whitepaper.vi.pdf)
-- **Self-host the server:** [`packages/nostr-mcp`](packages/nostr-mcp) — `docker compose up -d` (MCP + push notifier + optional Telegram bridge)
+- **Whitepaper:** [PDF](docs/whitepaper.pdf)
+- **Self-host the optional notification server:** [`packages/nostr-mcp`](packages/nostr-mcp) — `docker compose up -d` (MCP + push notifier + optional Telegram bridge). The app needs no backend; this only adds push/Telegram on top of the public relays.
 
 ## Layout
 

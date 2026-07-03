@@ -96,7 +96,7 @@
   <div class="wrap">
     <img class="logo" src="icon.png" alt="Freeport" />
     <h1 data-i18n="h1">The marketplace with no middleman.</h1>
-    <p class="tag" data-i18n="tag">Freeport is a decentralized, peer-to-peer marketplace for rides, services and goods — built on Nostr. No company in the middle, no commission, no account. Your keys, your price.</p>
+    <p class="tag" data-i18n="tag">Freeport is a decentralized, peer-to-peer marketplace for rides, services and goods — built on Nostr. No company in the middle, no server to run, no commission, no account. Your keys, your price.</p>
     <div class="cta">
       <a class="btn btn-appstore" href="https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901" target="_blank" rel="noopener" data-i18n="cta_ios">&#xF8FF;&nbsp; Download on the App Store</a>
       <a class="btn btn-primary" href="https://freeport.trinh.uk" data-i18n="cta_open">Open the web app</a>
@@ -115,7 +115,7 @@
       <div class="feat"><div class="ic">🔑</div><h3 data-i18n="f2_h">No sign-up</h3><p data-i18n="f2_p">Your identity is a secure key created on your device — no email, no phone-number account, no password.</p></div>
       <div class="feat"><div class="ic">💸</div><h3 data-i18n="f3_h">Your price</h3><p data-i18n="f3_p">Negotiate openly with a built-in estimator. Zero commission means more stays with you.</p></div>
       <div class="feat"><div class="ic">🔒</div><h3 data-i18n="f4_h">Private by design</h3><p data-i18n="f4_p">Messages are end-to-end encrypted. Listings carry only a coarse, neighborhood-level location — never your exact spot.</p></div>
-      <div class="feat"><div class="ic">🌐</div><h3 data-i18n="f5_h">Built on Nostr</h3><p data-i18n="f5_p">Runs on an open protocol, not a private server — so no single company can shut it down, censor it, or sell your data.</p></div>
+      <div class="feat"><div class="ic">🌐</div><h3 data-i18n="f5_h">No backend needed</h3><p data-i18n="f5_p">The app has no server of its own — it talks straight to open, public Nostr relays. Nothing for you to host, and no single company can shut it down, censor it, or sell your data.</p></div>
       <div class="feat"><div class="ic">⭐</div><h3 data-i18n="f6_h">Earn reputation</h3><p data-i18n="f6_p">A transparent, peer-rated karma system builds trust between strangers, with no central authority.</p></div>
     </div>
   </div>
@@ -171,7 +171,7 @@
 const I18N = {
   vi: {
     h1: "Chợ không có trung gian.",
-    tag: "Freeport là một chợ ngang hàng, phi tập trung cho xe cộ, dịch vụ và hàng hóa — xây trên Nostr. Không công ty đứng giữa, không hoa hồng, không tài khoản. Khóa của bạn, giá của bạn.",
+    tag: "Freeport là một chợ ngang hàng, phi tập trung cho xe cộ, dịch vụ và hàng hóa — xây trên Nostr. Không công ty đứng giữa, không máy chủ phải vận hành, không hoa hồng, không tài khoản. Khóa của bạn, giá của bạn.",
     cta_ios: "&#xF8FF;&nbsp; Tải trên App Store",
     cta_open: "Mở ứng dụng web",
     cta_how: "Cách hoạt động",
@@ -182,7 +182,7 @@ const I18N = {
     f2_h: "Không cần đăng ký", f2_p: "Danh tính của bạn là một khóa an toàn tạo ngay trên thiết bị — không email, không tài khoản theo số điện thoại, không mật khẩu.",
     f3_h: "Giá của bạn", f3_p: "Thương lượng công khai với công cụ ước tính tích hợp. Không hoa hồng nghĩa là bạn giữ lại nhiều hơn.",
     f4_h: "Riêng tư từ thiết kế", f4_p: "Tin nhắn được mã hóa đầu-cuối. Bài đăng chỉ kèm vị trí thô ở mức khu phố — không bao giờ là điểm chính xác của bạn.",
-    f5_h: "Xây trên Nostr", f5_p: "Chạy trên một giao thức mở, không phải máy chủ riêng — nên không công ty nào có thể đóng cửa, kiểm duyệt hay bán dữ liệu của bạn.",
+    f5_h: "Không cần máy chủ", f5_p: "Ứng dụng không có máy chủ riêng — nó kết nối thẳng tới các relay Nostr mở, công cộng. Bạn không phải tự vận hành gì cả, và không công ty nào có thể đóng cửa, kiểm duyệt hay bán dữ liệu của bạn.",
     f6_h: "Tích lũy uy tín", f6_p: "Hệ thống karma minh bạch do người dùng đánh giá xây dựng niềm tin giữa người lạ, không cần cơ quan trung tâm.",
     how_h: "Cách hoạt động",
     how_lead: "Đăng hoặc duyệt, thương lượng, xong — tất cả chỉ giữa bạn và bên kia.",
@@ -206,10 +206,6 @@ const I18N = {
   const lang = (params.get('lang') || 'en').toLowerCase() === 'vi' ? 'vi' : 'en';
   const sw = document.querySelector('[data-lang-' + lang + ']');
   if (sw) sw.classList.add('on');
-  // whitepaper links per language
-  const wpFile = lang === 'vi' ? 'whitepaper.vi.pdf' : 'whitepaper.pdf';
-  document.getElementById('wp-link').setAttribute('href', wpFile);
-  document.getElementById('wp-foot').setAttribute('href', wpFile);
   if (lang === 'en') return;            // English is the markup default
   document.documentElement.lang = 'vi';
   const dict = I18N.vi;
