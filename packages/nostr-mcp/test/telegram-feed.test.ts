@@ -77,9 +77,13 @@ describe('group feed', () => {
     store.addWatch(-100, { topics: [DEMO_MARKET] });
     const { sent, edited, api } = fakeApi();
     const feed = makeIntentFeed(store, api, instantQueue(), 'https://fp.example');
-    feed(ride('SGD 20', undefined, 'ride-1', now()));
+    // Reuse ONE timestamp for both feeds. now() is whole seconds, so two calls
+    // straddling a second boundary would differ and make the "replay" newer —
+    // turning a genuine stale-replay into an edit and flaking this test.
+    const t = now();
+    feed(ride('SGD 20', undefined, 'ride-1', t));
     await new Promise((r) => setTimeout(r, 0));
-    feed(ride('SGD 20', undefined, 'ride-1', now())); // same created_at → replay
+    feed(ride('SGD 20', undefined, 'ride-1', t)); // same created_at → replay
     await new Promise((r) => setTimeout(r, 0));
     expect(sent).toHaveLength(1);
     expect(edited).toHaveLength(0);

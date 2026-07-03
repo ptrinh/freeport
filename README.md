@@ -1,5 +1,11 @@
 # Freeport
 
+[![CI](https://github.com/ptrinh/freeport/actions/workflows/ci.yml/badge.svg)](https://github.com/ptrinh/freeport/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![App Store](https://img.shields.io/badge/App_Store-iOS-000000?logo=apple&logoColor=white)](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901)
+[![Web app](https://img.shields.io/badge/web-freeport.trinh.uk-2ea44f)](https://freeport.trinh.uk)
+[![Protocol: Nostr](https://img.shields.io/badge/protocol-Nostr-8e44ad)](https://nostr.com)
+
 Decentralized P2P marketplace over Nostr. Users broadcast trade intents into
 topic-scoped markets; personal agents discover counterpart intents and
 negotiate automatically. Humans confirm final deals. No central operator, no
