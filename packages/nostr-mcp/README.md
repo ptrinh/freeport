@@ -1,8 +1,34 @@
 # freeport-nostr-mcp
 
-An MCP server that lets AI agents **search Freeport's decentralized Nostr marketplace** — ride requests, driver/provider offers, service & product posts, and reputation — by **kind, tag, and geohash radius**. Read-only; never signs or publishes; never touches encrypted DMs.
+A self-hostable server for [Freeport](https://freeport.trinh.uk), the decentralized P2P
+marketplace on Nostr. **One Docker image, three jobs** — run all of them or just the first:
 
-## Tools
+1. **MCP endpoint** (`/mcp`) — a read-only [Model Context Protocol](https://modelcontextprotocol.io)
+   server that lets AI agents **search the marketplace** (ride/service/goods offers &
+   requests, reputation, profiles) by kind, tag, and geohash radius. Never signs,
+   publishes, or reads encrypted DMs. *(Always on.)*
+2. **Web Push notifier** (`/subscribe`, `/vapidPublicKey`) — watches the relays and sends
+   **content-blind push alerts** to web/PWA subscribers when new matching activity
+   appears. *(On by default; `ENABLE_NOTIFY=0` for an MCP-only server.)*
+3. **Telegram bridge** — relays a market feed into **Telegram groups**, sends content-blind
+   pings, and (opt-in, custodial) lets Telegram-native users trade without the app.
+   *(Off unless `TELEGRAM_BOT_TOKEN` is set.)*
+
+Run it and you become an independent MCP host *and* notification host for the network —
+Freeport itself needs no central server; this only adds discovery + alerts on top of the
+public relays. Each job is detailed below.
+
+## Quick start (Docker)
+
+```bash
+git clone https://github.com/ptrinh/freeport.git
+cd freeport/packages/nostr-mcp
+cp .env.example .env        # optional: set VAPID_SUBJECT, relays, Telegram token…
+docker compose up -d        # builds from source on first run
+curl -s localhost:8788/health | jq   # MCP + notifier live; add a token for Telegram
+```
+
+## Tools (job 1 — MCP)
 
 | Tool | What it does |
 |------|--------------|
@@ -43,7 +69,7 @@ PORT=8788 npm run start:http   # POST /mcp, GET /health
 - **Stateless HTTP** — no per-session state; scale horizontally behind a load balancer (add a shared cache like Redis if you run multiple nodes).
 - **Rate limiting** (hosted endpoint) — per-IP + global token buckets return `429` with `Retry-After`. Tunables: `RATE_LIMIT_PER_MIN` (default 60), `RATE_LIMIT_GLOBAL_PER_MIN` (1200), `RATE_LIMIT_BURST` (20). Behind Cloudflare it keys on `CF-Connecting-IP`. `/health` is exempt.
 
-## Web Push notifier (same hostname)
+## Web Push notifier (job 2 — same hostname)
 
 The HTTP server also runs a self-hostable, content-blind **Web Push** notifier on the same host — so anyone running this becomes a push host for Freeport web/PWA users (incl. iOS 16.4+ Home-Screen installs). It does **not** push to the native App Store iOS app (that needs Apple's APNs key, runnable only by the app owner). Set `ENABLE_NOTIFY=0` for MCP-only.
 
@@ -69,7 +95,7 @@ What actually scales:
 
 For most self-hosters the constraint is bandwidth and uptime, not the box.
 
-## Telegram bridge (optional)
+## Telegram bridge (job 3 — optional)
 
 The same server can run a Telegram bot that meets communities where they already
 coordinate (e.g. rideshare groups). Long-poll based — **no public webhook
