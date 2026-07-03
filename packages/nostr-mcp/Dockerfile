@@ -2,13 +2,14 @@
 FROM node:22-alpine AS build
 WORKDIR /repo
 COPY package.json package-lock.json tsconfig.base.json ./
-# All workspaces listed in the root package.json must exist for npm to resolve
-# them, so copy agent too (it isn't built or shipped — just present).
+# protocol + agent are both bundled into the http.js output (the Telegram guest
+# bridge uses FreeportAgent), so both must be built before nostr-mcp's esbuild
+# step can resolve and inline them.
 COPY packages/protocol packages/protocol
 COPY packages/agent packages/agent
 COPY packages/nostr-mcp packages/nostr-mcp
 RUN npm install --no-audit --no-fund \
- && npm run build -w @freeport/protocol -w freeport-nostr-mcp
+ && npm run build -w @freeport/protocol -w @freeport/agent -w freeport-nostr-mcp
 
 FROM node:22-alpine AS runtime
 WORKDIR /app
