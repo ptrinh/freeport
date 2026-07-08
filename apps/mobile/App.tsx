@@ -353,6 +353,11 @@ function AppInner() {
   };
   // Pulsing glow behind the tab being highlighted by the current tour step.
   const tourGlow = useRef(new Animated.Value(0)).current;
+  // Set when onboarding just finished: once the client exists, auto-subscribe
+  // to the default notification server (DM pings only — empty filters match no
+  // intents server-side), so new accounts get "new message" alerts without
+  // finding the Settings toggle. One-shot; failure/denial just leaves push off.
+  const autoPushPending = useRef(false);
   const [client, setClient] = useState<MobileClient | null>(null);
   const [npub, setNpub] = useState('');
   const [intents, setIntents] = useState<Intent[]>([]);
@@ -1203,8 +1208,27 @@ function AppInner() {
     else if (tab === 'post' && !showPost) setTab('browse');
   }, [tab, showBrowse, showPost]);
 
+  // Auto-subscribe a freshly created/restored account to the default
+  // notification server. Runs once, only after onboarding, when init has
+  // produced the client (so the pubkey exists). Uses the prefs default
+  // endpoint; empty filters = DM pings only. Denied/unreachable → silently
+  // stays off, Settings still shows the manual toggle.
+  useEffect(() => {
+    if (!client || !autoPushPending.current) return;
+    autoPushPending.current = false;
+    (async () => {
+      try {
+        if (!pushSupported()) return;
+        const prefs = await loadPrefs();
+        const endpoint = (prefs.notifyEndpoint || '').trim();
+        if (endpoint) await enablePush(client.pubkey, endpoint);
+      } catch { /* best-effort: user can enable in Settings */ }
+    })();
+  }, [client]);
+
   const finishOnboarding = () => {
     setOnboarding(false);
+    autoPushPending.current = true; // subscribe to the default notifier once init yields a client
     setInitVersion((v) => v + 1); // re-run init now that a key exists
     pendingGlowId.current = null; // onboarding has no rating panel to glow
     setShowFireworks(true); // celebrate joining (fireworks play over the main UI)
@@ -1986,7 +2010,6 @@ function Onboarding({
 function OnboardingWelcome({ busy, onStart }: { busy: boolean; onStart: () => void }) {
   const POINTS: { icon: keyof typeof Ionicons.glyphMap; text: string }[] = [
     { icon: 'globe-outline', text: t("A true P2P marketplace on Nostr.") },
-    { icon: 'phone-portrait-outline', text: t("Keep the app open during a deal — there's no server to hold missed messages.") },
     { icon: 'shield-checkmark-outline', text: t("Your price. No commission. No censorship. No downtime.") },
     { icon: 'bug-outline', text: t("Please report any bugs to us.") },
   ];
