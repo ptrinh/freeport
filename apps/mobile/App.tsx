@@ -1607,6 +1607,17 @@ function Onboarding({
   // showing it with no backup dead-ends on "No cloud backup found", which
   // confused Play review and real new users. `null` = still checking → hidden.
   const [cloudHasBackup, setCloudHasBackup] = useState<boolean | null>(null);
+  // Will the post-onboarding auto-subscribe to the notifier be able to work?
+  // Known-dead cases (platform can't push — e.g. web outside an installed PWA —
+  // or permission already denied) bring back the "keep the app open" welcome
+  // point, since for those users it is still true. Checked here (mounts on the
+  // first screen) so the answer is settled long before the welcome step renders.
+  const [pushUnavailable, setPushUnavailable] = useState(false);
+  useEffect(() => {
+    pushStatus()
+      .then((st) => setPushUnavailable(st === 'unsupported' || st === 'denied'))
+      .catch(() => setPushUnavailable(true));
+  }, []);
   useEffect(() => {
     let cancelled = false;
     if (!cloudAvailable()) { setCloudHasBackup(false); return; }
@@ -1998,7 +2009,7 @@ function Onboarding({
           </Pressable>
         </>
       ) : (
-        <OnboardingWelcome busy={busy === 'create'} onStart={finishCreate} />
+        <OnboardingWelcome busy={busy === 'create'} onStart={finishCreate} pushUnavailable={pushUnavailable} />
       )}
     </ScrollView>
     </KeyboardAvoidingView>
@@ -2007,12 +2018,18 @@ function Onboarding({
 
 // Final onboarding screen: the points fade/slide in one by one; the Start
 // button only unlocks once the whole sequence has played (so the user reads it).
-function OnboardingWelcome({ busy, onStart }: { busy: boolean; onStart: () => void }) {
-  const POINTS: { icon: keyof typeof Ionicons.glyphMap; text: string }[] = [
+function OnboardingWelcome({ busy, onStart, pushUnavailable }: { busy: boolean; onStart: () => void; pushUnavailable?: boolean }) {
+  // Frozen on first render: the anims array below is sized to it, so the list
+  // must not change length mid-animation. pushUnavailable is settled by the
+  // time this step mounts (checked when onboarding opened).
+  const POINTS = useRef<{ icon: keyof typeof Ionicons.glyphMap; text: string }[]>([
     { icon: 'globe-outline', text: t("A true P2P marketplace on Nostr.") },
+    // Without push (unsupported platform / permission already denied) missed
+    // messages really do go unheld — keep the old advice for those users.
+    ...(pushUnavailable ? [{ icon: 'phone-portrait-outline' as const, text: t("Keep the app open during a deal — there's no server to hold missed messages.") }] : []),
     { icon: 'shield-checkmark-outline', text: t("Your price. No commission. No censorship. No downtime.") },
     { icon: 'bug-outline', text: t("Please report any bugs to us.") },
-  ];
+  ]).current;
   // One Animated.Value per line (title + each point); 0 → 1 drives opacity + slide.
   const anims = useRef([0, ...POINTS.map(() => 0)].map(() => new Animated.Value(0))).current;
   const [ready, setReady] = useState(false);
