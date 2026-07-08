@@ -80,6 +80,7 @@ import { applySideBackdrop } from './src/sideBackdrop';
 import { suggestPrice, estimateFare, setFareConfig, defaultFareConfig, type PriceSuggestion, type FareConfig } from './src/pricing';
 import { pushSupported, enablePush, updatePush, disablePush, pushStatus, type PushStatus, type PushFilters } from './src/push';
 import { pushUnavailableForOnboarding } from './src/pushAvailability';
+import { scrollNodeIntoView, type ScrollableNode } from './src/scrollToNode';
 import { requestTelegramLink, telegramLinkStatus } from './src/telegramLink';
 import { createTripSession, tripLink, tripSecret, restoreTripSession, decodeTripHash, publishTripLocation, subscribeTrip, type TripStatic, type TripSession, type TripView, type TripUpdate } from './src/livetrip';
 import { webBase } from './src/webBase';
@@ -3008,28 +3009,14 @@ function useRequiredFields(scrollRef?: React.RefObject<ScrollView | null>) {
     const node = nodes.current[key];
     if (!node) return;
     // Defer a tick so any just-opened section is laid out before measuring.
+    // Platform split lives in scrollNodeIntoView (unit-tested): on web the ref
+    // IS the DOM element and findNodeHandle THROWS (GlitchTip FREEPORT-1) —
+    // it must only ever be called on the native path.
     setTimeout(() => {
-      // Web (react-native-web ≥0.19): the View ref IS the DOM element —
-      // findNodeHandle THROWS on web ("not supported… use the ref property"),
-      // which crashed publish-blocked feedback in production (GlitchTip
-      // FREEPORT-1). Use the node directly; scrollIntoView reliably scrolls
-      // the form's container (the native measureLayout path doesn't on web).
-      if (Platform.OS === 'web') {
-        const el = node as unknown as { scrollIntoView?: (o?: any) => void };
-        try { el?.scrollIntoView?.({ behavior: 'smooth', block: 'center' }); } catch { /* pulse still fires */ }
-        return;
-      }
-      const sv = scrollRef?.current;
-      if (!sv) return;
-      const handle = findNodeHandle(sv);
-      if (handle == null) return;
-      try {
-        (node as any).measureLayout?.(
-          handle,
-          (_x: number, y: number) => sv.scrollTo({ y: Math.max(0, y - 24), animated: true }),
-          () => {},
-        );
-      } catch { /* measureLayout unsupported here — the pulse still fires */ }
+      scrollNodeIntoView(node as unknown as ScrollableNode, scrollRef?.current ?? null, {
+        isWeb: Platform.OS === 'web',
+        findHandle: (sv) => findNodeHandle(sv as any),
+      });
     }, 60);
   };
   return { register, focus, flag };
