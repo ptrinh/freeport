@@ -3,7 +3,7 @@
     "name": "Freeport",
     "slug": "freeport",
     "owner": "ptrinh",
-    "version": "0.3.0",
+    "version": "1.4.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
@@ -14,7 +14,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "17"
+      "buildNumber": "18"
     },
     "android": {
       "package": "uk.trinh.freeport",
@@ -39,7 +39,7 @@
           "apiKey": "AIzaSyB70aRYEMJlBtl3LgvnBpGe6dkKuJhwJY4"
         }
       },
-      "versionCode": 17
+      "versionCode": 18
     },
     "web": {
       "bundler": "metro",
