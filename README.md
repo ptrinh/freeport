@@ -3,6 +3,7 @@
 [![CI](https://github.com/ptrinh/freeport/actions/workflows/ci.yml/badge.svg)](https://github.com/ptrinh/freeport/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![App Store](https://img.shields.io/badge/App_Store-iOS-000000?logo=apple&logoColor=white)](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901)
+[![Google Play](https://img.shields.io/badge/Google_Play-Android-414141?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=uk.trinh.freeport)
 [![Web app](https://img.shields.io/badge/web-freeport.trinh.uk-2ea44f)](https://freeport.trinh.uk)
 [![Protocol: Nostr](https://img.shields.io/badge/protocol-Nostr-8e44ad)](https://nostr.com)
 
@@ -11,7 +12,7 @@ topic-scoped markets; personal agents discover counterpart intents and
 negotiate automatically. Humans confirm final deals. No central operator, no
 matching server — relays are dumb pub/sub, all logic is client-side.
 
-- **App:** https://freeport.trinh.uk (web/PWA) · [iOS](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901) · Android
+- **App:** https://freeport.trinh.uk (web/PWA) · [iOS](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901) · [Android](https://play.google.com/store/apps/details?id=uk.trinh.freeport)
 - **Whitepaper:** [PDF](docs/whitepaper.pdf)
 - **Self-host the optional notification server:** [`packages/nostr-mcp`](packages/nostr-mcp) — `docker compose up -d` (MCP + push notifier + optional Telegram bridge). The app needs no backend; this only adds push/Telegram on top of the public relays.
 
