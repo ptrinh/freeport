@@ -68,6 +68,19 @@
       ],
       "expo-font",
       [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#06080c",
+          "image": "./assets/icon.png",
+          "imageWidth": 200,
+          "dark": {
+            "backgroundColor": "#06080c",
+            "image": "./assets/icon.png",
+            "imageWidth": 200
+          }
+        }
+      ],
+      [
         "expo-notifications",
         {
           "color": "#3b82f6"
