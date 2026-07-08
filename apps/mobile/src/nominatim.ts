@@ -40,7 +40,35 @@ const COUNTRY_LANG: Record<string, string> = {
   KE: 'sw', TZ: 'sw', ET: 'am',
 };
 
+// Short-TTL cache + in-flight dedup. The UI re-resolves the same coordinates
+// repeatedly within a session (post form open/close, live pin, confirm screens
+// — production breadcrumbs showed identical reverse lookups 3× in 45s), and
+// reverseLine alone is two requests each time. Coordinates don't change their
+// address in minutes, and Nominatim's usage policy asks callers to cache.
+const CACHE_TTL_MS = 5 * 60_000;
+const CACHE_MAX = 64;
+const cache = new Map<string, { at: number; data: any | null }>();
+const inflight = new Map<string, Promise<any | null>>();
+
 async function fetchJson(path: string, acceptLang?: string): Promise<any | null> {
+  const key = `${acceptLang ?? ''}|${path}`;
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.data;
+  const pending = inflight.get(key);
+  if (pending) return pending;
+  const p = fetchJsonUncached(path, acceptLang).then((data) => {
+    inflight.delete(key);
+    if (data != null) { // don't cache failures — retry next call
+      if (cache.size >= CACHE_MAX) { const oldest = cache.keys().next().value; if (oldest != null) cache.delete(oldest); }
+      cache.set(key, { at: Date.now(), data });
+    }
+    return data;
+  });
+  inflight.set(key, p);
+  return p;
+}
+
+async function fetchJsonUncached(path: string, acceptLang?: string): Promise<any | null> {
   try {
     const ctrl = new AbortController();
     const tmr = setTimeout(() => ctrl.abort(), 6000);
