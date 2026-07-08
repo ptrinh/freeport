@@ -3009,13 +3009,15 @@ function useRequiredFields(scrollRef?: React.RefObject<ScrollView | null>) {
     if (!node) return;
     // Defer a tick so any just-opened section is laid out before measuring.
     setTimeout(() => {
-      // Web (react-native-web): the node handle IS the DOM element, and
-      // scrollIntoView reliably scrolls the form's scroll container. The native
-      // measureLayout+scrollTo path below does not move the page on web, so the
-      // field highlighted but the screen never scrolled up to it.
+      // Web (react-native-web ≥0.19): the View ref IS the DOM element —
+      // findNodeHandle THROWS on web ("not supported… use the ref property"),
+      // which crashed publish-blocked feedback in production (GlitchTip
+      // FREEPORT-1). Use the node directly; scrollIntoView reliably scrolls
+      // the form's container (the native measureLayout path doesn't on web).
       if (Platform.OS === 'web') {
-        const el = findNodeHandle(node) as unknown as { scrollIntoView?: (o?: any) => void } | null;
-        if (el?.scrollIntoView) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+        const el = node as unknown as { scrollIntoView?: (o?: any) => void };
+        try { el?.scrollIntoView?.({ behavior: 'smooth', block: 'center' }); } catch { /* pulse still fires */ }
+        return;
       }
       const sv = scrollRef?.current;
       if (!sv) return;
