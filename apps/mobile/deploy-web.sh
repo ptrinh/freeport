@@ -131,6 +131,10 @@ echo "▸ Publishing privacy policy at /privacy…"
 mkdir -p dist/privacy
 cp store/privacy.html dist/privacy/index.html
 
+echo "▸ Publishing acceptable-use policy at /aup…"
+mkdir -p dist/aup
+cp store/aup.html dist/aup/index.html
+
 echo "▸ Publishing /llms.txt (agent-readable site guide)…"
 cp store/llms.txt dist/llms.txt
 

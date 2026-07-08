@@ -148,6 +148,15 @@ curl -s http://127.0.0.1:8788/health | jq .telegram
 Bot commands: `/watch /near /unwatch /listen /status` (groups), `/start /stop`
 (linking), `/ride /myposts /cancelpost /exportkey /forgetme` (guest mode).
 
+## Abuse & acceptable use
+
+The public instance (`nostr-mcp.trinh.uk`, the Telegram bot, `freeport.trinh.uk`)
+operates under the [Acceptable Use Policy](https://freeport.trinh.uk/aup) —
+report violations to [freeport@trinh.uk](mailto:freeport@trinh.uk) with subject
+`ABUSE REPORT`. If you self-host this server you are the operator of your
+instance: publish your own policy and abuse contact, and use the relay write
+policy / notifier to block keys you don't want to serve.
+
 ## Geohash radius note
 
 Nostr relay filters match tag values **exactly** — no prefix/radius operator. `nostr_search_intents` filters by topic (`#t`) at the relay and refines distance **client-side** via haversine on each post's `g` tag. To push radius filtering to the relay (`relaySideGeohash: true`), posts must carry **multi-precision geohash prefix tags**; today they carry a single precision-6 `g`, so relay-side geohash is opt-in and a no-op until publishers add prefix tags.

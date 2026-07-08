@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Freeport — Acceptable Use Policy</title>
+<meta name="color-scheme" content="dark light" />
+<style>
+  :root { color-scheme: dark light; }
+  body { margin: 0; background: #06080c; color: #e7ecf3;
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 32px 20px 80px; }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 30px; margin: 0 0 4px; }
+  h2 { font-size: 20px; margin: 32px 0 8px; }
+  .sub { color: #8b97a6; margin: 0 0 24px; }
+  a { color: #6ea8ff; }
+  code { background: #11151c; padding: 1px 5px; border-radius: 5px; }
+  ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+  .muted { color: #8b97a6; }
+  hr { border: none; border-top: 1px solid #1c2430; margin: 28px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Freeport — Acceptable Use Policy</h1>
+  <p class="sub">Last updated: 9 July 2026</p>
+
+  <p>Freeport is an open protocol and open-source software. Anyone can run
+  their own relay, notification server, or bridge. This policy applies to the
+  <strong>public instance we operate</strong>: the web app at
+  <code>freeport.trinh.uk</code>, the notification/MCP server at
+  <code>nostr-mcp.trinh.uk</code> (including its Telegram bridge and bot), and
+  any Nostr relay we host. It does not — and cannot — govern the wider Nostr
+  network or instances run by others.</p>
+
+  <h2>Not allowed on our infrastructure</h2>
+  <ul>
+    <li>Buying, selling, or advertising <strong>illegal goods or services</strong> —
+      including drugs, weapons, stolen goods or data, and counterfeit items.</li>
+    <li>Any content sexualizing or exploiting <strong>minors</strong>. Zero tolerance;
+      reported to authorities where the law requires.</li>
+    <li><strong>Fraud and scams</strong> — phishing, fake listings, payment fraud,
+      impersonation.</li>
+    <li><strong>Harassment, threats of violence, or doxxing</strong> of any person.</li>
+    <li><strong>Spam</strong> and platform abuse (flooding, Sybil swarms, deliberately
+      poisoning market feeds).</li>
+  </ul>
+
+  <h2>What we do about it</h2>
+  <p>Listings on Freeport are public. Direct messages are end-to-end
+  encrypted — we cannot read them, and never will be able to. When a specific
+  violation on our infrastructure is reported to us in good faith, we can and
+  will:</p>
+  <ul>
+    <li>Block the offending keys from our relay (write policy), notification
+      server, market feeds, and Telegram bridge — including suspending or
+      deleting custodial guest accounts.</li>
+    <li>Drop the offending listings from surfaces we serve.</li>
+    <li>Report to law enforcement where legally required.</li>
+  </ul>
+  <p class="muted">Because Nostr is decentralized, removal from our
+  infrastructure does not erase content from the wider network — other relays
+  are operated by other people, under their own policies.</p>
+
+  <h2>Reporting</h2>
+  <ul>
+    <li>In the app: use the <strong>Report</strong> button on any listing.</li>
+    <li>By email: <a href="mailto:freeport@trinh.uk?subject=ABUSE%20REPORT">freeport@trinh.uk</a>
+      with subject <code>ABUSE REPORT</code>. Include the listing/pubkey
+      (npub) and what you observed. We review reports promptly and in good
+      faith.</li>
+  </ul>
+
+  <h2>Self-hosted instances</h2>
+  <p>Freeport's code is MIT-licensed and designed to be self-hosted. Operators
+  of their own relays, notifiers, or bridges are responsible for their own
+  instances and applicable laws. This policy binds only the public instance
+  listed above.</p>
+
+  <hr />
+  <p class="muted">Freeport takes no fees, holds no funds, and processes no
+  payments. Trades are agreements between the two people making them; users
+  are responsible for complying with the laws that apply to them.</p>
+</main>
+</body>
+</html>
