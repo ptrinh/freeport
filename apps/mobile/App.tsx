@@ -79,6 +79,7 @@ import { intentTopics, browseTopic } from './src/topics';
 import { applySideBackdrop } from './src/sideBackdrop';
 import { suggestPrice, estimateFare, setFareConfig, defaultFareConfig, type PriceSuggestion, type FareConfig } from './src/pricing';
 import { pushSupported, enablePush, updatePush, disablePush, pushStatus, type PushStatus, type PushFilters } from './src/push';
+import { pushUnavailableForOnboarding } from './src/pushAvailability';
 import { requestTelegramLink, telegramLinkStatus } from './src/telegramLink';
 import { createTripSession, tripLink, tripSecret, restoreTripSession, decodeTripHash, publishTripLocation, subscribeTrip, type TripStatic, type TripSession, type TripView, type TripUpdate } from './src/livetrip';
 import { webBase } from './src/webBase';
@@ -1608,15 +1609,19 @@ function Onboarding({
   // confused Play review and real new users. `null` = still checking → hidden.
   const [cloudHasBackup, setCloudHasBackup] = useState<boolean | null>(null);
   // Will the post-onboarding auto-subscribe to the notifier be able to work?
-  // Known-dead cases (platform can't push — e.g. web outside an installed PWA —
-  // or permission already denied) bring back the "keep the app open" welcome
-  // point, since for those users it is still true. Checked here (mounts on the
-  // first screen) so the answer is settled long before the welcome step renders.
+  // Known-dead cases bring back the "keep the app open" welcome point, since
+  // for those users it is still true: platform can't push (e.g. web outside an
+  // installed PWA), permission already denied, or the notification server
+  // isn't responding (GET /health, CORS-open, 5s cap). Checked here (mounts on
+  // the first screen) so the answer settles before the welcome step renders.
   const [pushUnavailable, setPushUnavailable] = useState(false);
   useEffect(() => {
-    pushStatus()
-      .then((st) => setPushUnavailable(st === 'unsupported' || st === 'denied'))
-      .catch(() => setPushUnavailable(true));
+    let cancelled = false;
+    pushUnavailableForOnboarding({
+      status: pushStatus,
+      endpoint: async () => (await loadPrefs()).notifyEndpoint,
+    }).then((v) => { if (!cancelled) setPushUnavailable(v); });
+    return () => { cancelled = true; };
   }, []);
   useEffect(() => {
     let cancelled = false;
