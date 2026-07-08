@@ -18,6 +18,7 @@
     },
     "android": {
       "package": "uk.trinh.freeport",
+      "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",

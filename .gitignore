@@ -16,7 +16,10 @@ dist/
 *.p12
 *.mobileprovision
 *.certSigningRequest
-google-services.json
+# google-services.json is deliberately COMMITTED: it's client config that ships
+# inside every APK (like the Maps key), needed by EAS builds. Keep its API key
+# restricted in Google Cloud Console. The Firebase ADMIN key below is a secret.
+*firebase-adminsdk*.json
 GoogleService-Info.plist
 
 # Build artifacts (use EAS / releases, not git)

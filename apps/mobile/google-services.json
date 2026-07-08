@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "536426884584",
+    "project_id": "freeport-p2p",
+    "storage_bucket": "freeport-p2p.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:536426884584:android:c40ce7061c9463b760085d",
+        "android_client_info": {
+          "package_name": "uk.trinh.freeport"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUQcwISCtn9FoSJHNU2u_BI-UqPfypcMU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
