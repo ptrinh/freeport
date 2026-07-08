@@ -4727,16 +4727,19 @@ function isTripMsg(t: string): boolean {
 }
 
 /** A single voice-memo bubble with a tap-to-play button. */
-function VoiceMessage({ url }: { url: string }) {
+function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
   const [playing, setPlaying] = useState(false);
   const play = async () => {
     setPlaying(true);
     try { await playAudio(url); } catch {} finally { setPlaying(false); }
   };
+  // Outgoing bubbles are accent-filled; the default text/accent colors are low
+  // contrast on them in light mode — use the light "out" color there.
+  const outColor = dir === 'out' ? '#f5f7fa' : undefined;
   return (
     <Pressable style={s.voiceMsg} onPress={play}>
-      <Ionicons name={playing ? 'volume-high' : 'play'} size={18} color={palette.accent} />
-      <Text style={s.voiceMsgText}>{t("Voice memo")}</Text>
+      <Ionicons name={playing ? 'volume-high' : 'play'} size={18} color={outColor ?? palette.accent} />
+      <Text style={[s.voiceMsgText, dir === 'out' && s.chatTextOut]}>{t("Voice memo")}</Text>
     </Pressable>
   );
 }
@@ -4756,15 +4759,18 @@ const ChatBubble = React.memo(function ChatBubble({
   return (
     <View style={[s.chatBubble, dir === 'out' ? s.chatOut : s.chatIn]}>
       {isAudioMsg(text)
-        ? <VoiceMessage url={text} />
+        ? <VoiceMessage url={text} dir={dir} />
         : isImageMsg(text)
         ? <Pressable onPress={() => onZoom(text)}>
             <Image source={{ uri: text }} style={s.chatImage} resizeMode="cover" />
           </Pressable>
         : isTripMsg(text)
         ? <Pressable style={s.trackMsg} onPress={() => Linking.openURL(text.trim())}>
-            <Ionicons name="navigate" size={16} color={palette.link} />
-            <Text style={s.trackMsgText}>{t('Track live location')}</Text>
+            {/* On an outgoing (accent-filled) bubble the link color equals the
+                bubble color in light mode — use the light "out" text color so it
+                stays legible on both sides. */}
+            <Ionicons name="navigate" size={16} color={dir === 'out' ? '#f5f7fa' : palette.link} />
+            <Text style={[s.trackMsgText, dir === 'out' && s.chatTextOut]}>{t('Track live location')}</Text>
           </Pressable>
         : <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn]}>{text}</Text>}
     </View>
