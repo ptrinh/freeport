@@ -14,7 +14,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "12"
+      "buildNumber": "13"
     },
     "android": {
       "package": "uk.trinh.freeport",
@@ -38,7 +38,7 @@
           "apiKey": "AIzaSyB70aRYEMJlBtl3LgvnBpGe6dkKuJhwJY4"
         }
       },
-      "versionCode": 15
+      "versionCode": 16
     },
     "web": {
       "bundler": "metro",
