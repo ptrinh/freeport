@@ -63,19 +63,25 @@ export async function pushStatus(): Promise<PushStatus> {
   }
 }
 
-/** Request permission, get an Expo token, and register with the sender. */
+/** Request permission, get an Expo token, and register with the sender.
+ *  Never rejects — resolves 'error' instead (register()'s fetch throws on
+ *  network failure; see the web variant's GlitchTip issue 4). */
 export async function enablePush(pubkeyHex: string, endpoint: string, filters?: PushFilters): Promise<PushStatus> {
   if (!pushSupported()) return 'unsupported';
   if (!endpoint) return 'error';
-  let { status } = await Notifications.getPermissionsAsync();
-  if (status !== 'granted') status = (await Notifications.requestPermissionsAsync()).status;
-  if (status !== 'granted') return status === 'denied' ? 'denied' : 'off';
-  const token = await getToken();
-  if (!token) return 'error';
-  const ok = await register(endpoint, token, pubkeyHex, filters);
-  if (!ok) return 'error';
-  await kvSet(TOKEN_KEY, token);
-  return 'on';
+  try {
+    let { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') status = (await Notifications.requestPermissionsAsync()).status;
+    if (status !== 'granted') return status === 'denied' ? 'denied' : 'off';
+    const token = await getToken();
+    if (!token) return 'error';
+    const ok = await register(endpoint, token, pubkeyHex, filters);
+    if (!ok) return 'error';
+    await kvSet(TOKEN_KEY, token);
+    return 'on';
+  } catch {
+    return 'error';
+  }
 }
 
 /** Update registered filters without re-requesting permission. No-op if not registered. */

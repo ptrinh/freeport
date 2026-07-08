@@ -76,25 +76,33 @@ export async function pushStatus(): Promise<PushStatus> {
   }
 }
 
-/** Request permission, subscribe, and register with the sender. Call from a tap. */
+/** Request permission, subscribe, and register with the sender. Call from a tap.
+ *  Never rejects — resolves 'error' instead: pushManager.subscribe() rejects
+ *  with DOMException NetworkError where the browser's push service is
+ *  unreachable (e.g. FCM blocked country-wide), which surfaced as unhandled
+ *  rejections in production (GlitchTip issue 4). */
 export async function enablePush(pubkeyHex: string, endpoint: string, filters?: PushFilters): Promise<PushStatus> {
   if (!pushSupported()) return 'unsupported';
   if (!endpoint) return 'error' as PushStatus;
-  const perm = await Notification.requestPermission();
-  if (perm !== 'granted') return perm === 'denied' ? 'denied' : 'off';
-  const key = await fetchVapidKey(endpoint);
-  if (!key) return 'error' as PushStatus;
-  const reg = await navigator.serviceWorker.ready;
-  // A browser allows ONE push subscription per SW, bound to one VAPID key. If a
-  // stale one exists (e.g. a previous sender's key), drop it and resubscribe so
-  // the subscription matches THIS sender — otherwise pushes silently fail.
-  const existing = await reg.pushManager.getSubscription();
-  if (existing) await existing.unsubscribe().catch(() => {});
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(key) as BufferSource,
-  });
-  return (await register(endpoint, pubkeyHex, sub, filters)) ? 'on' : ('error' as PushStatus);
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') return perm === 'denied' ? 'denied' : 'off';
+    const key = await fetchVapidKey(endpoint);
+    if (!key) return 'error' as PushStatus;
+    const reg = await navigator.serviceWorker.ready;
+    // A browser allows ONE push subscription per SW, bound to one VAPID key. If a
+    // stale one exists (e.g. a previous sender's key), drop it and resubscribe so
+    // the subscription matches THIS sender — otherwise pushes silently fail.
+    const existing = await reg.pushManager.getSubscription();
+    if (existing) await existing.unsubscribe().catch(() => {});
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(key) as BufferSource,
+    });
+    return (await register(endpoint, pubkeyHex, sub, filters)) ? 'on' : ('error' as PushStatus);
+  } catch {
+    return 'error' as PushStatus;
+  }
 }
 
 /** Update the registered filters without re-subscribing (cheap; safe to call
