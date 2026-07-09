@@ -3,5 +3,9 @@
   "identifier": "default",
   "description": "Core permissions for the Freeport desktop window. App-defined commands (host server) are allowed by default in Tauri v2.",
   "windows": ["main"],
-  "permissions": ["core:default"]
+  "permissions": [
+    "core:default",
+    "notification:default",
+    "geolocation:default"
+  ]
 }

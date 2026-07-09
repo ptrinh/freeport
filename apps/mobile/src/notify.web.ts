@@ -15,6 +15,7 @@ export async function initNotifications(): Promise<boolean> {
   // Don't prompt here — browsers reject Notification.requestPermission() outside
   // a user gesture. Permission is granted from the Settings "Notifications"
   // toggle; we just report whether it's already granted.
+  if (isTauri()) return nativeNotificationGranted();
   return typeof Notification !== 'undefined' && Notification.permission === 'granted';
 }
 
@@ -22,17 +23,24 @@ export async function initNotifications(): Promise<boolean> {
 // Notification API. Unavailable when self-hosted over plain http on a LAN IP,
 // or in the Tauri desktop WebView. There, treat the "enable notifications"
 // required-action as satisfied (nothing the user can do) rather than nag.
+import { isTauri, nativeNotificationGranted, nativeRequestNotification, nativeNotify } from './desktopNative';
+
 function notifUnavailable(): boolean {
+  // Web Push / Notification API needs a secure context (HTTPS/localhost).
+  // On the Tauri desktop we instead use the native notification plugin (below),
+  // so it is NOT "unavailable" there.
   const g = globalThis as any;
-  return !!g.__TAURI__ || g.isSecureContext === false || typeof Notification === 'undefined';
+  return g.isSecureContext === false || typeof Notification === 'undefined';
 }
 
 export async function notificationGranted(): Promise<boolean> {
+  if (isTauri()) return nativeNotificationGranted();
   if (notifUnavailable()) return true; // suppress the nag where push can't work
   return typeof Notification !== 'undefined' && Notification.permission === 'granted';
 }
 
 export async function requestNotifications(): Promise<boolean> {
+  if (isTauri()) return nativeRequestNotification();
   try {
     if (notifUnavailable() || typeof Notification === 'undefined') return false;
     return (await Notification.requestPermission()) === 'granted';
@@ -49,6 +57,7 @@ export function onNotificationTap(_cb: (data: NotifTarget) => void): () => void 
 }
 
 export async function notify(title: string, body: string, data?: NotifTarget): Promise<void> {
+  if (isTauri()) { await nativeNotify(title, body); return; } // native OS notification on desktop
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
   const url = data?.tab ? `/?tab=${data.tab}` : '/';
   try {

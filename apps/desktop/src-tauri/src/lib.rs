@@ -495,6 +495,8 @@ pub fn run() {
     }
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_geolocation::init())
         .manage(HostMutex::default())
         .setup(|app| {
             // GUI: serve the host from the AppHandle's asset resolver (same

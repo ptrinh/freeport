@@ -22,17 +22,21 @@ function getGeoFlag(): boolean | null {
   try { const v = globalThis.localStorage?.getItem(GEO_OK_KEY); return v == null ? null : v === '1'; } catch { return null; }
 }
 
+import { isTauri, nativeGeolocation, nativeGeoGranted, nativeRequestGeo } from './desktopNative';
+
 // Precise geolocation needs a SECURE context (HTTPS or localhost) and a working
 // Geolocation API. It is unavailable when the app is served over plain http on
-// a LAN IP (self-hosted "Host Freeport for others") and in the Tauri desktop
-// WebView. In those cases callers fall back to IP-based location + the manual
-// picker, and the "grant location" nag is suppressed (nothing the user can do).
+// a LAN IP (self-hosted "Host Freeport for others"). In that case callers fall
+// back to IP-based location + the manual picker, and the "grant location" nag
+// is suppressed. On the Tauri desktop we use the native geolocation plugin
+// instead (handled separately below).
 function geoUnavailable(): boolean {
   const g = globalThis as any;
-  return !!g.__TAURI__ || g.isSecureContext === false || !g.navigator?.geolocation;
+  return g.isSecureContext === false || !g.navigator?.geolocation;
 }
 
 export async function getCurrentCoords(): Promise<Coords | null> {
+  if (isTauri()) return nativeGeolocation(); // native Core Location (falls back to null → IP if unsupported)
   if (geoUnavailable()) return null;
   return new Promise((resolve) => {
     let done = false;
@@ -51,8 +55,9 @@ export async function getCurrentCoords(): Promise<Coords | null> {
  *  now (common on iOS Safari's cold GPS read). Records the real outcome so the
  *  Permissions-API "prompt" quirk can't keep the nag on screen. */
 export async function requestLocationPermission(): Promise<boolean> {
-  // Can't prompt in an insecure/desktop context — report "ok" so no recovery
-  // alert fires (the nag is already hidden via locationGranted()).
+  if (isTauri()) return nativeRequestGeo(); // native Core Location prompt on desktop
+  // Can't prompt in an insecure context — report "ok" so no recovery alert
+  // fires (the nag is already hidden via locationGranted()).
   if (geoUnavailable()) return true;
   if (!globalThis.navigator?.geolocation) return false;
   return new Promise((resolve) => {
@@ -72,6 +77,7 @@ export async function requestLocationPermission(): Promise<boolean> {
  *  authoritative only for 'granted'/'denied'; on iOS Safari it returns 'prompt'
  *  even when usable, so we fall back to our remembered outcome there. */
 export async function locationGranted(): Promise<boolean> {
+  if (isTauri()) return nativeGeoGranted(); // reflect the native plugin's permission state
   if (geoUnavailable()) return true; // suppress the nag where geolocation can't work
   try {
     const p = await (globalThis.navigator as any)?.permissions?.query?.({ name: 'geolocation' });
