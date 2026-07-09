@@ -14,6 +14,8 @@ export interface HostStatus {
   urls: string[];
   /** Embedded relay ws:// URLs (present when notify is on). */
   relay_urls: string[];
+  /** Whether the Telegram bridge is active. */
+  telegram: boolean;
 }
 
 type TauriGlobal = { core?: { invoke?: (cmd: string, args?: Record<string, unknown>) => Promise<unknown> } };
@@ -34,6 +36,12 @@ async function invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T
   return (await g.core.invoke(cmd, args)) as T;
 }
 
-export const hostStart = (port: number, notify: boolean) => invoke<HostStatus>('host_start', { port, notify });
+export const hostStart = (port: number, notify: boolean, telegramToken?: string, telegramPassphrase?: string) =>
+  invoke<HostStatus>('host_start', {
+    port,
+    notify,
+    telegram_token: telegramToken?.trim() || null,
+    telegram_passphrase: telegramPassphrase?.trim() || null,
+  });
 export const hostStop = () => invoke<HostStatus>('host_stop');
 export const hostStatus = () => invoke<HostStatus>('host_status');

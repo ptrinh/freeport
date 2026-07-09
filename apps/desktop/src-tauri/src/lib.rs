@@ -33,6 +33,7 @@ struct HostState {
     running: bool,
     port: u16,
     notify: bool,
+    telegram: bool,
     relay_port: u16,
     stop: Option<Arc<AtomicBool>>,
     handle: Option<JoinHandle<()>>,
@@ -47,6 +48,8 @@ struct HostStatus {
     port: u16,
     /// Whether the notification server is being hosted on the same port.
     notify: bool,
+    /// Whether the Telegram bridge is active (a bot token was supplied).
+    telegram: bool,
     /// True if a notifier sidecar is bundled in this build (feature available).
     notify_available: bool,
     /// Shareable URLs (one per non-loopback IPv4 interface) when running.
@@ -98,11 +101,16 @@ fn notifier_data_dir() -> PathBuf {
     dir
 }
 
-fn spawn_notifier(internal: u16, relay_port: u16) -> std::io::Result<Child> {
+fn spawn_notifier(
+    internal: u16,
+    relay_port: u16,
+    tg_token: Option<&str>,
+    tg_passphrase: Option<&str>,
+) -> std::io::Result<Child> {
     let path = sidecar_path()
         .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "notifier not bundled"))?;
-    std::process::Command::new(path)
-        .env("HOST", "127.0.0.1")
+    let mut cmd = std::process::Command::new(path);
+    cmd.env("HOST", "127.0.0.1")
         .env("PORT", internal.to_string())
         .env("ENABLE_NOTIFY", "1")
         // Also run the embedded NIP-01 relay on its own LAN-facing WS port,
@@ -111,8 +119,17 @@ fn spawn_notifier(internal: u16, relay_port: u16) -> std::io::Result<Child> {
         .env("RELAY_HOST", "0.0.0.0")
         .env("RELAY_PORT", relay_port.to_string())
         .env("DATA_DIR", notifier_data_dir())
-        .env("VAPID_SUBJECT", "mailto:hi@freeport.network")
-        .stdout(std::process::Stdio::null())
+        .env("VAPID_SUBJECT", "mailto:hi@freeport.network");
+    // Optional Telegram bridge: enabled only when a bot token is supplied. The
+    // guest passphrase additionally turns on custodial guest-agent mode.
+    if let Some(tok) = tg_token.map(str::trim).filter(|s| !s.is_empty()) {
+        cmd.env("TELEGRAM_BOT_TOKEN", tok)
+            .env("TELEGRAM_WEB_BASE", "https://freeport.network");
+        if let Some(pass) = tg_passphrase.map(str::trim).filter(|s| !s.is_empty()) {
+            cmd.env("TELEGRAM_GUEST_KEY_PASSPHRASE", pass);
+        }
+    }
+    cmd.stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
         .spawn()
 }
@@ -240,7 +257,13 @@ fn serve_loop(server: Server, stop: Arc<AtomicBool>, notifier: Option<u16>) {
 }
 
 #[tauri::command]
-fn host_start(state: State<'_, HostMutex>, port: u16, notify: bool) -> Result<HostStatus, String> {
+fn host_start(
+    state: State<'_, HostMutex>,
+    port: u16,
+    notify: bool,
+    telegram_token: Option<String>,
+    telegram_passphrase: Option<String>,
+) -> Result<HostStatus, String> {
     if port < 1024 {
         return Err("Please choose a port of 1024 or higher.".into());
     }
@@ -257,7 +280,7 @@ fn host_start(state: State<'_, HostMutex>, port: u16, notify: bool) -> Result<Ho
     let relay_port = port.saturating_add(1);
     let mut child = None;
     let notifier_port = if notify {
-        match spawn_notifier(INTERNAL_NOTIFIER_PORT, relay_port) {
+        match spawn_notifier(INTERNAL_NOTIFIER_PORT, relay_port, telegram_token.as_deref(), telegram_passphrase.as_deref()) {
             Ok(c) => {
                 child = Some(c);
                 Some(INTERNAL_NOTIFIER_PORT)
@@ -274,9 +297,12 @@ fn host_start(state: State<'_, HostMutex>, port: u16, notify: bool) -> Result<Ho
         .name("freeport-host".into())
         .spawn(move || serve_loop(server, stop2, notifier_port))
         .map_err(|e| e.to_string())?;
+    let telegram_on = notify
+        && telegram_token.as_deref().map(|s| !s.trim().is_empty()).unwrap_or(false);
     st.running = true;
     st.port = port;
     st.notify = notify;
+    st.telegram = telegram_on;
     st.relay_port = relay_port;
     st.stop = Some(stop);
     st.handle = Some(handle);
@@ -285,6 +311,7 @@ fn host_start(state: State<'_, HostMutex>, port: u16, notify: bool) -> Result<Ho
         running: true,
         port,
         notify,
+        telegram: telegram_on,
         notify_available: true,
         urls: local_urls(port),
         relay_urls: if notify { relay_urls(relay_port) } else { vec![] },
@@ -306,9 +333,10 @@ fn host_stop(state: State<'_, HostMutex>) -> Result<HostStatus, String> {
     }
     st.running = false;
     st.notify = false;
+    st.telegram = false;
     st.port = 0;
     st.relay_port = 0;
-    Ok(HostStatus { running: false, port: 0, notify: false, notify_available: notifier_available(), urls: vec![], relay_urls: vec![] })
+    Ok(HostStatus { running: false, port: 0, notify: false, telegram: false, notify_available: notifier_available(), urls: vec![], relay_urls: vec![] })
 }
 
 #[tauri::command]
@@ -319,11 +347,12 @@ fn host_status(state: State<'_, HostMutex>) -> HostStatus {
             running: true,
             port: st.port,
             notify: st.notify,
+            telegram: st.telegram,
             notify_available: avail,
             urls: local_urls(st.port),
             relay_urls: if st.notify { relay_urls(st.relay_port) } else { vec![] },
         },
-        _ => HostStatus { running: false, port: 0, notify: false, notify_available: avail, urls: vec![], relay_urls: vec![] },
+        _ => HostStatus { running: false, port: 0, notify: false, telegram: false, notify_available: avail, urls: vec![], relay_urls: vec![] },
     }
 }
 
@@ -346,7 +375,7 @@ fn flag_value(args: &[String], name: &str) -> Option<String> {
 /// block until the process is killed (Ctrl-C). For always-on boxes (a Pi, a
 /// VPS) that want to be a persistent Freeport distribution node. With `notify`,
 /// also host the notification server on the same port.
-fn run_headless(port: u16, notify: bool) {
+fn run_headless(port: u16, notify: bool, tg_token: Option<String>, tg_passphrase: Option<String>) {
     let server = match Server::http(("0.0.0.0", port)) {
         Ok(s) => s,
         Err(e) => {
@@ -360,7 +389,7 @@ fn run_headless(port: u16, notify: bool) {
             eprintln!("Freeport: this build doesn't include the notification server (--notify unavailable).");
             std::process::exit(1);
         }
-        match spawn_notifier(INTERNAL_NOTIFIER_PORT, port.saturating_add(1)) {
+        match spawn_notifier(INTERNAL_NOTIFIER_PORT, port.saturating_add(1), tg_token.as_deref(), tg_passphrase.as_deref()) {
             Ok(c) => {
                 _notifier_child = Some(c);
                 Some(INTERNAL_NOTIFIER_PORT)
@@ -373,7 +402,12 @@ fn run_headless(port: u16, notify: bool) {
     } else {
         None
     };
-    println!("Freeport — hosting the web app{} on port {port}", if notify { " + notification/MCP server + relay" } else { "" });
+    let tg_on = notify && tg_token.as_deref().map(|s| !s.trim().is_empty()).unwrap_or(false);
+    println!(
+        "Freeport — hosting the web app{}{} on port {port}",
+        if notify { " + notification/MCP server + relay" } else { "" },
+        if tg_on { " + Telegram bridge" } else { "" },
+    );
     let urls = local_urls(port);
     if urls.is_empty() {
         println!("  http://<this-machine-ip>:{port}  (no network interface detected)");
@@ -401,7 +435,9 @@ fn print_help() {
          OPTIONS:\n  \
          --serve            Run headless: host the Freeport web app on your LAN, no window\n  \
          --port <PORT>      Port to host on (default {})\n  \
-         --notify           Also host the notification server on the same port\n  \
+         --notify           Also host the notification/MCP server + a relay\n  \
+         --telegram-token <T>              Run the Telegram bridge with this bot token (implies --notify)\n  \
+         --telegram-guest-passphrase <P>   Enable custodial guest mode (advanced; holds keys for guests)\n  \
          -h, --help         Show this help\n  \
          -v, --version      Show version",
         env!("CARGO_PKG_VERSION"),
@@ -425,8 +461,11 @@ pub fn run() {
         let port = flag_value(&args, "--port")
             .and_then(|s| s.parse::<u16>().ok())
             .unwrap_or(DEFAULT_PORT);
-        let notify = args.iter().any(|a| a == "--notify" || a == "--notifications");
-        run_headless(port, notify);
+        let tg_token = flag_value(&args, "--telegram-token");
+        let tg_passphrase = flag_value(&args, "--telegram-guest-passphrase");
+        // Telegram (and thus notify) implied when a bot token is given.
+        let notify = args.iter().any(|a| a == "--notify" || a == "--notifications") || tg_token.is_some();
+        run_headless(port, notify, tg_token, tg_passphrase);
         return;
     }
 

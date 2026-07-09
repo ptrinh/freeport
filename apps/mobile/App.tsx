@@ -5110,7 +5110,10 @@ function confirmAsync(title: string, message: string, confirmLabel: string): Pro
 function DesktopHostPanel() {
   const [portText, setPortText] = useState('1988');
   const [withNotify, setWithNotify] = useState(false);
-  const [status, setStatus] = useState<HostStatus>({ running: false, port: 0, notify: false, notify_available: false, urls: [], relay_urls: [] });
+  const [tgToken, setTgToken] = useState('');
+  const [tgPass, setTgPass] = useState('');
+  const [tgOpen, setTgOpen] = useState(false);
+  const [status, setStatus] = useState<HostStatus>({ running: false, port: 0, notify: false, telegram: false, notify_available: false, urls: [], relay_urls: [] });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -5128,7 +5131,8 @@ function DesktopHostPanel() {
           setError(t('Enter a port between 1024 and 65535.'));
           return;
         }
-        setStatus(await hostStart(port, withNotify && status.notify_available));
+        const useNotify = withNotify && status.notify_available;
+        setStatus(await hostStart(port, useNotify, useNotify ? tgToken : '', useNotify ? tgPass : ''));
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -5156,6 +5160,24 @@ function DesktopHostPanel() {
               </View>
             </Pressable>
           )}
+          {status.notify_available && withNotify && (
+            <View style={{ marginTop: 10, marginStart: 32 }}>
+              <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }} onPress={() => setTgOpen((v) => !v)}>
+                <Ionicons name={tgOpen ? 'chevron-down' : 'chevron-forward'} size={16} color={palette.text3} />
+                <Text style={s.dim}>{t('Telegram bridge (optional)')}</Text>
+              </Pressable>
+              {tgOpen && (
+                <View style={{ marginTop: 8 }}>
+                  <Field label={t('Telegram bot token')} value={tgToken} onChange={setTgToken} placeholder="123456:AA…" secure />
+                  <Text style={[s.dim, { fontSize: 12, marginTop: 4 }]}>{t('From @BotFather. Relays a market feed into groups and sends content-blind pings.')}</Text>
+                  <View style={{ marginTop: 10 }}>
+                    <Field label={t('Guest-mode passphrase (advanced)')} value={tgPass} onChange={setTgPass} placeholder={t('leave empty to keep guest mode off')} secure />
+                  </View>
+                  <Text style={[s.fieldError, { fontSize: 12, marginTop: 4 }]}>{t('Guest mode is custodial: your node holds an encrypted key for each Telegram user who posts. Only enable if you accept that responsibility.')}</Text>
+                </View>
+              )}
+            </View>
+          )}
           <Pressable style={[s.btnAccept, { marginTop: 8 }, busy && { opacity: 0.6 }]} disabled={busy} onPress={toggle}>
             {busy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Start hosting')}</Text>}
           </Pressable>
@@ -5177,6 +5199,7 @@ function DesktopHostPanel() {
               </View>
             </>
           )}
+          {status.telegram && <Text style={[s.dim, { marginTop: 6, fontSize: 12 }]}>{'🤖 ' + t('Telegram bridge active.')}</Text>}
           <Text style={[s.dim, { marginTop: 6, fontSize: 12 }]}>{t('Your OS firewall may ask to allow incoming connections the first time.')}</Text>
           <Pressable style={[s.btnCounter, { marginTop: 8 }, busy && { opacity: 0.6 }]} disabled={busy} onPress={toggle}>
             {busy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Stop hosting')}</Text>}
