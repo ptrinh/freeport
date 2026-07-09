@@ -76,9 +76,43 @@ freeport listen --market <topic>         watch a market
 freeport run --config <agent.json>       full agent loop [--post intent.json] [--yes]
 ```
 
+### Desktop app CLI (headless host)
+
+The desktop app ([GitHub Releases](https://github.com/ptrinh/freeport/releases))
+doubles as a headless server — host Freeport for people on your network from a
+terminal, a VPS, or systemd, no window needed:
+
+```sh
+# macOS (or symlink it: sudo ln -s /Applications/Freeport.app/Contents/MacOS/Freeport /usr/local/bin/freeport)
+/Applications/Freeport.app/Contents/MacOS/Freeport --serve
+# Linux (.deb installs to /usr/bin)
+freeport --serve
+# Windows
+"C:\Program Files\Freeport\Freeport.exe" --serve
+```
+
+```
+--serve                            host the web app on your LAN, headless (no window)
+--port <PORT>                      port to host on (default 1988)
+--notify                           also host the notification/MCP server + a Nostr relay
+--telegram-token <T>               run the Telegram bridge with this bot token (implies --notify)
+--telegram-guest-passphrase <P>    enable custodial guest mode (advanced; holds keys for guests)
+-v, --version / -h, --help
+```
+
+It prints the LAN URLs to share (`http://192.168.x.x:1988`) and, with
+`--notify`, a relay URL to add to the app's relay list. Ctrl-C stops it. The
+same server is available from the GUI under **Features → Host Freeport for
+others**.
+
 ## Status
 
-- **Distribution**: live on the Apple App Store; Google Play in review.
+- **Distribution**: live on the [Apple App Store](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901); Google Play in review;
+  web at [freeport.network](https://freeport.network). Desktop installers on
+  [GitHub Releases](https://github.com/ptrinh/freeport/releases/latest) —
+  macOS (`.dmg`, Apple Silicon + Intel, signed & notarized), Windows (`.exe`/`.msi`,
+  x64 — runs on ARM via emulation), Linux (`.deb`, x64 + arm64) — with built-in
+  self-update on macOS/Windows.
 - **Reputation**: implemented — karma ratings (PoW-backed, `apps/mobile/src/karma.ts`),
   deal receipts, proven-deal counts, per-viewer web-of-trust weighting, and a
   `nostr_search_reputation` MCP tool. What remains open is *sybil resistance*:
