@@ -112,7 +112,20 @@ jobs:
           tagName: ${{ startsWith(github.ref, 'refs/tags/desktop-v') && github.ref_name || '' }}
           # __VERSION__ is substituted by tauri-action with the app version.
           releaseName: ${{ startsWith(github.ref, 'refs/tags/desktop-v') && 'Freeport Desktop v__VERSION__' || '' }}
-          releaseBody: 'Freeport desktop app. Download the installer for your OS below.'
+          releaseBody: |
+            ## Which file do I download?
+
+            | Your computer | Download |
+            |---|---|
+            | **macOS** — Apple Silicon (M1 or newer) | `Freeport_…_aarch64.dmg` |
+            | **macOS** — Intel | `Freeport_…_x64.dmg` |
+            | **Windows** 10/11 (x64; also runs on Windows-on-ARM) | `Freeport_…_x64-setup.exe` (or the `.msi`) |
+            | **Linux** — x64, Debian/Ubuntu | `Freeport_…_amd64.deb` |
+            | **Linux** — arm64 (Raspberry Pi 4+, ARM servers) | `Freeport_…_arm64.deb` |
+
+            The `.sig`, `.app.tar.gz`, and `latest.json` files are used by the app's built-in auto-updater — you can ignore them.
+
+            macOS builds are signed and notarized. The app includes a headless server mode (`--serve`) — see the [README](https://github.com/ptrinh/freeport#desktop-app-cli-headless-host).
           # Published immediately: the in-app updater polls
           # releases/latest/download/latest.json, which only resolves for a
           # published release.
