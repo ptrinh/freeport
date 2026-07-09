@@ -1,0 +1,15 @@
+{
+  "name": "freeport-desktop",
+  "version": "1.4.0",
+  "private": true,
+  "description": "Freeport desktop app (Tauri) — the Freeport web app packaged for Windows/macOS/Linux, with an optional built-in host server to share Freeport on your LAN.",
+  "scripts": {
+    "build:web": "bash ./build-web.sh",
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0"
+  }
+}

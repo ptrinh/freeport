@@ -1,0 +1,28 @@
+[package]
+name = "freeport-desktop"
+version = "1.4.0"
+description = "Freeport — decentralized P2P marketplace on Nostr"
+authors = ["Freeport"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "freeport_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# Built-in "host Freeport on your LAN" server: a tiny, dependency-light static
+# file server serving the embedded web bundle.
+tiny_http = "0.12"
+include_dir = "0.7"
+local-ip-address = "0.6"
+
+[features]
+# by default Tauri runs in production mode when `tauri dev` is not used
+custom-protocol = ["tauri/custom-protocol"]

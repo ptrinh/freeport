@@ -89,6 +89,7 @@ import { suggestPrice, estimateFare, setFareConfig, defaultFareConfig, type Pric
 import { pushSupported, enablePush, updatePush, disablePush, pushStatus, type PushStatus, type PushFilters } from './src/push';
 import { pushUnavailableForOnboarding } from './src/pushAvailability';
 import { scrollNodeIntoView, type ScrollableNode } from './src/scrollToNode';
+import { isTauri, hostStart, hostStop, hostStatus, type HostStatus } from './src/desktopHost';
 import { requestTelegramLink, telegramLinkStatus } from './src/telegramLink';
 import { createTripSession, tripLink, tripSecret, restoreTripSession, decodeTripHash, publishTripLocation, subscribeTrip, type TripStatic, type TripSession, type TripView, type TripUpdate } from './src/livetrip';
 import { webBase } from './src/webBase';
@@ -5102,6 +5103,70 @@ function confirmAsync(title: string, message: string, confirmLabel: string): Pro
   });
 }
 
+/** Desktop-only: run a built-in HTTP server that serves the Freeport web app
+ *  (this same bundle) on a chosen port, so anyone on the LAN can open it in a
+ *  browser — a zero-infra way to share/self-host Freeport. Rendered only when
+ *  isTauri(). The Rust side lives in apps/desktop/src-tauri. */
+function DesktopHostPanel() {
+  const [portText, setPortText] = useState('8080');
+  const [status, setStatus] = useState<HostStatus>({ running: false, port: 0, urls: [] });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => { hostStatus().then(setStatus).catch(() => {}); }, []);
+
+  const toggle = async () => {
+    setError(null);
+    setBusy(true);
+    try {
+      if (status.running) {
+        setStatus(await hostStop());
+      } else {
+        const port = parseInt(portText.trim(), 10);
+        if (!Number.isFinite(port) || port < 1024 || port > 65535) {
+          setError(t('Enter a port between 1024 and 65535.'));
+          return;
+        }
+        setStatus(await hostStart(port));
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <View style={{ marginTop: 22 }}>
+      <Text style={s.sectionTitle}>{t('Host Freeport for others')}</Text>
+      <Text style={[s.dim, { marginTop: 4 }]}>{t('Serve this app on your network so anyone nearby can open it in a browser — no install, no store. The shared app still connects directly to the public relays.')}</Text>
+
+      {!status.running ? (
+        <>
+          <View style={{ marginTop: 12 }}>
+            <Field label={t('Port')} value={portText} onChange={setPortText} placeholder="8080" keyboardType="number-pad" />
+          </View>
+          <Pressable style={[s.btnAccept, { marginTop: 8 }, busy && { opacity: 0.6 }]} disabled={busy} onPress={toggle}>
+            {busy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Start hosting')}</Text>}
+          </Pressable>
+        </>
+      ) : (
+        <>
+          <Text style={[s.dim, { marginTop: 12 }]}>{t('Hosting on port {port}. Share one of these links (same Wi-Fi/network):', { port: String(status.port) })}</Text>
+          <View style={s.codeBox}>
+            <Text style={s.codeText} selectable>{(status.urls.length ? status.urls : [t('No network address found — are you online?')]).join('\n')}</Text>
+          </View>
+          <Text style={[s.dim, { marginTop: 6, fontSize: 12 }]}>{t('Your OS firewall may ask to allow incoming connections the first time.')}</Text>
+          <Pressable style={[s.btnCounter, { marginTop: 8 }, busy && { opacity: 0.6 }]} disabled={busy} onPress={toggle}>
+            {busy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Stop hosting')}</Text>}
+          </Pressable>
+        </>
+      )}
+      {error && <Text style={[s.fieldError, { marginTop: 8 }]}>{error}</Text>}
+    </View>
+  );
+}
+
 function SettingsTab({
   npub,
   signerRef,
@@ -6044,6 +6109,9 @@ function SettingsTab({
           )}
         </>
       )}
+
+      {/* Desktop only: host the Freeport web app on the LAN for others. */}
+      {isTauri() && <DesktopHostPanel />}
 
       {/* "What's a notification server?" explainer + self-host instructions. */}
       <Modal visible={notifyHelpOpen} transparent animationType="fade" onRequestClose={() => setNotifyHelpOpen(false)}>
