@@ -29,7 +29,14 @@ export async function initTelemetry(on: boolean): Promise<void> {
       // (`iabjs://…`, gtm, fb pixels) and its errors land on our global
       // handlers — e.g. "Java object is gone" from FB's Android IAB perf
       // logger (GlitchTip issue 5, a visitor arriving via a Facebook post).
-      denyUrls: [/^iabjs:\/\//i, /connect\.facebook\.net/i, /^gap:\/\//i],
+      denyUrls: [
+        /^iabjs:\/\//i,
+        /connect\.facebook\.net/i,
+        /^gap:\/\//i,
+        // Cloudflare Web Analytics beacon (auto-injected by CF Pages) crashing
+        // on old engines without Array.prototype.at (GlitchTip issue 7).
+        /static\.cloudflareinsights\.com/i,
+      ],
       ignoreErrors: [
         'Java object is gone',                 // FB Android IAB bridge torn down
         /__gCrWeb/i,                           // Chrome-iOS injected script
