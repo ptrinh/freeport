@@ -16,7 +16,7 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 
 use serde::Serialize;
-use tauri::State;
+use tauri::{Manager, State};
 use tiny_http::{Header, Request, Response, Server};
 
 /// Fixed loopback port the bundled notification-server sidecar binds to; the
