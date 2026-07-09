@@ -89,7 +89,7 @@ import { initLayoutDirection, applyLayoutDirection, dirIcon } from './src/rtl';
 import { useWebUpdateAvailable } from './src/webUpdate';
 import { SimplePool } from 'nostr-tools/pool';
 import { getPow } from 'nostr-tools/nip13';
-import { COUNTRIES, statesOf, citiesOf, currencyForCountry, currencyFractionDigits, currencySymbol, fmtMoney, matchLocation, levelsOf, flagEmoji, searchLocations, type Currency } from './src/locations';
+import { COUNTRIES, statesOf, citiesOf, currencyForCountry, currencyForMarket, currencyFractionDigits, currencySymbol, fmtMoney, matchLocation, levelsOf, flagEmoji, searchLocations, type Currency } from './src/locations';
 
 // Country codes sorted A–Z by name, plus a code→name lookup, for the Location picker.
 const COUNTRY_CODES_AZ: string[] = [...COUNTRIES].sort((a, b) => a.name.localeCompare(b.name)).map((c) => c.code);
@@ -4536,7 +4536,9 @@ function CounterEditor({
   const isRide = nego.intent.content.schema.startsWith('rideshare');
   const existing = nego.terms ?? {};
   const existingWindow = existing.window;
-  const existingPay = parsePayment(existing.payment, 'SGD');
+  // Same market-derived default as RespondEditor: counters on unpriced threads
+  // follow the intent's market currency, not a hardcoded one.
+  const existingPay = parsePayment(existing.payment, currencyForMarket(nego.intent.content.market, 'USD'));
   const existingDur = existing.duration_minutes ?? 60;
   const [time, setTime] = useState<Date>(() =>
     existingWindow ? new Date(existingWindow.start * 1000) : defaultIntentTime(),
@@ -4672,7 +4674,9 @@ function RespondEditor({
   const isRide = intent.content.schema.startsWith('rideshare');
   const p = intent.content.payload as Record<string, any>;
   const intentWindow = intent.content.window;
-  const intentPay = parsePayment(p.payment, 'SGD');
+  // Unpriced posts default the offer to the POST's market currency (a Hanoi
+  // ride → VND) — a Singaporean responding to a Hanoi post was getting SGD.
+  const intentPay = parsePayment(p.payment, currencyForMarket(intent.content.market, 'USD'));
   const intentDur = p.duration_minutes ?? 60;
   const [time, setTime] = useState<Date>(() =>
     intentWindow ? new Date(intentWindow.start * 1000) : defaultIntentTime(),

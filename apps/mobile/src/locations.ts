@@ -368,6 +368,18 @@ export function currencyForCountry(code: string): Currency {
   return COUNTRY_CURRENCY[code] ?? 'USD';
 }
 
+/**
+ * Currency implied by a market/topic slug. Market keys start with the slugged
+ * ISO-3166 country ("vn_hanoi_ridesharing" → VN → VND; the legacy demo key
+ * "sg-rideshare" → SG → SGD), so an offer on a post priced in that market can
+ * default to the POST's currency — not the responder's. A Singapore-based user
+ * offering on a Hanoi ride must see VND, whatever their device/location says.
+ */
+export function currencyForMarket(market: string | undefined, fallback: Currency): Currency {
+  const cc = String(market || '').split(/[_-]/)[0].toUpperCase();
+  return (cc.length === 2 && COUNTRY_CURRENCY[cc]) || fallback;
+}
+
 /** Minor-unit count for a currency (0 for VND/JPY/KRW…, usually 2). */
 export function currencyFractionDigits(currency: Currency): number {
   try {
