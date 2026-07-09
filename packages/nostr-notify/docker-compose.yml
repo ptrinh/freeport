@@ -9,7 +9,7 @@ services:
       - HOST=0.0.0.0
       - PORT=8789
       - DATA_DIR=/data
-      - VAPID_SUBJECT=mailto:admin@trinh.uk
+      - VAPID_SUBJECT=mailto:hi@freeport.network
       # Pin VAPID keys via env so subscriptions survive a volume wipe (optional):
       # - VAPID_PUBLIC_KEY=...
       # - VAPID_PRIVATE_KEY=...

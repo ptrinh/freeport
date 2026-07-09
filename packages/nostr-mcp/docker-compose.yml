@@ -23,7 +23,7 @@ services:
       # Web Push notifier (shares this hostname). Set ENABLE_NOTIFY=0 for MCP-only.
       - ENABLE_NOTIFY=1
       - DATA_DIR=/data
-      - VAPID_SUBJECT=mailto:admin@trinh.uk
+      - VAPID_SUBJECT=mailto:hi@freeport.network
       # Pin VAPID keys via env so push subscriptions survive a volume wipe:
       # - VAPID_PUBLIC_KEY=...
       # - VAPID_PRIVATE_KEY=...

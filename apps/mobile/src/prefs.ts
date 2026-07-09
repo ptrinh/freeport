@@ -80,12 +80,22 @@ const DEFAULTS: Prefs = {
   telemetryEnabled: true,
 };
 
+/** Public-instance hostnames we've renamed. Installs that saved one of these
+ *  follow the rename (same server, new canonical name — mcp.freeport.network);
+ *  a custom self-hosted URL is never touched. Exported for tests. */
+export function migrateNotifyEndpoint(stored: unknown): string | undefined {
+  const v = String(stored ?? '').trim().replace(/\/+$/, '');
+  if (!v) return undefined;
+  return v === 'https://nostr-mcp.trinh.uk' ? DEFAULTS.notifyEndpoint : v;
+}
+
 export async function loadPrefs(): Promise<Prefs> {
   try {
     const raw = await kvGet(STORE_KEY);
     if (!raw) return { ...DEFAULTS };
     const parsed = JSON.parse(raw);
-    return { ...DEFAULTS, ...parsed, location: { ...DEFAULTS.location, ...parsed.location } };
+    const notifyEndpoint = migrateNotifyEndpoint(parsed.notifyEndpoint) ?? DEFAULTS.notifyEndpoint;
+    return { ...DEFAULTS, ...parsed, notifyEndpoint, location: { ...DEFAULTS.location, ...parsed.location } };
   } catch {
     return { ...DEFAULTS };
   }

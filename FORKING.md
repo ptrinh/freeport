@@ -74,7 +74,7 @@ A fork should leave no trace of the upstream deployment. Grep for these and
 replace what you find:
 
 ```sh
-grep -rn "trinh.uk\|ptrinh\|uk.trinh\|Freeport" --include="*.ts*" --include="*.json" \
+grep -rn "trinh.uk\|freeport.network\|ptrinh\|uk.trinh\|Freeport" --include="*.ts*" --include="*.json" \
   packages apps relay demo | grep -v node_modules | grep -v locales
 ```
 
