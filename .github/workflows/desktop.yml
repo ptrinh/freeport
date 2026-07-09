@@ -16,12 +16,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: macos-latest      # Apple Silicon + Intel (universal)
-            args: '--target universal-apple-darwin'
+          - platform: macos-latest
+            args: '--target aarch64-apple-darwin'
+            rust_target: aarch64-apple-darwin
+            triple: aarch64-apple-darwin
+            bun_target: bun-darwin-arm64
+          - platform: macos-latest
+            args: '--target x86_64-apple-darwin'
+            rust_target: x86_64-apple-darwin
+            triple: x86_64-apple-darwin
+            bun_target: bun-darwin-x64
           - platform: ubuntu-22.04
             args: ''
+            rust_target: x86_64-unknown-linux-gnu
+            triple: x86_64-unknown-linux-gnu
+            bun_target: bun-linux-x64
           - platform: windows-latest
             args: ''
+            rust_target: x86_64-pc-windows-msvc
+            triple: x86_64-pc-windows-msvc
+            bun_target: bun-windows-x64
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +48,7 @@ jobs:
       - name: Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ${{ matrix.rust_target }}
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
@@ -53,6 +67,17 @@ jobs:
           npm ci --prefix apps/mobile
           npm run build        # compile @freeport/protocol + agent → dist (expo export needs them)
           npm --prefix apps/desktop install
+
+      - name: Install Bun (for the notifier sidecar)
+        uses: oven-sh/setup-bun@v2
+
+      - name: Build notification-server sidecar
+        shell: bash
+        run: |
+          mkdir -p apps/desktop/src-tauri/binaries
+          EXT=""; [ "${{ matrix.platform }}" = "windows-latest" ] && EXT=".exe"
+          bun build packages/nostr-mcp/src/http.ts --compile --target=${{ matrix.bun_target }} \
+            --outfile "apps/desktop/src-tauri/binaries/freeport-notifier-${{ matrix.triple }}$EXT"
 
       - name: Generate app icons
         working-directory: apps/desktop
@@ -76,12 +101,11 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
-          name: freeport-desktop-${{ matrix.platform }}
+          name: freeport-desktop-${{ matrix.triple }}
           path: |
-            apps/desktop/src-tauri/target/release/bundle/**/*.dmg
             apps/desktop/src-tauri/target/**/release/bundle/**/*.dmg
-            apps/desktop/src-tauri/target/release/bundle/**/*.AppImage
-            apps/desktop/src-tauri/target/release/bundle/**/*.deb
-            apps/desktop/src-tauri/target/release/bundle/**/*.exe
-            apps/desktop/src-tauri/target/release/bundle/**/*.msi
+            apps/desktop/src-tauri/target/**/release/bundle/**/*.AppImage
+            apps/desktop/src-tauri/target/**/release/bundle/**/*.deb
+            apps/desktop/src-tauri/target/**/release/bundle/**/*.exe
+            apps/desktop/src-tauri/target/**/release/bundle/**/*.msi
           if-no-files-found: warn

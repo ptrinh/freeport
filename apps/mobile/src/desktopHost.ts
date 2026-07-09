@@ -7,6 +7,10 @@
 export interface HostStatus {
   running: boolean;
   port: number;
+  /** Notification server being hosted on the same port. */
+  notify: boolean;
+  /** Whether this build bundled the notifier (feature available). */
+  notify_available: boolean;
   urls: string[];
 }
 
@@ -28,6 +32,6 @@ async function invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T
   return (await g.core.invoke(cmd, args)) as T;
 }
 
-export const hostStart = (port: number) => invoke<HostStatus>('host_start', { port });
+export const hostStart = (port: number, notify: boolean) => invoke<HostStatus>('host_start', { port, notify });
 export const hostStop = () => invoke<HostStatus>('host_stop');
 export const hostStatus = () => invoke<HostStatus>('host_status');

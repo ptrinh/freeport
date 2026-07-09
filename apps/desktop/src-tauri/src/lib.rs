@@ -7,7 +7,9 @@
 //! domain is unavailable. The served app still talks directly to the public
 //! Nostr relays; this only distributes the client, it is not a relay or notifier.
 
-use std::io::Cursor;
+use std::io::{Cursor, Read};
+use std::path::PathBuf;
+use std::process::Child;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
@@ -16,7 +18,11 @@ use std::time::Duration;
 use include_dir::{include_dir, Dir};
 use serde::Serialize;
 use tauri::State;
-use tiny_http::{Header, Response, Server};
+use tiny_http::{Header, Request, Response, Server};
+
+/// Fixed loopback port the bundled notification-server sidecar binds to; the
+/// public host server reverse-proxies notifier routes here.
+const INTERNAL_NOTIFIER_PORT: u16 = 47615;
 
 /// The web bundle, embedded at compile time. `apps/desktop/dist` is produced by
 /// build-web.sh (tauri beforeBuildCommand) before the crate is compiled.
@@ -26,8 +32,10 @@ static WEB: Dir = include_dir!("$CARGO_MANIFEST_DIR/../dist");
 struct HostState {
     running: bool,
     port: u16,
+    notify: bool,
     stop: Option<Arc<AtomicBool>>,
     handle: Option<JoinHandle<()>>,
+    notifier: Option<Child>,
 }
 
 type HostMutex = Mutex<HostState>;
@@ -36,6 +44,10 @@ type HostMutex = Mutex<HostState>;
 struct HostStatus {
     running: bool,
     port: u16,
+    /// Whether the notification server is being hosted on the same port.
+    notify: bool,
+    /// True if a notifier sidecar is bundled in this build (feature available).
+    notify_available: bool,
     /// Shareable URLs (one per non-loopback IPv4 interface) when running.
     urls: Vec<String>,
 }
@@ -54,6 +66,93 @@ fn local_urls(port: u16) -> Vec<String> {
     urls.sort();
     urls.dedup();
     urls
+}
+
+// ── Notification-server sidecar (bundled Bun-compiled freeport-nostr-mcp) ──────
+
+/// Path to the notifier sidecar next to the main executable (Tauri places
+/// externalBin there). None if this build didn't bundle it.
+fn sidecar_path() -> Option<PathBuf> {
+    let dir = std::env::current_exe().ok()?.parent()?.to_path_buf();
+    let name = if cfg!(windows) { "freeport-notifier.exe" } else { "freeport-notifier" };
+    let p = dir.join(name);
+    p.exists().then_some(p)
+}
+
+/// Whether the notifier feature is available in this build.
+fn notifier_available() -> bool {
+    sidecar_path().is_some()
+}
+
+/// Persistent data dir for the notifier (VAPID keys + push subscriptions).
+fn notifier_data_dir() -> PathBuf {
+    let base = std::env::var_os("XDG_DATA_HOME").map(PathBuf::from)
+        .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".local/share")))
+        .or_else(|| std::env::var_os("APPDATA").map(PathBuf::from))
+        .unwrap_or_else(std::env::temp_dir);
+    let dir = base.join("freeport-notifier");
+    let _ = std::fs::create_dir_all(&dir);
+    dir
+}
+
+fn spawn_notifier(internal: u16) -> std::io::Result<Child> {
+    let path = sidecar_path()
+        .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "notifier not bundled"))?;
+    std::process::Command::new(path)
+        .env("HOST", "127.0.0.1")
+        .env("PORT", internal.to_string())
+        .env("ENABLE_NOTIFY", "1")
+        .env("DATA_DIR", notifier_data_dir())
+        .env("VAPID_SUBJECT", "mailto:hi@freeport.network")
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+}
+
+/// Routes served by the notifier (everything else is the static web app).
+fn is_notifier_path(url: &str) -> bool {
+    let p = url.split(['?', '#']).next().unwrap_or("");
+    p == "/health"
+        || p == "/vapidPublicKey"
+        || p.starts_with("/mcp")
+        || p.starts_with("/subscribe")
+        || p.starts_with("/unsubscribe")
+        || p.starts_with("/telegram")
+}
+
+/// Forward a request to the loopback notifier and copy the response back.
+fn proxy_to_notifier(mut req: Request, internal: u16) {
+    let url = format!("http://127.0.0.1:{}{}", internal, req.url());
+    let method = req.method().as_str().to_uppercase();
+    let ctype = req
+        .headers()
+        .iter()
+        .find(|h| h.field.equiv("Content-Type"))
+        .map(|h| h.value.as_str().to_string());
+    let mut body = Vec::new();
+    let _ = req.as_reader().read_to_end(&mut body);
+
+    let mut rb = ureq::request(&method, &url);
+    if let Some(ct) = &ctype {
+        rb = rb.set("Content-Type", ct);
+    }
+    let result = if body.is_empty() { rb.call() } else { rb.send_bytes(&body) };
+    match result {
+        Ok(resp) | Err(ureq::Error::Status(_, resp)) => {
+            let status = resp.status();
+            let ct = resp.content_type().to_string();
+            let mut buf = Vec::new();
+            let _ = resp.into_reader().read_to_end(&mut buf);
+            let header = Header::from_bytes(&b"Content-Type"[..], ct.as_bytes())
+                .unwrap_or_else(|_| Header::from_bytes(&b"Content-Type"[..], &b"application/octet-stream"[..]).unwrap());
+            let len = buf.len();
+            let _ = req.respond(Response::new(status.into(), vec![header], Cursor::new(buf), Some(len), None));
+        }
+        Err(_) => {
+            // notifier still starting up or unreachable
+            let _ = req.respond(Response::from_string("Notifier unavailable").with_status_code(502));
+        }
+    }
 }
 
 fn content_type(path: &str) -> &'static str {
@@ -95,10 +194,16 @@ fn lookup(req_path: &str) -> Option<(&'static [u8], &'static str)> {
     WEB.get_file("index.html").map(|f| (f.contents(), content_type("index.html")))
 }
 
-fn serve_loop(server: Server, stop: Arc<AtomicBool>) {
+fn serve_loop(server: Server, stop: Arc<AtomicBool>, notifier: Option<u16>) {
     while !stop.load(Ordering::Relaxed) {
         match server.recv_timeout(Duration::from_millis(300)) {
             Ok(Some(req)) => {
+                if let Some(np) = notifier {
+                    if is_notifier_path(req.url()) {
+                        proxy_to_notifier(req, np);
+                        continue;
+                    }
+                }
                 let (body, ctype): (&[u8], &str) = match lookup(req.url()) {
                     Some(hit) => hit,
                     None => {
@@ -119,7 +224,7 @@ fn serve_loop(server: Server, stop: Arc<AtomicBool>) {
 }
 
 #[tauri::command]
-fn host_start(state: State<'_, HostMutex>, port: u16) -> Result<HostStatus, String> {
+fn host_start(state: State<'_, HostMutex>, port: u16, notify: bool) -> Result<HostStatus, String> {
     if port < 1024 {
         return Err("Please choose a port of 1024 or higher.".into());
     }
@@ -127,19 +232,38 @@ fn host_start(state: State<'_, HostMutex>, port: u16) -> Result<HostStatus, Stri
     if st.running {
         return Err(format!("Already hosting on port {}. Stop it first.", st.port));
     }
+    if notify && !notifier_available() {
+        return Err("This build doesn't include the notification server.".into());
+    }
     let server = Server::http(("0.0.0.0", port))
         .map_err(|e| format!("Couldn't start on port {}: {}", port, e))?;
+
+    let mut child = None;
+    let notifier_port = if notify {
+        match spawn_notifier(INTERNAL_NOTIFIER_PORT) {
+            Ok(c) => {
+                child = Some(c);
+                Some(INTERNAL_NOTIFIER_PORT)
+            }
+            Err(e) => return Err(format!("Couldn't start the notification server: {}", e)),
+        }
+    } else {
+        None
+    };
+
     let stop = Arc::new(AtomicBool::new(false));
     let stop2 = stop.clone();
     let handle = std::thread::Builder::new()
         .name("freeport-host".into())
-        .spawn(move || serve_loop(server, stop2))
+        .spawn(move || serve_loop(server, stop2, notifier_port))
         .map_err(|e| e.to_string())?;
     st.running = true;
     st.port = port;
+    st.notify = notify;
     st.stop = Some(stop);
     st.handle = Some(handle);
-    Ok(HostStatus { running: true, port, urls: local_urls(port) })
+    st.notifier = child;
+    Ok(HostStatus { running: true, port, notify, notify_available: true, urls: local_urls(port) })
 }
 
 #[tauri::command]
@@ -151,17 +275,22 @@ fn host_stop(state: State<'_, HostMutex>) -> Result<HostStatus, String> {
     if let Some(handle) = st.handle.take() {
         let _ = handle.join();
     }
+    if let Some(mut child) = st.notifier.take() {
+        let _ = child.kill();
+        let _ = child.wait();
+    }
     st.running = false;
-    let port = st.port;
+    st.notify = false;
     st.port = 0;
-    Ok(HostStatus { running: false, port, urls: vec![] })
+    Ok(HostStatus { running: false, port: 0, notify: false, notify_available: notifier_available(), urls: vec![] })
 }
 
 #[tauri::command]
 fn host_status(state: State<'_, HostMutex>) -> HostStatus {
+    let avail = notifier_available();
     match state.lock() {
-        Ok(st) if st.running => HostStatus { running: true, port: st.port, urls: local_urls(st.port) },
-        _ => HostStatus { running: false, port: 0, urls: vec![] },
+        Ok(st) if st.running => HostStatus { running: true, port: st.port, notify: st.notify, notify_available: avail, urls: local_urls(st.port) },
+        _ => HostStatus { running: false, port: 0, notify: false, notify_available: avail, urls: vec![] },
     }
 }
 
@@ -182,8 +311,9 @@ fn flag_value(args: &[String], name: &str) -> Option<String> {
 
 /// Headless: no GUI window — just run the static host server on `port` and
 /// block until the process is killed (Ctrl-C). For always-on boxes (a Pi, a
-/// VPS) that want to be a persistent Freeport distribution node.
-fn run_headless(port: u16) {
+/// VPS) that want to be a persistent Freeport distribution node. With `notify`,
+/// also host the notification server on the same port.
+fn run_headless(port: u16, notify: bool) {
     let server = match Server::http(("0.0.0.0", port)) {
         Ok(s) => s,
         Err(e) => {
@@ -191,7 +321,26 @@ fn run_headless(port: u16) {
             std::process::exit(1);
         }
     };
-    println!("Freeport — hosting the web app on port {port}");
+    let mut _notifier_child = None;
+    let notifier_port = if notify {
+        if !notifier_available() {
+            eprintln!("Freeport: this build doesn't include the notification server (--notify unavailable).");
+            std::process::exit(1);
+        }
+        match spawn_notifier(INTERNAL_NOTIFIER_PORT) {
+            Ok(c) => {
+                _notifier_child = Some(c);
+                Some(INTERNAL_NOTIFIER_PORT)
+            }
+            Err(e) => {
+                eprintln!("Freeport: couldn't start the notification server: {e}");
+                std::process::exit(1);
+            }
+        }
+    } else {
+        None
+    };
+    println!("Freeport — hosting the web app{} on port {port}", if notify { " + notification server" } else { "" });
     let urls = local_urls(port);
     if urls.is_empty() {
         println!("  http://<this-machine-ip>:{port}  (no network interface detected)");
@@ -202,7 +351,7 @@ fn run_headless(port: u16) {
     }
     println!("Anyone on your network can open one of those URLs. Press Ctrl-C to stop.");
     // Never-set stop flag → serves forever; Ctrl-C terminates the process.
-    serve_loop(server, Arc::new(AtomicBool::new(false)));
+    serve_loop(server, Arc::new(AtomicBool::new(false)), notifier_port);
 }
 
 fn print_help() {
@@ -213,6 +362,7 @@ fn print_help() {
          OPTIONS:\n  \
          --serve            Run headless: host the Freeport web app on your LAN, no window\n  \
          --port <PORT>      Port to host on (default {})\n  \
+         --notify           Also host the notification server on the same port\n  \
          -h, --help         Show this help\n  \
          -v, --version      Show version",
         env!("CARGO_PKG_VERSION"),
@@ -236,7 +386,8 @@ pub fn run() {
         let port = flag_value(&args, "--port")
             .and_then(|s| s.parse::<u16>().ok())
             .unwrap_or(DEFAULT_PORT);
-        run_headless(port);
+        let notify = args.iter().any(|a| a == "--notify" || a == "--notifications");
+        run_headless(port, notify);
         return;
     }
 

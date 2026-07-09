@@ -5109,7 +5109,8 @@ function confirmAsync(title: string, message: string, confirmLabel: string): Pro
  *  isTauri(). The Rust side lives in apps/desktop/src-tauri. */
 function DesktopHostPanel() {
   const [portText, setPortText] = useState('1988');
-  const [status, setStatus] = useState<HostStatus>({ running: false, port: 0, urls: [] });
+  const [withNotify, setWithNotify] = useState(false);
+  const [status, setStatus] = useState<HostStatus>({ running: false, port: 0, notify: false, notify_available: false, urls: [] });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -5127,7 +5128,7 @@ function DesktopHostPanel() {
           setError(t('Enter a port between 1024 and 65535.'));
           return;
         }
-        setStatus(await hostStart(port));
+        setStatus(await hostStart(port, withNotify && status.notify_available));
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -5146,6 +5147,15 @@ function DesktopHostPanel() {
           <View style={{ marginTop: 12 }}>
             <Field label={t('Port')} value={portText} onChange={setPortText} placeholder="1988" keyboardType="number-pad" />
           </View>
+          {status.notify_available && (
+            <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 }} onPress={() => setWithNotify((v) => !v)}>
+              <Ionicons name={withNotify ? 'checkbox' : 'square-outline'} size={22} color={withNotify ? palette.accent : palette.text3} />
+              <View style={{ flex: 1 }}>
+                <Text style={s.toggleTitle}>{t('Also host the notification server')}</Text>
+                <Text style={[s.dim, { fontSize: 12 }]}>{t('Runs a push/MCP server on this port too. Best on an always-on machine.')}</Text>
+              </View>
+            </Pressable>
+          )}
           <Pressable style={[s.btnAccept, { marginTop: 8 }, busy && { opacity: 0.6 }]} disabled={busy} onPress={toggle}>
             {busy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Start hosting')}</Text>}
           </Pressable>
@@ -5156,6 +5166,9 @@ function DesktopHostPanel() {
           <View style={s.codeBox}>
             <Text style={s.codeText} selectable>{(status.urls.length ? status.urls : [t('No network address found — are you online?')]).join('\n')}</Text>
           </View>
+          {status.notify && status.urls[0] && (
+            <Text style={[s.dim, { marginTop: 6, fontSize: 12 }]}>{t('Notification server on too — others can set their Notification service URL to {url}', { url: status.urls[0] })}</Text>
+          )}
           <Text style={[s.dim, { marginTop: 6, fontSize: 12 }]}>{t('Your OS firewall may ask to allow incoming connections the first time.')}</Text>
           <Pressable style={[s.btnCounter, { marginTop: 8 }, busy && { opacity: 0.6 }]} disabled={busy} onPress={toggle}>
             {busy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Stop hosting')}</Text>}
