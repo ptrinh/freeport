@@ -165,7 +165,8 @@ export const COUNTRIES: CountryData[] = [
       'New Hampshire': ['Manchester', 'Nashua', 'Concord'],
       'New Jersey': ['Newark', 'Jersey City', 'Trenton', 'Atlantic City'],
       'New Mexico': ['Albuquerque', 'Santa Fe', 'Las Cruces'],
-      'New York': ['New York City', 'Buffalo', 'Rochester', 'Albany', 'Syracuse', 'Yonkers'],
+      // Nassau + Suffolk counties (Long Island) added on a user request from NYC-LI.
+      'New York': ['New York City', 'Buffalo', 'Rochester', 'Albany', 'Syracuse', 'Yonkers', 'Nassau County', 'Suffolk County'],
       'North Carolina': ['Charlotte', 'Raleigh', 'Greensboro', 'Durham', 'Winston-Salem'],
       'North Dakota': ['Fargo', 'Bismarck', 'Grand Forks'],
       Ohio: ['Columbus', 'Cleveland', 'Cincinnati', 'Toledo', 'Akron'],
