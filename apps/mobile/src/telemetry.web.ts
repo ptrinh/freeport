@@ -24,6 +24,17 @@ export async function initTelemetry(on: boolean): Promise<void> {
       dsn: GLITCHTIP_DSN,
       sendDefaultPii: false,
       tracesSampleRate: 0,
+      // Third-party noise, not our code: in-app browsers (Facebook/Messenger/
+      // Instagram/TikTok) inject their own instrumentation into the WebView
+      // (`iabjs://…`, gtm, fb pixels) and its errors land on our global
+      // handlers — e.g. "Java object is gone" from FB's Android IAB perf
+      // logger (GlitchTip issue 5, a visitor arriving via a Facebook post).
+      denyUrls: [/^iabjs:\/\//i, /connect\.facebook\.net/i, /^gap:\/\//i],
+      ignoreErrors: [
+        'Java object is gone',                 // FB Android IAB bridge torn down
+        /__gCrWeb/i,                           // Chrome-iOS injected script
+        'window.webkit.messageHandlers',       // iOS WKWebView bridge noise
+      ],
       beforeSend: (event) => (enabled ? (scrubEvent(event as any) as any) : null),
       beforeBreadcrumb: (b) => (enabled ? (scrubBreadcrumb(b as any) as any) : null),
     });
