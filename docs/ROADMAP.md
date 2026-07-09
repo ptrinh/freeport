@@ -70,3 +70,52 @@ local intent liquidity, not with an optimizer. Recommended order:
 - Hard parts are UX/incentives, not protocol: route-detour consent, fair split,
   cancellation of one leg, and enough same-area intents for matches to exist.
   Revisit once real usage clusters somewhere.
+
+## More ride-hailing-parity features
+
+Same constraint as above: everything must work as peer-side logic over public
+relay data. Roughly ordered by value-for-effort:
+
+### Driver destination mode / corridor intents — the P2P killer feature
+- A driver posts "driving A → B at 17:00, 3 seats" as an OFFER intent with a
+  route corridor (geohash prefixes along the path); riders along it match in.
+- This IS intercity carpool (BlaBlaCar-style) — a market the big apps leave
+  open, and the mode where P2P liquidity is easiest to bootstrap (long routes,
+  planned in advance, price-sensitive riders).
+- Mostly reuses existing matching; needs corridor-geohash generation from a
+  route polyline + an offer-side post form.
+
+### Scheduled & recurring rides — small/medium
+- Schedule on the intent (post now, window in the future) largely exists;
+  recurring ("every weekday 07:30") = client-side scheduler that re-posts the
+  template each cycle. Commitment/no-show risk is handled by the existing
+  karma/receipts, not escrow.
+
+### Attribute tags + filters — small, high match quality
+- Intent tags: child seat, pet-friendly, wheelchair accessible, quiet ride,
+  women-only preference, luggage size. Client-side filters on browse/notify.
+  Pure template + UI work; no protocol change.
+
+### Demand heatmap for drivers — small/medium, pure client-side
+- Aggregate open-intent density by geohash from the relays the client already
+  reads and render a heat layer on the map. No server, no new data exposure
+  (intents are already public). A "pro" feature for drivers that stays P2P.
+
+### Safety kit — medium
+- SOS button: quick-dial local emergency number + auto-share the live trip to
+  pre-chosen trusted contacts (live-trip sharing already exists).
+- Route-deviation alert: compare live position against the expected route
+  client-side; nudge the rider ("off route — everything OK?") with one-tap SOS.
+
+### Hourly charter / rental — small
+- Intent type with per-hour pricing terms (car + driver for N hours). Template
+  + UI only; negotiation flow unchanged.
+
+### In-chat auto-translate — medium, privacy-sensitive
+- 56 UI locales already exist; translating chat between two people needs a
+  translation engine. On-device model preferred; a cloud API must be explicit
+  opt-in per chat (it leaks message content to a third party — surface that).
+
+### Non-goals (need a central operator)
+Wallet/in-app payments, surge pricing (Freeport is free negotiation), loyalty
+programs, trip insurance, centralized driver vetting.
