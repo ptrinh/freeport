@@ -5151,8 +5151,8 @@ function DesktopHostPanel() {
             <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 }} onPress={() => setWithNotify((v) => !v)}>
               <Ionicons name={withNotify ? 'checkbox' : 'square-outline'} size={22} color={withNotify ? palette.accent : palette.text3} />
               <View style={{ flex: 1 }}>
-                <Text style={s.toggleTitle}>{t('Also host the notification server')}</Text>
-                <Text style={[s.dim, { fontSize: 12 }]}>{t('Runs a push/MCP server on this port too. Best on an always-on machine.')}</Text>
+                <Text style={s.toggleTitle}>{t('Also host the notification + MCP server')}</Text>
+                <Text style={[s.dim, { fontSize: 12 }]}>{t('Runs the push notifier and MCP endpoint on this port too. Best on an always-on machine.')}</Text>
               </View>
             </Pressable>
           )}

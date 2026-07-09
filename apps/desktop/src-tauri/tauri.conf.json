@@ -27,7 +27,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["deb", "appimage", "nsis", "msi", "app", "dmg"],
+    "targets": ["deb", "nsis", "msi", "app", "dmg"],
     "externalBin": ["binaries/freeport-notifier"],
     "icon": [
       "icons/32x32.png",
