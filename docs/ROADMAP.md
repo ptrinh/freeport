@@ -52,9 +52,9 @@ local intent liquidity, not with an optimizer. Recommended order:
   rendered on the deal card / route link.
 
 ### 2. Delivery intents + driver-side batching — medium
-- **Scope**: peer courier marketplace ("ship hộ / mua hộ" — pickup at X,
-  drop at Y, what item, who fronts the goods payment), NOT integrated food
-  ordering. Menus/restaurant POS/payments need a central operator — non-goal.
+- **Scope**: peer courier marketplace (pickup at X, drop at Y, what item, who
+  fronts the goods payment), NOT integrated food ordering. Menus/restaurant
+  POS/payments need a central operator — non-goal.
 - New intent kind/template for deliveries (size/weight class, declared value,
   who-pays-goods flag).
 - **Batching is client-side only**: a driver holds N independent deals. The
