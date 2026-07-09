@@ -18,13 +18,23 @@ export async function initNotifications(): Promise<boolean> {
   return typeof Notification !== 'undefined' && Notification.permission === 'granted';
 }
 
+// Web Push / Notifications need a SECURE context (HTTPS or localhost) and the
+// Notification API. Unavailable when self-hosted over plain http on a LAN IP,
+// or in the Tauri desktop WebView. There, treat the "enable notifications"
+// required-action as satisfied (nothing the user can do) rather than nag.
+function notifUnavailable(): boolean {
+  const g = globalThis as any;
+  return !!g.__TAURI__ || g.isSecureContext === false || typeof Notification === 'undefined';
+}
+
 export async function notificationGranted(): Promise<boolean> {
+  if (notifUnavailable()) return true; // suppress the nag where push can't work
   return typeof Notification !== 'undefined' && Notification.permission === 'granted';
 }
 
 export async function requestNotifications(): Promise<boolean> {
   try {
-    if (typeof Notification === 'undefined') return false;
+    if (notifUnavailable() || typeof Notification === 'undefined') return false;
     return (await Notification.requestPermission()) === 'granted';
   } catch { return false; }
 }
