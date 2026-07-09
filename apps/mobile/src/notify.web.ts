@@ -23,7 +23,7 @@ export async function initNotifications(): Promise<boolean> {
 // Notification API. Unavailable when self-hosted over plain http on a LAN IP,
 // or in the Tauri desktop WebView. There, treat the "enable notifications"
 // required-action as satisfied (nothing the user can do) rather than nag.
-import { isTauri, nativeNotificationGranted, nativeRequestNotification, nativeNotify } from './desktopNative';
+import { isTauri, nativeNotificationGranted, nativeRequestNotification, nativeNotify, onNativeNotificationTap } from './desktopNative';
 
 function notifUnavailable(): boolean {
   // Web Push / Notification API needs a secure context (HTTPS/localhost).
@@ -52,12 +52,15 @@ export type NotifTarget = { tab?: 'post' | 'messages' | 'browse' | 'settings' };
 
 // On web, taps are handled by the service worker's `notificationclick` (which
 // navigates / postMessages the app), so this is a no-op for API parity.
-export function onNotificationTap(_cb: (data: NotifTarget) => void): () => void {
+export function onNotificationTap(cb: (data: NotifTarget) => void): () => void {
+  // Desktop (Tauri): route native-notification taps here so we can deep-link.
+  // On web the service worker's notificationclick handles taps, so no-op.
+  if (isTauri()) return onNativeNotificationTap((tab) => cb({ tab: tab as NotifTarget['tab'] }));
   return () => {};
 }
 
 export async function notify(title: string, body: string, data?: NotifTarget): Promise<void> {
-  if (isTauri()) { await nativeNotify(title, body); return; } // native OS notification on desktop
+  if (isTauri()) { await nativeNotify(title, body, data?.tab); return; } // native OS notification on desktop
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
   const url = data?.tab ? `/?tab=${data.tab}` : '/';
   try {
