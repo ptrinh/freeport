@@ -16,6 +16,25 @@ export function isTauri(): boolean {
   return inv() != null;
 }
 
+// ── External links (tauri-plugin-opener) ──────────────────────────────────────
+
+/** Open a URL in the system browser / default app (tel:, mailto:, https:).
+ *  The Tauri WebView silently drops window.open() to external origins, which is
+ *  what react-native-web's Linking.openURL does — so on desktop we route
+ *  through the opener plugin instead. */
+export async function openExternal(url: string): Promise<boolean> {
+  const invoke = inv();
+  if (!invoke) return false;
+  try { await invoke('plugin:opener|open_url', { url }); return true; } catch { return false; }
+}
+
+/** Monkey-patch Linking.openURL to use the system opener when running in the
+ *  desktop shell. No-op elsewhere. Call once at startup. */
+export function installDesktopLinkOpener(linking: { openURL: (url: string) => Promise<any> }): void {
+  if (!isTauri()) return;
+  linking.openURL = (url: string) => openExternal(url) as Promise<any>;
+}
+
 // ── Native notifications (tauri-plugin-notification) ──────────────────────────
 
 export async function nativeNotificationGranted(): Promise<boolean> {

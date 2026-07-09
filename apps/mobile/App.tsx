@@ -90,6 +90,10 @@ import { pushSupported, enablePush, updatePush, disablePush, pushStatus, type Pu
 import { pushUnavailableForOnboarding } from './src/pushAvailability';
 import { scrollNodeIntoView, type ScrollableNode } from './src/scrollToNode';
 import { isTauri, hostStart, hostStop, hostStatus, type HostStatus } from './src/desktopHost';
+import { installDesktopLinkOpener } from './src/desktopNative';
+// Desktop shell: window.open() to external origins is silently dropped by the
+// WebView, so route Linking.openURL through the system opener plugin instead.
+installDesktopLinkOpener(Linking);
 import { requestTelegramLink, telegramLinkStatus } from './src/telegramLink';
 import { createTripSession, tripLink, tripSecret, restoreTripSession, decodeTripHash, publishTripLocation, subscribeTrip, type TripStatic, type TripSession, type TripView, type TripUpdate } from './src/livetrip';
 import { webBase } from './src/webBase';
