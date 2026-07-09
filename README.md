@@ -12,8 +12,8 @@ topic-scoped markets; personal agents discover counterpart intents and
 negotiate automatically. Humans confirm final deals. No central operator, no
 matching server — relays are dumb pub/sub, all logic is client-side.
 
-- **App:** https://freeport.network (web/PWA) · [iOS](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901) · [Android](https://play.google.com/store/apps/details?id=uk.trinh.freeport)
-- **Whitepaper:** [PDF](docs/whitepaper.pdf)
+- **App:** https://freeport.network (web/PWA) · [iOS](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901) · [Android](https://play.google.com/store/apps/details?id=uk.trinh.freeport) · [Desktop — Mac/Windows/Linux](https://github.com/ptrinh/freeport/releases/latest)
+- **Whitepaper:** [PDF](https://freeport.network/intro/whitepaper.pdf)
 - **Self-host the optional notification server:** [`packages/nostr-mcp`](packages/nostr-mcp) — `docker compose up -d` (MCP + push notifier + optional Telegram bridge). The app needs no backend; this only adds push/Telegram on top of the public relays.
 
 ## Layout
