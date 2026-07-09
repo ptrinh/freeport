@@ -6151,11 +6151,11 @@ function SettingsTab({
               </Pressable>
             </>
           )}
+
+          {/* Desktop only: host the Freeport web app on the LAN for others. */}
+          {isTauri() && <DesktopHostPanel />}
         </>
       )}
-
-      {/* Desktop only: host the Freeport web app on the LAN for others. */}
-      {isTauri() && <DesktopHostPanel />}
 
       {/* "What's a notification server?" explainer + self-host instructions. */}
       <Modal visible={notifyHelpOpen} transparent animationType="fade" onRequestClose={() => setNotifyHelpOpen(false)}>
