@@ -13,8 +13,6 @@
  * no per-request override — that's why addresses came back in English. Routing
  * through Nominatim lets us control the language.
  */
-import { getI18nLang } from './i18n';
-
 export interface Coords { latitude: number; longitude: number }
 export interface RawPlace { countryCode?: string; region?: string; city?: string }
 export interface Suggestion { label: string; latitude: number; longitude: number }
@@ -163,8 +161,10 @@ export async function suggest(
     const d = 0.35; // ~35 km box around the pickup → nudge Nominatim toward nearby
     path += `&viewbox=${near.longitude - d},${near.latitude + d},${near.longitude + d},${near.latitude - d}`;
   }
-  // Local language of the destination's country (fall back to app language).
-  const localLang = (countryCode && COUNTRY_LANG[countryCode.toUpperCase()]) || getI18nLang() || 'en';
+  // Label in the destination country's local language; fall back to ENGLISH
+  // (not the passenger's app language) so places show their real name — e.g.
+  // Singapore stays "Singapore", not the Vietnamese exonym "Tân Gia Ba".
+  const localLang = (countryCode && COUNTRY_LANG[countryCode.toUpperCase()]) || 'en';
   const arr = await fetchJson(path, localLang);
   if (!Array.isArray(arr)) return [];
   // A leading house number the user typed (e.g. "453 Ngọc Hồi") — kept in the

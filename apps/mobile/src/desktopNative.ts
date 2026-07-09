@@ -16,8 +16,6 @@ export function isTauri(): boolean {
   return inv() != null;
 }
 
-export interface Coords { latitude: number; longitude: number }
-
 // ── Native notifications (tauri-plugin-notification) ──────────────────────────
 
 export async function nativeNotificationGranted(): Promise<boolean> {
@@ -43,42 +41,4 @@ export async function nativeNotify(title: string, body: string): Promise<boolean
     await invoke('plugin:notification|notify', { options: { title, body } });
     return true;
   } catch { return false; }
-}
-
-// ── Native geolocation (tauri-plugin-geolocation; mobile-first, desktop may
-//    report unsupported → callers fall back to IP) ──────────────────────────
-
-async function geoPermitted(invoke: Invoke, request: boolean): Promise<boolean> {
-  try {
-    let s = await invoke('plugin:geolocation|check_permissions');
-    let state = s?.location ?? s?.coarseLocation;
-    if (state !== 'granted' && request) {
-      s = await invoke('plugin:geolocation|request_permissions', { permissions: ['location'] });
-      state = s?.location ?? s?.coarseLocation;
-    }
-    return state === 'granted';
-  } catch { return false; }
-}
-
-export async function nativeGeoGranted(): Promise<boolean> {
-  const invoke = inv();
-  if (!invoke) return false;
-  return geoPermitted(invoke, false);
-}
-
-export async function nativeRequestGeo(): Promise<boolean> {
-  const invoke = inv();
-  if (!invoke) return false;
-  return geoPermitted(invoke, true);
-}
-
-export async function nativeGeolocation(): Promise<Coords | null> {
-  const invoke = inv();
-  if (!invoke) return null;
-  try {
-    if (!(await geoPermitted(invoke, true))) return null;
-    const pos = await invoke('plugin:geolocation|get_current_position', { options: {} });
-    const c = pos?.coords;
-    return c && typeof c.latitude === 'number' ? { latitude: c.latitude, longitude: c.longitude } : null;
-  } catch { return null; }
 }
