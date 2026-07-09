@@ -135,11 +135,20 @@ echo "▸ Publishing acceptable-use policy at /aup…"
 mkdir -p dist/aup
 cp store/aup.html dist/aup/index.html
 
+# The marketing/landing page (same files GitHub Pages serves from docs/) also
+# lives at /intro on the app domain, so freeport.network/intro is the shareable
+# front door. Assets are referenced relatively, so a straight copy works.
+echo "▸ Publishing landing page at /intro…"
+mkdir -p dist/intro
+cp ../../docs/index.html dist/intro/index.html
+cp ../../docs/favicon.png ../../docs/icon.png ../../docs/shot-deals.png ../../docs/shot-request.png \
+   ../../docs/whitepaper.pdf ../../docs/whitepaper.vi.pdf dist/intro/
+
 echo "▸ Publishing /llms.txt (agent-readable site guide)…"
 cp store/llms.txt dist/llms.txt
 
 echo "▸ Deploying to Cloudflare Pages…"
 npx wrangler pages deploy dist --project-name freeport --branch main --commit-dirty=true
 
-echo "✓ Live at https://freeport.network/ (and https://freeport-dj7.pages.dev/)"
+echo "✓ Live at https://freeport.network/ (and https://freeport.trinh.uk/)"
 echo "✓ Privacy policy at https://freeport.network/privacy"
