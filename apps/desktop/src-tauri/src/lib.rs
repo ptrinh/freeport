@@ -165,8 +165,81 @@ fn host_status(state: State<'_, HostMutex>) -> HostStatus {
     }
 }
 
+const DEFAULT_PORT: u16 = 1988;
+
+fn flag_value(args: &[String], name: &str) -> Option<String> {
+    let mut it = args.iter();
+    while let Some(a) = it.next() {
+        if a == name {
+            return it.next().cloned();
+        }
+        if let Some(v) = a.strip_prefix(&format!("{name}=")) {
+            return Some(v.to_string());
+        }
+    }
+    None
+}
+
+/// Headless: no GUI window — just run the static host server on `port` and
+/// block until the process is killed (Ctrl-C). For always-on boxes (a Pi, a
+/// VPS) that want to be a persistent Freeport distribution node.
+fn run_headless(port: u16) {
+    let server = match Server::http(("0.0.0.0", port)) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("Freeport: couldn't bind port {port}: {e}");
+            std::process::exit(1);
+        }
+    };
+    println!("Freeport — hosting the web app on port {port}");
+    let urls = local_urls(port);
+    if urls.is_empty() {
+        println!("  http://<this-machine-ip>:{port}  (no network interface detected)");
+    } else {
+        for u in &urls {
+            println!("  {u}");
+        }
+    }
+    println!("Anyone on your network can open one of those URLs. Press Ctrl-C to stop.");
+    // Never-set stop flag → serves forever; Ctrl-C terminates the process.
+    serve_loop(server, Arc::new(AtomicBool::new(false)));
+}
+
+fn print_help() {
+    println!(
+        "Freeport desktop {}\n\n\
+         USAGE:\n  freeport [--serve] [--port <PORT>]\n\n\
+         Without arguments, opens the Freeport app window.\n\n\
+         OPTIONS:\n  \
+         --serve            Run headless: host the Freeport web app on your LAN, no window\n  \
+         --port <PORT>      Port to host on (default {})\n  \
+         -h, --help         Show this help\n  \
+         -v, --version      Show version",
+        env!("CARGO_PKG_VERSION"),
+        DEFAULT_PORT
+    );
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let args: Vec<String> = std::env::args().collect();
+
+    if args.iter().any(|a| a == "-h" || a == "--help") {
+        print_help();
+        return;
+    }
+    if args.iter().any(|a| a == "-v" || a == "--version") {
+        println!("freeport {}", env!("CARGO_PKG_VERSION"));
+        return;
+    }
+    if args.iter().any(|a| a == "--serve" || a == "serve" || a == "--headless") {
+        let port = flag_value(&args, "--port")
+            .and_then(|s| s.parse::<u16>().ok())
+            .unwrap_or(DEFAULT_PORT);
+        run_headless(port);
+        return;
+    }
+
     tauri::Builder::default()
         .manage(HostMutex::default())
         .invoke_handler(tauri::generate_handler![host_start, host_stop, host_status])

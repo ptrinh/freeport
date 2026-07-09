@@ -5108,7 +5108,7 @@ function confirmAsync(title: string, message: string, confirmLabel: string): Pro
  *  browser — a zero-infra way to share/self-host Freeport. Rendered only when
  *  isTauri(). The Rust side lives in apps/desktop/src-tauri. */
 function DesktopHostPanel() {
-  const [portText, setPortText] = useState('8080');
+  const [portText, setPortText] = useState('1988');
   const [status, setStatus] = useState<HostStatus>({ running: false, port: 0, urls: [] });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -5144,7 +5144,7 @@ function DesktopHostPanel() {
       {!status.running ? (
         <>
           <View style={{ marginTop: 12 }}>
-            <Field label={t('Port')} value={portText} onChange={setPortText} placeholder="8080" keyboardType="number-pad" />
+            <Field label={t('Port')} value={portText} onChange={setPortText} placeholder="1988" keyboardType="number-pad" />
           </View>
           <Pressable style={[s.btnAccept, { marginTop: 8 }, busy && { opacity: 0.6 }]} disabled={busy} onPress={toggle}>
             {busy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Start hosting')}</Text>}
