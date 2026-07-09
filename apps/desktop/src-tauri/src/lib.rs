@@ -15,7 +15,6 @@ use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use std::time::Duration;
 
-use include_dir::{include_dir, Dir};
 use serde::Serialize;
 use tauri::State;
 use tiny_http::{Header, Request, Response, Server};
@@ -24,9 +23,21 @@ use tiny_http::{Header, Request, Response, Server};
 /// public host server reverse-proxies notifier routes here.
 const INTERNAL_NOTIFIER_PORT: u16 = 47615;
 
-/// The web bundle, embedded at compile time. `apps/desktop/dist` is produced by
-/// build-web.sh (tauri beforeBuildCommand) before the crate is compiled.
-static WEB: Dir = include_dir!("$CARGO_MANIFEST_DIR/../dist");
+/// Resolves a request path to (bytes, mime). Backed by Tauri's single embedded
+/// copy of the web bundle (no second include_dir embed) — the GUI closure uses
+/// the AppHandle asset resolver, the headless closure uses the context assets.
+type AssetSource = Arc<dyn Fn(&str) -> Option<(Vec<u8>, String)> + Send + Sync + 'static>;
+
+/// Held in Tauri state so host_start can hand the resolver to the server thread.
+struct Assets(AssetSource);
+
+/// Normalize a request URL to a Tauri asset key ("/index.html" for the root).
+fn asset_key(url: &str) -> String {
+    let clean = url.split(['?', '#']).next().unwrap_or("");
+    let clean = clean.trim_start_matches('/');
+    let path = if clean.is_empty() { "index.html" } else { clean };
+    format!("/{path}")
+}
 
 #[derive(Default)]
 struct HostState {
@@ -211,23 +222,22 @@ fn content_type(path: &str) -> &'static str {
     }
 }
 
-/// Resolve a request path to an embedded file, with SPA fallback: a bare path
-/// or an extension-less/unknown route serves index.html (Freeport is a single
-/// page); a missing asset with an extension returns 404.
-fn lookup(req_path: &str) -> Option<(&'static [u8], &'static str)> {
-    let clean = req_path.split(['?', '#']).next().unwrap_or("").trim_start_matches('/');
-    let clean = if clean.is_empty() { "index.html" } else { clean };
-    if let Some(f) = WEB.get_file(clean) {
-        return Some((f.contents(), content_type(clean)));
+/// Resolve a request path from the embedded bundle, with SPA fallback: a bare
+/// path or an extension-less/unknown route serves index.html (Freeport is a
+/// single page); a missing asset with an extension returns 404.
+fn lookup(assets: &AssetSource, req_path: &str) -> Option<(Vec<u8>, String)> {
+    let key = asset_key(req_path);
+    if let Some(hit) = assets(&key) {
+        return Some(hit);
     }
-    let looks_like_asset = clean.rsplit('/').next().map(|s| s.contains('.')).unwrap_or(false);
+    let looks_like_asset = key.rsplit('/').next().map(|s| s.contains('.')).unwrap_or(false);
     if looks_like_asset {
         return None; // real missing asset → 404
     }
-    WEB.get_file("index.html").map(|f| (f.contents(), content_type("index.html")))
+    assets("/index.html")
 }
 
-fn serve_loop(server: Server, stop: Arc<AtomicBool>, notifier: Option<u16>) {
+fn serve_loop(server: Server, stop: Arc<AtomicBool>, notifier: Option<u16>, assets: AssetSource) {
     while !stop.load(Ordering::Relaxed) {
         match server.recv_timeout(Duration::from_millis(1000)) {
             Ok(Some(req)) => {
@@ -237,7 +247,7 @@ fn serve_loop(server: Server, stop: Arc<AtomicBool>, notifier: Option<u16>) {
                         continue;
                     }
                 }
-                let (body, ctype): (&[u8], &str) = match lookup(req.url()) {
+                let (body, ctype) = match lookup(&assets, req.url()) {
                     Some(hit) => hit,
                     None => {
                         let _ = req.respond(Response::from_string("Not found").with_status_code(404));
@@ -246,7 +256,8 @@ fn serve_loop(server: Server, stop: Arc<AtomicBool>, notifier: Option<u16>) {
                 };
                 let header = Header::from_bytes(&b"Content-Type"[..], ctype.as_bytes())
                     .unwrap_or_else(|_| Header::from_bytes(&b"Content-Type"[..], &b"application/octet-stream"[..]).unwrap());
-                let resp = Response::new(200.into(), vec![header], Cursor::new(body), Some(body.len()), None);
+                let len = body.len();
+                let resp = Response::new(200.into(), vec![header], Cursor::new(body), Some(len), None);
                 let _ = req.respond(resp);
             }
             Ok(None) => continue, // timeout → re-check stop flag
@@ -259,6 +270,7 @@ fn serve_loop(server: Server, stop: Arc<AtomicBool>, notifier: Option<u16>) {
 #[tauri::command]
 fn host_start(
     state: State<'_, HostMutex>,
+    assets: State<'_, Assets>,
     port: u16,
     notify: bool,
     telegram_token: Option<String>,
@@ -293,9 +305,10 @@ fn host_start(
 
     let stop = Arc::new(AtomicBool::new(false));
     let stop2 = stop.clone();
+    let asset_src = assets.0.clone();
     let handle = std::thread::Builder::new()
         .name("freeport-host".into())
-        .spawn(move || serve_loop(server, stop2, notifier_port))
+        .spawn(move || serve_loop(server, stop2, notifier_port, asset_src))
         .map_err(|e| e.to_string())?;
     let telegram_on = notify
         && telegram_token.as_deref().map(|s| !s.trim().is_empty()).unwrap_or(false);
@@ -375,7 +388,7 @@ fn flag_value(args: &[String], name: &str) -> Option<String> {
 /// block until the process is killed (Ctrl-C). For always-on boxes (a Pi, a
 /// VPS) that want to be a persistent Freeport distribution node. With `notify`,
 /// also host the notification server on the same port.
-fn run_headless(port: u16, notify: bool, tg_token: Option<String>, tg_passphrase: Option<String>) {
+fn run_headless(port: u16, notify: bool, tg_token: Option<String>, tg_passphrase: Option<String>, assets: AssetSource) {
     let server = match Server::http(("0.0.0.0", port)) {
         Ok(s) => s,
         Err(e) => {
@@ -424,7 +437,7 @@ fn run_headless(port: u16, notify: bool, tg_token: Option<String>, tg_passphrase
     }
     println!("Anyone on your network can open one of those URLs. Press Ctrl-C to stop.");
     // Never-set stop flag → serves forever; Ctrl-C terminates the process.
-    serve_loop(server, Arc::new(AtomicBool::new(false)), notifier_port);
+    serve_loop(server, Arc::new(AtomicBool::new(false)), notifier_port, assets);
 }
 
 fn print_help() {
@@ -457,6 +470,10 @@ pub fn run() {
         println!("freeport {}", env!("CARGO_PKG_VERSION"));
         return;
     }
+    // Build the Tauri context ONCE (embeds the web bundle a single time). Both
+    // the GUI webview and our host server read from this one copy.
+    let ctx = tauri::generate_context!();
+
     if args.iter().any(|a| a == "--serve" || a == "serve" || a == "--headless") {
         let port = flag_value(&args, "--port")
             .and_then(|s| s.parse::<u16>().ok())
@@ -465,13 +482,31 @@ pub fn run() {
         let tg_passphrase = flag_value(&args, "--telegram-guest-passphrase");
         // Telegram (and thus notify) implied when a bot token is given.
         let notify = args.iter().any(|a| a == "--notify" || a == "--notifications") || tg_token.is_some();
-        run_headless(port, notify, tg_token, tg_passphrase);
+        // Headless has no AppHandle; read assets straight from the embedded
+        // context (leaked to 'static — the process serves until killed).
+        let ctx: &'static _ = Box::leak(Box::new(ctx));
+        let assets: AssetSource = Arc::new(|key: &str| {
+            ctx.assets()
+                .get(&key.into())
+                .map(|bytes| (bytes.to_vec(), content_type(key).to_string()))
+        });
+        run_headless(port, notify, tg_token, tg_passphrase, assets);
         return;
     }
 
     tauri::Builder::default()
         .manage(HostMutex::default())
+        .setup(|app| {
+            // GUI: serve the host from the AppHandle's asset resolver (same
+            // single embedded copy the webview uses).
+            let resolver = app.asset_resolver();
+            let assets: AssetSource = Arc::new(move |key: &str| {
+                resolver.get(key.to_string()).map(|a| (a.bytes, a.mime_type))
+            });
+            app.manage(Assets(assets));
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![host_start, host_stop, host_status])
-        .run(tauri::generate_context!())
+        .run(ctx)
         .expect("error while running Freeport desktop");
 }
