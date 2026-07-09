@@ -150,7 +150,7 @@ Bot commands: `/watch /near /unwatch /listen /status` (groups), `/start /stop`
 
 ## Abuse & acceptable use
 
-The public instance (`nostr-mcp.trinh.uk`, the Telegram bot, `freeport.network`)
+The public instance (`mcp.freeport.network`, the Telegram bot, `freeport.network`)
 operates under the [Acceptable Use Policy](https://freeport.network/aup) —
 report violations to [hi@freeport.network](mailto:hi@freeport.network) with subject
 `ABUSE REPORT`. If you self-host this server you are the operator of your

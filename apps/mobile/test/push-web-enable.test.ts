@@ -46,12 +46,12 @@ afterEach(() => vi.unstubAllGlobals());
 describe('web enablePush never rejects (GlitchTip issue 4)', () => {
   it('push service unreachable — subscribe() rejects DOMException NetworkError → resolves "error"', async () => {
     stubBrowser({ subscribe: () => Promise.reject(networkError()) });
-    await expect(enablePush('ab'.repeat(32), 'https://nostr-mcp.trinh.uk')).resolves.toBe('error');
+    await expect(enablePush('ab'.repeat(32), 'https://mcp.freeport.network')).resolves.toBe('error');
   });
 
   it('service worker never becomes ready (rejects) → resolves "error"', async () => {
     stubBrowser({ ready: Promise.reject(networkError()) });
-    await expect(enablePush('ab'.repeat(32), 'https://nostr-mcp.trinh.uk')).resolves.toBe('error');
+    await expect(enablePush('ab'.repeat(32), 'https://mcp.freeport.network')).resolves.toBe('error');
   });
 
   it('notifier /subscribe unreachable (fetch throws) → resolves "error"', async () => {
@@ -63,24 +63,24 @@ describe('web enablePush never rejects (GlitchTip issue 4)', () => {
         throw networkError(); // POST /subscribe
       }) as any,
     });
-    await expect(enablePush('ab'.repeat(32), 'https://nostr-mcp.trinh.uk')).resolves.toBe('error');
+    await expect(enablePush('ab'.repeat(32), 'https://mcp.freeport.network')).resolves.toBe('error');
   });
 
   it('permission denied → "denied" (no subscribe attempted)', async () => {
     const subscribe = vi.fn();
     stubBrowser({ permission: 'denied', subscribe });
-    await expect(enablePush('ab'.repeat(32), 'https://nostr-mcp.trinh.uk')).resolves.toBe('denied');
+    await expect(enablePush('ab'.repeat(32), 'https://mcp.freeport.network')).resolves.toBe('denied');
     expect(subscribe).not.toHaveBeenCalled();
   });
 
   it('happy path still returns "on"', async () => {
     stubBrowser();
-    await expect(enablePush('ab'.repeat(32), 'https://nostr-mcp.trinh.uk')).resolves.toBe('on');
+    await expect(enablePush('ab'.repeat(32), 'https://mcp.freeport.network')).resolves.toBe('on');
   });
 
   it('unsupported platform (no stubs) → "unsupported"', async () => {
     vi.unstubAllGlobals();
     expect(pushSupported()).toBe(false);
-    await expect(enablePush('ab'.repeat(32), 'https://nostr-mcp.trinh.uk')).resolves.toBe('unsupported');
+    await expect(enablePush('ab'.repeat(32), 'https://mcp.freeport.network')).resolves.toBe('unsupported');
   });
 });

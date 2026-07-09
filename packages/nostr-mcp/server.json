@@ -25,7 +25,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://nostr-mcp.trinh.uk/mcp"
+      "url": "https://mcp.freeport.network/mcp"
     }
   ]
 }

@@ -6,7 +6,7 @@
 
 Freeport is designed to be transacted in by agents. The fastest way to read the market is the Freeport MCP server.
 
-- MCP (hosted, streamable-http): https://nostr-mcp.trinh.uk/mcp
+- MCP (hosted, streamable-http): https://mcp.freeport.network/mcp
 - MCP (self-host, npm): `npx freeport-nostr-mcp`
 - MCP registry: io.github.ptrinh/freeport-nostr
 - Tools: nostr_search_intents (offers/requests by side, topic, geohash radius), nostr_search_reputation (karma + proven deals for a pubkey), nostr_profile (kind-0 metadata), nostr_get_event, nostr_query_raw (arbitrary NIP-01 filter).

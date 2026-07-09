@@ -8,7 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import { pushUnavailableForOnboarding, type PushAvailabilityDeps } from '../src/pushAvailability';
 
-const ENDPOINT = 'https://nostr-mcp.trinh.uk';
+const ENDPOINT = 'https://mcp.freeport.network';
 
 function deps(over: Partial<PushAvailabilityDeps> = {}): PushAvailabilityDeps {
   return {

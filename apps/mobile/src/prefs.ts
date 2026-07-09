@@ -68,7 +68,7 @@ const DEFAULTS: Prefs = {
   role: '',
   language: '',
   fareConfig: null,
-  notifyEndpoint: 'https://nostr-mcp.trinh.uk',
+  notifyEndpoint: 'https://mcp.freeport.network',
   backgroundService: false,
   distanceUnit: 'auto',
   browseCategory: '',

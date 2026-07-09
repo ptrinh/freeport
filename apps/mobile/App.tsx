@@ -5952,7 +5952,7 @@ function SettingsTab({
               <Pressable onPress={() => setNotifyHelpOpen(true)} hitSlop={6} style={{ marginTop: 6 }}>
                 <Text style={{ color: palette.link, fontWeight: '600' }}>{'ⓘ ' + t("What's a notification server?")}</Text>
               </Pressable>
-              <Field label={t("Notification service URL")} value={notifyEndpoint} onChange={setNotifyEndpoint} placeholder="https://nostr-mcp.trinh.uk" />
+              <Field label={t("Notification service URL")} value={notifyEndpoint} onChange={setNotifyEndpoint} placeholder="https://mcp.freeport.network" />
               <Text style={s.dim}>{t("Leave the default to use the public sender, or point to your own self-hosted one.")}</Text>
               <Pressable
                 style={[s.btnAccept, { marginTop: 4 }, (pushBusy || !notifyEndpoint.trim() || !myPubkeyHex) && { opacity: 0.6 }]}
