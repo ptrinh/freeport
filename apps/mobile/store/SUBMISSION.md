@@ -4,13 +4,13 @@ Everything you need to publish **Freeport** (`uk.trinh.freeport`, v0.1.0) to the
 Apple App Store and Google Play. Copy/paste the fields below into the consoles.
 
 > ⚠️ **Before you start:** replace the placeholder support/privacy email
-> `privacy@trinh.uk` (in `store/privacy.html` and below) with a real, monitored
+> `privacy@freeport.network` (in `store/privacy.html` and below) with a real, monitored
 > inbox if that alias isn't set up. Both stores email you there.
 
 - **Privacy policy URL:** https://freeport.network/privacy  *(published by `deploy-web.sh`)*
 - **Marketing URL:** https://freeport.network
 - **Support URL:** https://freeport.network
-- **Support email:** privacy@trinh.uk  *(confirm/replace)*
+- **Support email:** privacy@freeport.network  *(confirm/replace)*
 - **Category:** Travel (primary) · Lifestyle (secondary)
 - **Age rating:** 17+ (user-generated content + unmoderated user communication)
 - **Price:** Free
@@ -190,7 +190,7 @@ that: `eas submit -p android --profile production --latest`
 ---
 
 ## 6. Pre-submit checklist
-- [ ] Replace placeholder `privacy@trinh.uk` with a monitored inbox.
+- [ ] Replace placeholder `privacy@freeport.network` with a monitored inbox.
 - [ ] `freeport.network/privacy` loads (run `./deploy-web.sh`).
 - [ ] Production builds finished (iOS build 4 `.ipa`, Android `.aab`).
 - [ ] App Store Connect app record created (name, bundle, category, age 17+).
