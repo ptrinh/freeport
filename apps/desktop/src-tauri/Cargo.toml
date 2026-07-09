@@ -29,3 +29,12 @@ ureq = "2"
 [features]
 # by default Tauri runs in production mode when `tauri dev` is not used
 custom-protocol = ["tauri/custom-protocol"]
+
+# Smaller, stripped release binary (size-optimized; this app is I/O-bound so the
+# codegen trade-off is invisible at runtime).
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

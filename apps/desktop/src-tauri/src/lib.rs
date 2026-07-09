@@ -229,7 +229,7 @@ fn lookup(req_path: &str) -> Option<(&'static [u8], &'static str)> {
 
 fn serve_loop(server: Server, stop: Arc<AtomicBool>, notifier: Option<u16>) {
     while !stop.load(Ordering::Relaxed) {
-        match server.recv_timeout(Duration::from_millis(300)) {
+        match server.recv_timeout(Duration::from_millis(1000)) {
             Ok(Some(req)) => {
                 if let Some(np) = notifier {
                     if is_notifier_path(req.url()) {
