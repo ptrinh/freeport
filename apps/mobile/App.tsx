@@ -6029,6 +6029,11 @@ function SettingsTab({
           scroll
         />
       </View>
+
+      {/* Desktop only: host the Freeport web app on the LAN for others.
+          Inside Features and NOT gated by pushSupported() (which is false in
+          the desktop WebView) so it always shows on desktop. */}
+      {isTauri() && <DesktopHostPanel />}
       </>
       )}
 
@@ -6151,9 +6156,6 @@ function SettingsTab({
               </Pressable>
             </>
           )}
-
-          {/* Desktop only: host the Freeport web app on the LAN for others. */}
-          {isTauri() && <DesktopHostPanel />}
         </>
       )}
 
