@@ -5,7 +5,7 @@ Items intentionally postponed, with enough context to pick them up later.
 ## Lock-screen live progress (Live Activity) — deferred until native build
 
 **Goal:** show deal/trip progress on the phone lock screen + Dynamic Island
-(like Grab/Be/Xanh SM), driven by the existing fulfillment stages
+(like mainstream ride-hailing apps), driven by the existing fulfillment stages
 (Confirmed → Picked up → Completed).
 
 **Why deferred:** not possible in the current targets.
@@ -39,7 +39,7 @@ Update (2026-07): native EAS builds now exist (App Store + Play). The remaining
 work is just the widget extension + stage wiring above; local-only updates
 still apply (no push server).
 
-## Grab-parity features (multi-stop, delivery batching, ride pooling)
+## Advanced marketplace features (multi-stop, delivery batching, ride pooling)
 
 No central dispatcher in Freeport, so each of these is re-expressed as
 peer-side logic + small protocol conventions — matching quality scales with
