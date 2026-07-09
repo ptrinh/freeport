@@ -13,6 +13,7 @@ import {
   findNodeHandle,
   Image,
   KeyboardAvoidingView,
+  LayoutAnimation,
   PanResponder,
   Linking,
   Modal,
@@ -23,9 +24,16 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  UIManager,
   useColorScheme,
   View,
 } from 'react-native';
+
+// Android (old architecture) needs LayoutAnimation explicitly enabled; on the
+// new arch / iOS this is a no-op, and on web the API itself is a no-op.
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AreaMap, PickerMap } from './src/Map';
 import { t, tn, setI18nLang, getI18nLang, ensureI18nLang, onI18nLoaded } from './src/i18n';
@@ -1582,6 +1590,45 @@ function AppInner() {
 
 // ─── Onboarding (first launch) ────────────────────────────────────────────────
 
+/** Collapsible role-group header (RIDESHARING / SERVICE-PRODUCT). An icon chip
+ *  + press feedback make the row read as tappable (plain text headers were
+ *  getting missed), and the chevron rotates in sync with the accordion. */
+function RoleGroupHeader({ icon, label, note, open, onPress, disabled, style }: {
+  icon: IoniconName;
+  label: string;
+  note: string;
+  open: boolean;
+  onPress: () => void;
+  disabled?: boolean;
+  style?: object;
+}) {
+  const spin = useRef(new Animated.Value(open ? 1 : 0)).current;
+  useEffect(() => {
+    Animated.timing(spin, { toValue: open ? 1 : 0, duration: 220, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
+  }, [open, spin]);
+  const rotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
+  return (
+    <Pressable
+      style={({ pressed }) => [s.roleGroupHeader, style, pressed && { opacity: 0.65 }]}
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityState={{ expanded: open }}
+    >
+      <View style={[s.roleGroupIcon, open && s.roleGroupIconOn]}>
+        <Ionicons name={icon} size={20} color={open ? palette.accent : palette.text3} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={s.roleGroupLabel}>{label}</Text>
+        <Text style={s.roleGroupNote}>{note}</Text>
+      </View>
+      <Animated.View style={{ transform: [{ rotate }] }}>
+        <Ionicons name="chevron-down" size={20} color={open ? palette.accent : palette.text3} />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
 function Onboarding({
   onCreate,
   onFinish,
@@ -1657,6 +1704,17 @@ function Onboarding({
   const [openGroup, setOpenGroup] = useState<'ride' | 'svc'>(
     picked === 'customer' || picked === 'provider' ? 'svc' : 'ride',
   );
+  // Animate the accordion swap: the closing group collapses while the opening
+  // one expands+fades in a single motion (no-op on web, instant there).
+  const toggleGroup = (g: 'ride' | 'svc') => {
+    LayoutAnimation.configureNext({
+      duration: 240,
+      create: { type: 'easeInEaseOut', property: 'opacity' },
+      update: { type: 'easeInEaseOut' },
+      delete: { type: 'easeInEaseOut', property: 'opacity' },
+    });
+    setOpenGroup(g);
+  };
   const role: 'passenger' | 'driver' | null =
     picked == null ? null : (picked === 'driver' || picked === 'provider') ? 'driver' : 'passenger';
   const services = picked === 'customer' || picked === 'provider';
@@ -1846,17 +1904,14 @@ function Onboarding({
         <>
           <Text style={s.sectionTitle}>{t("I'm mainly a…")}</Text>
 
-          <Pressable
-            style={[s.row, { alignItems: 'center', justifyContent: 'space-between' }]}
-            onPress={() => setOpenGroup('ride')}
+          <RoleGroupHeader
+            icon="car-sport-outline"
+            label={t("Ridesharing")}
+            note={t("Basic user interface")}
+            open={openGroup === 'ride'}
+            onPress={() => toggleGroup('ride')}
             disabled={busy !== null}
-          >
-            <View style={{ flex: 1 }}>
-              <Text style={s.roleGroupLabel}>{t("Ridesharing")}</Text>
-              <Text style={s.roleGroupNote}>{t("Basic user interface")}</Text>
-            </View>
-            <Ionicons name={openGroup === 'ride' ? 'chevron-up' : 'chevron-down'} size={20} color={palette.text3} />
-          </Pressable>
+          />
           {openGroup === 'ride' && (
           <View style={{ gap: 10, marginTop: 4 }}>
             <Pressable
@@ -1886,17 +1941,15 @@ function Onboarding({
           </View>
           )}
 
-          <Pressable
-            style={[s.row, { marginTop: 16, alignItems: 'center', justifyContent: 'space-between' }]}
-            onPress={() => setOpenGroup('svc')}
+          <RoleGroupHeader
+            icon="storefront-outline"
+            label={t("Service/Product")}
+            note={t("Advanced user interface")}
+            open={openGroup === 'svc'}
+            onPress={() => toggleGroup('svc')}
             disabled={busy !== null}
-          >
-            <View style={{ flex: 1 }}>
-              <Text style={s.roleGroupLabel}>{t("Service/Product")}</Text>
-              <Text style={s.roleGroupNote}>{t("Advanced user interface")}</Text>
-            </View>
-            <Ionicons name={openGroup === 'svc' ? 'chevron-up' : 'chevron-down'} size={20} color={palette.text3} />
-          </Pressable>
+            style={{ marginTop: 16 }}
+          />
           {openGroup === 'svc' && (
           <View style={{ gap: 10, marginTop: 4 }}>
             <Pressable
@@ -7504,8 +7557,12 @@ function makeStyles(c: Palette) {
     emptyWrap: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48, paddingHorizontal: 24, gap: 10 },
     emptyText: { color: c.dim, fontSize: 14, textAlign: 'center' },
     priceTag: { color: c.text, fontSize: 16, fontWeight: '700', marginTop: 4 },
-    roleGroupLabel: { color: c.text2, fontSize: 12, fontWeight: '700', letterSpacing: 0.4, textTransform: 'uppercase', marginTop: 8 },
-    roleGroupNote: { color: c.muted, fontSize: 12, marginTop: 1, marginBottom: 4 },
+    roleGroupHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingHorizontal: 2, borderRadius: 12 },
+    roleGroupIcon: { width: 38, height: 38, borderRadius: 11, backgroundColor: c.chipBg, borderWidth: 1, borderColor: c.border, alignItems: 'center', justifyContent: 'center' },
+    // Accent tint when the group is expanded — same hue in both themes.
+    roleGroupIconOn: { backgroundColor: 'rgba(59,130,246,0.14)', borderColor: 'rgba(59,130,246,0.45)' },
+    roleGroupLabel: { color: c.text2, fontSize: 12, fontWeight: '700', letterSpacing: 0.4, textTransform: 'uppercase' },
+    roleGroupNote: { color: c.muted, fontSize: 12, marginTop: 1 },
     roleCard: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.border, padding: 16 },
     roleCardOn: { borderColor: c.accent, backgroundColor: c.chipBlueBg },
     roleCardTitle: { color: c.text, fontSize: 16, fontWeight: '700' },
