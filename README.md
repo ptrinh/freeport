@@ -107,7 +107,8 @@ others**.
 
 ## Status
 
-- **Distribution**: live on the [Apple App Store](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901); Google Play in review;
+- **Distribution**: live on the [Apple App Store](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901)
+  and [Google Play](https://play.google.com/store/apps/details?id=uk.trinh.freeport);
   web at [freeport.network](https://freeport.network). Desktop installers on
   [GitHub Releases](https://github.com/ptrinh/freeport/releases/latest) —
   macOS (`.dmg`, Apple Silicon + Intel, signed & notarized), Windows (`.exe`/`.msi`,
