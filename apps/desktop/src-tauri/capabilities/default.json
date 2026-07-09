@@ -6,6 +6,10 @@
   "permissions": [
     "core:default",
     "notification:default",
-    "opener:default"
+    "opener:default",
+    "updater:default",
+    "process:default",
+    "dialog:default",
+    "fs:default"
   ]
 }

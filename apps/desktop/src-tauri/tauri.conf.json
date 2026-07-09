@@ -1,8 +1,16 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Freeport",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "identifier": "network.freeport.desktop",
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE1RUY0RENBMTIzRjIxRDcKUldUWElUOFN5azN2RlJSVXc1OUI3dTV2T0hNekxSdkVZOHpueEM0eXNxajhYMStGUFpUUE1wVk0K",
+      "endpoints": [
+        "https://github.com/ptrinh/freeport/releases/latest/download/latest.json"
+      ]
+    }
+  },
   "build": {
     "frontendDist": "../dist",
     "beforeBuildCommand": "npm run build:web",
@@ -27,6 +35,7 @@
   },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": ["deb", "nsis", "msi", "app", "dmg"],
     "externalBin": ["binaries/freeport-notifier"],
     "icon": [

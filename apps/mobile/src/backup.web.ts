@@ -10,6 +10,7 @@ import { loadPrefs, savePrefs, type Prefs } from './prefs';
 import { loadProfile, saveProfile, type UserProfile } from './profile';
 import { loadAddressBook, replaceAddressBook, type AddressBook } from './addressbook';
 import { kvGet, kvSet } from './kv';
+import { isTauri } from './desktopNative';
 
 const FILE_NAME = 'freeport-backup.json';
 const CREATED_KEY = 'freeport.created';
@@ -37,8 +38,24 @@ async function applyExtras(extras: BackupExtras): Promise<void> {
   if (typeof rated === 'string' && rated) await kvSet(RATED_KEY, rated);
 }
 
-export async function backupToFile(sk: Uint8Array, passphrase: string): Promise<void> {
-  const blob = new Blob([await buildBundle(sk, passphrase)], { type: 'application/json' });
+/** Save the backup bundle. Desktop (Tauri): native save dialog — the WebView's
+ *  anchor-download drops the file into Downloads with zero feedback. Web: Blob
+ *  download (the browser's own download UI is the feedback). Returns the saved
+ *  path on desktop (null if the user cancelled), null on web. */
+export async function backupToFile(sk: Uint8Array, passphrase: string): Promise<string | null> {
+  const content = await buildBundle(sk, passphrase);
+  if (isTauri()) {
+    const { save } = await import('@tauri-apps/plugin-dialog');
+    const path = await save({
+      defaultPath: FILE_NAME,
+      filters: [{ name: 'JSON', extensions: ['json'] }],
+    });
+    if (!path) return null; // cancelled
+    const { writeTextFile } = await import('@tauri-apps/plugin-fs');
+    await writeTextFile(path, content);
+    return path;
+  }
+  const blob = new Blob([content], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -47,6 +64,7 @@ export async function backupToFile(sk: Uint8Array, passphrase: string): Promise<
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+  return null;
 }
 
 /** Pick a backup file and return its raw text, or null on cancel — split from

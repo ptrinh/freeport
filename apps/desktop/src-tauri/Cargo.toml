@@ -1,6 +1,6 @@
 [package]
 name = "freeport-desktop"
-version = "1.4.0"
+version = "1.4.1"
 description = "Freeport — decentralized P2P marketplace on Nostr"
 authors = ["Freeport"]
 edition = "2021"
@@ -19,6 +19,13 @@ tauri-plugin-notification = "2"
 # Open external links (share links, tel:, mailto:) in the system browser/app —
 # the WebView drops window.open() to external origins.
 tauri-plugin-opener = "2"
+# Self-update from GitHub Releases (latest.json, minisign-verified) + relaunch.
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+# Native save dialog + file write for account export (the WebView's silent
+# download-to-Downloads gives no feedback).
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 # Built-in "host Freeport on your LAN" server: a tiny, dependency-light static

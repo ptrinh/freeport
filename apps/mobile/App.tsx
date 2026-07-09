@@ -5664,7 +5664,10 @@ function SettingsTab({
     if (!secretKey) return;
     setBackingUp(true);
     try {
-      await backupToFile(secretKey, ''); // plain nsec — no password
+      const savedPath = await backupToFile(secretKey, ''); // plain nsec — no password
+      // Desktop save-dialog path: confirm where it landed (web/native have
+      // their own download/share-sheet feedback).
+      if (savedPath) Alert.alert(t('Account exported'), savedPath);
     } catch (e: any) {
       Alert.alert(t('Backup failed'), e?.message ?? 'Try again.');
     } finally { setBackingUp(false); }

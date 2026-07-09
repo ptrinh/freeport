@@ -88,8 +88,9 @@ export async function restoreFromBundleText(text: string): Promise<Uint8Array> {
   return sk;
 }
 
-/** Write the backup file and open the share sheet. */
-export async function backupToFile(sk: Uint8Array, passphrase: string): Promise<void> {
+/** Write the backup file and open the share sheet. Returns the saved path when
+ *  the platform can know it (desktop save dialog); null otherwise. */
+export async function backupToFile(sk: Uint8Array, passphrase: string): Promise<string | null> {
   const uri = FileSystem.cacheDirectory + FILE_NAME;
   await FileSystem.writeAsStringAsync(uri, await buildBundle(sk, passphrase));
   try {
@@ -102,6 +103,7 @@ export async function backupToFile(sk: Uint8Array, passphrase: string): Promise<
     // Don't leave key material lying in the cache
     await FileSystem.deleteAsync(uri, { idempotent: true });
   }
+  return null; // the share sheet is its own confirmation
 }
 
 /**

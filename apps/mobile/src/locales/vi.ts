@@ -568,6 +568,7 @@ const c: Record<string, string> = {
   "Restore account from {name}": "Khôi phục tài khoản từ {name}",
   "No cloud backup found.": "Không tìm thấy bản sao lưu trên đám mây.",
   "Backup failed": "Sao lưu thất bại",
+  "Account exported": "Đã xuất tài khoản",
   "A friendly reminder": "Một lời nhắc thân thiện",
   "Freeport has no company in the middle. You are Freeport — and we rely on you to keep it safe. If someone’s details, like a licence plate or phone number, don’t match, don’t go through with the deal. Report them instead.": "Freeport không có công ty nào đứng giữa. Bạn chính là Freeport — và chúng tôi trông cậy vào bạn để giữ cho nơi này an toàn. Nếu thông tin của ai đó, như biển số xe hay số điện thoại, không khớp, đừng tiến hành giao dịch. Hãy báo cáo họ.",
   "Welcome to Freeport.": "Chào mừng đến với Freeport.",

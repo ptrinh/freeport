@@ -49,6 +49,10 @@ export async function nativeRequestNotification(): Promise<boolean> {
   try { return (await invoke('plugin:notification|request_permission')) === 'granted'; } catch { return false; }
 }
 
+// Deep-link target of the most recent notification shown while the window was
+// unfocused — consumed by the focus fallback in onNativeNotificationTap.
+let lastUnfocusedNotify: { tab: string; at: number } | null = null;
+
 /** Show a native OS notification. Requests permission on first use. `tab` is
  *  carried in `extra` so a tap can deep-link (see onNativeNotificationTap). */
 export async function nativeNotify(title: string, body: string, tab?: string): Promise<boolean> {
@@ -58,14 +62,29 @@ export async function nativeNotify(title: string, body: string, tab?: string): P
     let granted = await nativeNotificationGranted();
     if (!granted) granted = await nativeRequestNotification();
     if (!granted) return false;
+    if (tab && typeof document !== 'undefined' && !document.hasFocus()) {
+      lastUnfocusedNotify = { tab, at: Date.now() };
+    }
     await invoke('plugin:notification|notify', { options: { title, body, extra: tab ? { tab } : undefined } });
     return true;
   } catch { return false; }
 }
 
-/** Route native-notification taps to a callback with the carried `tab`. Uses
- *  the plugin's onAction (fires on tap/action). Best-effort: desktop body-tap
- *  delivery varies by OS; returns a no-op unsubscribe if unavailable. */
+// How long after an unfocused notification a window-focus still counts as
+// "the user tapped it". Short on purpose: past this, a focus is far more
+// likely the user just returning to the app on their own.
+const TAP_FOCUS_WINDOW_MS = 2 * 60_000;
+
+/** Route native-notification taps to a callback with the carried `tab`.
+ *
+ *  Two mechanisms, because tauri-plugin-notification's onAction only fires on
+ *  mobile — desktop OSes don't deliver body-tap events to the plugin:
+ *  1. onAction — authoritative where available.
+ *  2. Focus fallback — tapping a macOS notification activates the app, so a
+ *     window-focus arriving shortly after a notification that was shown while
+ *     the window was UNFOCUSED is treated as a tap on it. May rarely fire when
+ *     the user returns via the Dock instead, but only within the window and
+ *     only when there genuinely is fresh activity to show. */
 export function onNativeNotificationTap(cb: (tab?: string) => void): () => void {
   if (!isTauri()) return () => {};
   let unlisten: (() => void) | undefined;
@@ -74,10 +93,22 @@ export function onNativeNotificationTap(cb: (tab?: string) => void): () => void 
     try {
       const mod: any = await import('@tauri-apps/plugin-notification');
       const un = await mod.onAction((n: any) => {
+        lastUnfocusedNotify = null; // authoritative — don't double-fire via focus
         cb(n?.extra?.tab ?? n?.notification?.extra?.tab);
       });
       if (cancelled) un(); else unlisten = un;
     } catch { /* plugin/action API unavailable on this platform */ }
   })();
-  return () => { cancelled = true; try { unlisten?.(); } catch { /* ignore */ } };
+  const onFocus = () => {
+    const last = lastUnfocusedNotify;
+    if (!last) return;
+    lastUnfocusedNotify = null;
+    if (Date.now() - last.at <= TAP_FOCUS_WINDOW_MS) cb(last.tab);
+  };
+  if (typeof window !== 'undefined') window.addEventListener('focus', onFocus);
+  return () => {
+    cancelled = true;
+    try { unlisten?.(); } catch { /* ignore */ }
+    if (typeof window !== 'undefined') window.removeEventListener('focus', onFocus);
+  };
 }
