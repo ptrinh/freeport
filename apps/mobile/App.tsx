@@ -7653,8 +7653,11 @@ function makeStyles(c: Palette) {
     catChipOn: { backgroundColor: c.accentBtn, borderColor: c.accent },
     catChipText: { color: c.chipText, fontSize: 12 },
     catChipTextOn: { color: 'white', fontWeight: '600' },
-    sortBackdrop: { flex: 1, backgroundColor: '#000000aa', justifyContent: 'flex-end' },
-    sortSheet: { backgroundColor: c.bg, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 20, borderTopWidth: 1, borderColor: c.border },
+    // On web the Modal overlays the whole browser window, not the 480px app
+    // column — center the sheet and cap it to the column width so desktop
+    // dropdowns don't stretch across the entire screen (user report).
+    sortBackdrop: { flex: 1, backgroundColor: '#000000aa', justifyContent: 'flex-end', ...(Platform.OS === 'web' ? { alignItems: 'center' as const } : null) },
+    sortSheet: { backgroundColor: c.bg, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 20, borderTopWidth: 1, borderColor: c.border, ...(Platform.OS === 'web' ? { width: '100%' as const, maxWidth: 480, borderLeftWidth: 1, borderRightWidth: 1 } : null) },
     sortChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 6 },
     sortChip: { backgroundColor: c.chipBg, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: c.borderStrong },
     sortChipRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
