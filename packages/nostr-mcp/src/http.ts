@@ -105,3 +105,14 @@ app.delete('/mcp', limiter, methodNotAllowed);
 app.listen(PORT, HOST, () => {
   console.error(`[freeport-nostr] HTTP server on http://${HOST}:${PORT}/mcp${NOTIFY ? ' (+notify)' : ''}`);
 });
+
+// Optional embedded NIP-01 relay (self-hosted "Freeport in a box"). Off unless
+// ENABLE_RELAY=1; runs on its own WS port (default PORT+1) since WebSocket
+// can't share the HTTP port here.
+if (process.env.ENABLE_RELAY === '1') {
+  const relayPort = Number(process.env.RELAY_PORT ?? PORT + 1);
+  const relayHost = process.env.RELAY_HOST ?? HOST;
+  import('./relay.js')
+    .then(({ startRelay }) => startRelay({ port: relayPort, host: relayHost }))
+    .catch((e) => console.error('[freeport-nostr] relay failed to start', e));
+}

@@ -12,6 +12,8 @@ export interface HostStatus {
   /** Whether this build bundled the notifier (feature available). */
   notify_available: boolean;
   urls: string[];
+  /** Embedded relay ws:// URLs (present when notify is on). */
+  relay_urls: string[];
 }
 
 type TauriGlobal = { core?: { invoke?: (cmd: string, args?: Record<string, unknown>) => Promise<unknown> } };

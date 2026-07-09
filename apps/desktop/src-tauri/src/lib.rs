@@ -33,6 +33,7 @@ struct HostState {
     running: bool,
     port: u16,
     notify: bool,
+    relay_port: u16,
     stop: Option<Arc<AtomicBool>>,
     handle: Option<JoinHandle<()>>,
     notifier: Option<Child>,
@@ -50,6 +51,8 @@ struct HostStatus {
     notify_available: bool,
     /// Shareable URLs (one per non-loopback IPv4 interface) when running.
     urls: Vec<String>,
+    /// Embedded relay ws:// URLs (present when notify is on).
+    relay_urls: Vec<String>,
 }
 
 fn local_urls(port: u16) -> Vec<String> {
@@ -95,18 +98,31 @@ fn notifier_data_dir() -> PathBuf {
     dir
 }
 
-fn spawn_notifier(internal: u16) -> std::io::Result<Child> {
+fn spawn_notifier(internal: u16, relay_port: u16) -> std::io::Result<Child> {
     let path = sidecar_path()
         .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "notifier not bundled"))?;
     std::process::Command::new(path)
         .env("HOST", "127.0.0.1")
         .env("PORT", internal.to_string())
         .env("ENABLE_NOTIFY", "1")
+        // Also run the embedded NIP-01 relay on its own LAN-facing WS port,
+        // so the node is a complete "Freeport in a box".
+        .env("ENABLE_RELAY", "1")
+        .env("RELAY_HOST", "0.0.0.0")
+        .env("RELAY_PORT", relay_port.to_string())
         .env("DATA_DIR", notifier_data_dir())
         .env("VAPID_SUBJECT", "mailto:hi@freeport.network")
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
         .spawn()
+}
+
+/// ws:// URLs for the embedded relay (one per non-loopback IPv4 interface).
+fn relay_urls(relay_port: u16) -> Vec<String> {
+    local_urls(relay_port)
+        .into_iter()
+        .map(|u| u.replacen("http://", "ws://", 1))
+        .collect()
 }
 
 /// Routes served by the notifier (everything else is the static web app).
@@ -238,9 +254,10 @@ fn host_start(state: State<'_, HostMutex>, port: u16, notify: bool) -> Result<Ho
     let server = Server::http(("0.0.0.0", port))
         .map_err(|e| format!("Couldn't start on port {}: {}", port, e))?;
 
+    let relay_port = port.saturating_add(1);
     let mut child = None;
     let notifier_port = if notify {
-        match spawn_notifier(INTERNAL_NOTIFIER_PORT) {
+        match spawn_notifier(INTERNAL_NOTIFIER_PORT, relay_port) {
             Ok(c) => {
                 child = Some(c);
                 Some(INTERNAL_NOTIFIER_PORT)
@@ -260,10 +277,18 @@ fn host_start(state: State<'_, HostMutex>, port: u16, notify: bool) -> Result<Ho
     st.running = true;
     st.port = port;
     st.notify = notify;
+    st.relay_port = relay_port;
     st.stop = Some(stop);
     st.handle = Some(handle);
     st.notifier = child;
-    Ok(HostStatus { running: true, port, notify, notify_available: true, urls: local_urls(port) })
+    Ok(HostStatus {
+        running: true,
+        port,
+        notify,
+        notify_available: true,
+        urls: local_urls(port),
+        relay_urls: if notify { relay_urls(relay_port) } else { vec![] },
+    })
 }
 
 #[tauri::command]
@@ -282,15 +307,23 @@ fn host_stop(state: State<'_, HostMutex>) -> Result<HostStatus, String> {
     st.running = false;
     st.notify = false;
     st.port = 0;
-    Ok(HostStatus { running: false, port: 0, notify: false, notify_available: notifier_available(), urls: vec![] })
+    st.relay_port = 0;
+    Ok(HostStatus { running: false, port: 0, notify: false, notify_available: notifier_available(), urls: vec![], relay_urls: vec![] })
 }
 
 #[tauri::command]
 fn host_status(state: State<'_, HostMutex>) -> HostStatus {
     let avail = notifier_available();
     match state.lock() {
-        Ok(st) if st.running => HostStatus { running: true, port: st.port, notify: st.notify, notify_available: avail, urls: local_urls(st.port) },
-        _ => HostStatus { running: false, port: 0, notify: false, notify_available: avail, urls: vec![] },
+        Ok(st) if st.running => HostStatus {
+            running: true,
+            port: st.port,
+            notify: st.notify,
+            notify_available: avail,
+            urls: local_urls(st.port),
+            relay_urls: if st.notify { relay_urls(st.relay_port) } else { vec![] },
+        },
+        _ => HostStatus { running: false, port: 0, notify: false, notify_available: avail, urls: vec![], relay_urls: vec![] },
     }
 }
 
@@ -327,7 +360,7 @@ fn run_headless(port: u16, notify: bool) {
             eprintln!("Freeport: this build doesn't include the notification server (--notify unavailable).");
             std::process::exit(1);
         }
-        match spawn_notifier(INTERNAL_NOTIFIER_PORT) {
+        match spawn_notifier(INTERNAL_NOTIFIER_PORT, port.saturating_add(1)) {
             Ok(c) => {
                 _notifier_child = Some(c);
                 Some(INTERNAL_NOTIFIER_PORT)
@@ -340,12 +373,18 @@ fn run_headless(port: u16, notify: bool) {
     } else {
         None
     };
-    println!("Freeport — hosting the web app{} on port {port}", if notify { " + notification server" } else { "" });
+    println!("Freeport — hosting the web app{} on port {port}", if notify { " + notification/MCP server + relay" } else { "" });
     let urls = local_urls(port);
     if urls.is_empty() {
         println!("  http://<this-machine-ip>:{port}  (no network interface detected)");
     } else {
         for u in &urls {
+            println!("  {u}");
+        }
+    }
+    if notify {
+        println!("Relay (add to the app's relay list):");
+        for u in relay_urls(port.saturating_add(1)) {
             println!("  {u}");
         }
     }
