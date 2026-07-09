@@ -39,7 +39,7 @@ export async function mountTelegram(
   pool: RelayPool, // MCP shared pool (guest publish + reputation queries)
 ): Promise<TelegramBridge> {
   const token = process.env.TELEGRAM_BOT_TOKEN!;
-  const webBase = (process.env.TELEGRAM_WEB_BASE ?? 'https://freeport.trinh.uk').replace(/\/$/, '');
+  const webBase = (process.env.TELEGRAM_WEB_BASE ?? 'https://freeport.network').replace(/\/$/, '');
   const pollTimeout = Math.max(1, Number(process.env.TELEGRAM_POLL_TIMEOUT_SEC ?? 50));
   const relays = pool.relays;
 

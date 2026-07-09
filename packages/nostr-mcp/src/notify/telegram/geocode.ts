@@ -8,7 +8,7 @@ import { geohashEncode } from '@freeport/protocol';
 
 export interface GeoPoint { name: string; lat: number; lon: number; geohash: string }
 
-const UA = 'Freeport/1.0 (+https://freeport.trinh.uk)';
+const UA = 'Freeport/1.0 (+https://freeport.network)';
 const CACHE_MAX = 500;
 
 export class Geocoder {

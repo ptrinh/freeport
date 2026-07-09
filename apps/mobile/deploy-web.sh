@@ -141,5 +141,5 @@ cp store/llms.txt dist/llms.txt
 echo "▸ Deploying to Cloudflare Pages…"
 npx wrangler pages deploy dist --project-name freeport --branch main --commit-dirty=true
 
-echo "✓ Live at https://freeport.trinh.uk/ (and https://freeport-dj7.pages.dev/)"
-echo "✓ Privacy policy at https://freeport.trinh.uk/privacy"
+echo "✓ Live at https://freeport.network/ (and https://freeport-dj7.pages.dev/)"
+echo "✓ Privacy policy at https://freeport.network/privacy"

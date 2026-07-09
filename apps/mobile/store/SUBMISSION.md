@@ -7,9 +7,9 @@ Apple App Store and Google Play. Copy/paste the fields below into the consoles.
 > `privacy@trinh.uk` (in `store/privacy.html` and below) with a real, monitored
 > inbox if that alias isn't set up. Both stores email you there.
 
-- **Privacy policy URL:** https://freeport.trinh.uk/privacy  *(published by `deploy-web.sh`)*
-- **Marketing URL:** https://freeport.trinh.uk
-- **Support URL:** https://freeport.trinh.uk
+- **Privacy policy URL:** https://freeport.network/privacy  *(published by `deploy-web.sh`)*
+- **Marketing URL:** https://freeport.network
+- **Support URL:** https://freeport.network
 - **Support email:** privacy@trinh.uk  *(confirm/replace)*
 - **Category:** Travel (primary) · Lifestyle (secondary)
 - **Age rating:** 17+ (user-generated content + unmoderated user communication)
@@ -149,7 +149,7 @@ to back up the on-device key to the user's own iCloud Keychain.
 
 ### Other required Play forms
 - **Target audience:** 18+ (avoid the "designed for families" path).
-- **Privacy policy URL:** https://freeport.trinh.uk/privacy
+- **Privacy policy URL:** https://freeport.network/privacy
 - **App access:** "All functionality is available without special access; no
   login required." (Provide the same review steps as the iOS notes above.)
 - **Government apps / financial features / health:** No.
@@ -191,7 +191,7 @@ that: `eas submit -p android --profile production --latest`
 
 ## 6. Pre-submit checklist
 - [ ] Replace placeholder `privacy@trinh.uk` with a monitored inbox.
-- [ ] `freeport.trinh.uk/privacy` loads (run `./deploy-web.sh`).
+- [ ] `freeport.network/privacy` loads (run `./deploy-web.sh`).
 - [ ] Production builds finished (iOS build 4 `.ipa`, Android `.aab`).
 - [ ] App Store Connect app record created (name, bundle, category, age 17+).
 - [ ] Play Console app created (Data safety, content rating, target audience).

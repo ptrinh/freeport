@@ -107,7 +107,7 @@ describe('parseHitch — real SGP Hitch template posts', () => {
     expect(parseHitch('Pick up: somewhere\n(no drop off)')).toBeNull();
   });
   it('builds a prefilled broadcast URL', () => {
-    const url = broadcastUrl('https://freeport.trinh.uk', { from: '730336', to: 'Tanjong Pagar', when: 'now', pax: 1 });
+    const url = broadcastUrl('https://freeport.network', { from: '730336', to: 'Tanjong Pagar', when: 'now', pax: 1 });
     expect(url).toContain('tab=post');
     expect(url).toContain('from=730336');
     expect(url).toContain('to=Tanjong+Pagar');

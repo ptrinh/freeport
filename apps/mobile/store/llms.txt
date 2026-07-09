@@ -22,6 +22,6 @@ Freeport is designed to be transacted in by agents. The fastest way to read the 
 
 ## Links
 
-- App: https://freeport.trinh.uk
+- App: https://freeport.network
 - Whitepaper: https://ptrinh.github.io/freeport/
-- Privacy: https://freeport.trinh.uk/privacy
+- Privacy: https://freeport.network/privacy

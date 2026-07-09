@@ -27,7 +27,7 @@ const app = express();
 // are meaningful (the rate limiter prefers CF-Connecting-IP regardless).
 app.set('trust proxy', true);
 
-// CORS: the web app / iOS PWA (e.g. freeport.trinh.uk) and browser-based MCP
+// CORS: the web app / iOS PWA (e.g. freeport.network) and browser-based MCP
 // clients call these endpoints cross-origin. They carry no cookies/credentials,
 // so any origin is safe. Without this, the browser blocks /vapidPublicKey and
 // /subscribe and the PWA reports "couldn't reach the notification service".

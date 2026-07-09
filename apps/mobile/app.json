@@ -100,7 +100,7 @@
       "eas": {
         "projectId": "1c014d95-0907-4e4c-a65a-8beedf0fc805"
       },
-      "webBase": "https://freeport.trinh.uk"
+      "webBase": "https://freeport.network"
     },
     "runtimeVersion": {
       "policy": "appVersion"

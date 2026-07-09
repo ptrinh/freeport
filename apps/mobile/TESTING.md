@@ -12,10 +12,10 @@ and sets the tab title to `Freeport · P<N>` so tabs are easy to tell apart.
 
 Open each party in its own tab:
 ```
-https://freeport.trinh.uk/?profile=1     ← e.g. Passenger A
-https://freeport.trinh.uk/?profile=2     ← Passenger B
-https://freeport.trinh.uk/?profile=3     ← Driver A
-https://freeport.trinh.uk/?profile=4     ← Driver B
+https://freeport.network/?profile=1     ← e.g. Passenger A
+https://freeport.network/?profile=2     ← Passenger B
+https://freeport.network/?profile=3     ← Driver A
+https://freeport.network/?profile=4     ← Driver B
 ```
 All tabs share one Chrome profile/extension — the isolation is the `?profile`
 namespace, NOT separate Chrome profiles. (Native apps ignore `?profile`; this is

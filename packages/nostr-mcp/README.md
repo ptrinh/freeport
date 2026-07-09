@@ -1,6 +1,6 @@
 # freeport-nostr-mcp
 
-A self-hostable server for [Freeport](https://freeport.trinh.uk), the decentralized P2P
+A self-hostable server for [Freeport](https://freeport.network), the decentralized P2P
 marketplace on Nostr. **One Docker image, three jobs** — run all of them or just the first:
 
 1. **MCP endpoint** (`/mcp`) — a read-only [Model Context Protocol](https://modelcontextprotocol.io)
@@ -130,7 +130,7 @@ Three layers, from least to most involved:
 | Env | Default | Purpose |
 |-----|---------|---------|
 | `TELEGRAM_BOT_TOKEN` | — | Enables the bridge (feed + pings). |
-| `TELEGRAM_WEB_BASE` | `https://freeport.trinh.uk` | Deep-link origin for buttons. |
+| `TELEGRAM_WEB_BASE` | `https://freeport.network` | Deep-link origin for buttons. |
 | `TELEGRAM_POLL_TIMEOUT_SEC` | `50` | Long-poll timeout. |
 | `TELEGRAM_GUEST_KEY_PASSPHRASE` | — | Enables guest mode; NIP-49 at-rest key encryption. **Secret.** |
 | `GUEST_COUNTRY_HINT` | — | Nominatim country bias for guest geocoding (e.g. `sg`). |
@@ -150,8 +150,8 @@ Bot commands: `/watch /near /unwatch /listen /status` (groups), `/start /stop`
 
 ## Abuse & acceptable use
 
-The public instance (`nostr-mcp.trinh.uk`, the Telegram bot, `freeport.trinh.uk`)
-operates under the [Acceptable Use Policy](https://freeport.trinh.uk/aup) —
+The public instance (`nostr-mcp.trinh.uk`, the Telegram bot, `freeport.network`)
+operates under the [Acceptable Use Policy](https://freeport.network/aup) —
 report violations to [freeport@trinh.uk](mailto:freeport@trinh.uk) with subject
 `ABUSE REPORT`. If you self-host this server you are the operator of your
 instance: publish your own policy and abuse contact, and use the relay write

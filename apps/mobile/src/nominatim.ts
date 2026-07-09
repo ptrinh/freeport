@@ -75,7 +75,7 @@ async function fetchJsonUncached(path: string, acceptLang?: string): Promise<any
     const headers: Record<string, string> = {
       // Identify the app per Nominatim's usage policy. Browsers silently drop a
       // UA override (harmless); native fetch sends it.
-      'User-Agent': 'Freeport/1.0 (+https://freeport.trinh.uk)',
+      'User-Agent': 'Freeport/1.0 (+https://freeport.network)',
     };
     if (acceptLang) headers['Accept-Language'] = acceptLang;
     const res = await fetch(`${BASE}/${path}&format=jsonv2`, { signal: ctrl.signal, headers });

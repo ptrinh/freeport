@@ -31,7 +31,7 @@ services:
       # Telegram bridge (group feed + personal pings). Set the bot token to
       # enable; long-poll (no public webhook needed). ENABLE_TELEGRAM=0 forces off.
       # - TELEGRAM_BOT_TOKEN=123456:ABC...
-      # - TELEGRAM_WEB_BASE=https://freeport.trinh.uk
+      # - TELEGRAM_WEB_BASE=https://freeport.network
       # - TELEGRAM_POLL_TIMEOUT_SEC=50
       # Guest-agent mode (CUSTODIAL — the bridge holds a NIP-49-encrypted key per
       # Telegram-native user so they can post + deal without the app). Set the
