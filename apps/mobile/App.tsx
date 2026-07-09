@@ -6093,8 +6093,8 @@ function SettingsTab({
           <Text style={[s.dim, { marginTop: 10 }]}>© Phil T</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 4 }}>
             <Text style={s.dim}>{t('Feedback')}: </Text>
-            <Pressable hitSlop={6} onPress={() => Linking.openURL('mailto:freeport@trinh.uk')}>
-              <Text style={s.link}>freeport@trinh.uk</Text>
+            <Pressable hitSlop={6} onPress={() => Linking.openURL('mailto:hi@freeport.network')}>
+              <Text style={s.link}>hi@freeport.network</Text>
             </Pressable>
           </View>
         </>
