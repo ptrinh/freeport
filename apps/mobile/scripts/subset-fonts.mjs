@@ -3,8 +3,8 @@
  * Subset the icon fonts in an `expo export --platform web` dist to just the
  * glyphs the app can actually render — the full sets are ~1.7 MB and the app
  * uses a few dozen icons, so every first-time web visitor downloads ~97% dead
- * glyphs. Files are rewritten IN PLACE (same hashed filename the bundle
- * references), still TrueType so nothing else changes.
+ * glyphs. The subset file is renamed to its new content hash (references in
+ * the export are rewritten) so caches can never serve a stale glyph set.
  *
  * Used glyph names are collected as every string literal in the app source
  * that is a key of the icon set's glyphmap. Over-inclusive by design (any
@@ -18,6 +18,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
 import subsetFont from 'subset-font';
 
 export const FONT_STEMS = ['Ionicons', 'MaterialCommunityIcons'];
@@ -63,7 +64,15 @@ export function usedGlyphText(stem, root = appRoot) {
   return { text: used.map((name) => String.fromCodePoint(glyphmap[name])).join(''), count: used.length };
 }
 
-/** Subset every FONT_STEMS ttf under dist/assets in place (TrueType→TrueType). */
+/**
+ * Subset every FONT_STEMS ttf under dist/assets (TrueType→TrueType).
+ *
+ * The subset file is RENAMED to its new content hash and every reference in
+ * the exported JS/HTML is rewritten. Keeping the original metro hash bit us
+ * once: the URL stays constant across deploys while the bytes change, so
+ * browsers (and the desktop webview) kept serving a stale cached font and new
+ * icons rendered blank until a hard refresh.
+ */
 export async function subsetDistFonts(dist, root = appRoot) {
   const fontFiles = findFiles(path.join(dist, 'assets'), (p) =>
     FONT_STEMS.some((s) => path.basename(p).startsWith(s + '.')) && p.endsWith('.ttf'));
@@ -73,8 +82,25 @@ export async function subsetDistFonts(dist, root = appRoot) {
     const before = fs.statSync(f).size;
     const { text, count } = usedGlyphText(stem, root);
     const buf = await subsetFont(fs.readFileSync(f), text, { targetFormat: 'truetype' });
-    fs.writeFileSync(f, buf);
-    console.log(`  ${stem}: ${count} glyphs, ${(before / 1024).toFixed(0)} kB → ${(buf.length / 1024).toFixed(0)} kB`);
+    const oldHash = path.basename(f).split('.')[1];
+    const newHash = crypto.createHash('md5').update(buf).digest('hex');
+    const renamed = path.join(path.dirname(f), `${stem}.${newHash}.ttf`);
+    fs.writeFileSync(renamed, buf);
+    if (renamed !== f) fs.unlinkSync(f);
+    // Metro embeds the asset hash in the bundle (registry entry + URL); the
+    // export may also reference it from HTML preloads. Rewrite everywhere.
+    if (/^[0-9a-f]{32}$/.test(oldHash) && oldHash !== newHash) {
+      const textFiles = findFiles(dist, (p) => /\.(js|html|css|json)$/.test(p));
+      let hits = 0;
+      for (const tf of textFiles) {
+        const txt = fs.readFileSync(tf, 'utf8');
+        if (!txt.includes(oldHash)) continue;
+        fs.writeFileSync(tf, txt.split(oldHash).join(newHash));
+        hits++;
+      }
+      if (!hits) throw new Error(`subset-fonts: no references to ${stem} hash ${oldHash} found — refusing to ship a dangling font`);
+    }
+    console.log(`  ${stem}: ${count} glyphs, ${(before / 1024).toFixed(0)} kB → ${(buf.length / 1024).toFixed(0)} kB (${newHash.slice(0, 8)})`);
   }
 }
 
