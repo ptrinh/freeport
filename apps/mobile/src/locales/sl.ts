@@ -703,5 +703,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Izberite uporabniško ime: samo črke in številke",
   "That username is taken": "To uporabniško ime je že zasedeno",
   "Lightning addresses are not available yet": "Naslovi Lightning še niso na voljo",
+  "Send": "Pošlji",
+  "Pay": "Plačaj",
+  "Connect": "Poveži",
+  "Choose from photos": "Izberi iz fotografij",
+  "No QR code found in that photo": "Na tej fotografiji ni najdene kode QR",
 };
 export default c;

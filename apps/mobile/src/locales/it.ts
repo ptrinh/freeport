@@ -697,5 +697,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Scegli un nome utente: solo lettere e numeri",
   "That username is taken": "Questo nome utente è già in uso",
   "Lightning addresses are not available yet": "Gli indirizzi Lightning non sono ancora disponibili",
+  "Send": "Invia",
+  "Pay": "Paga",
+  "Connect": "Connetti",
+  "Choose from photos": "Scegli dalle foto",
+  "No QR code found in that photo": "Nessun codice QR trovato nella foto",
 };
 export default c;

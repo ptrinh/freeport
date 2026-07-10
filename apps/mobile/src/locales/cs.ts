@@ -700,5 +700,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Zvolte uživatelské jméno: pouze písmena a číslice",
   "That username is taken": "Toto uživatelské jméno je obsazené",
   "Lightning addresses are not available yet": "Lightning adresy zatím nejsou k dispozici",
+  "Send": "Odeslat",
+  "Pay": "Zaplatit",
+  "Connect": "Připojit",
+  "Choose from photos": "Vybrat z fotek",
+  "No QR code found in that photo": "V této fotce nebyl nalezen žádný QR kód",
 };
 export default c;

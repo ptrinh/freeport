@@ -737,5 +737,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "选择用户名：仅限字母和数字",
   "That username is taken": "该用户名已被占用",
   "Lightning addresses are not available yet": "Lightning 地址尚不可用",
+  "Send": "发送",
+  "Pay": "支付",
+  "Connect": "连接",
+  "Choose from photos": "从照片中选择",
+  "No QR code found in that photo": "该照片中未找到 QR 码",
 };
 export default c;

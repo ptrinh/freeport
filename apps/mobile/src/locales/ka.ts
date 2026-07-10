@@ -694,5 +694,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "აირჩიეთ მომხმარებლის სახელი: მხოლოდ ასოები და ციფრები",
   "That username is taken": "ეს მომხმარებლის სახელი დაკავებულია",
   "Lightning addresses are not available yet": "Lightning-მისამართები ჯერ ხელმისაწვდომი არ არის",
+  "Send": "გაგზავნა",
+  "Pay": "გადახდა",
+  "Connect": "დაკავშირება",
+  "Choose from photos": "აირჩიეთ ფოტოებიდან",
+  "No QR code found in that photo": "ამ ფოტოში QR კოდი ვერ მოიძებნა",
 };
 export default c;

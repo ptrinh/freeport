@@ -694,5 +694,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "အသုံးပြုသူအမည် ရွေးပါ — စာလုံးနှင့် ဂဏန်းများသာ",
   "That username is taken": "ထိုအသုံးပြုသူအမည်ကို ယူဆောင်ပြီးဖြစ်သည်",
   "Lightning addresses are not available yet": "Lightning လိပ်စာများ မရရှိသေးပါ",
+  "Send": "ပို့မည်",
+  "Pay": "ငွေပေးချေမည်",
+  "Connect": "ချိတ်ဆက်မည်",
+  "Choose from photos": "ဓာတ်ပုံများမှ ရွေးရန်",
+  "No QR code found in that photo": "ထိုဓာတ်ပုံတွင် QR ကုဒ် မတွေ့ပါ",
 };
 export default c;

@@ -694,5 +694,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "İstifadəçi adı seçin: yalnız hərflər və rəqəmlər",
   "That username is taken": "Bu istifadəçi adı artıq götürülüb",
   "Lightning addresses are not available yet": "Lightning ünvanları hələ mövcud deyil",
+  "Send": "Göndər",
+  "Pay": "Ödə",
+  "Connect": "Qoşul",
+  "Choose from photos": "Şəkillərdən seçin",
+  "No QR code found in that photo": "Həmin şəkildə QR kod tapılmadı",
 };
 export default c;

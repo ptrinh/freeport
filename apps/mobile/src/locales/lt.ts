@@ -698,5 +698,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Pasirinkite naudotojo vardą: tik raidės ir skaičiai",
   "That username is taken": "Šis naudotojo vardas jau užimtas",
   "Lightning addresses are not available yet": "Lightning adresai dar negalimi",
+  "Send": "Siųsti",
+  "Pay": "Mokėti",
+  "Connect": "Prijungti",
+  "Choose from photos": "Pasirinkti iš nuotraukų",
+  "No QR code found in that photo": "Toje nuotraukoje QR kodas nerastas",
 };
 export default c;

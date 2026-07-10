@@ -737,5 +737,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Chọn tên người dùng: chỉ gồm chữ và số",
   "That username is taken": "Tên này đã có người dùng",
   "Lightning addresses are not available yet": "Địa chỉ Lightning chưa khả dụng",
+  "Connect": "Kết nối",
+  "Pay": "Thanh toán",
+  "Send": "Gửi",
+  "Choose from photos": "Chọn từ ảnh",
+  "No QR code found in that photo": "Không tìm thấy mã QR trong ảnh đó",
 };
 export default c;

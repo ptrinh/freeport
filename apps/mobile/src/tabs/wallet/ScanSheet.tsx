@@ -128,6 +128,53 @@ export function ScanSheet({
   onClose: () => void;
   onCode: (value: string) => void;
 }) {
+  const [pickErr, setPickErr] = useState('');
+
+  // Decode a QR from a picked photo. Web: canvas + BarcodeDetector/jsQR.
+  // Native: expo-image-picker (in the binary) + expo-camera's scanFromURLAsync
+  // (next binary; the button still works for camera-less decode paths on web).
+  const pickImage = async () => {
+    setPickErr('');
+    try {
+      if (Platform.OS === 'web') {
+        const file = await new Promise<File | null>((resolve) => {
+          const inp = document.createElement('input');
+          inp.type = 'file'; inp.accept = 'image/*';
+          inp.onchange = () => resolve(inp.files?.[0] ?? null);
+          inp.click();
+        });
+        if (!file) return;
+        const bmp = await createImageBitmap(file);
+        const canvas = document.createElement('canvas');
+        canvas.width = bmp.width; canvas.height = bmp.height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(bmp, 0, 0);
+        const Detector = (window as any).BarcodeDetector;
+        if (Detector) {
+          const codes = await new Detector({ formats: ['qr_code'] }).detect(canvas);
+          if (codes?.[0]?.rawValue) { onCode(codes[0].rawValue); return; }
+        } else {
+          const jsqr = (await import('jsqr')).default;
+          const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsqr(img.data, img.width, img.height);
+          if (code?.data) { onCode(code.data); return; }
+        }
+        setPickErr(t('No QR code found in that photo'));
+        return;
+      }
+      const picker: any = await import('expo-image-picker');
+      const res = await picker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 });
+      const uri = res?.assets?.[0]?.uri;
+      if (!uri) return;
+      const cam: any = await import('expo-camera');
+      const codes = await cam.Camera.scanFromURLAsync(uri, ['qr']);
+      if (codes?.[0]?.data) { onCode(codes[0].data); return; }
+      setPickErr(t('No QR code found in that photo'));
+    } catch {
+      setPickErr(t('No QR code found in that photo'));
+    }
+  };
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' }} onPress={onClose} />
@@ -141,6 +188,13 @@ export function ScanSheet({
         <View style={{ paddingHorizontal: 16 }}>
           {visible && (Platform.OS === 'web' ? <WebScanner onCode={onCode} /> : <NativeScanner onCode={onCode} />)}
           <Text style={[s.dim, { textAlign: 'center', marginTop: 10 }]}>{t('Point the camera at a payment QR code')}</Text>
+          <Pressable onPress={pickImage} style={[s.btnGhost, { marginTop: 10 }]}>
+            <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
+              <Ionicons name="image-outline" size={14} color={palette.text2} />
+              <Text style={s.btnGhostText}>{t('Choose from photos')}</Text>
+            </View>
+          </Pressable>
+          {!!pickErr && <Text style={[s.dim, { color: palette.danger, textAlign: 'center', marginTop: 6 }]}>{pickErr}</Text>}
         </View>
       </View>
     </Modal>

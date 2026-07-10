@@ -697,5 +697,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Válasszon felhasználónevet: csak betűk és számok",
   "That username is taken": "Ez a felhasználónév foglalt",
   "Lightning addresses are not available yet": "A lightning-címek még nem érhetők el",
+  "Send": "Küldés",
+  "Pay": "Fizetés",
+  "Connect": "Csatlakozás",
+  "Choose from photos": "Választás a fényképek közül",
+  "No QR code found in that photo": "Nem található QR-kód a fényképen",
 };
 export default c;

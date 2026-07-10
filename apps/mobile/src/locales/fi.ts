@@ -697,5 +697,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Valitse käyttäjänimi: vain kirjaimia ja numeroita",
   "That username is taken": "Käyttäjänimi on jo varattu",
   "Lightning addresses are not available yet": "Lightning-osoitteet eivät ole vielä käytettävissä",
+  "Send": "Lähetä",
+  "Pay": "Maksa",
+  "Connect": "Yhdistä",
+  "Choose from photos": "Valitse kuvista",
+  "No QR code found in that photo": "Kuvasta ei löytynyt QR-koodia",
 };
 export default c;

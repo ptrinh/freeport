@@ -737,5 +737,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Pilih nama pengguna: hanya huruf dan angka",
   "That username is taken": "Nama pengguna itu sudah digunakan",
   "Lightning addresses are not available yet": "Alamat lightning belum tersedia",
+  "Send": "Kirim",
+  "Pay": "Bayar",
+  "Connect": "Hubungkan",
+  "Choose from photos": "Pilih dari foto",
+  "No QR code found in that photo": "Tidak ada kode QR di foto itu",
 };
 export default c;

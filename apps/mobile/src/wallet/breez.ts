@@ -193,8 +193,11 @@ export class BreezSparkProvider implements WalletProvider {
   async fiatRate(coin: string): Promise<number | null> {
     if (!this.rateCache || Date.now() - this.rateCache.at > 60_000) {
       try {
-        const rates: Array<{ coin: string; value: number }> = await this.sdk.fetchFiatRates();
-        this.rateCache = { at: Date.now(), rates: new Map((rates ?? []).map((r) => [r.coin?.toUpperCase(), r.value])) };
+        // listFiatRates lives on BreezSdk (fetchFiatRates is the FiatService
+        // interface — not exposed on the SDK object itself).
+        const resp = await this.sdk.listFiatRates();
+        const rates: Array<{ coin: string; value: number }> = resp?.rates ?? resp ?? [];
+        this.rateCache = { at: Date.now(), rates: new Map(rates.map((r) => [r.coin?.toUpperCase(), r.value])) };
       } catch { return null; }
     }
     return this.rateCache.rates.get(coin.toUpperCase()) ?? null;

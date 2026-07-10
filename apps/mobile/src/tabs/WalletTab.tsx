@@ -7,6 +7,7 @@ import { walletProviderFor, defaultWalletProvider, parseNwcUrl, type WalletProvi
 import { WalletHome } from './wallet/WalletHome';
 import { SendSheet } from './wallet/SendSheet';
 import { ReceiveSheet } from './wallet/ReceiveSheet';
+import { ScanSheet, scanSupported } from './wallet/ScanSheet';
 
 /**
  * Wallet tab (Experimental) — Glow-style UI (adapted from breez/glow-web,
@@ -49,6 +50,9 @@ function WalletTab({
   // Sheets
   const [sendOpen, setSendOpen] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
+  const [canScan, setCanScan] = useState(false);
+  useEffect(() => { scanSupported().then(setCanScan).catch(() => {}); }, []);
   const [sendPrefill, setSendPrefill] = useState<{ dest: string; hint?: string } | null>(null);
 
   // NWC connect form (setup view / switch flow)
@@ -189,6 +193,7 @@ function WalletTab({
         onRefresh={() => provider.current && refresh(provider.current)}
         walletLabel={provider.current?.kind === 'breez-spark' ? t('Built-in wallet') : t('Connected wallet')}
         onSend={() => { setSendPrefill(null); setSendOpen(true); }}
+        onScan={canScan ? () => setScanOpen(true) : undefined}
         onReceive={() => setReceiveOpen(true)}
         onScroll={onScroll}
         footer={
@@ -222,6 +227,11 @@ function WalletTab({
         visible={receiveOpen}
         provider={provider.current}
         onClose={() => { setReceiveOpen(false); provider.current && refresh(provider.current); }}
+      />
+      <ScanSheet
+        visible={scanOpen}
+        onClose={() => setScanOpen(false)}
+        onCode={(v) => { setScanOpen(false); setSendPrefill({ dest: v }); setSendOpen(true); }}
       />
     </View>
   );

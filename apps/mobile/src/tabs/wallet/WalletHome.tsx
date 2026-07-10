@@ -22,6 +22,7 @@ export function WalletHome({
   onRefresh,
   walletLabel,
   onSend,
+  onScan,
   onReceive,
   footer,
   onScroll,
@@ -38,6 +39,8 @@ export function WalletHome({
   onRefresh: () => void;
   walletLabel: string;
   onSend: () => void;
+  /** Middle QR button — omitted when the platform can't scan. */
+  onScan?: () => void;
   onReceive: () => void;
   footer?: React.ReactNode;
   onScroll?: (e: any) => void;
@@ -135,6 +138,11 @@ export function WalletHome({
             <Text style={{ color: 'white', fontWeight: '800', fontSize: 16 }}>{t('Send')}</Text>
           </View>
         </Pressable>
+        {onScan && (
+          <Pressable onPress={onScan} style={{ width: 52, height: 52, borderRadius: 14, backgroundColor: palette.card, borderWidth: 1, borderColor: palette.border, alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="qr-code" size={20} color={palette.text2} />
+          </Pressable>
+        )}
         <Pressable onPress={onReceive} style={{ flex: 1, height: 52, borderRadius: 14, backgroundColor: palette.accentBtn, alignItems: 'center', justifyContent: 'center' }}>
           <View style={[s.row, { gap: 8 }]}>
             <Ionicons name="arrow-down" size={17} color="white" />

@@ -694,5 +694,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "የተጠቃሚ ስም ይምረጡ፦ ፊደላትና ቁጥሮች ብቻ",
   "That username is taken": "ያ የተጠቃሚ ስም ተይዟል",
   "Lightning addresses are not available yet": "የLightning አድራሻዎች ገና አይገኙም",
+  "Send": "ላክ",
+  "Pay": "ክፈል",
+  "Connect": "አገናኝ",
+  "Choose from photos": "ከፎቶዎች ምረጥ",
+  "No QR code found in that photo": "በዚያ ፎቶ ውስጥ QR ኮድ አልተገኘም",
 };
 export default c;

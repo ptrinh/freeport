@@ -694,5 +694,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Chagua jina la mtumiaji: herufi na nambari pekee",
   "That username is taken": "Jina hilo la mtumiaji limechukuliwa",
   "Lightning addresses are not available yet": "Anwani za lightning hazipatikani bado",
+  "Send": "Tuma",
+  "Pay": "Lipa",
+  "Connect": "Unganisha",
+  "Choose from photos": "Chagua kutoka kwenye picha",
+  "No QR code found in that photo": "Hakuna msimbo wa QR uliopatikana katika picha hiyo",
 };
 export default c;

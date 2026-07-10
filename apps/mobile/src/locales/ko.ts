@@ -737,5 +737,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "사용자 이름 선택: 영문과 숫자만",
   "That username is taken": "이미 사용 중인 사용자 이름입니다",
   "Lightning addresses are not available yet": "Lightning 주소는 아직 사용할 수 없습니다",
+  "Send": "보내기",
+  "Pay": "결제",
+  "Connect": "연결",
+  "Choose from photos": "사진에서 선택",
+  "No QR code found in that photo": "해당 사진에서 QR 코드를 찾을 수 없습니다",
 };
 export default c;

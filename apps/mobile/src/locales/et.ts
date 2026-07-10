@@ -697,5 +697,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Vali kasutajanimi: ainult tähed ja numbrid",
   "That username is taken": "See kasutajanimi on juba võetud",
   "Lightning addresses are not available yet": "Lightning-aadressid pole veel saadaval",
+  "Send": "Saada",
+  "Pay": "Maksa",
+  "Connect": "Ühenda",
+  "Choose from photos": "Vali fotode hulgast",
+  "No QR code found in that photo": "Sellel fotol QR-koodi ei leitud",
 };
 export default c;

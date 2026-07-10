@@ -101,7 +101,7 @@ function makeStyles(c: Palette) {
     cardHighlight: { borderColor: c.accent },
     cardTitle: { color: c.text, fontWeight: '700', fontSize: 17, letterSpacing: -0.2, marginTop: 6, marginBottom: 4 },
     meta: { color: c.dim2, fontSize: 11, marginTop: 4 },
-    dim: { color: c.dim, fontSize: 13 },
+    dim: { color: c.dim, fontSize: 13, lineHeight: 19, marginTop: 2 },
     pad: { padding: 16, paddingBottom: 40 },
     label: { color: c.muted, fontSize: 12, marginTop: 12, marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.5 },
     fieldLabelRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },

@@ -694,5 +694,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "පරිශීලක නාමයක් තෝරන්න: අකුරු සහ ඉලක්කම් පමණි",
   "That username is taken": "එම පරිශීලක නාමය දැනටමත් ගෙන ඇත",
   "Lightning addresses are not available yet": "Lightning ලිපින තවම ලබා ගත නොහැක",
+  "Send": "යවන්න",
+  "Pay": "ගෙවන්න",
+  "Connect": "සම්බන්ධ කරන්න",
+  "Choose from photos": "ඡායාරූප වලින් තෝරන්න",
+  "No QR code found in that photo": "එම ඡායාරූපයේ QR කේතයක් හමු නොවීය",
 };
 export default c;

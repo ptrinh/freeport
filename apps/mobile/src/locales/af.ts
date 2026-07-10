@@ -697,5 +697,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Kies 'n gebruikersnaam: net letters en syfers",
   "That username is taken": "Daardie gebruikersnaam is reeds geneem",
   "Lightning addresses are not available yet": "Lightning-adresse is nog nie beskikbaar nie",
+  "Send": "Stuur",
+  "Pay": "Betaal",
+  "Connect": "Koppel",
+  "Choose from photos": "Kies uit foto's",
+  "No QR code found in that photo": "Geen QR-kode in daardie foto gevind nie",
 };
 export default c;

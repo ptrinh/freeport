@@ -15,15 +15,20 @@ import { loadKey } from './identity';
 let timer: ReturnType<typeof setTimeout> | null = null;
 
 export function scheduleCloudSync(): void {
-  if (!cloudAvailable()) return;
   if (timer) clearTimeout(timer);
   timer = setTimeout(async () => {
     timer = null;
     try {
       const sk = await loadKey();
       if (!sk) return; // no identity yet
-      const { buildCloudBundle } = await import('./backup');
-      await cloudSave(await buildCloudBundle(sk));
+      if (cloudAvailable()) {
+        const { buildCloudBundle } = await import('./backup');
+        await cloudSave(await buildCloudBundle(sk));
+      }
+      // Relay copy (encrypted to self) — this is what a passkey sign-in on a
+      // brand-new device restores from; the OS cloud is per-platform.
+      const { publishSettingsSync } = await import('./relaySync');
+      await publishSettingsSync(sk);
     } catch { /* best-effort; manual backup + file backup remain */ }
   }, 1500);
 }

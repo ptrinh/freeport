@@ -697,5 +697,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Επιλέξτε όνομα χρήστη: μόνο γράμματα και αριθμοί",
   "That username is taken": "Αυτό το όνομα χρήστη χρησιμοποιείται ήδη",
   "Lightning addresses are not available yet": "Οι διευθύνσεις Lightning δεν είναι ακόμα διαθέσιμες",
+  "Send": "Αποστολή",
+  "Pay": "Πληρωμή",
+  "Connect": "Σύνδεση",
+  "Choose from photos": "Επιλογή από φωτογραφίες",
+  "No QR code found in that photo": "Δεν βρέθηκε κωδικός QR σε αυτή τη φωτογραφία",
 };
 export default c;

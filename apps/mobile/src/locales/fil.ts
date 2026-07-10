@@ -694,5 +694,10 @@ const c: Record<string, string> = {
   "Pick a username: letters and numbers only": "Pumili ng username: mga letra at numero lang",
   "That username is taken": "Nakuha na ang username na iyon",
   "Lightning addresses are not available yet": "Hindi pa available ang mga lightning address",
+  "Send": "Ipadala",
+  "Pay": "Magbayad",
+  "Connect": "Ikonekta",
+  "Choose from photos": "Pumili mula sa mga larawan",
+  "No QR code found in that photo": "Walang QR code na nakita sa larawang iyon",
 };
 export default c;

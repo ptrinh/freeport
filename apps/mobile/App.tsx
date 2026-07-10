@@ -42,6 +42,7 @@ import {
 } from '@freeport/protocol';
 import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, restoreNsec } from './src/identity';
 import { createPasskeyIdentity, signInWithPasskey } from './src/passkey';
+import { restoreSettingsSync } from './src/relaySync';
 import { nsecEncode } from 'nostr-tools/nip19';
 import { restoreBackupText, buildCloudBundle, restoreFromBundleText } from './src/backup';
 import { cloudAvailable, cloudSave, cloudRestore, cloudClear } from './src/cloudBackup';
@@ -1111,6 +1112,9 @@ function AppInner() {
             onPasskeySignIn={async () => {
               const sk = await signInWithPasskey();
               await restoreBackupText(nsecEncode(sk), ''); // same path as a bare-nsec restore
+              // Pull profile + settings back from the encrypted relay sync
+              // (or the public kind:0 as a fallback) before entering the app.
+              try { await restoreSettingsSync(sk); } catch { /* fresh account */ }
               finishOnboarding();
             }}
             onCloudRestore={async () => {
