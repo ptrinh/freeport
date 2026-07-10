@@ -17,7 +17,9 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
+import subsetFont from 'subset-font';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const dist = path.resolve(process.argv[2] ?? path.join(root, 'dist'));
@@ -97,15 +99,37 @@ html = html.replace(/(href|src)="(\/(?:favicon|icons)[^"]+)"/g, (m, attr, ref) =
 html = html.replace(/<link rel="manifest"[^>]*>\n?/, '');
 html = html.replace(/<script>if\("serviceWorker" in navigator\)[\s\S]*?<\/script>\n?/, '');
 
-// ── Icon fonts: embed as data URIs + runtime shim that rewrites the
-// @font-face styles Expo injects, so registration succeeds offline.
+// ── Icon fonts: SUBSET to the glyphs the app can actually render, then embed
+// as woff2 data URIs + a runtime shim that rewrites the @font-face styles
+// Expo injects, so registration succeeds offline. Full icon fonts are ~1.7 MB;
+// the app uses a few dozen glyphs. Used names are collected as every string
+// literal in the app source that is a key of the icon set's glyphmap — this
+// over-includes (any word that happens to be a glyph name) but each glyph is
+// tiny, and it safely covers icons picked via data tables (SORT_ICON,
+// categoryIcon()…) since those are string literals somewhere in the source.
+const srcFiles = [
+  path.join(root, 'App.tsx'),
+  ...findFiles(path.join(root, 'src'), (p) => /\.(ts|tsx)$/.test(p)),
+];
+const literals = new Set();
+const litRe = /(['"`])((?:\\.|(?!\1)[^\\\n])*)\1/g;
+for (const f of srcFiles) {
+  const txt = fs.readFileSync(f, 'utf8');
+  for (const m of txt.matchAll(litRe)) literals.add(m[2]);
+}
+const glyphmapsDir = path.join(root, 'node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/glyphmaps');
+
 const fontFiles = findFiles(path.join(dist, 'assets'), (p) =>
   FONT_STEMS.some((s) => path.basename(p).startsWith(s + '.')) && p.endsWith('.ttf'));
 const fontMap = {};
 for (const f of fontFiles) {
   const stem = path.basename(f).split('.')[0];
-  fontMap[stem] = dataUri(f);
-  console.log(`  embedded font ${path.basename(f)} (${(fs.statSync(f).size / 1024).toFixed(0)} kB)`);
+  const glyphmap = JSON.parse(fs.readFileSync(path.join(glyphmapsDir, `${stem}.json`), 'utf8'));
+  const used = Object.keys(glyphmap).filter((name) => literals.has(name));
+  const text = used.map((name) => String.fromCodePoint(glyphmap[name])).join('');
+  const woff2 = await subsetFont(fs.readFileSync(f), text, { targetFormat: 'woff2' });
+  fontMap[stem] = `data:font/woff2;base64,${woff2.toString('base64')}`;
+  console.log(`  embedded font ${stem}: ${used.length} glyphs, ${(woff2.length / 1024).toFixed(0)} kB (was ${(fs.statSync(f).size / 1024).toFixed(0)} kB ttf)`);
 }
 const missing = FONT_STEMS.filter((s) => !fontMap[s]);
 if (missing.length) throw new Error(`icon fonts not found in dist/assets: ${missing.join(', ')}`);
@@ -135,5 +159,32 @@ const shim = `<script>
 `;
 html = html.replace(/<head[^>]*>/, (m) => m + '\n' + shim);
 
-fs.writeFileSync(out, html);
-console.log(`  wrote ${out} (${(fs.statSync(out).size / 1024 / 1024).toFixed(1)} MB)`);
+// ── Self-extracting wrapper: gzip the whole document and ship a small stub
+// that inflates it with DecompressionStream and document.write()s it in place
+// (same file:// origin). Cuts ~11 MB to ~4 MB. DecompressionStream is in every
+// evergreen browser (Chrome 80+, Safari 16.4+, Firefox 113+); older ones get
+// a plain-text hint instead of a broken page.
+const gz = zlib.gzipSync(Buffer.from(html, 'utf8'), { level: 9 });
+const stub = `<!doctype html>
+<html><head><meta charset="utf-8"><title>Freeport</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html,body{height:100%;margin:0;background:#06080c;color:#e7ecf3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+#u{display:flex;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:12px}</style>
+</head><body><div id="u"><div style="font-size:28px;font-weight:800">Freeport</div><div id="m" style="color:#8b97a6;font-size:14px">Unpacking…</div></div>
+<script type="text/plain" id="z">${gz.toString('base64')}</script>
+<script>
+(async function(){
+  try{
+    var b=atob(document.getElementById("z").textContent.trim());
+    var a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);
+    var html=await new Response(new Blob([a]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+    document.open();document.write(html);document.close();
+  }catch(e){
+    document.getElementById("m").textContent="This browser can't unpack the offline app (needs Chrome 80+/Safari 16.4+/Firefox 113+): "+e;
+  }
+})();
+</script>
+</body></html>
+`;
+fs.writeFileSync(out, stub);
+console.log(`  wrote ${out} (${(fs.statSync(out).size / 1024 / 1024).toFixed(1)} MB — inner html ${(html.length / 1024 / 1024).toFixed(1)} MB, gzip ${(gz.length / 1024 / 1024).toFixed(1)} MB)`);
