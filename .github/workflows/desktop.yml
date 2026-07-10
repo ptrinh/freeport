@@ -122,6 +122,7 @@ jobs:
             | **Windows** 10/11 (x64; also runs on Windows-on-ARM) | `Freeport_…_x64-setup.exe` (or the `.msi`) |
             | **Linux** — x64, Debian/Ubuntu | `Freeport_…_amd64.deb` |
             | **Linux** — arm64 (Raspberry Pi 4+, ARM servers) | `Freeport_…_arm64.deb` |
+            | **Any browser, no install** — single-file offline copy | `Freeport_…-offline.html` |
 
             The `.sig`, `.app.tar.gz`, and `latest.json` files are used by the app's built-in auto-updater — you can ignore them.
 
@@ -131,6 +132,18 @@ jobs:
           # published release.
           releaseDraft: false
           includeUpdaterJson: true
+
+      - name: Attach single-file offline app to the release
+        # One leg only; the web bundle is platform-independent. Browsers can't
+        # "Save page as" a working copy (Chrome skips webfonts → no icons), so
+        # every release ships a fully self-contained HTML that runs from file://.
+        if: startsWith(github.ref, 'refs/tags/desktop-v') && matrix.platform == 'ubuntu-22.04'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#desktop-v}"
+          node apps/mobile/scripts/build-offline.mjs apps/desktop/dist "Freeport_${VERSION}-offline.html"
+          gh release upload "$GITHUB_REF_NAME" "Freeport_${VERSION}-offline.html" --clobber
 
       - name: Upload artifacts (dispatch validation builds)
         if: github.event_name == 'workflow_dispatch'

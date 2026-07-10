@@ -118,7 +118,9 @@ others**.
   [GitHub Releases](https://github.com/ptrinh/freeport/releases/latest) —
   macOS (`.dmg`, Apple Silicon + Intel, signed & notarized), Windows (`.exe`/`.msi`,
   x64 — runs on ARM via emulation), Linux (`.deb`, x64 + arm64) — with built-in
-  self-update on macOS/Windows.
+  self-update on macOS/Windows — plus a **single-file offline copy**
+  (`Freeport_x.y.z-offline.html`): the whole app, fonts and all 56 languages in
+  one HTML file that runs from `file://` with no install and no server.
 - **Reputation**: implemented — karma ratings (PoW-backed, `apps/mobile/src/karma.ts`),
   deal receipts, proven-deal counts, per-viewer web-of-trust weighting, and a
   `nostr_search_reputation` MCP tool. What remains open is *sybil resistance*:
