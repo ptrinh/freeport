@@ -93,6 +93,9 @@ html = html.replace(/(href|src)="(\/(?:favicon|icons)[^"]+)"/g, (m, attr, ref) =
   return fs.existsSync(file) ? `${attr}="${dataUri(file)}"` : m;
 });
 
+// Preload hints for local assets 404 from file:// (the real tags are inlined).
+html = html.replace(/<link rel="preload" href="\/[^"]+"[^>]*>\n?/g, '');
+
 // ── Drop PWA bits that are meaningless (and noisy) on file://.
 html = html.replace(/<link rel="manifest"[^>]*>\n?/, '');
 html = html.replace(/<script>if\("serviceWorker" in navigator\)[\s\S]*?<\/script>\n?/, '');
@@ -127,12 +130,35 @@ for (const f of findFiles(path.join(dist, 'assets'), (p) => !p.endsWith('.ttf'))
   console.log(`  embedded asset ${rel} (${(fs.statSync(f).size / 1024).toFixed(0)} kB)`);
 }
 
+// ── Runtime-injected CSS chunks (leaflet). The bundle appends
+// <link href="/_expo/static/css/…css"> at runtime — dead on file://, and
+// without leaflet.css the map renders no tiles. Embed every exported CSS file
+// (url() refs resolved) and let the shim rewrite the hrefs.
+const cssMap = {};
+const cssDir = path.join(dist, '_expo/static/css');
+if (fs.existsSync(cssDir)) {
+  for (const f of findFiles(cssDir, (p) => p.endsWith('.css'))) {
+    let css = fs.readFileSync(f, 'utf8');
+    css = css.replace(/url\((['"]?)([^)'"]+)\1\)/g, (mm, q, ref) => {
+      if (/^(data:|https?:)/.test(ref)) return mm;
+      const refPath = ref.split(/[?#]/)[0];
+      if (!refPath) return mm;
+      const asset = path.resolve(path.dirname(f), refPath);
+      return fs.existsSync(asset) && fs.statSync(asset).isFile() ? `url(${dataUri(asset)})` : mm;
+    });
+    const rel = '/' + path.relative(dist, f).split(path.sep).join('/');
+    cssMap[rel] = `data:text/css;base64,${Buffer.from(css, 'utf8').toString('base64')}`;
+    console.log(`  embedded css ${rel} (${(css.length / 1024).toFixed(0)} kB)`);
+  }
+}
+
 const shim = `<script>
 /* offline copy: swap runtime-injected icon-font URLs and /assets/ image srcs
    for embedded data URIs */
 (function(){
   var FONTS=${JSON.stringify(fontMap)};
   var ASSETS=${JSON.stringify(assetMap)};
+  var CSS=${JSON.stringify(cssMap)};
   function fixStyle(node){
     if(!node.textContent||node.textContent.indexOf('@font-face')===-1)return;
     var t=node.textContent,changed=false;
@@ -151,13 +177,19 @@ const shim = `<script>
      before require()ing it — which fails on file:// and fell back to English.
      Point those scripts at an empty data: URI: onload fires instantly and the
      pre-registered module resolves. */
+  function cssFor(v){
+    var m=(''+v).match(/\\/_expo\\/static\\/css\\/[^?#]+\\.css/);
+    return m&&CSS[m[0]]?CSS[m[0]]:null;
+  }
   try{
     var origCreate=document.createElement.bind(document);
     var srcDesc=Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype,'src');
+    var hrefDesc=Object.getOwnPropertyDescriptor(HTMLLinkElement.prototype,'href');
     var isChunk=function(v){return /\\/_expo\\/static\\/js\\/web\\/[^?#]+\\.js/.test(''+v);};
     document.createElement=function(tag){
       var el=origCreate.apply(document,arguments);
-      if((''+tag).toLowerCase()==='script'){
+      var t=(''+tag).toLowerCase();
+      if(t==='script'){
         Object.defineProperty(el,'src',{
           configurable:true,
           get:srcDesc.get,
@@ -165,6 +197,15 @@ const shim = `<script>
         });
         var osa=el.setAttribute.bind(el);
         el.setAttribute=function(n,v){osa(n,n==='src'&&isChunk(v)?'data:text/javascript,':v);};
+      } else if(t==='link'){
+        /* runtime CSS chunks (leaflet) — rewrite to embedded data URIs */
+        Object.defineProperty(el,'href',{
+          configurable:true,
+          get:hrefDesc.get,
+          set:function(v){var c=cssFor(v);hrefDesc.set.call(this,c||v);}
+        });
+        var ola=el.setAttribute.bind(el);
+        el.setAttribute=function(n,v){var c=n==='href'?cssFor(v):null;ola(n,c||v);};
       }
       return el;
     };

@@ -30,7 +30,10 @@ function notifUnavailable(): boolean {
   // On the Tauri desktop we instead use the native notification plugin (below),
   // so it is NOT "unavailable" there.
   const g = globalThis as any;
-  return g.isSecureContext === false || typeof Notification === 'undefined';
+  // file:// (offline single-file build): no service worker, and permission
+  // grants aren't persisted — suppress the notifications nag entirely.
+  const isFile = g.location?.protocol === 'file:';
+  return isFile || g.isSecureContext === false || typeof Notification === 'undefined';
 }
 
 export async function notificationGranted(): Promise<boolean> {

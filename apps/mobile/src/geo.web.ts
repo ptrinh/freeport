@@ -30,7 +30,12 @@ function getGeoFlag(): boolean | null {
 // manual picker, and the "grant location" nag is suppressed.
 function geoUnavailable(): boolean {
   const g = globalThis as any;
-  return !!g.__TAURI__ || g.isSecureContext === false || !g.navigator?.geolocation;
+  // file:// (the single-file offline build): Chrome never PERSISTS a
+  // geolocation grant for file origins, so every getCurrentPosition() call
+  // re-prompts — the app asked "allow location?" in a loop. Treat it like
+  // Tauri: skip GPS entirely and fall back to coarse IP location.
+  const isFile = g.location?.protocol === 'file:';
+  return !!g.__TAURI__ || isFile || g.isSecureContext === false || !g.navigator?.geolocation;
 }
 
 export async function getCurrentCoords(): Promise<Coords | null> {

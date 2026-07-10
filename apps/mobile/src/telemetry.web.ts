@@ -15,6 +15,10 @@ let enabled = false;
 let started = false;
 
 export async function initTelemetry(on: boolean): Promise<void> {
+  // The single-file offline build (file://) reports nothing: every event from
+  // there is environment noise (failed fetches with no stack, no sourcemaps)
+  // — e.g. "NetworkError: A network error occurred." (GlitchTip issue 4).
+  if (typeof location !== 'undefined' && location.protocol === 'file:') return;
   enabled = on;
   if (started) return;
   started = true;
