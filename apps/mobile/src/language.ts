@@ -82,13 +82,15 @@ export const LANGUAGES: Language[] = [
   { code: 'uk', name: 'Ukrainian', native: 'Українська' },
   { code: 'ur', name: 'Urdu', native: 'اردو' },
   { code: 'uz', name: 'Uzbek', native: 'Oʻzbekcha' },
-  { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt' },
+  // Hidden from the picker for now (kept as a catalog so existing users who
+  // already selected it keep a fully-translated UI):
+  // { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt' },
 ];
 
 export const LANGUAGE_CODES: string[] = LANGUAGES.map((l) => l.code);
 const NATIVE_NAME: Record<string, string> = Object.fromEntries(LANGUAGES.map((l) => [l.code, l.native]));
 
-/** Native name for a code (e.g. 'vi' → 'Tiếng Việt'); falls back to the code itself. */
+/** Native name for a code (e.g. 'th' → 'ไทย'); falls back to the code itself. */
 export function languageLabel(code: string): string {
   return NATIVE_NAME[code] ?? code;
 }
@@ -116,7 +118,7 @@ export function systemLanguage(): string {
 }
 
 /**
- * The device's region as an ISO 3166-1 alpha-2 code, e.g. 'VN' from "vi-VN",
+ * The device's region as an ISO 3166-1 alpha-2 code, e.g. 'DE' from "de-DE",
  * 'CN' from "zh-Hans-CN". '' when the locale has no region subtag. Used as a
  * best-effort fallback (e.g. default currency) before the user sets a location
  * and when GPS/IP detection comes back empty.

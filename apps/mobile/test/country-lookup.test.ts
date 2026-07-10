@@ -15,7 +15,7 @@ describe('COUNTRY_NAME (code → name lookup)', () => {
   });
 
   it('agrees with countryByCode', () => {
-    expect(COUNTRY_NAME['VN']).toBe('Vietnam');
+    expect(COUNTRY_NAME['TH']).toBe('Thailand');
     expect(COUNTRY_NAME['SG']).toBe('Singapore');
     expect(COUNTRY_NAME['US']).toBe(countryByCode('US')!.name);
   });

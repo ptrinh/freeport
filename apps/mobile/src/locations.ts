@@ -55,25 +55,29 @@ const ms = (...names: string[]): Record<string, string[]> =>
   Object.fromEntries(names.map((n) => [n, []]));
 
 export const COUNTRIES: CountryData[] = [
-  {
-    code: 'VN',
-    name: 'Vietnam',
-    levels: 2,
-    states: {
-      'Hồ Chí Minh': ['Quận 1', 'Quận 3', 'Quận 5', 'Quận 7', 'Bình Thạnh', 'Phú Nhuận', 'Thủ Đức', 'Gò Vấp', 'Tân Bình'],
-      'Hà Nội': ['Hoàn Kiếm', 'Ba Đình', 'Đống Đa', 'Cầu Giấy', 'Hai Bà Trưng', 'Tây Hồ', 'Long Biên', 'Hà Đông'],
-      'Đà Nẵng': ['Hải Châu', 'Thanh Khê', 'Sơn Trà', 'Ngũ Hành Sơn', 'Liên Chiểu'],
-      'Hải Phòng': ['Hồng Bàng', 'Lê Chân', 'Ngô Quyền', 'Hải An'],
-      'Cần Thơ': ['Ninh Kiều', 'Bình Thủy', 'Cái Răng'],
-      'Bình Dương': ['Thủ Dầu Một', 'Dĩ An', 'Thuận An'],
-      'Đồng Nai': ['Biên Hòa', 'Long Khánh'],
-      'Khánh Hòa': ['Nha Trang', 'Cam Ranh'],
-      'Lâm Đồng': ['Đà Lạt', 'Bảo Lộc'],
-      'Quảng Ninh': ['Hạ Long', 'Cẩm Phả', 'Móng Cái'],
-      'Thừa Thiên Huế': ['Huế'],
-      'Bà Rịa – Vũng Tàu': ['Vũng Tàu', 'Bà Rịa'],
-    },
-  },
+  // Vietnam is hidden from the location picker for now (pending legal review
+  // of the VN market). Functional per-country data (currency, dial codes,
+  // reverse-geocode language) is intentionally kept so posts/deals originating
+  // there still render correctly for everyone else.
+  // {
+  //   code: 'VN',
+  //   name: 'Vietnam',
+  //   levels: 2,
+  //   states: {
+  //     'Hồ Chí Minh': ['Quận 1', 'Quận 3', 'Quận 5', 'Quận 7', 'Bình Thạnh', 'Phú Nhuận', 'Thủ Đức', 'Gò Vấp', 'Tân Bình'],
+  //     'Hà Nội': ['Hoàn Kiếm', 'Ba Đình', 'Đống Đa', 'Cầu Giấy', 'Hai Bà Trưng', 'Tây Hồ', 'Long Biên', 'Hà Đông'],
+  //     'Đà Nẵng': ['Hải Châu', 'Thanh Khê', 'Sơn Trà', 'Ngũ Hành Sơn', 'Liên Chiểu'],
+  //     'Hải Phòng': ['Hồng Bàng', 'Lê Chân', 'Ngô Quyền', 'Hải An'],
+  //     'Cần Thơ': ['Ninh Kiều', 'Bình Thủy', 'Cái Răng'],
+  //     'Bình Dương': ['Thủ Dầu Một', 'Dĩ An', 'Thuận An'],
+  //     'Đồng Nai': ['Biên Hòa', 'Long Khánh'],
+  //     'Khánh Hòa': ['Nha Trang', 'Cam Ranh'],
+  //     'Lâm Đồng': ['Đà Lạt', 'Bảo Lộc'],
+  //     'Quảng Ninh': ['Hạ Long', 'Cẩm Phả', 'Móng Cái'],
+  //     'Thừa Thiên Huế': ['Huế'],
+  //     'Bà Rịa – Vũng Tàu': ['Vũng Tàu', 'Bà Rịa'],
+  //   },
+  // },
   {
     code: 'SG',
     name: 'Singapore',
@@ -383,7 +387,7 @@ export function currencyForCountry(code: string): Currency {
  * ISO-3166 country ("vn_hanoi_ridesharing" → VN → VND; the legacy demo key
  * "sg-rideshare" → SG → SGD), so an offer on a post priced in that market can
  * default to the POST's currency — not the responder's. A Singapore-based user
- * offering on a Hanoi ride must see VND, whatever their device/location says.
+ * offering on a Bangkok ride must see THB, whatever their device/location says.
  */
 export function currencyForMarket(market: string | undefined, fallback: Currency): Currency {
   const cc = String(market || '').split(/[_-]/)[0].toUpperCase();
@@ -393,8 +397,8 @@ export function currencyForMarket(market: string | undefined, fallback: Currency
 /** Currency to prefill in an offer/respond form. Priority:
  *  1. The post's explicit asking price → its currency (poster's choice).
  *  2. The PICKUP's country — a ride is paid at the curb in the pickup
- *     country's money (user report: a Vietnam-pickup post that landed in an
- *     SG market offered S$; it must offer ₫).
+ *     country's money (user report: a pickup post that landed in another country's
+ *     another market offered that market's currency; it must offer the pickup's).
  *  3. The market topic's country, else USD. */
 export function offerCurrency(
   explicit: Currency | null | undefined,
@@ -430,7 +434,7 @@ export function currencySymbol(currency: Currency): string {
 
 /**
  * Format a money amount in its currency for display.
- * Vietnam and Singapore keep their established local look (123.456₫ / S$50);
+ * Each currency keeps its established local look (123.456 Rp / RM50);
  * every other currency uses Intl with its narrow symbol and native digits.
  */
 export function fmtMoney(amount: number, currency: Currency): string {
@@ -449,7 +453,7 @@ export function levelsOf(code: string): 1 | 2 | 3 {
   return countryByCode(code)?.levels ?? 2;
 }
 
-/** Lowercase + strip diacritics for fuzzy matching ("Hồ Chí Minh" ↔ "Ho Chi Minh"). */
+/** Lowercase + strip diacritics for fuzzy matching ("São Paulo" ↔ "Sao Paulo"). */
 function norm(s: string): string {
   return s
     .toLowerCase()
@@ -459,7 +463,7 @@ function norm(s: string): string {
     .trim();
 }
 
-/** Space/hyphen-insensitive form so "Hanoi" ↔ "Hà Nội", "North-East" ↔ "North East". */
+/** Space/hyphen-insensitive form so "Sao Paulo" ↔ "São Paulo", "North-East" ↔ "North East". */
 function tight(s: string): string {
   return s.replace(/[\s-]/g, '');
 }
@@ -471,7 +475,7 @@ function fuzzyFind(options: string[], query: string): string {
   return (
     options.find((o) => norm(o) === q) ||
     options.find((o) => norm(o).includes(q) || q.includes(norm(o))) ||
-    // Space/hyphen-insensitive ("Hanoi" ↔ "Hà Nội", "North-East" ↔ "North East")
+    // Space/hyphen-insensitive ("Sao Paulo" ↔ "São Paulo", "North-East" ↔ "North East")
     options.find((o) => tight(norm(o)).includes(qt) || qt.includes(tight(norm(o)))) ||
     ''
   );
@@ -500,7 +504,7 @@ export interface LocationOption {
   country: string;
   state: string;
   city: string;
-  label: string;   // e.g. "🇻🇳  Hà Nội, Vietnam" or "🇺🇸  Brooklyn · New York, United States"
+  label: string;   // e.g. "🇧🇷  São Paulo, Brazil" or "🇺🇸  Brooklyn · New York, United States"
   level: 1 | 2 | 3; // 1 = country, 2 = state, 3 = city (used only for ranking)
 }
 
@@ -529,8 +533,8 @@ function buildSearchIndex(): { key: string; opt: LocationOption }[] {
 
 /**
  * Fuzzy quick-search across all countries/states/cities for the location picker.
- * Diacritic- and space-insensitive, so "Han" → "Hà Nội" and "hochiminh" → "Hồ
- * Chí Minh". Prefix matches rank above substring matches; then by level (more
+ * Diacritic- and space-insensitive, so "Sao" → "São Paulo" and "saopaulo" → "São
+ * Paulo". Prefix matches rank above substring matches; then by level (more
  * specific first). Returns at most `limit` results; '' for queries under 2 chars.
  */
 export function searchLocations(query: string, limit = 8): LocationOption[] {

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { parseLocaleAmount, parseAmountWithK } from '../src/money';
 
 describe('parseLocaleAmount', () => {
-  // Regression: a Vietnamese-formatted "5,50" was read as 550 by parseFloat,
+  // Regression: a comma-decimal "5,50" (German/French style) was read as 550 by parseFloat,
   // turning a 5.50 SGD counter-offer into 550 SGD. (commit on the money round-trip)
   it('reads a comma decimal without inflating it', () => {
     expect(parseLocaleAmount('5,50')).toBe(5.5);

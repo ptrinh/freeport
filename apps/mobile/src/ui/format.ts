@@ -142,7 +142,7 @@ export function snapToStep(amount: number, currency: Currency): number {
 
 /**
  * Parse a number out of a money string formatted in ANY locale. `fmtMoney`
- * localises decimals — Vietnamese writes 5.50 as "5,50" and 1234.50 as
+ * localises decimals — German writes 5.50 as "5,50" and 1234.50 as
  * "1.234,50", English as "5.50" / "1,234.50" — so a fixed dot-only parse turned
  * a VI "5,50" counter into 550. Treat the rightmost '.'/',' as the decimal
  * point, unless it's followed by a 3-digit group (then it's thousands, no
@@ -160,7 +160,7 @@ export function parsePayment(str: string | undefined, fallbackCurrency: Currency
 }
 
 /** Some locales conventionally write the currency mark after the number
- * (e.g. Vietnamese "10.000₫"), unlike the leading "$10" form. */
+ * (e.g. Polish "10,00 zł"), unlike the leading "$10" form. */
 export function symbolIsSuffix(currency: Currency): boolean {
   return currency === 'VND';
 }

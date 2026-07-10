@@ -1,7 +1,7 @@
 /**
  * Locale-tolerant money parsing.
  *
- * Payment amounts travel as locale-FORMATTED strings (e.g. a Vietnamese user
+ * Payment amounts travel as locale-FORMATTED strings (e.g. a German user
  * sees "5,50 SGD"), then get re-parsed on the other side. A naive parseFloat
  * drops the comma and reads "5,50" as 550 — the bug that turned a 5.50 SGD
  * counter-offer into 550 SGD. parseLocaleAmount treats the rightmost separator

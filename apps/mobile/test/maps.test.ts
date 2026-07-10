@@ -88,11 +88,11 @@ describe('distance helpers', () => {
   it('usesMiles is true only for mile countries', () => {
     expect(usesMiles('US')).toBe(true);
     expect(usesMiles('gb')).toBe(true);
-    expect(usesMiles('VN')).toBe(false);
+    expect(usesMiles('TH')).toBe(false);
     expect(usesMiles(undefined)).toBe(false);
   });
   it('formatDistance renders km and mi with a unit', () => {
-    expect(formatDistance(14.5, 'VN')).toMatch(/14|15/);
+    expect(formatDistance(14.5, 'TH')).toMatch(/14|15/);
     expect(formatDistance(10, 'US')).toMatch(/mi/i);
   });
   it('distanceKmBetweenGeohashes ~ correct for far points; null on invalid', () => {
@@ -120,8 +120,8 @@ describe('geohashForPlace', () => {
 describe('reverse / GPS / IP detection', () => {
   it('detectRawLocationGPS reverse-geocodes the device coords, null when denied', async () => {
     vi.mocked(geo.getCurrentCoords).mockResolvedValueOnce({ latitude: 1.3, longitude: 103.8 } as any);
-    vi.mocked(geo.reverseGeocodeRaw).mockResolvedValueOnce({ countryCode: 'SG', city: 'SG' } as any);
-    expect(await detectRawLocationGPS()).toEqual({ countryCode: 'SG', city: 'SG' });
+    vi.mocked(geo.reverseGeocodeRaw).mockResolvedValueOnce({ countryCode: 'MY', city: 'KL' } as any);
+    expect(await detectRawLocationGPS()).toEqual({ countryCode: 'MY', city: 'KL' });
 
     vi.mocked(geo.getCurrentCoords).mockResolvedValueOnce(null as any);
     expect(await detectRawLocationGPS()).toBeNull();
@@ -134,11 +134,11 @@ describe('reverse / GPS / IP detection', () => {
 
   it('detectRawLocationIP / detectCoordsIP read an IP lookup (cached)', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({
-      json: async () => ({ success: true, country_code: 'SG', region: 'Central', city: 'Singapore', latitude: 1.29, longitude: 103.85 }),
+      json: async () => ({ success: true, country_code: 'MY', region: 'KL', city: 'Kuala Lumpur', latitude: 3.14, longitude: 101.69 }),
     })) as any);
-    expect(await detectRawLocationIP()).toEqual({ countryCode: 'SG', region: 'Central', city: 'Singapore' });
+    expect(await detectRawLocationIP()).toEqual({ countryCode: 'MY', region: 'KL', city: 'Kuala Lumpur' });
     // Second call is served from the module's IP cache (same successful result).
-    expect(await detectCoordsIP()).toEqual({ latitude: 1.29, longitude: 103.85 });
+    expect(await detectCoordsIP()).toEqual({ latitude: 3.14, longitude: 101.69 });
     vi.unstubAllGlobals();
   });
 });

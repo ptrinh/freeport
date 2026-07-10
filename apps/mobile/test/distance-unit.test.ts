@@ -18,11 +18,11 @@ import { effectiveUnit, formatDistance, usesMiles } from '../src/maps';
 describe('effectiveUnit — single source of truth for km/mi', () => {
   it('explicit preference always wins, regardless of country', () => {
     expect(effectiveUnit('km', 'US')).toBe('km');
-    expect(effectiveUnit('mi', 'VN')).toBe('mi');
+    expect(effectiveUnit('mi', 'TH')).toBe('mi');
   });
 
-  it("the reported case: Auto in Vietnam → km (NOT miles)", () => {
-    expect(effectiveUnit('auto', 'VN')).toBe('km');
+  it("the reported case: Auto in a km country → km (NOT miles)", () => {
+    expect(effectiveUnit('auto', 'TH')).toBe('km');
   });
 
   it('Auto follows the country: mile countries → mi, others → km', () => {
@@ -33,10 +33,10 @@ describe('effectiveUnit — single source of truth for km/mi', () => {
   });
 
   it('legacy/missing pref values behave as Auto, never crash', () => {
-    expect(effectiveUnit(undefined, 'VN')).toBe('km');
+    expect(effectiveUnit(undefined, 'TH')).toBe('km');
     expect(effectiveUnit(null, 'US')).toBe('mi');
     expect(effectiveUnit('', undefined)).toBe('km');
-    expect(effectiveUnit('AUTO', 'VN')).toBe('km'); // unknown string ≠ km/mi → auto
+    expect(effectiveUnit('AUTO', 'TH')).toBe('km'); // unknown string ≠ km/mi → auto
   });
 
   it('agrees with usesMiles for the auto path', () => {
@@ -46,20 +46,20 @@ describe('effectiveUnit — single source of truth for km/mi', () => {
 
 describe('formatDistance — rounds before Intl (Hermes maximumFractionDigits bug)', () => {
   it('the reported value: 313 km shown in miles is "195 mi", never "194.53mi"', () => {
-    const s = formatDistance(313.06, 'VN', 'mi');
+    const s = formatDistance(313.06, 'TH', 'mi');
     expect(s).toMatch(/195/);
     expect(s).not.toMatch(/194\.5/);
   });
 
   it('same distance in km stays km', () => {
-    const s = formatDistance(313.06, 'VN', 'km');
+    const s = formatDistance(313.06, 'TH', 'km');
     expect(s).toMatch(/313/);
     expect(s).toMatch(/km/);
     expect(s).not.toMatch(/mi/);
   });
 
   it('short distances keep one decimal', () => {
-    expect(formatDistance(4.26, 'VN', 'km')).toMatch(/4[.,]3/);
+    expect(formatDistance(4.26, 'TH', 'km')).toMatch(/4[.,]3/);
   });
 
   it('explicit unit beats the country fallback', () => {

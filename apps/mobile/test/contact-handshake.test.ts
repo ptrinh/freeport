@@ -14,11 +14,11 @@ const NOW = 1_800_000_000;
 
 describe('needsContactBackflow — send our contact when theirs arrived', () => {
   it('the passenger case: confirmed, has their contact, never sent ours', () => {
-    expect(needsContactBackflow({ state: 'confirmed', theirContact: 'awadw · +65…', ourContact: undefined } as any)).toBe(true);
+    expect(needsContactBackflow({ state: 'confirmed', theirContact: 'awadw · +66…', ourContact: undefined } as any)).toBe(true);
   });
 
   it('already sent ours → nothing to do (prevents re-send spam)', () => {
-    expect(needsContactBackflow({ state: 'confirmed', theirContact: 'x', ourContact: 'me · +84…' } as any)).toBe(false);
+    expect(needsContactBackflow({ state: 'confirmed', theirContact: 'x', ourContact: 'me · +60…' } as any)).toBe(false);
   });
 
   it('not confirmed / no inbound contact yet → no back-flow', () => {
@@ -28,7 +28,7 @@ describe('needsContactBackflow — send our contact when theirs arrived', () => 
 });
 
 describe('shouldPokeForContact — waiting side re-sends its accept', () => {
-  const stuck = { state: 'confirmed', ourContact: 'me · +84…', theirContact: undefined, updatedAt: NOW - 300 };
+  const stuck = { state: 'confirmed', ourContact: 'me · +60…', theirContact: undefined, updatedAt: NOW - 300 };
 
   it('the driver case: confirmed, sent ours, theirs missing, stuck > grace', () => {
     expect(shouldPokeForContact(stuck as any, NOW)).toBe(true);

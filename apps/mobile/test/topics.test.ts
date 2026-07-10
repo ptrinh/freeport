@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { areaKey, intentTopics, browseTopic } from '../src/topics';
 
-const loc = (o: Record<string, unknown> = {}): any => ({ country: 'VN', state: '', city: 'Ha Noi', ...o });
+const loc = (o: Record<string, unknown> = {}): any => ({ country: 'BR', state: '', city: 'Sao Paulo', ...o });
 
 describe('areaKey', () => {
   it('joins country + city, slugged and diacritic-stripped', () => {
-    expect(areaKey(loc({ city: 'Hà Nội' }))).toBe('vn_hanoi');
+    expect(areaKey(loc({ city: 'São Paulo' }))).toBe('br_saopaulo');
   });
   it('falls back to state when there is no city', () => {
-    expect(areaKey(loc({ city: '', state: 'Hanoi' }))).toBe('vn_hanoi');
+    expect(areaKey(loc({ city: '', state: 'Sao Paulo' }))).toBe('br_saopaulo');
   });
   it('uses country alone when no city/state', () => {
     expect(areaKey(loc({ country: 'SG', city: '', state: '' }))).toBe('sg');

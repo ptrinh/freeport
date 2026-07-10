@@ -38,7 +38,7 @@ describe('isRtlLang', () => {
     for (const c of ['ar', 'he', 'fa', 'ur', 'ar-EG', 'he_IL', 'FA']) expect(isRtlLang(c)).toBe(true);
   });
   it('treats everything else as LTR', () => {
-    for (const c of ['en', 'vi', 'zh', 'ru', 'de', '', 'xx']) expect(isRtlLang(c)).toBe(false);
+    for (const c of ['en', 'th', 'zh', 'ru', 'de', '', 'xx']) expect(isRtlLang(c)).toBe(false);
   });
   it('exposes exactly the four catalogs', () => {
     expect([...RTL_LANGS].sort()).toEqual(['ar', 'fa', 'he', 'ur']);

@@ -718,8 +718,8 @@ function RespondEditor({
   const isRide = intent.content.schema.startsWith('rideshare');
   const p = intent.content.payload as Record<string, any>;
   const intentWindow = intent.content.window;
-  // Unpriced posts default the offer to the POST's market currency (a Hanoi
-  // ride → VND) — a Singaporean responding to a Hanoi post was getting SGD.
+  // Unpriced posts default the offer to the POST's market currency (a Bangkok
+  // ride → THB) — a responder from another country was getting their own currency.
   const intentPay = parsePayment(p.payment, currencyForMarket(intent.content.market, 'USD'));
   const intentDur = p.duration_minutes ?? 60;
   const [time, setTime] = useState<Date>(() =>
@@ -734,7 +734,8 @@ function RespondEditor({
   const [sending, setSending] = useState(false);
 
   // Unpriced ride: the market topic can carry the POSTER's selected country,
-  // not the pickup's (a Vietnam pickup posted into an SG market showed S$).
+  // not the pickup's (a pickup in country A posted into a country-B market
+  // showed B's currency).
   // Resolve the pickup geohash to its country (cached Nominatim lookup) and
   // switch the offer currency — unless the user already changed it.
   useEffect(() => {

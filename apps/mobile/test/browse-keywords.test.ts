@@ -1,34 +1,34 @@
 /**
- * Multi-keyword filter: comma-separated terms, AND semantics — the user's
- * example "158, Nẵng" must match a post whose text contains both "158" and
- * "Nẵng" (a Đà Nẵng address at house number 158).
+ * Multi-keyword filter: comma-separated terms, AND semantics — e.g.
+ * "158, élysées" must match a post whose text contains both "158" and
+ * "élysées" (an address at house number 158; diacritics must match too).
  */
 import { describe, it, expect } from 'vitest';
 import { matchesKeywords } from '../src/browseFilter';
 
-const POST = '158 đường quang trung, phường hải châu → đường nguyễn văn linh, thành phố đà nẵng';
+const POST = '158 rue de la convention, vaugirard → avenue des champs-élysées, paris';
 
 describe('matchesKeywords', () => {
-  it('the example: "158, Nẵng" matches the Đà Nẵng post', () => {
-    expect(matchesKeywords(POST, '158, Nẵng')).toBe(true);
+  it('the example: "158, élysées" matches the Paris post', () => {
+    expect(matchesKeywords(POST, '158, élysées')).toBe(true);
   });
 
   it('AND semantics: every term must appear', () => {
-    expect(matchesKeywords(POST, '158, Hà Nội')).toBe(false);
-    expect(matchesKeywords(POST, 'quang trung, hải châu, 158')).toBe(true);
+    expect(matchesKeywords(POST, '158, marseille')).toBe(false);
+    expect(matchesKeywords(POST, 'convention, vaugirard, 158')).toBe(true);
   });
 
   it('single keyword still works (no commas)', () => {
-    expect(matchesKeywords(POST, 'nẵng')).toBe(true);
-    expect(matchesKeywords(POST, 'saigon')).toBe(false);
+    expect(matchesKeywords(POST, 'élysées')).toBe(true);
+    expect(matchesKeywords(POST, 'berlin')).toBe(false);
   });
 
   it('case-insensitive on both sides', () => {
-    expect(matchesKeywords(POST.toUpperCase(), 'nẵng, QUANG trung')).toBe(true);
+    expect(matchesKeywords(POST.toUpperCase(), 'élysées, RUE de')).toBe(true);
   });
 
   it('whitespace around terms is ignored', () => {
-    expect(matchesKeywords(POST, '  158 ,   nẵng  ')).toBe(true);
+    expect(matchesKeywords(POST, '  158 ,   élysées  ')).toBe(true);
   });
 
   it('empty / commas-only queries match everything', () => {

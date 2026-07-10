@@ -87,8 +87,8 @@ async function fetchJsonUncached(path: string, acceptLang?: string): Promise<any
 /**
  * "<house> <road>, <suburb/district>, <city>" from a Nominatim address object.
  * `houseNumber` (a number the user typed) is kept when the result matched only
- * the street — e.g. "453 Ngọc Hồi" where OSM has no exact house 453, so the
- * driver still sees the number rather than just "Ngọc Hồi, …".
+ * the street — e.g. "453 Sukhumvit" where OSM has no exact house 453, so the
+ * driver still sees the number rather than just "Sukhumvit, …".
  */
 function addressLine(a: any, fallbackName?: string, houseNumber?: string): string {
   const street = a.road || fallbackName; // primary line (road, else the place name)
@@ -143,7 +143,7 @@ export async function forwardOne(name: string): Promise<Coords | null> {
  * Labels come back in the LOCATION's local language (COUNTRY_LANG), not the
  * passenger's app language, so the chosen destination is one the local driver
  * can read. The typed query still matches in any language — Nominatim resolves
- * "Noi Bai Airport" and "Sân bay Nội Bài" alike; we just localize the label.
+ * "Suvarnabhumi Airport" and "สนามบินสุวรรณภูมิ" alike; we just localize the label.
  */
 export async function suggest(
   query: string,
@@ -163,11 +163,11 @@ export async function suggest(
   }
   // Label in the destination country's local language; fall back to ENGLISH
   // (not the passenger's app language) so places show their real name — e.g.
-  // Singapore stays "Singapore", not the Vietnamese exonym "Tân Gia Ba".
+  // Munich stays "Munich", not a translated exonym like "Múnich".
   const localLang = (countryCode && COUNTRY_LANG[countryCode.toUpperCase()]) || 'en';
   const arr = await fetchJson(path, localLang);
   if (!Array.isArray(arr)) return [];
-  // A leading house number the user typed (e.g. "453 Ngọc Hồi") — kept in the
+  // A leading house number the user typed (e.g. "453 Sukhumvit") — kept in the
   // label when the matched result is just the street.
   const typedHouseNo = (query.match(/^\s*(\d{1,5}[A-Za-z]?)\b/) || [])[1];
   const out = arr
