@@ -42,6 +42,15 @@ export interface WalletTx {
   settled: boolean;
 }
 
+/** Simplified parse result for the Send flow (subset of the SDK's InputType). */
+export type ParsedDest =
+  | { kind: 'bolt11'; raw: string; sats: number | null; description?: string }
+  | { kind: 'lightningAddress'; raw: string }
+  | { kind: 'lnurlPay'; raw: string }
+  | { kind: 'bitcoinAddress'; raw: string }
+  | { kind: 'sparkAddress'; raw: string }
+  | { kind: 'unknown'; raw: string };
+
 export interface WalletProvider {
   readonly kind: 'nwc' | 'breez-spark';
   capabilities(): WalletCapabilities;
@@ -63,6 +72,12 @@ export interface WalletProvider {
   pay(destination: string, sats?: number): Promise<{ preimage?: string }>;
   /** Recent transactions, newest first. Empty if unsupported. */
   transactions(limit?: number): Promise<WalletTx[]>;
+  /** Classify a Send destination. Falls back to local heuristics (NWC). */
+  parse(input: string): Promise<ParsedDest>;
+  /** BTC price in `usd` per BTC, or null when the provider has no rate feed. */
+  usdRate(): Promise<number | null>;
+  /** A fresh on-chain deposit address, or null when unsupported (NWC). */
+  receiveOnchain(): Promise<string | null>;
   /** Tear down sockets/subscriptions. */
   close(): void;
 }

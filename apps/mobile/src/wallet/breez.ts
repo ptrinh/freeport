@@ -20,7 +20,7 @@ import { Platform } from 'react-native';
 import { loadKey } from '../identity';
 import { deriveWalletMnemonic } from './seed';
 import { mapSparkPayments } from './breezMap';
-import type { WalletBalance, WalletCapabilities, WalletInvoice, WalletProvider, WalletTx } from './types';
+import type { ParsedDest, WalletBalance, WalletCapabilities, WalletInvoice, WalletProvider, WalletTx } from './types';
 
 const API_KEY = process.env.EXPO_PUBLIC_BREEZ_API_KEY || '';
 const WASM_URL = '/breez_sdk_spark_wasm_bg.wasm';
@@ -165,6 +165,42 @@ export class BreezSparkProvider implements WalletProvider {
     } catch {
       return [];
     }
+  }
+
+  async parse(input: string): Promise<ParsedDest> {
+    const raw = input.trim();
+    try {
+      const r = await this.sdk.parse(raw);
+      switch (r?.type) {
+        case 'bolt11Invoice':
+          return { kind: 'bolt11', raw, sats: r.amountMsat != null ? Math.floor(Number(r.amountMsat) / 1000) : null, description: r.description || undefined };
+        case 'lightningAddress': return { kind: 'lightningAddress', raw };
+        case 'lnurlPay': return { kind: 'lnurlPay', raw };
+        case 'bitcoinAddress': return { kind: 'bitcoinAddress', raw };
+        case 'bip21': return { kind: 'bitcoinAddress', raw };
+        case 'sparkAddress':
+        case 'sparkInvoice': return { kind: 'sparkAddress', raw };
+        default: return { kind: 'unknown', raw };
+      }
+    } catch {
+      return { kind: 'unknown', raw };
+    }
+  }
+
+  private rateCache: { at: number; usd: number | null } | null = null;
+  async usdRate(): Promise<number | null> {
+    if (this.rateCache && Date.now() - this.rateCache.at < 60_000) return this.rateCache.usd;
+    try {
+      const rates: Array<{ coin: string; value: number }> = await this.sdk.fetchFiatRates();
+      const usd = rates?.find((r) => r.coin?.toUpperCase() === 'USD')?.value ?? null;
+      this.rateCache = { at: Date.now(), usd };
+      return usd;
+    } catch { return null; }
+  }
+
+  async receiveOnchain(): Promise<string | null> {
+    const r = await this.sdk.receivePayment({ paymentMethod: { type: 'bitcoinAddress' } });
+    return r?.paymentRequest || null;
   }
 
   /** The built-in wallet stays connected for the app's lifetime (it keeps

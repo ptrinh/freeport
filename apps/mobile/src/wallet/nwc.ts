@@ -11,8 +11,9 @@
 import { SimplePool } from 'nostr-tools/pool';
 import { finalizeEvent, getPublicKey, type Event } from 'nostr-tools/pure';
 import { encrypt as nip04Encrypt, decrypt as nip04Decrypt } from 'nostr-tools/nip04';
-import type { WalletBalance, WalletCapabilities, WalletInvoice, WalletProvider, WalletTx } from './types';
+import type { ParsedDest, WalletBalance, WalletCapabilities, WalletInvoice, WalletProvider, WalletTx } from './types';
 import { isLightningAddress, lnurlPayInvoice } from './lnurl';
+import { bolt11Sats } from './bolt11';
 
 const REQUEST_KIND = 23194;
 const RESPONSE_KIND = 23195;
@@ -122,6 +123,25 @@ export class NwcProvider implements WalletProvider {
 
   async address(): Promise<string | null> {
     return this.conn.lud16 ?? null;
+  }
+
+  async parse(input: string): Promise<ParsedDest> {
+    const raw = input.trim();
+    if (/^(lightning:)?ln(bc|tbs|tb|bcrt)/i.test(raw)) {
+      const inv = raw.replace(/^lightning:/i, '');
+      return { kind: 'bolt11', raw: inv, sats: bolt11Sats(inv) };
+    }
+    if (isLightningAddress(raw)) return { kind: 'lightningAddress', raw };
+    if (/^lnurl1/i.test(raw)) return { kind: 'lnurlPay', raw };
+    return { kind: 'unknown', raw };
+  }
+
+  async usdRate(): Promise<number | null> {
+    return null; // NIP-47 has no rate feed
+  }
+
+  async receiveOnchain(): Promise<string | null> {
+    return null;
   }
 
   async pay(destination: string, sats?: number): Promise<{ preimage?: string }> {

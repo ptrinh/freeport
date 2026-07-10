@@ -3,7 +3,7 @@ import { NwcProvider, parseNwcUrl } from './nwc';
 import type { WalletProvider } from './types';
 
 export { parseNwcUrl } from './nwc';
-export type { WalletProvider, WalletBalance, WalletInvoice, WalletTx, WalletCapabilities } from './types';
+export type { WalletProvider, WalletBalance, WalletInvoice, WalletTx, WalletCapabilities, ParsedDest } from './types';
 
 /**
  * Bring-your-own provider: constructed synchronously from a stored NWC url.
