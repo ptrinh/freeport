@@ -79,8 +79,13 @@ freeport run --config <agent.json>       full agent loop [--post intent.json] [-
 ### Desktop app CLI (headless host)
 
 The desktop app ([GitHub Releases](https://github.com/ptrinh/freeport/releases))
-doubles as a headless server — host Freeport for people on your network from a
-terminal, a VPS, or systemd, no window needed:
+ships with a **full copy of the Freeport web app embedded** — it runs entirely
+on its own, without freeport.network or any hosted infrastructure, talking
+straight to the public Nostr relays. That same embedded copy makes it a
+**self-host kit for Freeport itself**: it doubles as a headless server that
+serves the app to people on your network from a terminal, a VPS, or systemd,
+no window needed. If freeport.network ever disappeared, every desktop install
+would keep working and could host the app for others:
 
 ```sh
 # macOS (or symlink it: sudo ln -s /Applications/Freeport.app/Contents/MacOS/Freeport /usr/local/bin/freeport)
