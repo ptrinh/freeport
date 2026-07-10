@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "لا يوجد لدى Freeport خادم مركزي. لتنبيهك عندما يكون التطبيق مغلقًا، يراقب خادم إشعارات صغير المُرحِّلات العامة بحثًا عن الأحداث الموجهة إليك ويُرسل إشعارًا فوريًا إلى جهازك.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "إنه لا يرى المحتوى: رسائلك مشفرة من طرف إلى طرف، لذا فهو يعرف فقط أن شيئًا ما قد وصل إليك، وليس ما يقوله أبدًا.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "استخدم الخادم العام (الـ URL الافتراضي)، أو شغّل خادمك الخاص بأمر واحد ووجّه الـ URL أعلاه إليه:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "ثم اضبط الـ URL أعلاه على خادمك (على سبيل المثال http://your-host:8788). على Umbrel، ثبّته من متجر تطبيقات مجتمع Freeport.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "ثم اضبط الـ URL أعلاه على خادمك (على سبيل المثال http://your-host:1988). على Umbrel، ثبّته من متجر تطبيقات مجتمع Freeport.",
   "Self-hosting guide on GitHub": "دليل الاستضافة الذاتية على GitHub",
   "Got it": "فهمت",
   "Share live location": "مشاركة الموقع المباشر",

@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport 没有中央服务器。为了在应用关闭时提醒你，一个小型通知服务器会监视公共中继上发给你的事件，并把 push 转发到你的设备。",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "它对内容是无感的：你的消息经过端到端加密，所以它只知道有东西发给了你，却永远不知道内容是什么。",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "使用公共服务器（默认 URL），或用一条命令运行你自己的服务器，并把上面的 URL 指向它：",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "然后把上面的 URL 设为你的服务器（例如 http://your-host:8788）。在 Umbrel 上，可从 Freeport 社区应用商店安装它。",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "然后把上面的 URL 设为你的服务器（例如 http://your-host:1988）。在 Umbrel 上，可从 Freeport 社区应用商店安装它。",
   "Self-hosting guide on GitHub": "GitHub 上的自托管指南",
   "Got it": "知道了",
   "Share live location": "共享实时位置",

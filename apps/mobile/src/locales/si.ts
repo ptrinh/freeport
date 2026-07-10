@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport හට මධ්‍යම සේවාදායකයක් නැත. යෙදුම වසා ඇති විට ඔබට දැනුම් දීම සඳහා, කුඩා දැනුම්දීම් සේවාදායකයක් ඔබ වෙත යොමු කළ සිදුවීම් සඳහා පොදු relay නිරීක්ෂණය කර ඔබේ උපාංගයට push එකක් යවයි.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "එය අන්තර්ගතයට අන්ධයි: ඔබේ පණිවිඩ අන්ත සිට අන්තය දක්වා සංකේතනය කර ඇති නිසා, ඔබ වෙත යමක් පැමිණි බව පමණක් එය දනී, එහි ඇත්තේ කුමක්දැයි කිසිදා නොදනී.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "පොදු එක භාවිතා කරන්න (පෙරනිමි URL), නැතහොත් එක් විධානයකින් ඔබේම එකක් ධාවනය කර ඉහත URL එය වෙත යොමු කරන්න:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "ඉන්පසු ඉහත URL ඔබේ සේවාදායකයට සකසන්න (උදාහරණයක් ලෙස http://your-host:8788). Umbrel මත, එය Freeport ප්‍රජා යෙදුම් ගබඩාවෙන් ස්ථාපනය කරන්න.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "ඉන්පසු ඉහත URL ඔබේ සේවාදායකයට සකසන්න (උදාහරණයක් ලෙස http://your-host:1988). Umbrel මත, එය Freeport ප්‍රජා යෙදුම් ගබඩාවෙන් ස්ථාපනය කරන්න.",
   "Self-hosting guide on GitHub": "GitHub හි ස්වයං-සත්කාරක මාර්ගෝපදේශය",
   "Got it": "තේරුණා",
   "Share live location": "සජීවී ස්ථානය බෙදාගන්න",

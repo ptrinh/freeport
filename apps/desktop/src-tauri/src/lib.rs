@@ -85,7 +85,7 @@ fn local_urls(port: u16) -> Vec<String> {
     urls
 }
 
-// ── Notification-server sidecar (bundled Bun-compiled freeport-nostr-mcp) ──────
+// ── Notification-server sidecar (bundled Bun-compiled freeport-self-hosted) ──────
 
 /// Path to the notifier sidecar next to the main executable (Tauri places
 /// externalBin there). None if this build didn't bundle it.

@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport에는 중앙 서버가 없습니다. 앱이 닫혀 있을 때 알려드리기 위해, 작은 알림 서버가 공개 릴레이에서 회원님 앞으로 온 이벤트를 감시하고 기기로 push를 전달합니다.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "내용은 볼 수 없습니다. 메시지는 종단 간 암호화되어 있어, 회원님께 무언가 도착했다는 것만 알 뿐 그 내용은 결코 알지 못합니다.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "공개 서버(기본 URL)를 사용하거나, 명령 한 줄로 직접 실행하고 위의 URL을 그쪽으로 지정하세요:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "그런 다음 위의 URL을 회원님의 서버로 설정하세요(예: http://your-host:8788). Umbrel에서는 Freeport 커뮤니티 앱 스토어에서 설치하세요.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "그런 다음 위의 URL을 회원님의 서버로 설정하세요(예: http://your-host:1988). Umbrel에서는 Freeport 커뮤니티 앱 스토어에서 설치하세요.",
   "Self-hosting guide on GitHub": "GitHub의 셀프 호스팅 가이드",
   "Got it": "확인",
   "Share live location": "실시간 위치 공유",

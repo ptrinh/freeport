@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport tidak punya server pusat. Untuk memberi tahu Anda saat aplikasi tertutup, sebuah server notifikasi kecil memantau relay publik untuk peristiwa yang ditujukan kepada Anda dan meneruskan push ke perangkat Anda.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "Ia buta terhadap konten: pesan Anda terenkripsi ujung ke ujung, jadi ia hanya tahu bahwa ada sesuatu yang tiba untuk Anda, tidak pernah tahu isinya.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Gunakan yang publik (URL bawaan), atau jalankan milik Anda sendiri dengan satu perintah dan arahkan URL di atas ke sana:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Lalu atur URL di atas ke server Anda (misalnya http://your-host:8788). Di Umbrel, pasang dari toko aplikasi komunitas Freeport.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Lalu atur URL di atas ke server Anda (misalnya http://your-host:1988). Di Umbrel, pasang dari toko aplikasi komunitas Freeport.",
   "Self-hosting guide on GitHub": "Panduan self-hosting di GitHub",
   "Got it": "Mengerti",
   "Share live location": "Bagikan lokasi langsung",

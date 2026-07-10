@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport ማዕከላዊ አገልጋይ የለውም። መተግበሪያው ሲዘጋ እንዲያሳውቅዎ፣ ትንሽ የማሳወቂያ አገልጋይ ለእርስዎ የተላኩ ክስተቶችን በይፋዊ ሪሌዮች ላይ ይከታተላል እና ወደ መሣሪያዎ ግፊት ይልካል።",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "ይዘት-ዕውር ነው፦ መልዕክቶችዎ ከጫፍ እስከ ጫፍ የተመሰጠሩ ናቸው፣ ስለዚህ ለእርስዎ የሆነ ነገር እንደደረሰ ብቻ ያውቃል፣ ምን እንደሚል ግን በፍጹም አያውቅም።",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "ይፋዊውን ይጠቀሙ (ነባሪው URL)፣ ወይም በአንድ ትዕዛዝ የራስዎን ያስኪዱ እና ከላይ ያለውን URL ወደ እሱ ያመልክቱ፦",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "ከዚያ ከላይ ያለውን URL ወደ አገልጋይዎ ያቀናብሩ (ለምሳሌ http://your-host:8788)። በUmbrel ላይ፣ ከFreeport ማህበረሰብ መተግበሪያ መደብር ይጫኑት።",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "ከዚያ ከላይ ያለውን URL ወደ አገልጋይዎ ያቀናብሩ (ለምሳሌ http://your-host:1988)። በUmbrel ላይ፣ ከFreeport ማህበረሰብ መተግበሪያ መደብር ይጫኑት።",
   "Self-hosting guide on GitHub": "በGitHub ላይ ራስን የማስተናገድ መመሪያ",
   "Got it": "ገባኝ",
   "Share live location": "የቀጥታ አካባቢ አጋራ",

@@ -1117,7 +1117,7 @@ function SettingsTab({
               <View style={s.codeBox}>
                 <Text style={s.codeText} selectable>{'git clone https://github.com/ptrinh/freeport.git\ncd freeport/packages/nostr-mcp\ndocker compose up -d'}</Text>
               </View>
-              <Text style={[s.dim, { marginTop: 10 }]}>{t("Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.")}</Text>
+              <Text style={[s.dim, { marginTop: 10 }]}>{t("Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.")}</Text>
               <Pressable style={[s.mapLink, { marginTop: 12 }]} onPress={() => Linking.openURL('https://github.com/ptrinh/freeport/tree/main/packages/nostr-mcp')}>
                 <Text style={s.mapLinkText}>{'🔗 ' + t("Self-hosting guide on GitHub")}</Text>
               </Pressable>

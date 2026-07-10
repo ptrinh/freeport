@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport တွင် ဗဟိုဆာဗာ မရှိပါ။ အက်ပ်ပိတ်ထားချိန်တွင် သင့်ကို သတိပေးရန် အသေးစားအကြောင်းကြားချက်ဆာဗာတစ်ခုသည် သင့်ထံ ပေးပို့သော ဖြစ်ရပ်များအတွက် အများသုံး relay များကို စောင့်ကြည့်ပြီး သင့်စက်ပစ္စည်းသို့ push ကို ပို့ပေးသည်။",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "၎င်းသည် အကြောင်းအရာကို မမြင်ပါ၊ သင့်စာများကို အစအဆုံး စာဝှက်ထားသဖြင့် သင့်ထံ တစ်ခုခုရောက်လာကြောင်းသာ သိပြီး ၎င်းတွင် ဘာရေးထားသည်ကို ဘယ်တော့မှ မသိပါ။",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "အများသုံးဆာဗာ (မူရင်း URL) ကို သုံးပါ၊ သို့မဟုတ် command တစ်ခုတည်းဖြင့် သင့်ကိုယ်ပိုင်ကို ဖွင့်ပြီး အပေါ်က URL ကို ၎င်းဆီ ညွှန်ပါ-",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "ထို့နောက် အပေါ်က URL ကို သင့်ဆာဗာသို့ သတ်မှတ်ပါ (ဥပမာ http://your-host:8788)။ Umbrel တွင် ၎င်းကို Freeport community app store မှ ထည့်သွင်းပါ။",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "ထို့နောက် အပေါ်က URL ကို သင့်ဆာဗာသို့ သတ်မှတ်ပါ (ဥပမာ http://your-host:1988)။ Umbrel တွင် ၎င်းကို Freeport community app store မှ ထည့်သွင်းပါ။",
   "Self-hosting guide on GitHub": "GitHub ပေါ်ရှိ self-hosting လမ်းညွှန်",
   "Got it": "နားလည်ပါပြီ",
   "Share live location": "တိုက်ရိုက်တည်နေရာ မျှဝေရန်",

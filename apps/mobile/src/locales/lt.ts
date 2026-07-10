@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport neturi centrinio serverio. Kad įspėtų jus, kai programėlė uždaryta, mažas pranešimų serveris stebi viešuosius relius dėl jums skirtų įvykių ir persiunčia push į jūsų įrenginį.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "Jis nemato turinio: jūsų žinutės užšifruotos visu maršrutu, todėl jis žino tik tai, kad jums kažkas atėjo, bet niekada nežino, kas ten parašyta.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Naudokite viešąjį (numatytąjį URL) arba paleiskite savąjį viena komanda ir nukreipkite į jį aukščiau esantį URL:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Tada nustatykite aukščiau esantį URL į savo serverį (pavyzdžiui http://your-host:8788). „Umbrel“ įdiekite jį iš Freeport bendruomenės programėlių parduotuvės.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Tada nustatykite aukščiau esantį URL į savo serverį (pavyzdžiui http://your-host:1988). „Umbrel“ įdiekite jį iš Freeport bendruomenės programėlių parduotuvės.",
   "Self-hosting guide on GitHub": "Savarankiško prieglobos vadovas „GitHub“",
   "Got it": "Supratau",
   "Share live location": "Bendrinti vietą tiesiogiai",

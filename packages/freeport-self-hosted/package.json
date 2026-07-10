@@ -1,11 +1,11 @@
 {
-  "name": "freeport-nostr-mcp",
+  "name": "freeport-self-hosted",
   "version": "0.6.9",
-  "description": "MCP server for searching Freeport Nostr events (ride requests, driver/provider offers, service & product posts, reputation) by kind, tag, and geohash radius.",
+  "description": "Self-hosted Freeport in a box: the web app + read-only MCP server + content-blind push notifier + Nostr relay + Telegram bridge, one process, default port 1988.",
   "type": "module",
   "mcpName": "io.github.ptrinh/freeport-nostr",
   "bin": {
-    "freeport-nostr-mcp": "dist/stdio.js"
+    "freeport-self-hosted": "dist/stdio.js"
   },
   "main": "dist/http.js",
   "files": [
@@ -20,7 +20,8 @@
     "start:http": "node dist/http.js",
     "dev": "tsx src/stdio.ts",
     "dev:http": "tsx src/http.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build:web": "bash ./build-web.sh"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",

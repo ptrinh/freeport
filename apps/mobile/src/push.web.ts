@@ -1,7 +1,7 @@
 /**
  * Web Push opt-in (PWA). Subscribes the browser to push via the bundled service
  * worker (pwa/sw.js) and registers with a self-hostable, content-blind sender
- * (the notifier bundled into freeport-nostr-mcp — see packages/nostr-mcp). One
+ * (the notifier bundled into freeport-self-hosted — see packages/freeport-self-hosted). One
  * subscription covers BOTH:
  *   - DMs: the sender watches kind:4 to your pubkey → "New message".
  *   - Intent alerts: new offers/requests matching your `filters` (topic /

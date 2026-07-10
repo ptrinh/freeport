@@ -83,7 +83,7 @@ jobs:
         run: |
           mkdir -p apps/desktop/src-tauri/binaries
           EXT=""; [ "${{ matrix.platform }}" = "windows-latest" ] && EXT=".exe"
-          bun build packages/nostr-mcp/src/http.ts --compile --target=${{ matrix.bun_target }} \
+          bun build packages/freeport-self-hosted/src/http.ts --compile --target=${{ matrix.bun_target }} \
             --outfile "apps/desktop/src-tauri/binaries/freeport-notifier-${{ matrix.triple }}$EXT"
 
       - name: Generate app icons

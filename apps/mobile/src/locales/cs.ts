@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport nemá žádný centrální server. Aby vás upozornil, když je aplikace zavřená, malý server oznámení sleduje veřejné relaye kvůli událostem adresovaným vám a přeposílá push do vašeho zařízení.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "Je slepý k obsahu: vaše zprávy jsou šifrované od konce ke konci, takže ví jen to, že vám něco přišlo, nikdy ne, co v tom stojí.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Použijte veřejný (výchozí URL), nebo spusťte vlastní jedním příkazem a nasměrujte na něj URL výše:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Poté nastavte URL výše na svůj server (například http://your-host:8788). Na Umbrelu jej nainstalujte z komunitního obchodu aplikací Freeport.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Poté nastavte URL výše na svůj server (například http://your-host:1988). Na Umbrelu jej nainstalujte z komunitního obchodu aplikací Freeport.",
   "Self-hosting guide on GitHub": "Návod na self-hosting na GitHubu",
   "Got it": "Rozumím",
   "Share live location": "Sdílet polohu naživo",

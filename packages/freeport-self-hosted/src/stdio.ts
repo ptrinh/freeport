@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** stdio entry — for `npx freeport-nostr-mcp` and the MCP registry self-host path. */
+/** stdio entry — for `npx freeport-self-hosted` and the MCP registry self-host path. */
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createServer } from './server.js';
 

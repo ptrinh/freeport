@@ -1,7 +1,7 @@
 /**
  * Link this identity's Telegram account for content-blind activity pings,
  * delivered by the same notification server as Web Push / Expo push (the
- * Telegram bridge in freeport-nostr-mcp). Platform-neutral: opening a
+ * Telegram bridge in freeport-self-hosted). Platform-neutral: opening a
  * `https://t.me/<bot>?start=<code>` link works on native and web alike, so —
  * unlike push.ts — there's no `.web` twin.
  *

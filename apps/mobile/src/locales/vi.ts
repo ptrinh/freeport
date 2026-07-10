@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport không có máy chủ trung tâm. Để báo cho bạn khi ứng dụng đã đóng, một máy chủ thông báo nhỏ sẽ theo dõi các relay công khai để tìm những sự kiện gửi đến bạn và chuyển một push tới thiết bị của bạn.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "Nó không thấy nội dung: tin nhắn của bạn được mã hóa đầu cuối, nên nó chỉ biết rằng có gì đó vừa đến cho bạn, chứ không bao giờ biết nội dung là gì.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Dùng máy chủ công khai (URL mặc định), hoặc tự chạy máy chủ riêng chỉ bằng một lệnh rồi trỏ URL ở trên vào nó:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Sau đó đặt URL ở trên thành máy chủ của bạn (ví dụ http://your-host:8788). Trên Umbrel, hãy cài đặt nó từ kho ứng dụng cộng đồng Freeport.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Sau đó đặt URL ở trên thành máy chủ của bạn (ví dụ http://your-host:1988). Trên Umbrel, hãy cài đặt nó từ kho ứng dụng cộng đồng Freeport.",
   "Self-hosting guide on GitHub": "Hướng dẫn tự lưu trữ trên GitHub",
   "Got it": "Đã hiểu",
   "Share live location": "Chia sẻ vị trí trực tiếp",

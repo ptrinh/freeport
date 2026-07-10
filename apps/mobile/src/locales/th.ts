@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport ไม่มีเซิร์ฟเวอร์กลาง เพื่อแจ้งเตือนคุณเมื่อปิดแอป เซิร์ฟเวอร์การแจ้งเตือนขนาดเล็กจะคอยเฝ้าดูรีเลย์สาธารณะเพื่อหาเหตุการณ์ที่ส่งถึงคุณ และส่งต่อ push ไปยังอุปกรณ์ของคุณ",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "มันมองไม่เห็นเนื้อหา ข้อความของคุณเข้ารหัสแบบครบวงจร ดังนั้นมันจึงรู้เพียงว่ามีบางอย่างมาถึงคุณ ไม่เคยรู้ว่าข้อความนั้นว่าอย่างไร",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "ใช้ตัวสาธารณะ (URL เริ่มต้น) หรือรันของคุณเองด้วยคำสั่งเดียวแล้วชี้ URL ด้านบนไปที่มัน:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "จากนั้นตั้งค่า URL ด้านบนให้เป็นเซิร์ฟเวอร์ของคุณ (ตัวอย่างเช่น http://your-host:8788) บน Umbrel ให้ติดตั้งจากแอปสโตร์ชุมชน Freeport",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "จากนั้นตั้งค่า URL ด้านบนให้เป็นเซิร์ฟเวอร์ของคุณ (ตัวอย่างเช่น http://your-host:1988) บน Umbrel ให้ติดตั้งจากแอปสโตร์ชุมชน Freeport",
   "Self-hosting guide on GitHub": "คู่มือการโฮสต์ด้วยตัวเองบน GitHub",
   "Got it": "เข้าใจแล้ว",
   "Share live location": "แชร์ตำแหน่งแบบเรียลไทม์",

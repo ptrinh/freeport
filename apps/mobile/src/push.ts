@@ -1,6 +1,6 @@
 /**
  * Remote push opt-in — NATIVE (iOS/Android). Gets an Expo push token and
- * registers it with the content-blind notifier (bundled into freeport-nostr-mcp).
+ * registers it with the content-blind notifier (bundled into freeport-self-hosted).
  * One token covers DMs (the sender watches kind:4 to your pubkey → "New message")
  * and intent alerts (new offers/requests matching `filters`). The notifier sends
  * via Expo's push service, which uses the APNs/FCM key held in this app's EAS

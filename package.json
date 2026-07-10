@@ -6,11 +6,11 @@
   "workspaces": [
     "packages/protocol",
     "packages/agent",
-    "packages/nostr-mcp"
+    "packages/freeport-self-hosted"
   ],
   "scripts": {
-    "build": "npm run build -w @freeport/protocol -w @freeport/agent -w freeport-nostr-mcp",
-    "test": "npm run test -w @freeport/protocol -w @freeport/agent -w freeport-nostr-mcp && npm run test --prefix apps/mobile",
+    "build": "npm run build -w @freeport/protocol -w @freeport/agent -w freeport-self-hosted",
+    "test": "npm run test -w @freeport/protocol -w @freeport/agent -w freeport-self-hosted && npm run test --prefix apps/mobile",
     "demo": "bash demo/run-demo.sh"
   },
   "devDependencies": {

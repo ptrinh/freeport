@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "У Freeport нет центрального сервера. Чтобы оповещать вас, когда приложение закрыто, небольшой сервер уведомлений следит за публичными реле в поисках событий, адресованных вам, и пересылает push на ваше устройство.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "Он не видит содержимое: ваши сообщения зашифрованы сквозным шифрованием, поэтому он знает лишь то, что вам что-то пришло, но никогда не знает, что именно.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Используйте публичный (URL по умолчанию) или запустите свой одной командой и направьте URL выше на него:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Затем укажите в URL выше ваш сервер (например http://your-host:8788). В Umbrel установите его из магазина приложений сообщества Freeport.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Затем укажите в URL выше ваш сервер (например http://your-host:1988). В Umbrel установите его из магазина приложений сообщества Freeport.",
   "Self-hosting guide on GitHub": "Руководство по самостоятельному хостингу на GitHub",
   "Got it": "Понятно",
   "Share live location": "Поделиться геопозицией в реальном времени",

@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport には中央サーバーがありません。アプリを閉じているときに通知するため、小さな通知サーバーが公開リレーを監視してあなた宛てのイベントを探し、あなたの端末に push を転送します。",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "内容は見えません。メッセージはエンドツーエンドで暗号化されているため、あなた宛てに何かが届いたことだけがわかり、その内容は決してわかりません。",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "公開サーバー（デフォルトの URL）を使うか、コマンド1つで自分のサーバーを起動し、上の URL をそこに向けてください：",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "その後、上の URL を自分のサーバーに設定します（例: http://your-host:8788）。Umbrel では、Freeport コミュニティアプリストアからインストールできます。",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "その後、上の URL を自分のサーバーに設定します（例: http://your-host:1988）。Umbrel では、Freeport コミュニティアプリストアからインストールできます。",
   "Self-hosting guide on GitHub": "GitHub のセルフホスティングガイド",
   "Got it": "了解",
   "Share live location": "現在地をリアルタイム共有",

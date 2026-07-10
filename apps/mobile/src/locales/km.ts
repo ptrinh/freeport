@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport មិនមានម៉ាស៊ីនមេកណ្តាលទេ។ ដើម្បីជូនដំណឹងអ្នកនៅពេលកម្មវិធីត្រូវបានបិទ ម៉ាស៊ីនមេជូនដំណឹងតូចមួយឃ្លាំមើល relay សាធារណៈរកព្រឹត្តិការណ៍ដែលផ្ញើទៅអ្នក ហើយបញ្ជូន push ទៅឧបករណ៍របស់អ្នក។",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "វាមើលមិនឃើញខ្លឹមសារទេ៖ សាររបស់អ្នកត្រូវបានអ៊ីនគ្រីបពីចុងដល់ចុង ដូច្នេះវាដឹងតែថាមានអ្វីមួយមកដល់សម្រាប់អ្នក មិនដែលដឹងថាវានិយាយអ្វីឡើយ។",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "ប្រើម៉ាស៊ីនមេសាធារណៈ (URL លំនាំដើម) ឬដំណើរការម៉ាស៊ីនមេផ្ទាល់ខ្លួនរបស់អ្នកដោយពាក្យបញ្ជាតែមួយ ហើយចង្អុល URL ខាងលើទៅវា៖",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "បន្ទាប់មកកំណត់ URL ខាងលើទៅម៉ាស៊ីនមេរបស់អ្នក (ឧទាហរណ៍ http://your-host:8788)។ នៅលើ Umbrel សូមដំឡើងវាពីហាងកម្មវិធីសហគមន៍ Freeport។",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "បន្ទាប់មកកំណត់ URL ខាងលើទៅម៉ាស៊ីនមេរបស់អ្នក (ឧទាហរណ៍ http://your-host:1988)។ នៅលើ Umbrel សូមដំឡើងវាពីហាងកម្មវិធីសហគមន៍ Freeport។",
   "Self-hosting guide on GitHub": "មគ្គុទេសក៍ self-hosting នៅលើ GitHub",
   "Got it": "យល់ហើយ",
   "Share live location": "ចែករំលែកទីតាំងផ្ទាល់",

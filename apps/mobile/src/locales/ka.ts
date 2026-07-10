@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport-ს არ აქვს ცენტრალური სერვერი. რომ გაგაფრთხილოთ, როცა აპი დახურულია, პატარა შეტყობინებების სერვერი აკვირდება საჯარო რელეებს თქვენთვის გაგზავნილ მოვლენებზე და გადასცემს push-ს თქვენს მოწყობილობას.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "ის ვერ ხედავს შინაარსს: თქვენი შეტყობინებები ბოლომდე დაშიფრულია, ამიტომ მან მხოლოდ ის იცის, რომ რაღაც მოვიდა თქვენთვის, არასოდეს — რას წერია მასში.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "გამოიყენეთ საჯარო (ნაგულისხმევი URL), ან გაუშვით საკუთარი ერთი ბრძანებით და ზემოთ მოცემული URL მიმართეთ მასზე:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "შემდეგ ზემოთ მოცემული URL დააყენეთ თქვენს სერვერზე (მაგალითად http://your-host:8788). Umbrel-ზე დააინსტალირეთ ის Freeport-ის თემის აპების მაღაზიიდან.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "შემდეგ ზემოთ მოცემული URL დააყენეთ თქვენს სერვერზე (მაგალითად http://your-host:1988). Umbrel-ზე დააინსტალირეთ ის Freeport-ის თემის აპების მაღაზიიდან.",
   "Self-hosting guide on GitHub": "თვით-ჰოსტინგის სახელმძღვანელო GitHub-ზე",
   "Got it": "გასაგებია",
   "Share live location": "გააზიარეთ რეალურ დროში მდებარეობა",

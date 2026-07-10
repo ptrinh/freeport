@@ -3,7 +3,7 @@
 ## Setup
 
 ```sh
-npm install                     # workspace packages (protocol, agent, nostr-mcp)
+npm install                     # workspace packages (protocol, agent, freeport-self-hosted)
 npm install --prefix apps/mobile  # the Expo app has its own tree
 npm run build && npm test       # build packages, run all four test suites
 ```

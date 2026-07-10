@@ -25,7 +25,7 @@ jobs:
         run: npm ci --prefix apps/mobile
       - name: Build packages
         run: npm run build
-      - name: Test (protocol, agent, nostr-mcp, mobile)
+      - name: Test (protocol, agent, freeport-self-hosted, mobile)
         run: npm test
       - name: Typecheck mobile app
         run: npx tsc --noEmit

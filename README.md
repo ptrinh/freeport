@@ -14,7 +14,7 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 
 - **App:** https://freeport.network (web/PWA) · [iOS](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901) · [Android](https://play.google.com/store/apps/details?id=uk.trinh.freeport) · [Desktop — Mac/Windows/Linux](https://github.com/ptrinh/freeport/releases/latest)
 - **Whitepaper:** [PDF](https://freeport.network/intro/whitepaper.pdf)
-- **Self-host the optional notification server:** [`packages/nostr-mcp`](packages/nostr-mcp) — `docker compose up -d` (MCP + push notifier + optional Telegram bridge). The app needs no backend; this only adds push/Telegram on top of the public relays.
+- **Self-host all of Freeport:** [`packages/freeport-self-hosted`](packages/freeport-self-hosted) — `docker compose up -d` serves the web app + read-only MCP + content-blind push notifier + a Nostr relay + the optional Telegram bridge on port 1988. The app needs no backend; this is for communities who want their own node.
 
 ## Layout
 
@@ -23,7 +23,7 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 | `docs/protocol.md` | Protocol spec: intent event kinds (32101/32102), negotiation envelopes, state machine |
 | `packages/protocol` | Spec as code: event build/parse, negotiation state machine, matching, geohash |
 | `packages/agent` | CLI personal agent (`freeport run`): subscribe, auto-match, negotiate, human confirm |
-| `packages/nostr-mcp` | Read-only MCP server for agents + self-hostable notifier: Web Push / Expo push and the **Telegram bridge** (feed, listen mode, pings, guest mode) |
+| `packages/freeport-self-hosted` | Self-hosted Freeport in a box (default port 1988): the web app + read-only MCP server + Web Push / Expo notifier + NIP-01 relay + the **Telegram bridge** (feed, listen mode, pings, guest mode) |
 | `apps/mobile` | Expo/React Native + PWA client (post intent, negotiate, confirm deals, key backup, 55 locales incl. RTL). UI is split into `apps/mobile/src/tabs/*` (one file per tab) + `apps/mobile/src/ui/*` (theme, shared fields, formatters, alerts); see [`apps/mobile/CONTRIBUTING.md`](apps/mobile/CONTRIBUTING.md) |
 | `relay/` | Self-hosted strfry relay (docker-compose, Proxmox-LXC-sized, Uptime-Kuma health) |
 | `demo/` | Two-agent rideshare demo configs + script |
@@ -130,7 +130,7 @@ others**.
   **Telegram bridge** — relay a market feed into groups, parse organic "hitcher"
   posts into a one-tap broadcast, send personal activity pings, and (optional,
   custodial) let Telegram-native users post and deal without the app. All
-  self-hostable in `packages/nostr-mcp` — see its README to enable.
+  self-hostable in `packages/freeport-self-hosted` — see its README to enable.
 - **Localization**: 55 languages with plural-aware strings and full RTL
   (Arabic, Hebrew, Persian, Urdu).
 

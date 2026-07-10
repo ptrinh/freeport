@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport-এর কোনো কেন্দ্রীয় সার্ভার নেই। অ্যাপ বন্ধ থাকলে আপনাকে সতর্ক করতে, একটি ছোট নোটিফিকেশন সার্ভার আপনার উদ্দেশ্যে পাঠানো ইভেন্টগুলোর জন্য পাবলিক রিলেগুলো পর্যবেক্ষণ করে এবং আপনার ডিভাইসে একটি push পাঠায়।",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "এটি বিষয়বস্তু দেখতে পায় না: আপনার বার্তাগুলো প্রান্ত থেকে প্রান্ত পর্যন্ত এনক্রিপ্ট করা, তাই এটি শুধু জানে যে আপনার জন্য কিছু এসেছে, কখনও জানে না তাতে কী লেখা আছে।",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "পাবলিকটি ব্যবহার করুন (ডিফল্ট URL), অথবা একটি কমান্ডে নিজেরটি চালান এবং উপরের URL-টি সেদিকে নির্দেশ করুন:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "তারপর উপরের URL-টি আপনার সার্ভারে সেট করুন (উদাহরণস্বরূপ http://your-host:8788)। Umbrel-এ, এটি Freeport কমিউনিটি অ্যাপ স্টোর থেকে ইনস্টল করুন।",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "তারপর উপরের URL-টি আপনার সার্ভারে সেট করুন (উদাহরণস্বরূপ http://your-host:1988)। Umbrel-এ, এটি Freeport কমিউনিটি অ্যাপ স্টোর থেকে ইনস্টল করুন।",
   "Self-hosting guide on GitHub": "GitHub-এ সেলফ-হোস্টিং গাইড",
   "Got it": "বুঝেছি",
   "Share live location": "লাইভ অবস্থান শেয়ার করুন",

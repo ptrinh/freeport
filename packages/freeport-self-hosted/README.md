@@ -1,16 +1,23 @@
-# freeport-nostr-mcp
+# freeport-self-hosted
 
-A self-hostable server for [Freeport](https://freeport.network), the decentralized P2P
-marketplace on Nostr. **One Docker image, three jobs** — run all of them or just the first:
+**Self-hosted Freeport in a box** — one Docker image, one process, default port **1988**,
+five jobs (run all of them or just the ones you want):
 
+0. **The Freeport web app itself** (`/`) — the full client, served from this box. Open
+   `http://your-host:1988` and you're on Freeport with no app store and no freeport.network.
+   *(On when `web-dist` exists — `npm run build:web`, or automatic in the Docker image;
+   `ENABLE_WEB=0` to disable.)*
 1. **MCP endpoint** (`/mcp`) — a read-only [Model Context Protocol](https://modelcontextprotocol.io)
    server that lets AI agents **search the marketplace** (ride/service/goods offers &
    requests, reputation, profiles) by kind, tag, and geohash radius. Never signs,
    publishes, or reads encrypted DMs. *(Always on.)*
 2. **Web Push notifier** (`/subscribe`, `/vapidPublicKey`) — watches the relays and sends
    **content-blind push alerts** to web/PWA subscribers when new matching activity
-   appears. *(On by default; `ENABLE_NOTIFY=0` for an MCP-only server.)*
-3. **Telegram bridge** — relays a market feed into **Telegram groups**, sends content-blind
+   appears. *(On by default; `ENABLE_NOTIFY=0` to disable.)*
+3. **NIP-01 Nostr relay** (`ws://your-host:1989`) — an embedded relay nearby users can add
+   to their relay list, so the community's traffic doesn't depend on public relays.
+   *(On by default; `ENABLE_RELAY=0` to disable.)*
+4. **Telegram bridge** — relays a market feed into **Telegram groups**, sends content-blind
    pings, and (opt-in, custodial) lets Telegram-native users trade without the app.
    *(Off unless `TELEGRAM_BOT_TOKEN` is set.)*
 
@@ -22,10 +29,10 @@ public relays. Each job is detailed below.
 
 ```bash
 git clone https://github.com/ptrinh/freeport.git
-cd freeport/packages/nostr-mcp
+cd freeport/packages/freeport-self-hosted
 cp .env.example .env        # optional: set VAPID_SUBJECT, relays, Telegram token…
 docker compose up -d        # builds from source on first run
-curl -s localhost:8788/health | jq   # MCP + notifier live; add a token for Telegram
+curl -s localhost:1988/health | jq   # MCP + notifier live; add a token for Telegram
 ```
 
 ## Tools (job 1 — MCP)
@@ -54,10 +61,10 @@ On connect, the server sends an **instructions** string and exposes two **resour
 
 ```bash
 # stdio (Claude Desktop / registry self-host)
-npx freeport-nostr-mcp
+npx freeport-self-hosted
 
 # hosted HTTP endpoint
-PORT=8788 npm run start:http   # POST /mcp, GET /health
+PORT=1988 npm run start:http   # POST /mcp, GET /health
 ```
 
 `FREEPORT_RELAYS` (comma-separated wss URLs) overrides the default relay set.
@@ -141,7 +148,7 @@ Secrets belong in a gitignored `.env` (Compose `env_file`), **never** in a
 committed `docker-compose.yml`. Verify after enabling:
 
 ```bash
-curl -s http://127.0.0.1:8788/health | jq .telegram
+curl -s http://127.0.0.1:1988/health | jq .telegram
 # → { "enabled": true, "groups": N, "guests": N, "guestMode": true|false }
 ```
 

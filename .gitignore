@@ -40,3 +40,7 @@ apps/desktop/src-tauri/target/
 apps/desktop/src-tauri/gen/
 apps/desktop/src-tauri/icons/
 apps/desktop/src-tauri/binaries/
+
+# freeport-self-hosted web bundle (built by build-web.sh / Docker)
+packages/freeport-self-hosted/web-dist/
+packages/freeport-self-hosted/.web-export/

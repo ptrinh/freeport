@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport-da markaziy server yo'q. Ilova yopiq bo'lganda sizni ogohlantirish uchun kichik bildirishnoma serveri sizga yo'naltirilgan hodisalar uchun ommaviy relelarni kuzatadi va qurilmangizga push yuboradi.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "U mazmunni ko'rmaydi: xabarlaringiz uchdan-uchgacha shifrlangan, shuning uchun u faqat sizga nimadir kelganini biladi, hech qachon unda nima yozilganini bilmaydi.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Ommaviysidan foydalaning (standart URL) yoki bitta buyruq bilan o'zingiznikini ishga tushiring va yuqoridagi URL-ni unga yo'naltiring:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Keyin yuqoridagi URL-ni o'z serveringizga sozlang (masalan http://your-host:8788). Umbrel-da uni Freeport hamjamiyat ilovalar do'konidan o'rnating.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Keyin yuqoridagi URL-ni o'z serveringizga sozlang (masalan http://your-host:1988). Umbrel-da uni Freeport hamjamiyat ilovalar do'konidan o'rnating.",
   "Self-hosting guide on GitHub": "GitHub-dagi o'zini o'zi joylashtirish qo'llanmasi",
   "Got it": "Tushunarli",
   "Share live location": "Jonli joylashuvni ulashish",

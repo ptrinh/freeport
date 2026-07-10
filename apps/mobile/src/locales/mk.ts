@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport нема централен сервер. За да ве предупреди кога апликацијата е затворена, мал сервер за известувања ги набљудува јавните релеи за настани адресирани до вас и проследува push до вашиот уред.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "Тој е слеп за содржината: вашите пораки се шифрирани од крај до крај, па знае само дека нешто пристигнало за вас, никогаш што пишува во неа.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Користете го јавниот (стандардната URL адреса) или пуштете свој со една команда и насочете ја горната URL адреса кон него:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Потоа поставете ја горната URL адреса на вашиот сервер (на пример http://your-host:8788). На Umbrel, инсталирајте го од продавницата за апликации на заедницата Freeport.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Потоа поставете ја горната URL адреса на вашиот сервер (на пример http://your-host:1988). На Umbrel, инсталирајте го од продавницата за апликации на заедницата Freeport.",
   "Self-hosting guide on GitHub": "Водич за самостојно хостирање на GitHub",
   "Got it": "Разбрав",
   "Share live location": "Сподели локација во живо",

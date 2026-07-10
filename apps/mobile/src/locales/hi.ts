@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport का कोई केंद्रीय सर्वर नहीं है। ऐप बंद होने पर आपको सूचित करने के लिए, एक छोटा नोटिफ़िकेशन सर्वर आपके लिए भेजी गई घटनाओं हेतु सार्वजनिक रिले पर नज़र रखता है और आपके डिवाइस पर एक push भेजता है।",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "यह सामग्री को नहीं देख सकता: आपके संदेश एंड-टू-एंड एन्क्रिप्टेड हैं, इसलिए यह केवल इतना जानता है कि आपके लिए कुछ आया है, कभी नहीं जानता कि उसमें क्या लिखा है।",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "सार्वजनिक वाला (डिफ़ॉल्ट URL) इस्तेमाल करें, या एक ही कमांड में अपना खुद का चलाएँ और ऊपर दिए गए URL को उसकी ओर इंगित करें:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "फिर ऊपर दिए गए URL को अपने सर्वर पर सेट करें (उदाहरण के लिए http://your-host:8788)। Umbrel पर, इसे Freeport कम्युनिटी ऐप स्टोर से इंस्टॉल करें।",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "फिर ऊपर दिए गए URL को अपने सर्वर पर सेट करें (उदाहरण के लिए http://your-host:1988)। Umbrel पर, इसे Freeport कम्युनिटी ऐप स्टोर से इंस्टॉल करें।",
   "Self-hosting guide on GitHub": "GitHub पर सेल्फ-होस्टिंग गाइड",
   "Got it": "समझ गया",
   "Share live location": "लाइव स्थान साझा करें",

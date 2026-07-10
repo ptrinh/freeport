@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Walang sentral na server ang Freeport. Para abisuhan ka kapag sarado ang app, may maliit na notification server na nagbabantay sa mga pampublikong relay para sa mga eventong nakatuon sa iyo at nagpapasa ng push sa iyong device.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "Hindi nito nakikita ang nilalaman: ang iyong mga mensahe ay end-to-end encrypted, kaya alam lang nito na may dumating para sa iyo, hindi kailanman kung ano ang sinasabi nito.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Gamitin ang pampubliko (ang default na URL), o magpatakbo ng iyong sarili sa isang utos at ituro dito ang URL sa itaas:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Pagkatapos itakda ang URL sa itaas sa iyong server (halimbawa http://your-host:8788). Sa Umbrel, i-install ito mula sa Freeport community app store.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Pagkatapos itakda ang URL sa itaas sa iyong server (halimbawa http://your-host:1988). Sa Umbrel, i-install ito mula sa Freeport community app store.",
   "Self-hosting guide on GitHub": "Gabay sa self-hosting sa GitHub",
   "Got it": "Naintindihan",
   "Share live location": "Ibahagi ang live na lokasyon",

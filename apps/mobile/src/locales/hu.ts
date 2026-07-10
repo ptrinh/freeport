@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "A Freeportnak nincs központi szervere. Hogy értesítsen, amikor az alkalmazás zárva van, egy kis értesítési szerver figyeli a nyilvános reléket a neked címzett eseményekre, és push üzenetet továbbít az eszközödre.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "Tartalomra vak: az üzeneteid végpontok közötti titkosítással védettek, így csak azt tudja, hogy érkezett valami számodra, azt soha, hogy mi áll benne.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Használd a nyilvánosat (az alapértelmezett URL-t), vagy futtasd a sajátodat egyetlen paranccsal, és irányítsd rá a fenti URL-t:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Ezután állítsd be a fenti URL-t a saját szerveredre (például http://your-host:8788). Umbrelen telepítsd a Freeport közösségi alkalmazásboltból.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Ezután állítsd be a fenti URL-t a saját szerveredre (például http://your-host:1988). Umbrelen telepítsd a Freeport közösségi alkalmazásboltból.",
   "Self-hosting guide on GitHub": "Önálló tárhely útmutató a GitHubon",
   "Got it": "Értem",
   "Share live location": "Élő hely megosztása",

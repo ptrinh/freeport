@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport ບໍ່ມີເຊີບເວີສູນກາງ. ເພື່ອແຈ້ງເຕືອນທ່ານເມື່ອແອັບປິດຢູ່ ເຊີບເວີແຈ້ງເຕືອນນ້ອຍໆ ຈະຕິດຕາມ relay ສາທາລະນະຫາເຫດການທີ່ສົ່ງມາຫາທ່ານ ແລະ ສົ່ງຕໍ່ push ໄປຫາອຸປະກອນຂອງທ່ານ.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "ມັນເບິ່ງເນື້ອຫາບໍ່ໄດ້: ຂໍ້ຄວາມຂອງທ່ານຖືກເຂົ້າລະຫັດແບບ end-to-end ດັ່ງນັ້ນມັນຮູ້ພຽງແຕ່ວ່າມີບາງຢ່າງມາຮອດສຳລັບທ່ານ ບໍ່ເຄີຍຮູ້ວ່າມັນເວົ້າຫຍັງ.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "ໃຊ້ອັນສາທາລະນະ (URL ຄ່າເລີ່ມຕົ້ນ) ຫຼື ແລ່ນອັນຂອງທ່ານເອງດ້ວຍຄຳສັ່ງດຽວ ແລະ ຊີ້ URL ຂ້າງເທິງໄປຫາມັນ:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "ຈາກນັ້ນຕັ້ງ URL ຂ້າງເທິງໄປຫາເຊີບເວີຂອງທ່ານ (ຕົວຢ່າງ http://your-host:8788). ໃນ Umbrel, ຕິດຕັ້ງມັນຈາກ Freeport community app store.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "ຈາກນັ້ນຕັ້ງ URL ຂ້າງເທິງໄປຫາເຊີບເວີຂອງທ່ານ (ຕົວຢ່າງ http://your-host:1988). ໃນ Umbrel, ຕິດຕັ້ງມັນຈາກ Freeport community app store.",
   "Self-hosting guide on GitHub": "ຄູ່ມື self-hosting ໃນ GitHub",
   "Got it": "ເຂົ້າໃຈແລ້ວ",
   "Share live location": "ແບ່ງປັນທີ່ຕັ້ງສົດ",

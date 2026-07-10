@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeportilla ei ole keskuspalvelinta. Jotta saat ilmoituksen, kun sovellus on suljettu, pieni ilmoituspalvelin tarkkailee julkisia välityspalvelimia sinulle osoitettujen tapahtumien varalta ja välittää push-ilmoituksen laitteellesi.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "Se on sisällölle sokea: viestisi ovat päästä päähän salattuja, joten se tietää vain, että sinulle saapui jotain, ei koskaan mitä siinä lukee.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Käytä julkista (oletus-URL) tai käynnistä oma yhdellä komennolla ja osoita yllä oleva URL siihen:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Aseta sitten yllä oleva URL palvelimellesi (esimerkiksi http://your-host:8788). Umbrelissa asenna se Freeport-yhteisön sovelluskaupasta.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Aseta sitten yllä oleva URL palvelimellesi (esimerkiksi http://your-host:1988). Umbrelissa asenna se Freeport-yhteisön sovelluskaupasta.",
   "Self-hosting guide on GitHub": "Itsemajoitusopas GitHubissa",
   "Got it": "Selvä",
   "Share live location": "Jaa reaaliaikainen sijainti",

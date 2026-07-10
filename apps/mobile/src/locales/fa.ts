@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport هیچ سرور مرکزی ندارد. برای آگاه کردن شما هنگامی که برنامه بسته است، یک سرور اعلان کوچک رله‌های عمومی را برای رویدادهای ارسال‌شده به شما زیر نظر می‌گیرد و یک push به دستگاه شما ارسال می‌کند.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "این سرور نسبت به محتوا نابیناست: پیام‌های شما به‌صورت سرتاسری رمزگذاری شده‌اند، بنابراین فقط می‌داند که چیزی برای شما رسیده است، هرگز نمی‌داند چه می‌گوید.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "از سرور عمومی (URL پیش‌فرض) استفاده کنید، یا سرور خود را با یک دستور اجرا کنید و URL بالا را به آن اشاره دهید:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "سپس URL بالا را روی سرور خود تنظیم کنید (برای مثال http://your-host:8788). در Umbrel، آن را از فروشگاه برنامه‌های جامعه Freeport نصب کنید.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "سپس URL بالا را روی سرور خود تنظیم کنید (برای مثال http://your-host:1988). در Umbrel، آن را از فروشگاه برنامه‌های جامعه Freeport نصب کنید.",
   "Self-hosting guide on GitHub": "راهنمای میزبانی شخصی در GitHub",
   "Got it": "متوجه شدم",
   "Share live location": "اشتراک‌گذاری موقعیت زنده",

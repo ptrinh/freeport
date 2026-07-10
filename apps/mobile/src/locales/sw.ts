@@ -35,7 +35,7 @@ const c: Record<string, string> = {
   "Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.": "Freeport haina seva kuu. Ili kukutahadharisha wakati programu imefungwa, seva ndogo ya arifa hufuatilia relay za umma kwa matukio yaliyoelekezwa kwako na kupeleka push kwenye kifaa chako.",
   "It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.": "Haioni maudhui: ujumbe wako umesimbwa mwanzo hadi mwisho, kwa hiyo inajua tu kwamba kitu kimekufikia, kamwe haijui kinasema nini.",
   "Use the public one (the default URL), or run your own in one command and point the URL above at it:": "Tumia ile ya umma (URL chaguomsingi), au endesha yako mwenyewe kwa amri moja na uelekeze URL iliyo hapo juu kwake:",
-  "Then set the URL above to your server (for example http://your-host:8788). On Umbrel, install it from the Freeport community app store.": "Kisha weka URL iliyo hapo juu kwenye seva yako (kwa mfano http://your-host:8788). Kwenye Umbrel, isakinishe kutoka duka la programu la jamii ya Freeport.",
+  "Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.": "Kisha weka URL iliyo hapo juu kwenye seva yako (kwa mfano http://your-host:1988). Kwenye Umbrel, isakinishe kutoka duka la programu la jamii ya Freeport.",
   "Self-hosting guide on GitHub": "Mwongozo wa kujipangishia kwenye GitHub",
   "Got it": "Nimeelewa",
   "Share live location": "Shiriki eneo la moja kwa moja",
