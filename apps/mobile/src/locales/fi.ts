@@ -663,5 +663,7 @@ const c: Record<string, string> = {
   "pending": "odottaa",
   "Disconnect wallet": "Katkaise lompakon yhteys",
   "Emergency Call": "Hätäpuhelu",
+  "Starting the built-in wallet…": "Käynnistetään sisäänrakennettua lompakkoa…",
+  "Use your own wallet (NWC) instead": "Käytä sen sijaan omaa lompakkoasi (NWC)",
 };
 export default c;

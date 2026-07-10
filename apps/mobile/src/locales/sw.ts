@@ -660,5 +660,7 @@ const c: Record<string, string> = {
   "pending": "inasubiri",
   "Disconnect wallet": "Tenganisha pochi",
   "Emergency Call": "Simu ya dharura",
+  "Starting the built-in wallet…": "Inaanzisha pochi iliyojengwa ndani…",
+  "Use your own wallet (NWC) instead": "Tumia pochi yako mwenyewe (NWC) badala yake",
 };
 export default c;

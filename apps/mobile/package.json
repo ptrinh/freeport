@@ -9,16 +9,20 @@
     "ios": "expo start --ios",
     "android": "expo start --android",
     "eas-build-post-install": "cd ../../packages/protocol && npm install --no-audit --no-fund && npm run build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "postinstall": "node scripts/copy-breez-wasm.mjs"
   },
   "dependencies": {
     "@aptabase/react-native": "^0.5.0",
     "@aptabase/web": "^0.5.0",
+    "@breeztech/breez-sdk-spark": "^0.19.0",
+    "@breeztech/breez-sdk-spark-react-native": "^0.18.0",
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.3",
     "@freeport/protocol": "file:../../packages/protocol",
     "@react-native-community/datetimepicker": "8.4.4",
     "@react-native-picker/picker": "2.11.1",
+    "@scure/bip39": "^2.2.0",
     "@sentry/browser": "^10.62.0",
     "@sentry/react-native": "~7.2.0",
     "@tauri-apps/plugin-dialog": "^2.7.1",

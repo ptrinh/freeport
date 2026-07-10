@@ -706,5 +706,7 @@ const c: Record<string, string> = {
   "pending": "pendente",
   "Disconnect wallet": "Desconectar carteira",
   "Emergency Call": "Chamada de emergência",
+  "Starting the built-in wallet…": "Iniciando a carteira integrada…",
+  "Use your own wallet (NWC) instead": "Use sua própria carteira (NWC) em vez disso",
 };
 export default c;

@@ -703,5 +703,7 @@ const c: Record<string, string> = {
   "pending": "处理中",
   "Disconnect wallet": "断开钱包连接",
   "Emergency Call": "紧急呼叫",
+  "Starting the built-in wallet…": "正在启动内置钱包…",
+  "Use your own wallet (NWC) instead": "改用你自己的钱包 (NWC)",
 };
 export default c;

@@ -663,5 +663,7 @@ const c: Record<string, string> = {
   "pending": "σε εκκρεμότητα",
   "Disconnect wallet": "Αποσύνδεση πορτοφολιού",
   "Emergency Call": "Κλήση έκτακτης ανάγκης",
+  "Starting the built-in wallet…": "Εκκίνηση του ενσωματωμένου πορτοφολιού…",
+  "Use your own wallet (NWC) instead": "Χρησιμοποιήστε το δικό σας πορτοφόλι (NWC) αντ' αυτού",
 };
 export default c;

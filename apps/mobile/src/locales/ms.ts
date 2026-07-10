@@ -660,5 +660,7 @@ const c: Record<string, string> = {
   "pending": "belum selesai",
   "Disconnect wallet": "Putuskan sambungan dompet",
   "Emergency Call": "Panggilan Kecemasan",
+  "Starting the built-in wallet…": "Memulakan dompet terbina dalam…",
+  "Use your own wallet (NWC) instead": "Gunakan dompet anda sendiri (NWC) sebaliknya",
 };
 export default c;

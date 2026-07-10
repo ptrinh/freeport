@@ -660,5 +660,7 @@ const c: Record<string, string> = {
   "pending": "gözləyir",
   "Disconnect wallet": "Pulqabını ayır",
   "Emergency Call": "Təcili zəng",
+  "Starting the built-in wallet…": "Daxili pulqabı başladılır…",
+  "Use your own wallet (NWC) instead": "Bunun əvəzinə öz pulqabınızı (NWC) istifadə edin",
 };
 export default c;

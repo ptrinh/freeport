@@ -663,5 +663,7 @@ const c: Record<string, string> = {
   "pending": "hangende",
   "Disconnect wallet": "Ontkoppel beursie",
   "Emergency Call": "Noodoproep",
+  "Starting the built-in wallet…": "Die ingeboude beursie word begin…",
+  "Use your own wallet (NWC) instead": "Gebruik eerder jou eie beursie (NWC)",
 };
 export default c;

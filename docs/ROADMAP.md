@@ -163,6 +163,14 @@ statechain-based L2 — trust-MINIMIZED, not trustless (operators must delete
 old keys). Acceptable for spending-wallet amounts; nudge users to keep
 balances small ("this is a spending wallet").
 
+**Status (2026-07):** implemented behind Settings → Experimental → Wallet.
+Both providers live in `src/wallet/` (NWC + breez-spark, seed derived from
+the Nostr key via SHA-256 domain tag `freeport-wallet-v1`). Breez lazy-loads:
+web splits the glue into an async chunk and fetches the wasm (copied to
+`public/` on postinstall) only when the tab opens; native guards the dynamic
+import so pre-Breez binaries fall back to "coming in a future app update".
+Requires `EXPO_PUBLIC_BREEZ_API_KEY` at build time; without it only NWC shows.
+
 **Rollout:**
 1. PoC first: EAS build one target, measure real IPA/AAB delta, send/receive
    USDT between two devices, verify WASM on web + Tauri.

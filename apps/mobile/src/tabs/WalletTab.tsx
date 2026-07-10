@@ -3,14 +3,15 @@ import { ActivityIndicator, Platform, Pressable, ScrollView, Share, Text, TextIn
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../i18n';
 import { s, palette } from '../ui/theme';
-import { walletProviderFor, parseNwcUrl, type WalletProvider, type WalletTx } from '../wallet';
+import { walletProviderFor, defaultWalletProvider, parseNwcUrl, type WalletProvider, type WalletTx } from '../wallet';
 
 /**
  * Wallet tab (Experimental). Providers are pluggable (src/wallet/):
- *  - NWC (bring-your-own wallet) works TODAY — pure JS over nostr-tools.
- *  - The embedded Breez-Spark wallet ships with a future binary; its card is
- *    shown as "coming soon" so users know the built-in option is on the way.
- * Amounts are sats; the tab never touches the user's Freeport key.
+ *  - Default: the built-in Breez-Spark wallet, lazy-loaded on first open
+ *    (WASM on web; native module on iOS/Android — old binaries fall back to
+ *    a "coming in a future app update" card).
+ *  - Alternative: NWC (bring-your-own wallet), pure JS over nostr-tools.
+ * A stored NWC url always wins over the built-in wallet. Amounts are sats.
  */
 function WalletTab({
   nwcUrl,
@@ -27,7 +28,8 @@ function WalletTab({
   const [balance, setBalance] = useState<number | null>(null);
   const [txs, setTxs] = useState<WalletTx[]>([]);
   const [error, setError] = useState('');
-  const [busy, setBusy] = useState<'connect' | 'invoice' | 'pay' | 'refresh' | null>(null);
+  const [busy, setBusy] = useState<'boot' | 'connect' | 'invoice' | 'pay' | 'refresh' | null>(null);
+  const [showNwcForm, setShowNwcForm] = useState(false);
 
   // Setup form
   const [urlDraft, setUrlDraft] = useState('');
@@ -52,18 +54,31 @@ function WalletTab({
     } finally { setBusy(null); }
   };
 
-  // (Re)build the provider whenever the stored connection changes.
+  // (Re)build the provider whenever the stored connection changes. A stored
+  // NWC url is used directly; otherwise the built-in wallet lazy-loads.
   useEffect(() => {
+    let cancelled = false;
     provider.current?.close();
     provider.current = null;
-    setConnected(false); setBalance(null); setTxs([]); setAlias(undefined); setError('');
-    const p = walletProviderFor(nwcUrl);
-    if (!p) return;
-    provider.current = p;
-    setConnected(true);
-    p.info().then((i) => setAlias(i.alias)).catch(() => {});
-    void refresh(p);
-    return () => { p.close(); };
+    setConnected(false); setBalance(null); setTxs([]); setAlias(undefined); setError(''); setShowNwcForm(false);
+    const boot = async () => {
+      let p: WalletProvider | null = null;
+      if (nwcUrl) {
+        p = walletProviderFor(nwcUrl);
+      } else {
+        setBusy('boot');
+        p = await defaultWalletProvider();
+      }
+      if (cancelled) return;
+      setBusy(null);
+      if (!p) return;
+      provider.current = p;
+      setConnected(true);
+      if (p.kind === 'nwc') p.info().then((i) => { if (!cancelled) setAlias(i.alias); }).catch(() => {});
+      void refresh(p);
+    };
+    void boot();
+    return () => { cancelled = true; provider.current?.close(); };
   }, [nwcUrl]);
 
   const connect = async () => {
@@ -125,10 +140,19 @@ function WalletTab({
 
   const fmtTime = (ts: number) => new Date(ts * 1000).toLocaleString();
 
+  if (busy === 'boot') {
+    return (
+      <View style={[s.pad, { alignItems: 'center', paddingTop: 48 }]}>
+        <ActivityIndicator color={palette.dim} />
+        <Text style={[s.dim, { marginTop: 12 }]}>{t('Starting the built-in wallet…')}</Text>
+      </View>
+    );
+  }
+
   if (!connected) {
     return (
       <ScrollView contentContainerStyle={s.pad} onScroll={onScroll} scrollEventThrottle={16} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-        {/* Built-in wallet (Breez Spark) — arrives with a future binary. */}
+        {/* Built-in wallet (Breez Spark) — unavailable on this build. */}
         <View style={[s.card, { opacity: 0.65 }]}>
           <View style={[s.row, { gap: 8 }]}>
             <Ionicons name="wallet-outline" size={20} color={palette.text2} />
@@ -167,7 +191,7 @@ function WalletTab({
       {/* Balance */}
       <View style={s.card}>
         <View style={[s.row, { justifyContent: 'space-between' }]}>
-          <Text style={s.dim}>{alias ? alias : t('Connected wallet')}</Text>
+          <Text style={s.dim}>{provider.current?.kind === 'breez-spark' ? t('Built-in wallet') : alias || t('Connected wallet')}</Text>
           <Pressable hitSlop={8} onPress={() => provider.current && refresh(provider.current)}>
             {busy === 'refresh' ? <ActivityIndicator size="small" color={palette.dim} /> : <Ionicons name="refresh" size={16} color={palette.dim} />}
           </Pressable>
@@ -247,9 +271,32 @@ function WalletTab({
         </View>
       )}
 
-      <Pressable hitSlop={8} style={{ marginTop: 8, alignItems: 'center' }} onPress={() => onNwcUrlChange('')}>
-        <Text style={s.cancelLink}>{t('Disconnect wallet')}</Text>
-      </Pressable>
+      {provider.current?.kind === 'nwc' ? (
+        <Pressable hitSlop={8} style={{ marginTop: 8, alignItems: 'center' }} onPress={() => onNwcUrlChange('')}>
+          <Text style={s.cancelLink}>{t('Disconnect wallet')}</Text>
+        </Pressable>
+      ) : showNwcForm ? (
+        <View style={s.card}>
+          <Text style={s.cardTitle}>{t('Connect your own wallet')}</Text>
+          <Text style={s.dim}>{t('Paste a Nostr Wallet Connect (NWC) string from a wallet like Alby Hub, coinos or Primal. Freeport never sees your keys or funds.')}</Text>
+          <TextInput
+            style={[s.searchInput, { borderWidth: 1, borderColor: palette.border, borderRadius: 10, marginTop: 10, paddingHorizontal: 10, minHeight: 44, color: palette.text }]}
+            value={urlDraft}
+            onChangeText={setUrlDraft}
+            placeholder="nostr+walletconnect://…"
+            placeholderTextColor={palette.placeholder}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          <Pressable style={[s.btnAccept, { marginTop: 10 }, busy === 'connect' && { opacity: 0.6 }]} onPress={connect} disabled={busy !== null || !urlDraft.trim()}>
+            {busy === 'connect' ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Connect')}</Text>}
+          </Pressable>
+        </View>
+      ) : (
+        <Pressable hitSlop={8} style={{ marginTop: 8, alignItems: 'center' }} onPress={() => setShowNwcForm(true)}>
+          <Text style={s.cancelLink}>{t('Use your own wallet (NWC) instead')}</Text>
+        </Pressable>
+      )}
     </ScrollView>
   );
 }

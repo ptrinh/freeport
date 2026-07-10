@@ -663,5 +663,7 @@ const c: Record<string, string> = {
   "pending": "زیرِ التوا",
   "Disconnect wallet": "والٹ منقطع کریں",
   "Emergency Call": "ہنگامی کال",
+  "Starting the built-in wallet…": "بلٹ اِن والیٹ شروع ہو رہا ہے…",
+  "Use your own wallet (NWC) instead": "اس کے بجائے اپنا والیٹ (NWC) استعمال کریں",
 };
 export default c;

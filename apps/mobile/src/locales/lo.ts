@@ -660,5 +660,7 @@ const c: Record<string, string> = {
   "pending": "ກຳລັງດຳເນີນການ",
   "Disconnect wallet": "ຕັດການເຊື່ອມຕໍ່ກະເປົາເງິນ",
   "Emergency Call": "ໂທສຸກເສີນ",
+  "Starting the built-in wallet…": "ກຳລັງເປີດກະເປົາເງິນທີ່ມີໃນຕົວ…",
+  "Use your own wallet (NWC) instead": "ໃຊ້ກະເປົາເງິນຂອງທ່ານເອງ (NWC) ແທນ",
 };
 export default c;

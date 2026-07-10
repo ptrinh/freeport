@@ -660,5 +660,7 @@ const c: Record<string, string> = {
   "pending": "በመጠባበቅ ላይ",
   "Disconnect wallet": "ዋሌት ግንኙነት አቋርጥ",
   "Emergency Call": "የአደጋ ጊዜ ጥሪ",
+  "Starting the built-in wallet…": "አብሮ የተሰራውን ዋሌት በማስጀመር ላይ…",
+  "Use your own wallet (NWC) instead": "በምትኩ የራስዎን ዋሌት (NWC) ይጠቀሙ",
 };
 export default c;

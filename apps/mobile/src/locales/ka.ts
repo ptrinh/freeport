@@ -660,5 +660,7 @@ const c: Record<string, string> = {
   "pending": "მოლოდინში",
   "Disconnect wallet": "საფულის გათიშვა",
   "Emergency Call": "გადაუდებელი ზარი",
+  "Starting the built-in wallet…": "ჩაშენებული საფულის გაშვება…",
+  "Use your own wallet (NWC) instead": "სანაცვლოდ გამოიყენეთ საკუთარი საფულე (NWC)",
 };
 export default c;

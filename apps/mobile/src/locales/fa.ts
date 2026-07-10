@@ -663,5 +663,7 @@ const c: Record<string, string> = {
   "pending": "در انتظار",
   "Disconnect wallet": "قطع اتصال کیف پول",
   "Emergency Call": "تماس اضطراری",
+  "Starting the built-in wallet…": "در حال راه‌اندازی کیف پول داخلی…",
+  "Use your own wallet (NWC) instead": "به‌جای آن از کیف پول خودتان (NWC) استفاده کنید",
 };
 export default c;

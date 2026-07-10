@@ -663,5 +663,7 @@ const c: Record<string, string> = {
   "pending": "függőben",
   "Disconnect wallet": "Tárca leválasztása",
   "Emergency Call": "Segélyhívás",
+  "Starting the built-in wallet…": "Beépített tárca indítása…",
+  "Use your own wallet (NWC) instead": "Használd inkább a saját tárcádat (NWC)",
 };
 export default c;

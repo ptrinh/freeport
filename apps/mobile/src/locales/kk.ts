@@ -660,5 +660,7 @@ const c: Record<string, string> = {
   "pending": "күтілуде",
   "Disconnect wallet": "Әмиянды ажырату",
   "Emergency Call": "Шұғыл қоңырау",
+  "Starting the built-in wallet…": "Кірістірілген әмиян іске қосылуда…",
+  "Use your own wallet (NWC) instead": "Оның орнына өз әмияныңызды (NWC) пайдаланыңыз",
 };
 export default c;

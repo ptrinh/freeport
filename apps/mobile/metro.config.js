@@ -16,4 +16,9 @@ config.resolver.nodeModulesPaths = [
 // "exports", which Metro doesn't resolve by default in SDK 52.
 config.resolver.unstable_enablePackageExports = true;
 
+// The Breez SDK wasm glue references import.meta.url (we never take that
+// branch — src/wallet/breez.ts passes the wasm module explicitly — but Metro
+// must still be able to parse the file).
+config.transformer.unstable_transformImportMeta = true;
+
 module.exports = config;

@@ -663,5 +663,7 @@ const c: Record<string, string> = {
   "pending": "na čekanju",
   "Disconnect wallet": "Prekini vezu sa novčanikom",
   "Emergency Call": "Хитни позив",
+  "Starting the built-in wallet…": "Покретање уграђеног новчаника…",
+  "Use your own wallet (NWC) instead": "Користите сопствени новчаник (NWC)",
 };
 export default c;

@@ -703,5 +703,7 @@ const c: Record<string, string> = {
   "pending": "đang chờ",
   "Disconnect wallet": "Ngắt kết nối ví",
   "Emergency Call": "Gọi khẩn cấp",
+  "Starting the built-in wallet…": "Đang khởi động ví tích hợp…",
+  "Use your own wallet (NWC) instead": "Dùng ví của riêng bạn (NWC) thay thế",
 };
 export default c;

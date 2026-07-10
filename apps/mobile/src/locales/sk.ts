@@ -666,5 +666,7 @@ const c: Record<string, string> = {
   "pending": "čaká sa",
   "Disconnect wallet": "Odpojiť peňaženku",
   "Emergency Call": "Tiesňové volanie",
+  "Starting the built-in wallet…": "Spúšťa sa vstavaná peňaženka…",
+  "Use your own wallet (NWC) instead": "Použite radšej vlastnú peňaženku (NWC)",
 };
 export default c;

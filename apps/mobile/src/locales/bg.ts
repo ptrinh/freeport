@@ -663,5 +663,7 @@ const c: Record<string, string> = {
   "pending": "в изчакване",
   "Disconnect wallet": "Прекъсване на връзката с портфейла",
   "Emergency Call": "Спешно обаждане",
+  "Starting the built-in wallet…": "Стартиране на вградения портфейл…",
+  "Use your own wallet (NWC) instead": "Използвайте вместо това собствен портфейл (NWC)",
 };
 export default c;

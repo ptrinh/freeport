@@ -712,5 +712,7 @@ const c: Record<string, string> = {
   "pending": "в обработке",
   "Disconnect wallet": "Отключить кошелёк",
   "Emergency Call": "Экстренный вызов",
+  "Starting the built-in wallet…": "Запуск встроенного кошелька…",
+  "Use your own wallet (NWC) instead": "Использовать вместо этого свой кошелёк (NWC)",
 };
 export default c;

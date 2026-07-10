@@ -703,5 +703,7 @@ const c: Record<string, string> = {
   "pending": "대기 중",
   "Disconnect wallet": "지갑 연결 해제",
   "Emergency Call": "긴급 전화",
+  "Starting the built-in wallet…": "내장 지갑을 시작하는 중…",
+  "Use your own wallet (NWC) instead": "대신 내 지갑(NWC) 사용",
 };
 export default c;

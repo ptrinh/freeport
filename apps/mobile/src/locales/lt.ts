@@ -664,5 +664,7 @@ const c: Record<string, string> = {
   "pending": "laukiama",
   "Disconnect wallet": "Atjungti piniginę",
   "Emergency Call": "Skubusis skambutis",
+  "Starting the built-in wallet…": "Paleidžiama integruota piniginė…",
+  "Use your own wallet (NWC) instead": "Verčiau naudokite savo piniginę (NWC)",
 };
 export default c;

@@ -663,5 +663,7 @@ const c: Record<string, string> = {
   "pending": "gaida",
   "Disconnect wallet": "Atvienot maku",
   "Emergency Call": "Ārkārtas zvans",
+  "Starting the built-in wallet…": "Notiek iebūvētā maka palaišana…",
+  "Use your own wallet (NWC) instead": "Tā vietā izmantojiet savu maku (NWC)",
 };
 export default c;

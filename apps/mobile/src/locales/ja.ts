@@ -703,5 +703,7 @@ const c: Record<string, string> = {
   "pending": "保留中",
   "Disconnect wallet": "ウォレットを切断",
   "Emergency Call": "緊急通報",
+  "Starting the built-in wallet…": "内蔵ウォレットを起動しています…",
+  "Use your own wallet (NWC) instead": "代わりに自分のウォレット（NWC）を使う",
 };
 export default c;

@@ -663,5 +663,7 @@ const c: Record<string, string> = {
   "pending": "venter",
   "Disconnect wallet": "Koble fra lommebok",
   "Emergency Call": "Nødanrop",
+  "Starting the built-in wallet…": "Starter den innebygde lommeboken…",
+  "Use your own wallet (NWC) instead": "Bruk din egen lommebok (NWC) i stedet",
 };
 export default c;

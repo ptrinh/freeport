@@ -660,5 +660,7 @@ const c: Record<string, string> = {
   "pending": "စောင့်ဆိုင်းဆဲ",
   "Disconnect wallet": "ပိုက်ဆံအိတ် ချိတ်ဆက်မှု ဖြုတ်ရန်",
   "Emergency Call": "အရေးပေါ်ခေါ်ဆိုမှု",
+  "Starting the built-in wallet…": "ပါဝင်ပြီးသား ပိုက်ဆံအိတ်ကို စတင်နေသည်…",
+  "Use your own wallet (NWC) instead": "၎င်းအစား သင့်ကိုယ်ပိုင် ပိုက်ဆံအိတ် (NWC) ကို အသုံးပြုပါ",
 };
 export default c;

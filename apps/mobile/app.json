@@ -94,7 +94,8 @@
           "organization": "phil-t",
           "project": "freeport"
         }
-      ]
+      ],
+      "@breeztech/breez-sdk-spark-react-native"
     ],
     "extra": {
       "eas": {
