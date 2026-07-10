@@ -632,5 +632,8 @@ const c: Record<string, string> = {
   "First sort": "Elsődleges rendezés",
   "Second sort": "Másodlagos rendezés",
   "Third sort": "Harmadlagos rendezés",
+  "Offer sent — waiting for the other party to respond…": "Ajánlat elküldve — várakozás a másik fél válaszára…",
+  "You offered {terms}. They can accept, counter, or decline.": "Ajánlatod: {terms}. Elfogadhatja, ellenajánlatot tehet, vagy elutasíthatja.",
+  "They can accept, counter, or decline.": "Elfogadhatja, ellenajánlatot tehet, vagy elutasíthatja.",
 };
 export default c;

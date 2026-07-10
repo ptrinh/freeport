@@ -632,5 +632,8 @@ const c: Record<string, string> = {
   "First sort": "Πρώτη ταξινόμηση",
   "Second sort": "Δεύτερη ταξινόμηση",
   "Third sort": "Τρίτη ταξινόμηση",
+  "Offer sent — waiting for the other party to respond…": "Η προσφορά στάλθηκε — αναμονή για απάντηση από το άλλο μέρος…",
+  "You offered {terms}. They can accept, counter, or decline.": "Προσφέρατε {terms}. Μπορούν να αποδεχτούν, να κάνουν αντιπροσφορά ή να απορρίψουν.",
+  "They can accept, counter, or decline.": "Μπορούν να αποδεχτούν, να κάνουν αντιπροσφορά ή να απορρίψουν.",
 };
 export default c;

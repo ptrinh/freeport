@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "First sort": "Birinci sıralama",
   "Second sort": "İkinci sıralama",
   "Third sort": "Üçüncü sıralama",
+  "Offer sent — waiting for the other party to respond…": "Təklif göndərildi — qarşı tərəfin cavabı gözlənilir…",
+  "You offered {terms}. They can accept, counter, or decline.": "Siz {terms} təklif etdiniz. Qarşı tərəf qəbul edə, qarşı təklif edə və ya rədd edə bilər.",
+  "They can accept, counter, or decline.": "Qarşı tərəf qəbul edə, qarşı təklif edə və ya rədd edə bilər.",
 };
 export default c;

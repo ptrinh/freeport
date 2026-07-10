@@ -632,5 +632,8 @@ const c: Record<string, string> = {
   "First sort": "Prvo sortiranje",
   "Second sort": "Drugo sortiranje",
   "Third sort": "Treće sortiranje",
+  "Offer sent — waiting for the other party to respond…": "Ponuda poslana — čeka se odgovor druge strane…",
+  "You offered {terms}. They can accept, counter, or decline.": "Ponudili ste {terms}. Mogu prihvatiti, dati protuponudu ili odbiti.",
+  "They can accept, counter, or decline.": "Mogu prihvatiti, dati protuponudu ili odbiti.",
 };
 export default c;

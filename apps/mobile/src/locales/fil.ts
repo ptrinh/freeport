@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "First sort": "Unang pag-uuri",
   "Second sort": "Ikalawang pag-uuri",
   "Third sort": "Ikatlong pag-uuri",
+  "Offer sent — waiting for the other party to respond…": "Naipadala na ang alok — hinihintay ang tugon ng kabilang panig…",
+  "You offered {terms}. They can accept, counter, or decline.": "Nag-alok ka ng {terms}. Puwede nilang tanggapin, sagutan ng kontra-alok, o tanggihan.",
+  "They can accept, counter, or decline.": "Puwede nilang tanggapin, sagutan ng kontra-alok, o tanggihan.",
 };
 export default c;

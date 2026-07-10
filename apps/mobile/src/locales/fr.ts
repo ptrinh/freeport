@@ -675,5 +675,8 @@ const c: Record<string, string> = {
   "First sort": "Premier tri",
   "Second sort": "Deuxième tri",
   "Third sort": "Troisième tri",
+  "Offer sent — waiting for the other party to respond…": "Offre envoyée — en attente de la réponse de l'autre partie…",
+  "You offered {terms}. They can accept, counter, or decline.": "Vous avez proposé {terms}. L'autre partie peut accepter, faire une contre-offre ou refuser.",
+  "They can accept, counter, or decline.": "L'autre partie peut accepter, faire une contre-offre ou refuser.",
 };
 export default c;

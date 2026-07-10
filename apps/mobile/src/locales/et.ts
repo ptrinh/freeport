@@ -632,5 +632,8 @@ const c: Record<string, string> = {
   "First sort": "Esimene sortimine",
   "Second sort": "Teine sortimine",
   "Third sort": "Kolmas sortimine",
+  "Offer sent — waiting for the other party to respond…": "Pakkumine saadetud — ootame teise poole vastust…",
+  "You offered {terms}. They can accept, counter, or decline.": "Tegid pakkumise {terms}. Teine pool saab nõustuda, teha vastupakkumise või keelduda.",
+  "They can accept, counter, or decline.": "Teine pool saab nõustuda, teha vastupakkumise või keelduda.",
 };
 export default c;

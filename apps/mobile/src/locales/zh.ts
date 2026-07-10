@@ -672,5 +672,8 @@ const c: Record<string, string> = {
   "First sort": "第一排序",
   "Second sort": "第二排序",
   "Third sort": "第三排序",
+  "Offer sent — waiting for the other party to respond…": "报价已发送 — 正在等待对方回应…",
+  "You offered {terms}. They can accept, counter, or decline.": "你已报价 {terms}。对方可以接受、还价或拒绝。",
+  "They can accept, counter, or decline.": "对方可以接受、还价或拒绝。",
 };
 export default c;

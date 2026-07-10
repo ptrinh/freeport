@@ -36,6 +36,30 @@ export function messagesViewForNewActivity(
 }
 
 /**
+ * "My offer is out, the poster hasn't responded yet." These cards previously
+ * rendered NOTHING below the title (no status, no chat, no cancel) and read as
+ * broken next to accepted deals with their waiting banner (user report).
+ */
+export function isPendingOffer(n: Pick<Negotiation, 'state' | 'termsBy'>): boolean {
+  return n.state === 'open' && n.termsBy === 'us';
+}
+
+/** One-line summary of the terms I offered — "150.000₫ · 12:45" — for the
+ *  pending-offer banner. Empty when the offer changed nothing concrete
+ *  (flexible time, no price). Time formatting is injected (fmtClock lives in
+ *  the UI layer). */
+export function offerSummary(
+  terms: { payment?: string; window?: { start: number } } | undefined,
+  fmtTime: (d: Date) => string,
+): string {
+  if (!terms) return '';
+  const parts: string[] = [];
+  if (terms.payment) parts.push(terms.payment);
+  if (terms.window?.start) parts.push(fmtTime(new Date(terms.window.start * 1000)));
+  return parts.join(' · ');
+}
+
+/**
  * Lowercased haystack for keyword search over a post: title, author name, route
  * (from/to), service, location, notes, payment, category, subcategory.
  */

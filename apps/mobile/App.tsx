@@ -80,7 +80,7 @@ import { loadProfile, saveProfile, maskPhone, maskPlate, isDisplayablePhone, def
 import { normalizePhone, detectDialCode, dialForCountry } from './src/phone';
 import { routeUrl, placeUrl, placeParam, dirUrl, appleMapsScheme, geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, locationGranted, requestLocationPermission, reverseGeocode, detectRawLocationGPS, detectRawLocationIP, detectCoordsIP, distanceKmBetweenGeohashes, formatDistance, effectiveUnit, suggest } from './src/maps';
 import { parseAmountWithK } from './src/money';
-import { negoIsDone, messagesViewForNewActivity, searchableText } from './src/deals';
+import { negoIsDone, messagesViewForNewActivity, searchableText, isPendingOffer, offerSummary } from './src/deals';
 import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
 import { loadPrefs, savePrefs, type Prefs, type UserLocation } from './src/prefs';
 import { LANGUAGE_CODES, languageLabel, systemLanguage, systemCountry } from './src/language';
@@ -4395,6 +4395,41 @@ function DealsTab({
 
                 <ChatThread nego={item} onSend={(t) => client?.sendChat(item.id, t) ?? Promise.resolve()} />
               </>
+              );
+            })()}
+
+            {/* My offer is out, the poster hasn't responded — without this the
+                card showed nothing below the title and read as broken next to
+                accepted deals with their waiting banner (user report). */}
+            {isPendingOffer(item) && (() => {
+              const summary = offerSummary(item.terms, (d) => fmtClock(d));
+              return (
+                <>
+                  <View style={s.pendingBanner}>
+                    <Text style={s.pendingText}>{t('Offer sent — waiting for the other party to respond…')}</Text>
+                    <Text style={s.pendingSub}>
+                      {summary ? t('You offered {terms}. They can accept, counter, or decline.', { terms: summary })
+                               : t('They can accept, counter, or decline.')}
+                    </Text>
+                  </View>
+                  {confirmCancelId === item.id ? (
+                    <View style={s.cancelBox}>
+                      <Text style={s.cancelBoxText}>{t("The deal isn't confirmed yet, so this cancels your offer immediately.")}</Text>
+                      <View style={s.btnRow}>
+                        <Pressable style={[s.btnAccept, { flex: 1 }]} onPress={() => setConfirmCancelId(null)}>
+                          <Text style={s.btnText}>{t("Keep")}</Text>
+                        </Pressable>
+                        <Pressable style={[s.btnDecline, { flex: 1 }]} onPress={() => { runDealAction(client?.decline(item.id), t('Could not update the deal')); setConfirmCancelId(null); }}>
+                          <Text style={s.btnText}>{t("Cancel offer")}</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  ) : (
+                    <Pressable hitSlop={8} onPress={() => setConfirmCancelId(item.id)}>
+                      <Text style={s.cancelLink}>{t("Cancel offer")}</Text>
+                    </Pressable>
+                  )}
+                </>
               );
             })()}
 

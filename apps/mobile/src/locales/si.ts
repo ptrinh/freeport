@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "First sort": "පළමු අනුපිළිවෙල",
   "Second sort": "දෙවන අනුපිළිවෙල",
   "Third sort": "තෙවන අනුපිළිවෙල",
+  "Offer sent — waiting for the other party to respond…": "යෝජනාව යවන ලදී — අනෙක් පාර්ශ්වය ප්‍රතිචාර දක්වන තෙක් රැඳී සිටී…",
+  "You offered {terms}. They can accept, counter, or decline.": "ඔබ {terms} යෝජනා කළා. ඔවුන්ට පිළිගැනීමට, ප්‍රතියෝජනා කිරීමට, හෝ ප්‍රතික්ෂේප කිරීමට හැකිය.",
+  "They can accept, counter, or decline.": "ඔවුන්ට පිළිගැනීමට, ප්‍රතියෝජනා කිරීමට, හෝ ප්‍රතික්ෂේප කිරීමට හැකිය.",
 };
 export default c;

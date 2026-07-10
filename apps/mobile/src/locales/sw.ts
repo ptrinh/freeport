@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "First sort": "Upangaji wa kwanza",
   "Second sort": "Upangaji wa pili",
   "Third sort": "Upangaji wa tatu",
+  "Offer sent — waiting for the other party to respond…": "Ofa imetumwa — inasubiri upande mwingine ajibu…",
+  "You offered {terms}. They can accept, counter, or decline.": "Umetoa ofa ya {terms}. Wanaweza kukubali, kutoa ofa mbadala, au kukataa.",
+  "They can accept, counter, or decline.": "Wanaweza kukubali, kutoa ofa mbadala, au kukataa.",
 };
 export default c;

@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "First sort": "Isihan pertama",
   "Second sort": "Isihan kedua",
   "Third sort": "Isihan ketiga",
+  "Offer sent — waiting for the other party to respond…": "Tawaran dihantar — menunggu pihak satu lagi membalas…",
+  "You offered {terms}. They can accept, counter, or decline.": "Anda menawarkan {terms}. Mereka boleh terima, buat tawaran balas, atau tolak.",
+  "They can accept, counter, or decline.": "Mereka boleh terima, buat tawaran balas, atau tolak.",
 };
 export default c;

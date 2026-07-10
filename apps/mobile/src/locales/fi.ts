@@ -632,5 +632,8 @@ const c: Record<string, string> = {
   "First sort": "Ensimmäinen lajittelu",
   "Second sort": "Toinen lajittelu",
   "Third sort": "Kolmas lajittelu",
+  "Offer sent — waiting for the other party to respond…": "Tarjous lähetetty — odotetaan toisen osapuolen vastausta…",
+  "You offered {terms}. They can accept, counter, or decline.": "Tarjosit {terms}. Toinen osapuoli voi hyväksyä, tehdä vastatarjouksen tai hylätä.",
+  "They can accept, counter, or decline.": "Toinen osapuoli voi hyväksyä, tehdä vastatarjouksen tai hylätä.",
 };
 export default c;

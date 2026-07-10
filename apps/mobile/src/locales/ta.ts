@@ -632,5 +632,8 @@ const c: Record<string, string> = {
   "First sort": "முதல் வரிசைப்படுத்தல்",
   "Second sort": "இரண்டாம் வரிசைப்படுத்தல்",
   "Third sort": "மூன்றாம் வரிசைப்படுத்தல்",
+  "Offer sent — waiting for the other party to respond…": "முன்மொழிவு அனுப்பப்பட்டது — மறுதரப்பினர் பதிலளிக்கக் காத்திருக்கிறோம்…",
+  "You offered {terms}. They can accept, counter, or decline.": "நீங்கள் {terms} முன்மொழிந்தீர்கள். அவர்கள் ஏற்கலாம், எதிர்மொழிவு தரலாம் அல்லது நிராகரிக்கலாம்.",
+  "They can accept, counter, or decline.": "அவர்கள் ஏற்கலாம், எதிர்மொழிவு தரலாம் அல்லது நிராகரிக்கலாம்.",
 };
 export default c;

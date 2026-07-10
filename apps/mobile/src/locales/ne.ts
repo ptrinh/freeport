@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "First sort": "पहिलो क्रम",
   "Second sort": "दोस्रो क्रम",
   "Third sort": "तेस्रो क्रम",
+  "Offer sent — waiting for the other party to respond…": "प्रस्ताव पठाइयो — अर्को पक्षको जवाफ कुर्दै…",
+  "You offered {terms}. They can accept, counter, or decline.": "तपाईंले {terms} प्रस्ताव गर्नुभयो। उहाँले स्वीकार गर्न, प्रतिप्रस्ताव गर्न, वा अस्वीकार गर्न सक्नुहुन्छ।",
+  "They can accept, counter, or decline.": "उहाँले स्वीकार गर्न, प्रतिप्रस्ताव गर्न, वा अस्वीकार गर्न सक्नुहुन्छ।",
 };
 export default c;

@@ -632,5 +632,8 @@ const c: Record<string, string> = {
   "First sort": "מיון ראשון",
   "Second sort": "מיון שני",
   "Third sort": "מיון שלישי",
+  "Offer sent — waiting for the other party to respond…": "הצעה נשלחה — ממתין לתגובת הצד השני…",
+  "You offered {terms}. They can accept, counter, or decline.": "הצעת {terms}. אפשר לקבל, להגיש הצעה נגדית או לדחות.",
+  "They can accept, counter, or decline.": "אפשר לקבל, להגיש הצעה נגדית או לדחות.",
 };
 export default c;

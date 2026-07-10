@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "First sort": "የመጀመሪያ ድርደራ",
   "Second sort": "ሁለተኛ ድርደራ",
   "Third sort": "ሦስተኛ ድርደራ",
+  "Offer sent — waiting for the other party to respond…": "ቅናሽ ተልኳል — ሌላኛው ወገን ምላሽ እስኪሰጥ በመጠበቅ ላይ…",
+  "You offered {terms}. They can accept, counter, or decline.": "{terms} አቅርበዋል። ሊቀበሉት፣ አጸፋዊ ቅናሽ ሊያቀርቡ ወይም ውድቅ ሊያደርጉ ይችላሉ።",
+  "They can accept, counter, or decline.": "ሊቀበሉት፣ አጸፋዊ ቅናሽ ሊያቀርቡ ወይም ውድቅ ሊያደርጉ ይችላሉ።",
 };
 export default c;

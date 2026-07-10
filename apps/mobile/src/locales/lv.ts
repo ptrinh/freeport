@@ -632,5 +632,8 @@ const c: Record<string, string> = {
   "First sort": "Pirmā kārtošana",
   "Second sort": "Otrā kārtošana",
   "Third sort": "Trešā kārtošana",
+  "Offer sent — waiting for the other party to respond…": "Piedāvājums nosūtīts — gaida otras puses atbildi…",
+  "You offered {terms}. They can accept, counter, or decline.": "Jūs piedāvājāt {terms}. Otra puse var to pieņemt, iesniegt pretpiedāvājumu vai noraidīt.",
+  "They can accept, counter, or decline.": "Otra puse var to pieņemt, iesniegt pretpiedāvājumu vai noraidīt.",
 };
 export default c;

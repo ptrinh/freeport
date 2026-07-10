@@ -672,5 +672,8 @@ const c: Record<string, string> = {
   "First sort": "第1ソート",
   "Second sort": "第2ソート",
   "Third sort": "第3ソート",
+  "Offer sent — waiting for the other party to respond…": "オファーを送信しました — 相手の返答をお待ちください…",
+  "You offered {terms}. They can accept, counter, or decline.": "{terms} でオファーしました。相手は承諾・カウンター・辞退のいずれかを選べます。",
+  "They can accept, counter, or decline.": "相手は承諾・カウンター・辞退のいずれかを選べます。",
 };
 export default c;
