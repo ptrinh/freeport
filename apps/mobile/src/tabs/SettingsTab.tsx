@@ -699,16 +699,6 @@ function SettingsTab({
       </Pressable>
       {featuresOpen && (
       <>
-      <Pressable accessibilityRole="switch" accessibilityState={{ checked: servicesEnabled }} style={s.toggleRow} onPress={() => onServicesEnabledChange(!servicesEnabled)}>
-        <View style={{ flex: 1, marginEnd: 12 }}>
-          <Text style={s.toggleTitle}>{t("Service / Product marketplace")}</Text>
-          <Text style={s.dim}>{t("Buy and sell products & services beyond rideshare. Turn off for a leaner UI.")}</Text>
-        </View>
-        <View style={[s.switchTrack, servicesEnabled && s.switchTrackOn]}>
-          <View style={[s.switchThumb, servicesEnabled && s.switchThumbOn]} />
-        </View>
-      </Pressable>
-
       <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("Appearance")}</Text>
       <Text style={s.dim}>{t("Follow the system setting, or force a theme.")}</Text>
       <View style={[s.segRow, { marginTop: 8 }]}>
@@ -868,7 +858,12 @@ function SettingsTab({
           by default like the other Settings sections. The OTA update flow lives
           here as a small "Check now" link (native gets a real OTA swap; web just
           hard-reloads to the newest deploy). */}
-      <ExperimentalSection walletEnabled={experimentalWallet} onWalletEnabledChange={onExperimentalWalletChange} />
+      <ExperimentalSection
+        walletEnabled={experimentalWallet}
+        onWalletEnabledChange={onExperimentalWalletChange}
+        servicesEnabled={servicesEnabled}
+        onServicesEnabledChange={onServicesEnabledChange}
+      />
 
       <AboutSection onReplayTour={onReplayTour} />
 

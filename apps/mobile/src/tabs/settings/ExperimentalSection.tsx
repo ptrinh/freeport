@@ -14,9 +14,13 @@ import { s, palette } from '../../ui/theme';
 function ExperimentalSection({
   walletEnabled,
   onWalletEnabledChange,
+  servicesEnabled,
+  onServicesEnabledChange,
 }: {
   walletEnabled: boolean;
   onWalletEnabledChange: (v: boolean) => void;
+  servicesEnabled: boolean;
+  onServicesEnabledChange: (v: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -32,6 +36,23 @@ function ExperimentalSection({
       {open && (
         <>
           <Text style={s.dim}>{t('Early features that may change or break. Off by default.')}</Text>
+          {/* Service/Product vertical — moved here from Features: it's still
+              an early vertical (rideshare is the proven one). Same pref, no
+              behavior change. */}
+          <Pressable
+            accessibilityRole="switch"
+            accessibilityState={{ checked: servicesEnabled }}
+            style={s.toggleRow}
+            onPress={() => onServicesEnabledChange(!servicesEnabled)}
+          >
+            <View style={{ flex: 1, marginEnd: 12 }}>
+              <Text style={s.toggleTitle}>{t('Service / Product marketplace')}</Text>
+              <Text style={s.dim}>{t('Buy and sell products & services beyond rideshare. Turn off for a leaner UI.')}</Text>
+            </View>
+            <View style={[s.switchTrack, servicesEnabled && s.switchTrackOn]}>
+              <View style={[s.switchThumb, servicesEnabled && s.switchThumbOn]} />
+            </View>
+          </Pressable>
           <Pressable
             accessibilityRole="switch"
             accessibilityState={{ checked: walletEnabled }}
