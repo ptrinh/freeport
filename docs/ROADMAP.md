@@ -126,7 +126,24 @@ insurance, centralized driver vetting.
 Settlement without becoming a money transmitter: the app NEVER holds funds.
 The protocol's reserved `payment` field (v1) makes this additive.
 
-**Chosen stack: Breez SDK — Nodeless (Spark implementation).**
+**Architecture: a PLUGGABLE wallet layer** (`src/wallet/`), not a hard Breez
+dependency. One `WalletProvider` interface — `capabilities()` (assets,
+receive/send methods), `balance()`, `receive()` (bolt11 / Spark address),
+`pay(invoiceOrAddress)`, events — with two implementations:
+
+1. **`breez-spark` (default)**: the embedded self-custodial wallet below —
+   zero-setup UX for users who have no wallet (the majority).
+2. **`nwc` (NIP-47 Nostr Wallet Connect)**: bring-your-own wallet (Alby Hub,
+   coinos, Primal, self-hosted nodes…). Pairs naturally with the existing
+   nostr-tools stack; the user pastes/scans an NWC connection string in
+   Settings. Capability-gated: NWC is Lightning-BTC-only, so stablecoin
+   balance/denomination UI hides itself when this provider is active.
+
+Settings: "Wallet → Built-in (default) / Connect your own (NWC)". The deal
+"Pay" flow talks only to the interface, so providers are interchangeable and
+a future provider (e.g. another L2) is additive.
+
+**Default provider: Breez SDK — Nodeless (Spark implementation).**
 - One wallet, two assets: Lightning BTC + native stablecoins (USDT/USDB on
   Spark); balance can be HELD in USD — the right default for ride/service
   pricing (no BTC volatility between deal and settle).
@@ -157,6 +174,5 @@ balances small ("this is a spending wallet").
    PSA) BEFORE any public rollout. No escrow, ever — that flips the model to
    custodial.
 
-Deliberately skipped: NWC (NIP-47) as a middle tier — redundant once the
-embedded wallet exists; revisit as a power-user option. Custodial options
-(Cashu mints, exchange APIs) conflict with the no-operator model.
+Deliberately skipped: custodial options (Cashu mints, exchange APIs) —
+they conflict with the no-operator model.
