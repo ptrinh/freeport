@@ -81,18 +81,20 @@ import { useContactHandshake } from './src/hooks/useContactHandshake';
 import { useDeepLinkNav } from './src/hooks/useDeepLinkNav';
 import { useBackgroundGrace } from './src/hooks/useBackgroundGrace';
 import { MarketTab } from './src/tabs/BrowseTab';
+import { WalletTab } from './src/tabs/WalletTab';
 import { PostTab } from './src/tabs/PostTab';
 import { DealsTab, isImageMsg, isAudioMsg, isTripMsg } from './src/tabs/MessagesTab';
 import { SettingsTab } from './src/tabs/SettingsTab';
 import { Onboarding } from './src/tabs/Onboarding';
 
-type Tab = 'post' | 'messages' | 'browse' | 'settings';
+type Tab = 'post' | 'messages' | 'browse' | 'wallet' | 'settings';
 
 // [inactive (outline), active (filled)] per tab
 const TAB_ICONS: Record<Tab, [IoniconName, IoniconName]> = {
   post: ['add-circle-outline', 'add-circle'],
   messages: ['chatbubbles-outline', 'chatbubbles'],
   browse: ['compass-outline', 'compass'],
+  wallet: ['wallet-outline', 'wallet'],
   settings: ['settings-outline', 'settings'],
 };
 
@@ -339,6 +341,7 @@ function AppInner() {
   const [profile, setProfile] = useState<UserProfile>({ name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' });
   const [servicesEnabled, setServicesEnabled] = useState(false);
   const [experimentalWallet, setExperimentalWallet] = useState(false);
+  const [walletNwcUrl, setWalletNwcUrl] = useState('');
   const [location, setLocation] = useState<UserLocation>({ country: '', state: '', city: '' });
   // Mirror the latest location so the async launch auto-detect can tell whether
   // the user has manually changed it (e.g. picked a place during onboarding)
@@ -507,6 +510,7 @@ function AppInner() {
       const p = await loadPrefs();
       setServicesEnabled(p.servicesEnabled);
       setExperimentalWallet(p.experimentalWallet);
+      setWalletNwcUrl(p.walletNwcUrl);
       setLocation(p.location);
       setUseNip07(p.useNip07);
       setThemeState(p.theme); // palette applied by the effective-theme resolver above
@@ -939,6 +943,8 @@ function AppInner() {
   const visibleTabs: Tab[] = base.filter(
     (t) => (t !== 'browse' || showBrowse) && (t !== 'post' || showPost),
   );
+  // Experimental wallet: its tab slots in directly left of Settings.
+  if (experimentalWallet) visibleTabs.splice(visibleTabs.indexOf('settings'), 0, 'wallet');
   // Guided-tour steps per rideshare role (Customer/Provider get no tour). Each
   // step highlights a tab; a `wheel` step stays on Post and instead demos the
   // amount wheel. The passenger flow inserts a dedicated wheel/pricing step
@@ -1151,6 +1157,16 @@ function AppInner() {
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
       {tab === 'post' && <PostTab client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
       {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
+      {tab === 'wallet' && (
+        <WalletTab
+          nwcUrl={walletNwcUrl}
+          onNwcUrlChange={(url) => {
+            setWalletNwcUrl(url);
+            savePrefs({ walletNwcUrl: url }).catch(() => {});
+          }}
+          onScroll={onContentScroll}
+        />
+      )}
       {tab === 'settings' && (
         <SettingsTab
           npub={npub}
@@ -1324,7 +1340,7 @@ function AppInner() {
                 )}
               </View>
               <Animated.View style={{ height: anim.labelH, opacity: anim.labelOpacity, overflow: 'hidden', justifyContent: 'center' }}>
-                <Text style={[s.tabText, tab === tk && s.tabTextActive]}>{t(tk === 'post' && role === 'passenger' ? 'Request' : tk === 'browse' ? 'Browse' : tk === 'messages' ? 'Messages' : tk === 'settings' ? 'Settings' : 'Post')}</Text>
+                <Text style={[s.tabText, tab === tk && s.tabTextActive]}>{t(tk === 'post' && role === 'passenger' ? 'Request' : tk === 'browse' ? 'Browse' : tk === 'messages' ? 'Messages' : tk === 'settings' ? 'Settings' : tk === 'wallet' ? 'Wallet' : 'Post')}</Text>
               </Animated.View>
             </Animated.View>
           </Pressable>

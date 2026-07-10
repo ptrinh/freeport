@@ -1,0 +1,59 @@
+/**
+ * Pluggable wallet layer (see docs/ROADMAP.md "In-app wallet").
+ *
+ * One interface, multiple providers:
+ *  - `nwc` (Nostr Wallet Connect, NIP-47): bring-your-own wallet — pure JS
+ *    over the existing nostr-tools stack, works on every surface via OTA.
+ *  - `breez-spark` (planned): the embedded self-custodial wallet. Its SDK is
+ *    a native module, so it can only arrive with a new store binary; until
+ *    then the UI shows it as "coming soon".
+ *
+ * Amounts are SATS everywhere in this layer (NIP-47 speaks msats; providers
+ * convert at the boundary).
+ */
+
+export interface WalletCapabilities {
+  /** Lightning BTC send/receive. */
+  lightning: boolean;
+  /** Stablecoin balance/denomination (Breez Spark only). */
+  stablecoin: boolean;
+  /** Provider can list past transactions. */
+  transactions: boolean;
+}
+
+export interface WalletBalance {
+  sats: number;
+}
+
+export interface WalletInvoice {
+  /** bolt11 payment request. */
+  invoice: string;
+  /** sats requested (0 = any amount). */
+  sats: number;
+}
+
+export interface WalletTx {
+  direction: 'in' | 'out';
+  sats: number;
+  description?: string;
+  /** Unix seconds. */
+  ts: number;
+  /** True once settled (NWC list_transactions may include pending ones). */
+  settled: boolean;
+}
+
+export interface WalletProvider {
+  readonly kind: 'nwc' | 'breez-spark';
+  capabilities(): WalletCapabilities;
+  /** Human name of the underlying wallet, when the provider can know it. */
+  info(): Promise<{ alias?: string }>;
+  balance(): Promise<WalletBalance>;
+  /** Create a bolt11 invoice to RECEIVE `sats` (0 = any-amount invoice). */
+  receive(sats: number, description?: string): Promise<WalletInvoice>;
+  /** Pay a bolt11 invoice. Resolves once the wallet reports success. */
+  pay(invoice: string): Promise<{ preimage?: string }>;
+  /** Recent transactions, newest first. Empty if unsupported. */
+  transactions(limit?: number): Promise<WalletTx[]>;
+  /** Tear down sockets/subscriptions. */
+  close(): void;
+}

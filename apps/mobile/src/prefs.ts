@@ -46,6 +46,9 @@ export interface Prefs {
   browseSubcategory: string;
   /** Experimental: show the in-app wallet UI (Breez Spark / NWC). Off by default. */
   experimentalWallet: boolean;
+  /** NWC connection string for the bring-your-own wallet ('' = not connected).
+   *  Device-only, never published — treat like a credential. */
+  walletNwcUrl: string;
   /** Play a sound when a new post lands in the default browse subcategory. */
   browseAlertSound: boolean;
   /** Send a notification when a new post lands in the default browse subcategory. */
@@ -64,6 +67,7 @@ export interface Prefs {
 const DEFAULTS: Prefs = {
   servicesEnabled: false,
   experimentalWallet: false,
+  walletNwcUrl: '',
   location: { country: '', state: '', city: '' },
   locationManual: false,
   useNip07: false,
