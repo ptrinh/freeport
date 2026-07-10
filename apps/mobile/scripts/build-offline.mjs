@@ -123,6 +123,17 @@ if (missing.length) throw new Error(`icon fonts not found in dist/assets: ${miss
 // <img src="/assets/…png"> at runtime, which can't resolve from file://.
 // Embed every non-font asset (currently just the logo, ~195 kB) and let the
 // shim rewrite img srcs as React inserts them.
+// Built-in wallet wasm → gzip + base64 for zero-network wallet in the offline
+// file. Pre-gzipping beats letting the outer pass compress raw-wasm base64:
+// the runtime shim inflates it with DecompressionStream (already required by
+// the self-extractor).
+const wasmPath = path.join(dist, 'breez_sdk_spark_wasm_bg.wasm');
+const wasmB64 = fs.existsSync(wasmPath)
+  ? zlib.gzipSync(fs.readFileSync(wasmPath), { level: 9 }).toString('base64')
+  : '';
+if (wasmB64) console.log(`  embedded wallet wasm (${(fs.statSync(wasmPath).size / 1048576).toFixed(1)} MB raw → ${(wasmB64.length / 1048576).toFixed(1)} MB gz+b64)`);
+else console.warn('  ! no wallet wasm in dist — offline wallet will need network once');
+
 const assetMap = {};
 for (const f of findFiles(path.join(dist, 'assets'), (p) => !p.endsWith('.ttf'))) {
   const rel = '/' + path.relative(dist, f).split(path.sep).join('/');
@@ -158,6 +169,10 @@ const shim = `<script>
 (function(){
   var FONTS=${JSON.stringify(fontMap)};
   var ASSETS=${JSON.stringify(assetMap)};
+  /* Built-in wallet wasm, embedded so the wallet works with zero network.
+     src/wallet/breez.ts fetches /breez_sdk_spark_wasm_bg.wasm — the fetch
+     shim below answers from these bytes. */
+  var WASM_B64=${JSON.stringify(wasmB64)};
   var CSS=${JSON.stringify(cssMap)};
   function fixStyle(node){
     if(!node.textContent||node.textContent.indexOf('@font-face')===-1)return;
@@ -213,6 +228,14 @@ const shim = `<script>
     if(origFetch)window.fetch=function(input,init){
       var u=typeof input==='string'?input:(input&&input.url)||'';
       if(isChunk(u))return Promise.resolve(new Response('',{status:200,headers:{'Content-Type':'text/javascript'}}));
+      if(WASM_B64&&u.indexOf('breez_sdk_spark_wasm_bg.wasm')!==-1){
+        var bin=atob(WASM_B64),bytes=new Uint8Array(bin.length);
+        for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+        var inflated=new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')));
+        return inflated.arrayBuffer().then(function(buf){
+          return new Response(buf,{status:200,headers:{'Content-Type':'application/wasm'}});
+        });
+      }
       return origFetch(input,init);
     };
   }catch(_){}

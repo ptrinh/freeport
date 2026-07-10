@@ -36,3 +36,26 @@ if (js.includes(needle)) {
 } else {
   console.log('copy-breez-wasm: glue already patched');
 }
+
+// Patch the web entry's default init to forward its argument. Upstream drops
+// it, forcing the initSync() path — but Chrome disallows SYNCHRONOUS
+// WebAssembly instantiation over 8MB on the main thread, and this wasm is
+// 11MB. Forwarding lets us call the async __wbg_init with explicit bytes.
+const entry = join(root, 'node_modules/@breeztech/breez-sdk-spark/web/index.js');
+const ejs = readFileSync(entry, 'utf8');
+const eNeedle = `const initBreezSDK = async () => {
+    await setupWebStorage();
+    return await wasmInit();
+};`;
+const ePatched = `const initBreezSDK = async (arg) => {
+    await setupWebStorage();
+    return await wasmInit(arg); // patched by copy-breez-wasm.mjs: forward bytes for ASYNC instantiation (sync >8MB is disallowed)
+};`;
+if (ejs.includes(eNeedle)) {
+  writeFileSync(entry, ejs.replace(eNeedle, ePatched));
+  console.log('copy-breez-wasm: patched web entry to forward init args');
+} else if (ejs.includes('wasmInit(arg)')) {
+  console.log('copy-breez-wasm: web entry already patched');
+} else {
+  throw new Error('copy-breez-wasm: web entry init has an unexpected shape — update the patch');
+}

@@ -47,7 +47,8 @@ export function defaultWalletProvider(): Promise<WalletProvider | null> {
         if (!p) breezSingleton = null;
         return p;
       } catch (e) {
-        if (__DEV__) console.warn('built-in wallet unavailable:', e);
+        // Always logged: a silently-dead wallet is undiagnosable in the field.
+        console.warn('built-in wallet unavailable:', e);
         breezSingleton = null;
         return null;
       }

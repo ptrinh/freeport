@@ -83,8 +83,9 @@ async function loadSdk(mnemonic: string): Promise<any> {
       const storage: any = await import('@breeztech/breez-sdk-spark/storage');
       (globalThis as any).createDefaultStorage = storage.createDefaultStorage;
     } catch { /* SDK warns and uses its fallback */ }
-    const module = await WebAssembly.compile(await loadWasmBytes());
-    mod.initSync({ module });
+    // Async instantiation (via the patched default init) — Chrome forbids
+    // synchronous WebAssembly.Instance above 8MB on the main thread.
+    await mod.default({ module_or_path: await loadWasmBytes() });
     const config = mod.defaultConfig('mainnet');
     config.apiKey = API_KEY;
     return await mod.connect({
