@@ -11,8 +11,30 @@
  * distance hides them. Posts without a location are never hidden.
  */
 
+import { categoryOf, subcategoryOf } from './categories';
+
 /** Default locality radius for rides when the user has no Max distance set. */
 export const NEAR_KM = 200;
+
+/** Category/subcategory filter for the Browse feed.
+ *
+ *  The subcategory (vehicle class for rides) applies REGARDLESS of whether the
+ *  Service/Product vertical is enabled — the old code skipped this entire
+ *  filter when the vertical was off, so Settings' "Compact Car" default did
+ *  nothing and a Luxury Car request still showed (user report). The category
+ *  check still only matters with the vertical on (off = rideshare-only feed,
+ *  already narrowed by schema). */
+export function passesCategory(
+  schema: string,
+  payload: Record<string, any>,
+  servicesEnabled: boolean,
+  filterCat: string,
+  filterSub: string | null,
+): boolean {
+  if (servicesEnabled && categoryOf(schema, payload) !== filterCat) return false;
+  if (filterSub && subcategoryOf(schema, payload) !== filterSub) return false;
+  return true;
+}
 
 /** The user's Max distance preference in km (they type it in their own unit). */
 export function maxKmOf(maxDistance: number, unit: 'km' | 'mi'): number {

@@ -70,7 +70,7 @@ import { onWheelDemo, triggerWheelDemo } from './src/wheelDemo';
 import { Fireworks } from './src/Fireworks';
 import { installDebugApi, registerDebugClient } from './src/debug';
 import { locQuery, locRefSeed, locRefStore, locRefHas, userGeohashSeed, userGeohashStore } from './src/localityRef';
-import { passesDistance } from './src/browseFilter';
+import { passesDistance, passesCategory } from './src/browseFilter';
 import { initNotifications, notify, notificationGranted, requestNotifications, onNotificationTap } from './src/notify';
 import { beginBackgroundTask, endBackgroundTask } from './src/backgroundTask';
 import { uploadImage, uploadFile, UploadError } from './src/upload';
@@ -2279,15 +2279,10 @@ function MarketTab({
     });
     // Hide leftover service listings if the vertical is toggled off
     const visible = servicesEnabled ? live : live.filter((i) => !i.content.schema.startsWith('service'));
-    // Category (+ optional subcategory) filter, only when Service/Product is on
-    const byCategory = servicesEnabled
-      ? visible.filter((i) => {
-          const pl = i.content.payload as any;
-          if (categoryOf(i.content.schema, pl) !== filterCat) return false;
-          if (filterSub && subcategoryOf(i.content.schema, pl) !== filterSub) return false;
-          return true;
-        })
-      : visible;
+    // Category + subcategory filter (see browseFilter.ts) — the subcategory
+    // (vehicle class) applies even with the Service/Product vertical off.
+    const byCategory = visible.filter((i) =>
+      passesCategory(i.content.schema, i.content.payload as any, servicesEnabled, filterCat, filterSub));
     // Distance filter (see src/browseFilter.ts): rides default to NEAR_KM, but
     // the user's explicit Max distance preference overrides it in BOTH
     // directions — raising it to 1000 km must actually show farther rides.
@@ -2384,6 +2379,33 @@ function MarketTab({
         onClose={() => setSortOpen(false)}
         nearbyDisabled={!ref}
       />
+      {/* Vehicle-class chips when the Service/Product vertical is OFF: the
+          subcategory filter still applies (Settings default), so the user
+          needs an in-feed way to switch it. */}
+      {!servicesEnabled && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={s.catScroll}
+          contentContainerStyle={s.catRow}
+        >
+          {subcategoriesFor(RIDESHARE_CATEGORY).map((sub) => (
+            <Pressable
+              key={sub}
+              style={[s.catChip, s.catChipRow, filterSub === sub && s.catChipOn]}
+              onPress={() => setFilterSub(filterSub === sub ? null : sub)}
+            >
+              <MaterialCommunityIcons
+                name={subcategoryIcon(sub) as any}
+                size={14}
+                color={filterSub === sub ? 'white' : palette.chipText}
+                style={s.catChipIcon}
+              />
+              <Text style={[s.catChipText, filterSub === sub && s.catChipTextOn]}>{t(sub)}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      )}
       {/* Category filter — only when the Service/Product vertical is enabled.
           Tapping a category with subcategories drills into them (with a Back). */}
       {servicesEnabled && (
