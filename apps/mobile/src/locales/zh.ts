@@ -669,5 +669,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "有 {n} 条发布在您的范围之外——最近的一条距您 {dist}。",
   "{n} posts are outside your area.": "有 {n} 条发布在您的范围之外。",
   "Increase Max distance in Settings to see posts farther away.": "在“设置”中调高“最大距离”即可查看更远的发布。",
+  "First sort": "第一排序",
+  "Second sort": "第二排序",
+  "Third sort": "第三排序",
 };
 export default c;

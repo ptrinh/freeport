@@ -669,5 +669,8 @@ const c: Record<string, string> = {
   "Relay running — add to the app’s relay list:": "Relay đang chạy — thêm vào danh sách relay của ứng dụng:",
   "No network address found — are you online?": "Không tìm thấy địa chỉ mạng — bạn có đang online không?",
   "Host Freeport for others": "Host Freeport cho người khác",
+  "First sort": "Ưu tiên 1",
+  "Second sort": "Ưu tiên 2",
+  "Third sort": "Ưu tiên 3",
 };
 export default c;

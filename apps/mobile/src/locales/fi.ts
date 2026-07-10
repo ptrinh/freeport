@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} ilmoitusta on alueesi ulkopuolella — lähin on {dist} päässä.",
   "{n} posts are outside your area.": "{n} ilmoitusta on alueesi ulkopuolella.",
   "Increase Max distance in Settings to see posts farther away.": "Suurenna enimmäisetäisyyttä asetuksissa nähdäksesi kauempana olevat ilmoitukset.",
+  "First sort": "Ensimmäinen lajittelu",
+  "Second sort": "Toinen lajittelu",
+  "Third sort": "Kolmas lajittelu",
 };
 export default c;

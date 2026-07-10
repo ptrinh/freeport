@@ -626,5 +626,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "ມີ {n} ໂພສຢູ່ນອກເຂດຂອງທ່ານ — ໂພສທີ່ໃກ້ທີ່ສຸດຢູ່ຫ່າງ {dist}.",
   "{n} posts are outside your area.": "ມີ {n} ໂພສຢູ່ນອກເຂດຂອງທ່ານ.",
   "Increase Max distance in Settings to see posts farther away.": "ເພີ່ມ ໄລຍະຫ່າງສູງສຸດ ໃນ ການຕັ້ງຄ່າ ເພື່ອເບິ່ງໂພສທີ່ຢູ່ໄກກວ່າ.",
+  "First sort": "ຈັດລຽງທຳອິດ",
+  "Second sort": "ຈັດລຽງທີສອງ",
+  "Third sort": "ຈັດລຽງທີສາມ",
 };
 export default c;

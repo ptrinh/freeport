@@ -626,5 +626,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} post ang nasa labas ng iyong lugar — ang pinakamalapit ay {dist} ang layo.",
   "{n} posts are outside your area.": "{n} post ang nasa labas ng iyong lugar.",
   "Increase Max distance in Settings to see posts farther away.": "Taasan ang Max distance sa Settings para makita ang mga post na mas malayo.",
+  "First sort": "Unang pag-uuri",
+  "Second sort": "Ikalawang pag-uuri",
+  "Third sort": "Ikatlong pag-uuri",
 };
 export default c;

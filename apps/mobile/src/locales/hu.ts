@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} bejegyzés a körzeteden kívül esik — a legközelebbi {dist} távolságra van.",
   "{n} posts are outside your area.": "{n} bejegyzés a körzeteden kívül esik.",
   "Increase Max distance in Settings to see posts farther away.": "Növeld a Maximális távolság értékét a Beállításokban, hogy távolabbi bejegyzéseket is láss.",
+  "First sort": "Elsődleges rendezés",
+  "Second sort": "Másodlagos rendezés",
+  "Third sort": "Harmadlagos rendezés",
 };
 export default c;

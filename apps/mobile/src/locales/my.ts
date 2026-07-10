@@ -626,5 +626,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "ပို့စ် {n} ခုသည် သင့်ဧရိယာပြင်ပတွင် ရှိနေသည် — အနီးဆုံးမှာ {dist} အကွာတွင် ရှိသည်။",
   "{n} posts are outside your area.": "ပို့စ် {n} ခုသည် သင့်ဧရိယာပြင်ပတွင် ရှိနေသည်။",
   "Increase Max distance in Settings to see posts farther away.": "ပိုဝေးသော ပို့စ်များကို ကြည့်ရန် Settings တွင် Max distance ကို တိုးမြှင့်ပါ။",
+  "First sort": "ပထမ စီစဉ်မှု",
+  "Second sort": "ဒုတိယ စီစဉ်မှု",
+  "Third sort": "တတိယ စီစဉ်မှု",
 };
 export default c;

@@ -669,5 +669,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n}개의 게시물이 내 지역 밖에 있습니다 — 가장 가까운 게시물은 {dist} 거리에 있습니다.",
   "{n} posts are outside your area.": "{n}개의 게시물이 내 지역 밖에 있습니다.",
   "Increase Max distance in Settings to see posts farther away.": "설정에서 최대 거리를 늘리면 더 먼 곳의 게시물을 볼 수 있습니다.",
+  "First sort": "1차 정렬",
+  "Second sort": "2차 정렬",
+  "Third sort": "3차 정렬",
 };
 export default c;

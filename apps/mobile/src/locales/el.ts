@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} αγγελίες βρίσκονται εκτός της περιοχής σας — η πλησιέστερη απέχει {dist}.",
   "{n} posts are outside your area.": "{n} αγγελίες βρίσκονται εκτός της περιοχής σας.",
   "Increase Max distance in Settings to see posts farther away.": "Αυξήστε τη Μέγιστη απόσταση στις Ρυθμίσεις για να δείτε αγγελίες πιο μακριά.",
+  "First sort": "Πρώτη ταξινόμηση",
+  "Second sort": "Δεύτερη ταξινόμηση",
+  "Third sort": "Τρίτη ταξινόμηση",
 };
 export default c;

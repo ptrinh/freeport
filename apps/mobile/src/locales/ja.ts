@@ -669,5 +669,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n}件の投稿はエリア外です — 最も近いものは{dist}先にあります。",
   "{n} posts are outside your area.": "{n}件の投稿はエリア外です。",
   "Increase Max distance in Settings to see posts farther away.": "設定で最大距離を大きくすると、より遠くの投稿を表示できます。",
+  "First sort": "第1ソート",
+  "Second sort": "第2ソート",
+  "Third sort": "第3ソート",
 };
 export default c;

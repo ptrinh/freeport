@@ -2776,7 +2776,7 @@ function SortModal({
           <Text style={s.dim}>{t("Ties on the first sort fall through to the second, then the third.")}</Text>
           {tiers.map((tier, level) => (
             <View key={tier} style={{ marginTop: 14 }}>
-              <Text style={s.label}>{tier}</Text>
+              <Text style={s.label}>{t(tier)}</Text>
               <View style={s.sortChips}>
                 {SORT_CHOICES.map((key) => {
                   const selected = prefs[level] === key;

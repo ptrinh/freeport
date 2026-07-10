@@ -626,5 +626,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} хабарландыру сіздің аймағыңыздан тыс орналасқан — ең жақыны {dist} қашықтықта.",
   "{n} posts are outside your area.": "{n} хабарландыру сіздің аймағыңыздан тыс орналасқан.",
   "Increase Max distance in Settings to see posts farther away.": "Алысырақ орналасқан хабарландыруларды көру үшін Параметрлердегі «Ең үлкен қашықтық» мәнін арттырыңыз.",
+  "First sort": "Бірінші сұрыптау",
+  "Second sort": "Екінші сұрыптау",
+  "Third sort": "Үшінші сұрыптау",
 };
 export default c;

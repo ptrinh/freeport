@@ -672,5 +672,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "يوجد {n} من المنشورات خارج نطاقك — أقربها يبعد {dist}.",
   "{n} posts are outside your area.": "يوجد {n} من المنشورات خارج نطاقك.",
   "Increase Max distance in Settings to see posts farther away.": "قم بزيادة \"الحد الأقصى للمسافة\" في \"الإعدادات\" لرؤية منشورات أبعد.",
+  "First sort": "الفرز الأول",
+  "Second sort": "الفرز الثاني",
+  "Third sort": "الفرز الثالث",
 };
 export default c;

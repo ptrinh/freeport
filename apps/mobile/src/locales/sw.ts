@@ -626,5 +626,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "Machapisho {n} yako nje ya eneo lako — lililo karibu zaidi liko umbali wa {dist}.",
   "{n} posts are outside your area.": "Machapisho {n} yako nje ya eneo lako.",
   "Increase Max distance in Settings to see posts farther away.": "Ongeza Umbali wa juu zaidi katika Mipangilio ili kuona machapisho ya mbali zaidi.",
+  "First sort": "Upangaji wa kwanza",
+  "Second sort": "Upangaji wa pili",
+  "Third sort": "Upangaji wa tatu",
 };
 export default c;

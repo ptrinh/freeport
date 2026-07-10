@@ -632,5 +632,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} príspevkov je mimo vašej oblasti — najbližší je vzdialený {dist}.",
   "{n} posts are outside your area.": "{n} príspevkov je mimo vašej oblasti.",
   "Increase Max distance in Settings to see posts farther away.": "Ak chcete vidieť aj vzdialenejšie príspevky, zvýšte Max. vzdialenosť v Nastaveniach.",
+  "First sort": "Prvé triedenie",
+  "Second sort": "Druhé triedenie",
+  "Third sort": "Tretie triedenie",
 };
 export default c;

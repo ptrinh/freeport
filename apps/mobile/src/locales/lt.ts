@@ -630,5 +630,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} skelb. yra už jūsų zonos ribų — artimiausias yra už {dist}.",
   "{n} posts are outside your area.": "{n} skelb. yra už jūsų zonos ribų.",
   "Increase Max distance in Settings to see posts farther away.": "Padidinkite „Maks. atstumą“ nustatymuose, kad matytumėte tolimesnius skelbimus.",
+  "First sort": "Pirmas rikiavimas",
+  "Second sort": "Antras rikiavimas",
+  "Third sort": "Trečias rikiavimas",
 };
 export default c;

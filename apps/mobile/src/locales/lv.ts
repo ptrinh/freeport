@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} sludinājumi ir ārpus jūsu apkārtnes — tuvākais ir {dist} attālumā.",
   "{n} posts are outside your area.": "{n} sludinājumi ir ārpus jūsu apkārtnes.",
   "Increase Max distance in Settings to see posts farther away.": "Palieliniet Maks. attālumu sadaļā Iestatījumi, lai redzētu tālākus sludinājumus.",
+  "First sort": "Pirmā kārtošana",
+  "Second sort": "Otrā kārtošana",
+  "Third sort": "Trešā kārtošana",
 };
 export default c;

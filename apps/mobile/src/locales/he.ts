@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} פוסטים נמצאים מחוץ לאזור שלך — הקרוב ביותר במרחק {dist}.",
   "{n} posts are outside your area.": "{n} פוסטים נמצאים מחוץ לאזור שלך.",
   "Increase Max distance in Settings to see posts farther away.": "כדי לראות פוסטים רחוקים יותר, הגדילו את המרחק המרבי בהגדרות.",
+  "First sort": "מיון ראשון",
+  "Second sort": "מיון שני",
+  "Third sort": "מיון שלישי",
 };
 export default c;

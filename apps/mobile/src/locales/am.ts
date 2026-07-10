@@ -626,5 +626,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} ልጥፎች ከአካባቢዎ ውጭ ናቸው — በጣም ቅርቡ {dist} ርቀት ላይ ነው።",
   "{n} posts are outside your area.": "{n} ልጥፎች ከአካባቢዎ ውጭ ናቸው።",
   "Increase Max distance in Settings to see posts farther away.": "ራቅ ያሉ ልጥፎችን ለማየት በቅንብሮች ውስጥ ከፍተኛ ርቀትን ይጨምሩ።",
+  "First sort": "የመጀመሪያ ድርደራ",
+  "Second sort": "ሁለተኛ ድርደራ",
+  "Third sort": "ሦስተኛ ድርደራ",
 };
 export default c;

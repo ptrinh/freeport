@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} postitust jäävad sinu piirkonnast välja — lähim on {dist} kaugusel.",
   "{n} posts are outside your area.": "{n} postitust jäävad sinu piirkonnast välja.",
   "Increase Max distance in Settings to see posts farther away.": "Suurenda seadetes (Settings) valikut „Max distance“, et näha kaugemaid postitusi.",
+  "First sort": "Esimene sortimine",
+  "Second sort": "Teine sortimine",
+  "Third sort": "Kolmas sortimine",
 };
 export default c;

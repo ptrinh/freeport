@@ -629,5 +629,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} post sono fuori dalla tua zona — il più vicino è a {dist}.",
   "{n} posts are outside your area.": "{n} post sono fuori dalla tua zona.",
   "Increase Max distance in Settings to see posts farther away.": "Aumenta la Distanza massima nelle Impostazioni per vedere post più lontani.",
+  "First sort": "Primo ordinamento",
+  "Second sort": "Secondo ordinamento",
+  "Third sort": "Terzo ordinamento",
 };
 export default c;

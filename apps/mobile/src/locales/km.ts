@@ -626,5 +626,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "ការប្រកាសចំនួន {n} ស្ថិតនៅក្រៅតំបន់របស់អ្នក — ដែលនៅជិតបំផុតគឺចម្ងាយ {dist}។",
   "{n} posts are outside your area.": "ការប្រកាសចំនួន {n} ស្ថិតនៅក្រៅតំបន់របស់អ្នក។",
   "Increase Max distance in Settings to see posts farther away.": "សូមបង្កើនចម្ងាយអតិបរមា (Max distance) នៅក្នុងការកំណត់ (Settings) ដើម្បីមើលការប្រកាសដែលនៅឆ្ងាយជាងនេះ។",
+  "First sort": "តម្រៀបទីមួយ",
+  "Second sort": "តម្រៀបទីពីរ",
+  "Third sort": "តម្រៀបទីបី",
 };
 export default c;

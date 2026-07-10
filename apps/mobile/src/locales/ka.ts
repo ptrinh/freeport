@@ -626,5 +626,8 @@ const c: Record<string, string> = {
   "{n} posts are outside your area — the nearest is {dist} away.": "{n} პოსტი თქვენი არეალის გარეთაა — უახლოესი {dist} მანძილზეა.",
   "{n} posts are outside your area.": "{n} პოსტი თქვენი არეალის გარეთაა.",
   "Increase Max distance in Settings to see posts farther away.": "შორეული პოსტების სანახავად გაზარდეთ „მაქსიმალური მანძილი“ პარამეტრებში.",
+  "First sort": "პირველი დახარისხება",
+  "Second sort": "მეორე დახარისხება",
+  "Third sort": "მესამე დახარისხება",
 };
 export default c;
