@@ -1,3 +1,6 @@
 
 # Breez wasm copied from node_modules on postinstall
 public/
+
+# local build env (Breez API key)
+.env.local

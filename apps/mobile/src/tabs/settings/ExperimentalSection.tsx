@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { t } from '../../i18n';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { s, palette } from '../../ui/theme';
 
 /**
@@ -45,6 +45,7 @@ function ExperimentalSection({
             style={s.toggleRow}
             onPress={() => onServicesEnabledChange(!servicesEnabled)}
           >
+            <Ionicons name="storefront-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
             <View style={{ flex: 1, marginEnd: 12 }}>
               <Text style={s.toggleTitle}>{t('Service / Product marketplace')}</Text>
               <Text style={s.dim}>{t('Buy and sell products & services beyond rideshare. Turn off for a leaner UI.')}</Text>
@@ -59,6 +60,7 @@ function ExperimentalSection({
             style={s.toggleRow}
             onPress={() => onWalletEnabledChange(!walletEnabled)}
           >
+            <Ionicons name="wallet-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
             <View style={{ flex: 1, marginEnd: 12 }}>
               <Text style={s.toggleTitle}>{t('Wallet')}</Text>
               <Text style={s.dim}>{t('Self-custodial Bitcoin & stablecoin wallet — coming soon.')}</Text>
