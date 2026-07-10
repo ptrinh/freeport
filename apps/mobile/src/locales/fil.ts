@@ -621,5 +621,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Aktibo ang Telegram bridge.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Maaaring hingin ng OS firewall mo ang pahintulot para sa mga papasok na koneksyon sa unang pagkakataon.",
   "leave empty to keep guest mode off": "iwanang blangko para panatilihing off ang guest mode",
+  "Account exported": "Na-export na ang account",
+  "Finding posts near you…": "Hinahanap ang mga post malapit sa iyo…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} post ang nasa labas ng iyong lugar — ang pinakamalapit ay {dist} ang layo.",
+  "{n} posts are outside your area.": "{n} post ang nasa labas ng iyong lugar.",
+  "Increase Max distance in Settings to see posts farther away.": "Taasan ang Max distance sa Settings para makita ang mga post na mas malayo.",
 };
 export default c;

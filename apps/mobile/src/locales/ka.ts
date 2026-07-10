@@ -621,5 +621,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram bridge აქტიურია.",
   "Your OS firewall may ask to allow incoming connections the first time.": "თქვენი OS firewall-ი შესაძლოა პირველად მოთხოვნას გამოგიგზავნოთ შემომავალი კავშირების დასაშვებად.",
   "leave empty to keep guest mode off": "ცარიელი დატოვეთ, რომ სტუმრის რეჟიმი გამორთული დარჩეს",
+  "Account exported": "ანგარიში ექსპორტირებულია",
+  "Finding posts near you…": "ვეძებთ პოსტებს თქვენს ახლოს…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} პოსტი თქვენი არეალის გარეთაა — უახლოესი {dist} მანძილზეა.",
+  "{n} posts are outside your area.": "{n} პოსტი თქვენი არეალის გარეთაა.",
+  "Increase Max distance in Settings to see posts farther away.": "შორეული პოსტების სანახავად გაზარდეთ „მაქსიმალური მანძილი“ პარამეტრებში.",
 };
 export default c;

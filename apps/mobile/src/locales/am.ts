@@ -621,5 +621,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram bridge ንቁ ነው።",
   "Your OS firewall may ask to allow incoming connections the first time.": "የ OS firewall በመጀመሪያ ጊዜ ገቢ ግንኙነቶችን ለመፍቀድ ሊጠየቅ ይችላል።",
   "leave empty to keep guest mode off": "guest mode ጠፍቶ እንዲቆይ ባዶ ይተውት",
+  "Account exported": "አካውንት ተላከ",
+  "Finding posts near you…": "በአቅራቢያዎ ያሉ ልጥፎችን በመፈለግ ላይ…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} ልጥፎች ከአካባቢዎ ውጭ ናቸው — በጣም ቅርቡ {dist} ርቀት ላይ ነው።",
+  "{n} posts are outside your area.": "{n} ልጥፎች ከአካባቢዎ ውጭ ናቸው።",
+  "Increase Max distance in Settings to see posts farther away.": "ራቅ ያሉ ልጥፎችን ለማየት በቅንብሮች ውስጥ ከፍተኛ ርቀትን ይጨምሩ።",
 };
 export default c;

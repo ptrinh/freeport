@@ -664,5 +664,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegramブリッジが有効です。",
   "Your OS firewall may ask to allow incoming connections the first time.": "初回接続時、OSのファイアウォールが接続許可を求める場合があります。",
   "leave empty to keep guest mode off": "空欄のままにするとゲストモードは無効になります",
+  "Account exported": "アカウントをエクスポートしました",
+  "Finding posts near you…": "近くの投稿を探しています…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n}件の投稿はエリア外です — 最も近いものは{dist}先にあります。",
+  "{n} posts are outside your area.": "{n}件の投稿はエリア外です。",
+  "Increase Max distance in Settings to see posts farther away.": "設定で最大距離を大きくすると、より遠くの投稿を表示できます。",
 };
 export default c;

@@ -621,5 +621,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Kiunganishi cha Telegram kimewashwa.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Firewall ya mfumo wako wa uendeshaji inaweza kuuliza kuruhusu miunganisho inayoingia mara ya kwanza.",
   "leave empty to keep guest mode off": "acha wazi kuzima hali ya mgeni",
+  "Account exported": "Akaunti imehamishwa",
+  "Finding posts near you…": "Inatafuta machapisho karibu nawe…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "Machapisho {n} yako nje ya eneo lako — lililo karibu zaidi liko umbali wa {dist}.",
+  "{n} posts are outside your area.": "Machapisho {n} yako nje ya eneo lako.",
+  "Increase Max distance in Settings to see posts farther away.": "Ongeza Umbali wa juu zaidi katika Mipangilio ili kuona machapisho ya mbali zaidi.",
 };
 export default c;

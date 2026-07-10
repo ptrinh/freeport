@@ -624,5 +624,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram-yhdyskäytävä aktiivinen.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Käyttöjärjestelmäsi palomuuri voi pyytää lupaa saapuville yhteyksille ensimmäisellä kerralla.",
   "leave empty to keep guest mode off": "jätä tyhjäksi, jos haluat pitää vieraslataustilan pois käytöstä",
+  "Account exported": "Tili viety",
+  "Finding posts near you…": "Etsitään ilmoituksia läheltäsi…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} ilmoitusta on alueesi ulkopuolella — lähin on {dist} päässä.",
+  "{n} posts are outside your area.": "{n} ilmoitusta on alueesi ulkopuolella.",
+  "Increase Max distance in Settings to see posts farther away.": "Suurenna enimmäisetäisyyttä asetuksissa nähdäksesi kauempana olevat ilmoitukset.",
 };
 export default c;

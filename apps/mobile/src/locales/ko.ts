@@ -664,5 +664,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram bridge 활성화됨.",
   "Your OS firewall may ask to allow incoming connections the first time.": "처음 실행 시 OS 방화벽이 들어오는 연결을 허용할지 물어볼 수 있습니다.",
   "leave empty to keep guest mode off": "비워두면 게스트 모드가 꺼진 상태로 유지됩니다",
+  "Account exported": "계정 내보내기 완료",
+  "Finding posts near you…": "내 주변 게시물을 찾는 중…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n}개의 게시물이 내 지역 밖에 있습니다 — 가장 가까운 게시물은 {dist} 거리에 있습니다.",
+  "{n} posts are outside your area.": "{n}개의 게시물이 내 지역 밖에 있습니다.",
+  "Increase Max distance in Settings to see posts farther away.": "설정에서 최대 거리를 늘리면 더 먼 곳의 게시물을 볼 수 있습니다.",
 };
 export default c;

@@ -624,5 +624,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram bridge aktív.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Az operációs rendszer tűzfala első alkalommal bejövő kapcsolatok engedélyezését kérheti.",
   "leave empty to keep guest mode off": "hagyja üresen, hogy a vendég mód kikapcsolva maradjon",
+  "Account exported": "Fiók exportálva",
+  "Finding posts near you…": "Bejegyzések keresése a közeledben…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} bejegyzés a körzeteden kívül esik — a legközelebbi {dist} távolságra van.",
+  "{n} posts are outside your area.": "{n} bejegyzés a körzeteden kívül esik.",
+  "Increase Max distance in Settings to see posts farther away.": "Növeld a Maximális távolság értékét a Beállításokban, hogy távolabbi bejegyzéseket is láss.",
 };
 export default c;

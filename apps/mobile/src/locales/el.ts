@@ -624,5 +624,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Η γέφυρα Telegram είναι ενεργή.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Το τείχος προστασίας του λειτουργικού σας συστήματος ίσως ζητήσει να επιτρέψετε εισερχόμενες συνδέσεις την πρώτη φορά.",
   "leave empty to keep guest mode off": "αφήστε κενό για να παραμείνει η λειτουργία επισκέπτη ανενεργή",
+  "Account exported": "Ο λογαριασμός εξήχθη",
+  "Finding posts near you…": "Αναζήτηση αγγελιών κοντά σας…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} αγγελίες βρίσκονται εκτός της περιοχής σας — η πλησιέστερη απέχει {dist}.",
+  "{n} posts are outside your area.": "{n} αγγελίες βρίσκονται εκτός της περιοχής σας.",
+  "Increase Max distance in Settings to see posts farther away.": "Αυξήστε τη Μέγιστη απόσταση στις Ρυθμίσεις για να δείτε αγγελίες πιο μακριά.",
 };
 export default c;

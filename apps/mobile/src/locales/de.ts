@@ -667,5 +667,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram-Bridge aktiv.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Deine Betriebssystem-Firewall fragt beim ersten Mal möglicherweise nach eingehenden Verbindungen.",
   "leave empty to keep guest mode off": "leer lassen, um den Gastmodus deaktiviert zu lassen",
+  "Account exported": "Konto exportiert",
+  "Finding posts near you…": "Beiträge in Ihrer Nähe werden gesucht…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} Beiträge liegen außerhalb Ihres Umkreises — der nächste ist {dist} entfernt.",
+  "{n} posts are outside your area.": "{n} Beiträge liegen außerhalb Ihres Umkreises.",
+  "Increase Max distance in Settings to see posts farther away.": "Erhöhen Sie die Maximale Entfernung in den Einstellungen, um weiter entfernte Beiträge zu sehen.",
 };
 export default c;

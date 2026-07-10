@@ -664,5 +664,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram 桥接已激活。",
   "Your OS firewall may ask to allow incoming connections the first time.": "首次运行时，你的操作系统防火墙可能会请求允许接入连接。",
   "leave empty to keep guest mode off": "留空则保持访客模式关闭",
+  "Account exported": "账户已导出",
+  "Finding posts near you…": "正在查找您附近的发布…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "有 {n} 条发布在您的范围之外——最近的一条距您 {dist}。",
+  "{n} posts are outside your area.": "有 {n} 条发布在您的范围之外。",
+  "Increase Max distance in Settings to see posts farther away.": "在“设置”中调高“最大距离”即可查看更远的发布。",
 };
 export default c;

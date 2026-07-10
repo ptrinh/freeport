@@ -625,5 +625,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram tiltas aktyvus.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Jūsų OS ugniasienė gali paklausti leidimo įeinantiems ryšiams pirmą kartą.",
   "leave empty to keep guest mode off": "palikite tuščią, kad svečio režimas būtų išjungtas",
+  "Account exported": "Paskyra eksportuota",
+  "Finding posts near you…": "Ieškoma skelbimų netoli jūsų…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} skelb. yra už jūsų zonos ribų — artimiausias yra už {dist}.",
+  "{n} posts are outside your area.": "{n} skelb. yra už jūsų zonos ribų.",
+  "Increase Max distance in Settings to see posts farther away.": "Padidinkite „Maks. atstumą“ nustatymuose, kad matytumėte tolimesnius skelbimus.",
 };
 export default c;

@@ -621,5 +621,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram bridge সক্রিয় আছে।",
   "Your OS firewall may ask to allow incoming connections the first time.": "প্রথমবার আসা সংযোগ অনুমোদনের জন্য আপনার OS ফায়ারওয়াল অনুমতি চাইতে পারে।",
   "leave empty to keep guest mode off": "guest mode বন্ধ রাখতে খালি রাখুন",
+  "Account exported": "অ্যাকাউন্ট এক্সপোর্ট হয়েছে",
+  "Finding posts near you…": "আপনার কাছাকাছি পোস্ট খোঁজা হচ্ছে…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n}টি পোস্ট আপনার এলাকার বাইরে — সবচেয়ে কাছেরটি {dist} দূরে।",
+  "{n} posts are outside your area.": "{n}টি পোস্ট আপনার এলাকার বাইরে।",
+  "Increase Max distance in Settings to see posts farther away.": "আরও দূরের পোস্ট দেখতে Settings-এ গিয়ে Max distance বাড়ান।",
 };
 export default c;

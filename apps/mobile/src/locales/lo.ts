@@ -621,5 +621,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram bridge ກຳລັງໃຊ້ງານ.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Firewall ຂອງລະບົບປະຕິບັດການອາດຈະຖາມອະນຸຍາດການເຊື່ອມຕໍ່ເຂົ້າມາໃນຄັ້ງທຳອິດ.",
   "leave empty to keep guest mode off": "ປ່ອຍໃຫ້ຫວ່າງເພື່ອປິດໂໝດ guest",
+  "Account exported": "ສົ່ງອອກບັນຊີແລ້ວ",
+  "Finding posts near you…": "ກຳລັງຊອກຫາໂພສໃກ້ທ່ານ…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "ມີ {n} ໂພສຢູ່ນອກເຂດຂອງທ່ານ — ໂພສທີ່ໃກ້ທີ່ສຸດຢູ່ຫ່າງ {dist}.",
+  "{n} posts are outside your area.": "ມີ {n} ໂພສຢູ່ນອກເຂດຂອງທ່ານ.",
+  "Increase Max distance in Settings to see posts farther away.": "ເພີ່ມ ໄລຍະຫ່າງສູງສຸດ ໃນ ການຕັ້ງຄ່າ ເພື່ອເບິ່ງໂພສທີ່ຢູ່ໄກກວ່າ.",
 };
 export default c;

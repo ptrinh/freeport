@@ -624,5 +624,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegrami sild on aktiivne.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Sinu OS-i tulemüür võib esimesel korral küsida luba sissetulevate ühenduste jaoks.",
   "leave empty to keep guest mode off": "jäta tühjaks, et külalisrežiim jääks väljas",
+  "Account exported": "Konto eksporditud",
+  "Finding posts near you…": "Otsime postitusi sinu lähedal…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} postitust jäävad sinu piirkonnast välja — lähim on {dist} kaugusel.",
+  "{n} posts are outside your area.": "{n} postitust jäävad sinu piirkonnast välja.",
+  "Increase Max distance in Settings to see posts farther away.": "Suurenda seadetes (Settings) valikut „Max distance“, et näha kaugemaid postitusi.",
 };
 export default c;

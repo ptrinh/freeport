@@ -624,5 +624,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram-bryggan är aktiv.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Ditt OS-brandvägg kan fråga om att tillåta inkommande anslutningar första gången.",
   "leave empty to keep guest mode off": "lämna tomt för att hålla gästläget avstängt",
+  "Account exported": "Konto exporterat",
+  "Finding posts near you…": "Söker inlägg nära dig…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} inlägg ligger utanför ditt område — det närmaste är {dist} bort.",
+  "{n} posts are outside your area.": "{n} inlägg ligger utanför ditt område.",
+  "Increase Max distance in Settings to see posts farther away.": "Öka Max avstånd i Inställningar för att se inlägg längre bort.",
 };
 export default c;

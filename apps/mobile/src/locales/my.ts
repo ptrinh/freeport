@@ -621,5 +621,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram bridge အလုပ်လုပ်နေသည်။",
   "Your OS firewall may ask to allow incoming connections the first time.": "ပထမဆုံးအကြိမ် သင့် OS firewall က incoming connection များကို ခွင့်ပြုရန် မေးနိုင်သည်။",
   "leave empty to keep guest mode off": "guest mode ကို ပိတ်ထားလိုပါက အလွတ်ချန်ထားပါ",
+  "Account exported": "အကောင့်ကို ထုတ်ယူပြီးပါပြီ",
+  "Finding posts near you…": "သင့်အနီးရှိ ပို့စ်များကို ရှာနေသည်…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "ပို့စ် {n} ခုသည် သင့်ဧရိယာပြင်ပတွင် ရှိနေသည် — အနီးဆုံးမှာ {dist} အကွာတွင် ရှိသည်။",
+  "{n} posts are outside your area.": "ပို့စ် {n} ခုသည် သင့်ဧရိယာပြင်ပတွင် ရှိနေသည်။",
+  "Increase Max distance in Settings to see posts farther away.": "ပိုဝေးသော ပို့စ်များကို ကြည့်ရန် Settings တွင် Max distance ကို တိုးမြှင့်ပါ။",
 };
 export default c;

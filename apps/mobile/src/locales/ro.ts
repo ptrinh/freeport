@@ -624,5 +624,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Bridge Telegram activ.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Firewall-ul sistemului tău de operare poate cere permisiunea la prima conexiune primită.",
   "leave empty to keep guest mode off": "lasă necompletat pentru a păstra modul invitat dezactivat",
+  "Account exported": "Cont exportat",
+  "Finding posts near you…": "Căutăm postări în apropierea ta…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} postări sunt în afara zonei tale — cea mai apropiată este la {dist} distanță.",
+  "{n} posts are outside your area.": "{n} postări sunt în afara zonei tale.",
+  "Increase Max distance in Settings to see posts farther away.": "Mărește Distanța maximă din Setări pentru a vedea postări mai îndepărtate.",
 };
 export default c;

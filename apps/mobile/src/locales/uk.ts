@@ -630,5 +630,10 @@ const c: Record<string, string> = {
   "Telegram bridge active.": "Telegram-мостик активний.",
   "Your OS firewall may ask to allow incoming connections the first time.": "Файрвол вашої ОС може запитати дозвіл на вхідні з’єднання під час першого запуску.",
   "leave empty to keep guest mode off": "залиште порожнім, щоб гостьовий режим залишався вимкненим",
+  "Account exported": "Обліковий запис експортовано",
+  "Finding posts near you…": "Шукаємо дописи поруч із вами…",
+  "{n} posts are outside your area — the nearest is {dist} away.": "{n} дописів поза вашою зоною — найближчий за {dist} від вас.",
+  "{n} posts are outside your area.": "{n} дописів поза вашою зоною.",
+  "Increase Max distance in Settings to see posts farther away.": "Збільште «Максимальну відстань» у Налаштуваннях, щоб бачити дописи далі.",
 };
 export default c;
