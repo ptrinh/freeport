@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Freeport app icon: blue gradient rounded square, white ring, "F." mark -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="0.55" stop-color="#2457c5"/>
+      <stop offset="1" stop-color="#0f2a63"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="58" fill="url(#bg)"/>
+  <circle cx="128" cy="128" r="86" fill="none" stroke="#ffffff" stroke-width="13"/>
+  <!-- "F" glyph drawn as paths (no font dependency) -->
+  <path d="M103 82 h56 v22 h-33 v18 h29 v22 h-29 v40 h-23 z" fill="#ffffff"/>
+  <circle cx="152" cy="173" r="11" fill="#4da3ff"/>
+</svg>
