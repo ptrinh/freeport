@@ -2144,6 +2144,13 @@ function OnboardingWelcome({ busy, onStart, pushUnavailable }: { busy: boolean; 
 
 // ─── Market tab ──────────────────────────────────────────────────────────────
 
+// MarketTab unmounts on every tab switch, so its location references live here
+// too: remounting seeds from the last resolved values and the feed renders
+// filtered immediately (no "finding posts near you" flash, no unfiltered
+// flicker) — the effects still refresh them silently in the background.
+let locRefCache: { q: string; gh: string | null } | null = null;
+let userGeohashCache: string | null = null;
+
 function MarketTab({
   intents,
   client,
@@ -2176,7 +2183,7 @@ function MarketTab({
   const [keyword, setKeyword] = useState('');
   const [sortPrefs, setSortPrefs] = useState<SortKey[]>(['best', 'none', 'none']);
   const [sortOpen, setSortOpen] = useState(false);
-  const [userGeohash, setUserGeohash] = useState<string | null>(null);
+  const [userGeohash, setUserGeohash] = useState<string | null>(userGeohashCache);
   // Open Browse on the user's default category/subcategory (Driver/Provider
   // preference), falling back to Ridesharing when unset.
   const initCat = defaultCategory || RIDESHARE_CATEGORY;
@@ -2197,7 +2204,7 @@ function MarketTab({
     // device location is denied/unavailable so "near me" still works.
     (async () => {
       const c = (await getCurrentCoords()) ?? (await detectCoordsIP());
-      if (c) setUserGeohash(coordsToGeohash(c.latitude, c.longitude));
+      if (c) { const gh = coordsToGeohash(c.latitude, c.longitude); userGeohashCache = gh; setUserGeohash(gh); }
     })();
   }, []);
 
@@ -2206,18 +2213,23 @@ function MarketTab({
   // `locRefSettled` marks the geocode as finished (found or not): until then we
   // hold the feed back rather than render it unfiltered and yank far posts away
   // half a second later when the reference arrives (user-reported flicker).
-  const [locRef, setLocRef] = useState<string | null>(null);
-  const [locRefSettled, setLocRefSettled] = useState(false);
+  // Seeded from the module-level cache so a tab-switch remount renders
+  // instantly instead of re-entering the "finding posts near you" state.
+  const locQ = location.country
+    ? [location.city, location.state, COUNTRY_NAME[location.country] ?? location.country].filter(Boolean).join(', ')
+    : '';
+  const [locRef, setLocRef] = useState<string | null>(() => (locRefCache && locRefCache.q === locQ ? locRefCache.gh : null));
+  const [locRefSettled, setLocRefSettled] = useState(() => !locQ || locRefCache?.q === locQ);
   useEffect(() => {
-    if (!location.country) { setLocRef(null); setLocRefSettled(true); return; }
-    const q = [location.city, location.state, COUNTRY_NAME[location.country] ?? location.country].filter(Boolean).join(', ');
+    if (!locQ) { setLocRef(null); setLocRefSettled(true); return; }
     let cancelled = false;
-    setLocRefSettled(false);
-    geohashForPlace(q, '')
-      .then((gh) => { if (!cancelled) setLocRef(gh || null); })
+    // Already seeded for this query → refresh silently in the background.
+    if (locRefCache?.q !== locQ) setLocRefSettled(false);
+    geohashForPlace(locQ, '')
+      .then((gh) => { if (!cancelled) { setLocRef(gh || null); locRefCache = { q: locQ, gh: gh || null }; } })
       .finally(() => { if (!cancelled) setLocRefSettled(true); });
     return () => { cancelled = true; };
-  }, [location.country, location.state, location.city]);
+  }, [locQ]);
   // Distance reference: prefer the PRECISE device point (GPS, else coarse IP) over
   // the selected-location geocode. The latter is only a region centroid when the
   // user picked country+state with no city — comparing that centroid against a
