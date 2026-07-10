@@ -52,6 +52,13 @@ fi
 echo "▸ Subsetting icon fonts to used glyphs…"
 node scripts/subset-fonts.mjs dist
 
+# Metro's bundle filenames are NOT content hashes (two different AppEntry
+# bytes shipped under one name), and JS is cached 4h — rename every bundle to
+# its true content hash so stale caches can never pin old code. Must run
+# after every step that rewrites JS (nm rename, font subsetting).
+echo "▸ Content-hashing JS bundles…"
+node scripts/hash-bundles.mjs dist
+
 # Use our own PNG favicon. Expo's generated /favicon.ico ignores web.favicon
 # here (stale default), so serve assets/favicon.png and point the link at it.
 echo "▸ Overriding favicon with our logo…"
