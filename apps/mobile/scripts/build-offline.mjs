@@ -146,6 +146,35 @@ const shim = `<script>
     var src=el.getAttribute('src');
     if(src&&ASSETS[src.split('?')[0]])el.setAttribute('src',ASSETS[src.split('?')[0]]);
   }
+  /* Code-split chunks (locale catalogs) are pre-registered inline above, but
+     metro's asyncRequire still fetches the chunk URL via an injected <script>
+     before require()ing it — which fails on file:// and fell back to English.
+     Point those scripts at an empty data: URI: onload fires instantly and the
+     pre-registered module resolves. */
+  try{
+    var origCreate=document.createElement.bind(document);
+    var srcDesc=Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype,'src');
+    var isChunk=function(v){return /\\/_expo\\/static\\/js\\/web\\/[^?#]+\\.js/.test(''+v);};
+    document.createElement=function(tag){
+      var el=origCreate.apply(document,arguments);
+      if((''+tag).toLowerCase()==='script'){
+        Object.defineProperty(el,'src',{
+          configurable:true,
+          get:srcDesc.get,
+          set:function(v){srcDesc.set.call(this,isChunk(v)?'data:text/javascript,':v);}
+        });
+        var osa=el.setAttribute.bind(el);
+        el.setAttribute=function(n,v){osa(n,n==='src'&&isChunk(v)?'data:text/javascript,':v);};
+      }
+      return el;
+    };
+    var origFetch=window.fetch&&window.fetch.bind(window);
+    if(origFetch)window.fetch=function(input,init){
+      var u=typeof input==='string'?input:(input&&input.url)||'';
+      if(isChunk(u))return Promise.resolve(new Response('',{status:200,headers:{'Content-Type':'text/javascript'}}));
+      return origFetch(input,init);
+    };
+  }catch(_){}
   /* react-native-web preloads images on a DETACHED new Image() before ever
      inserting a node — a MutationObserver never sees it, and a failed preload
      renders nothing (the missing-logo bug). Rewrite at the property setter. */

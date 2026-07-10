@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
+    "puppeteer-core": "^25.3.0",
     "subset-font": "^2.5.0",
     "vitest": "^2.1.0"
   }
