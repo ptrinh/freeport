@@ -1063,6 +1063,14 @@ function AppInner() {
       .then((v) => { try { if (v) for (const id of JSON.parse(v) as string[]) autoContactSent.current.add(id); } catch { /* ignore */ } })
       .finally(() => setAutoContactReady(true));
   }, []);
+  // Re-evaluate the handshake healer even when nothing else changes: a stuck
+  // deal is by definition IDLE (no nego updates to retrigger the effect), and
+  // each chat resets updatedAt which defers the poke grace window.
+  const [handshakeTick, setHandshakeTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setHandshakeTick((n) => n + 1), 60_000);
+    return () => clearInterval(id);
+  }, []);
   useEffect(() => {
     if (!client || !autoContactReady) return;
     const nowSec = Math.floor(Date.now() / 1000);
@@ -1081,7 +1089,7 @@ function AppInner() {
         client.accept(n.id, n.ourContact!).catch(() => {});
       }
     }
-  }, [negos, client, profile, autoContactReady, resumeTick]);
+  }, [negos, client, profile, autoContactReady, resumeTick, handshakeTick]);
 
   // A pure passenger only posts ride requests and waits for drivers — Browse
   // (where you pick listings) is noise. Show it for drivers, or once the
