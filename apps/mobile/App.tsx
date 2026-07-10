@@ -69,6 +69,7 @@ import { wheelTick, eventAlert } from './src/haptics';
 import { onWheelDemo, triggerWheelDemo } from './src/wheelDemo';
 import { Fireworks } from './src/Fireworks';
 import { installDebugApi, registerDebugClient } from './src/debug';
+import { locQuery, locRefSeed, locRefStore, locRefHas, userGeohashSeed, userGeohashStore } from './src/localityRef';
 import { initNotifications, notify, notificationGranted, requestNotifications, onNotificationTap } from './src/notify';
 import { beginBackgroundTask, endBackgroundTask } from './src/backgroundTask';
 import { uploadImage, uploadFile, UploadError } from './src/upload';
@@ -2144,13 +2145,6 @@ function OnboardingWelcome({ busy, onStart, pushUnavailable }: { busy: boolean; 
 
 // ─── Market tab ──────────────────────────────────────────────────────────────
 
-// MarketTab unmounts on every tab switch, so its location references live here
-// too: remounting seeds from the last resolved values and the feed renders
-// filtered immediately (no "finding posts near you" flash, no unfiltered
-// flicker) — the effects still refresh them silently in the background.
-let locRefCache: { q: string; gh: string | null } | null = null;
-let userGeohashCache: string | null = null;
-
 function MarketTab({
   intents,
   client,
@@ -2183,7 +2177,7 @@ function MarketTab({
   const [keyword, setKeyword] = useState('');
   const [sortPrefs, setSortPrefs] = useState<SortKey[]>(['best', 'none', 'none']);
   const [sortOpen, setSortOpen] = useState(false);
-  const [userGeohash, setUserGeohash] = useState<string | null>(userGeohashCache);
+  const [userGeohash, setUserGeohash] = useState<string | null>(userGeohashSeed());
   // Open Browse on the user's default category/subcategory (Driver/Provider
   // preference), falling back to Ridesharing when unset.
   const initCat = defaultCategory || RIDESHARE_CATEGORY;
@@ -2204,7 +2198,7 @@ function MarketTab({
     // device location is denied/unavailable so "near me" still works.
     (async () => {
       const c = (await getCurrentCoords()) ?? (await detectCoordsIP());
-      if (c) { const gh = coordsToGeohash(c.latitude, c.longitude); userGeohashCache = gh; setUserGeohash(gh); }
+      if (c) { const gh = coordsToGeohash(c.latitude, c.longitude); userGeohashStore(gh); setUserGeohash(gh); }
     })();
   }, []);
 
@@ -2213,20 +2207,18 @@ function MarketTab({
   // `locRefSettled` marks the geocode as finished (found or not): until then we
   // hold the feed back rather than render it unfiltered and yank far posts away
   // half a second later when the reference arrives (user-reported flicker).
-  // Seeded from the module-level cache so a tab-switch remount renders
+  // Seeded from the localityRef module cache so a tab-switch remount renders
   // instantly instead of re-entering the "finding posts near you" state.
-  const locQ = location.country
-    ? [location.city, location.state, COUNTRY_NAME[location.country] ?? location.country].filter(Boolean).join(', ')
-    : '';
-  const [locRef, setLocRef] = useState<string | null>(() => (locRefCache && locRefCache.q === locQ ? locRefCache.gh : null));
-  const [locRefSettled, setLocRefSettled] = useState(() => !locQ || locRefCache?.q === locQ);
+  const locQ = locQuery(location, (c) => COUNTRY_NAME[c] ?? c);
+  const [locRef, setLocRef] = useState<string | null>(() => locRefSeed(locQ).gh);
+  const [locRefSettled, setLocRefSettled] = useState(() => locRefSeed(locQ).settled);
   useEffect(() => {
     if (!locQ) { setLocRef(null); setLocRefSettled(true); return; }
     let cancelled = false;
     // Already seeded for this query → refresh silently in the background.
-    if (locRefCache?.q !== locQ) setLocRefSettled(false);
+    if (!locRefHas(locQ)) setLocRefSettled(false);
     geohashForPlace(locQ, '')
-      .then((gh) => { if (!cancelled) { setLocRef(gh || null); locRefCache = { q: locQ, gh: gh || null }; } })
+      .then((gh) => { if (!cancelled) { setLocRef(gh || null); locRefStore(locQ, gh || null); } })
       .finally(() => { if (!cancelled) setLocRefSettled(true); });
     return () => { cancelled = true; };
   }, [locQ]);
