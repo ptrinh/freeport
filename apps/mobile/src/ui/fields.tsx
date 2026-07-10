@@ -19,7 +19,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { TimeSpinner } from '../TimeSpinner';
 import { t } from '../i18n';
-import { currencySymbol, fmtMoney, type Currency } from '../locations';
+import { currencySymbol, fmtMoney, searchLocations, type Currency } from '../locations';
 import { type PriceSuggestion } from '../pricing';
 import { wheelTick } from '../haptics';
 import { onWheelDemo } from '../wheelDemo';
@@ -858,8 +858,48 @@ function PaymentField({
   );
 }
 
+// Quick location search — a single box that fuzzy-matches across every
+// country/state/city so users don't have to drill the three dropdowns. Typing
+// "Broo" suggests e.g. "Brooklyn"; picking one fills country/state/city at once.
+// Lives alongside the dropdowns (both ways work).
+function QuickLocationSearch({ onPick }: { onPick: (loc: { country: string; state: string; city: string }) => void }) {
+  const [q, setQ] = useState('');
+  const [focused, setFocused] = useState(false);
+  const sugs = q.trim().length >= 2 ? searchLocations(q.trim(), 8) : [];
+  return (
+    <View style={{ marginBottom: 4, zIndex: 5 }}>
+      <Text style={s.label}>{t("Quick location search")}</Text>
+      <TextInput
+        style={s.input}
+        value={q}
+        onChangeText={setQ}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setTimeout(() => setFocused(false), 150)} // let a tap land first
+        placeholder={t("Type a country, state or city…")}
+        placeholderTextColor={palette.placeholder}
+        autoCapitalize="words"
+        autoCorrect={false}
+      />
+      {focused && sugs.length > 0 && (
+        <View style={s.suggestBox}>
+          {sugs.map((sg, i) => (
+            <Pressable
+              key={`${sg.label}-${i}`}
+              style={[s.suggestRow, i > 0 && s.suggestRowDiv]}
+              onPress={() => { onPick({ country: sg.country, state: sg.state, city: sg.city }); setQ(''); setFocused(false); }}
+            >
+              <Text style={s.suggestText} numberOfLines={1}>{sg.label}</Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 export {
   RoleGroupHeader,
+  QuickLocationSearch,
   WaitingBar,
   SlideToConfirm,
   SystemNotice,
