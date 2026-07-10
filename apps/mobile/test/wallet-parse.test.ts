@@ -34,7 +34,7 @@ describe('NwcProvider.parse (Send destination classification)', () => {
   });
 
   it('has no rate feed or on-chain receive', async () => {
-    expect(await p.usdRate()).toBeNull();
+    expect(await p.fiatRate('USD')).toBeNull();
     expect(await p.receiveOnchain()).toBeNull();
   });
 

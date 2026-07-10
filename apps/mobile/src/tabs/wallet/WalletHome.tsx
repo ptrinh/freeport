@@ -13,6 +13,8 @@ import type { WalletTx } from '../../wallet';
 export function WalletHome({
   balanceSats,
   usdRate,
+  localRate,
+  localCurrency,
   unit,
   onToggleUnit,
   txs,
@@ -26,7 +28,10 @@ export function WalletHome({
 }: {
   balanceSats: number | null;
   usdRate: number | null;
-  unit: 'sats' | 'usd';
+  /** BTC price in the user's local currency (null when unknown / same as USD). */
+  localRate: number | null;
+  localCurrency: string;
+  unit: 'sats' | 'usd' | 'local';
   onToggleUnit: () => void;
   txs: WalletTx[];
   refreshing: boolean;
@@ -37,8 +42,18 @@ export function WalletHome({
   footer?: React.ReactNode;
   onScroll?: (e: any) => void;
 }) {
-  const usd = balanceSats != null && usdRate ? (balanceSats / 1e8) * usdRate : null;
-  const showUsd = unit === 'usd' && usd != null;
+  const fiatFmt = (rate: number, code: string) => {
+    const v = (balanceSats! / 1e8) * rate;
+    try {
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: code, maximumFractionDigits: code === 'USD' ? 2 : 0 }).format(v);
+    } catch {
+      return `${v.toLocaleString(undefined, { maximumFractionDigits: 0 })} ${code}`;
+    }
+  };
+  const fiatValue = balanceSats == null ? null
+    : unit === 'usd' && usdRate ? fiatFmt(usdRate, 'USD')
+    : unit === 'local' && localRate ? fiatFmt(localRate, localCurrency)
+    : null;
   const fmtTime = (ts: number) => {
     const d = new Date(ts * 1000);
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) +
@@ -59,7 +74,7 @@ export function WalletHome({
               style={{ backgroundColor: palette.card, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 2 }}
             >
               <Text style={{ color: palette.dim, fontSize: 11, letterSpacing: 2 }}>
-                {unit === 'usd' && usdRate != null ? 'USD' : 'SATS'}
+                {(unit === 'usd' && usdRate != null ? 'USD' : unit === 'local' && localRate != null ? localCurrency : 'SATS') + ' \u21cc'}
               </Text>
             </Pressable>
             <Pressable hitSlop={8} onPress={onRefresh}>
@@ -69,9 +84,7 @@ export function WalletHome({
             </Pressable>
           </View>
           <Text style={{ color: palette.text, fontSize: 46, fontWeight: '800', marginTop: 6 }} numberOfLines={1} adjustsFontSizeToFit>
-            {balanceSats == null ? '…'
-              : showUsd ? `$${usd!.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-              : balanceSats.toLocaleString()}
+            {balanceSats == null ? '…' : fiatValue ?? balanceSats.toLocaleString()}
           </Text>
           <Text style={{ color: palette.dim, fontSize: 12, marginTop: 2 }}>{walletLabel}</Text>
         </View>
@@ -116,13 +129,13 @@ export function WalletHome({
 
       {/* Send / Receive bar */}
       <View style={[s.row, { gap: 10, paddingHorizontal: 12, paddingBottom: 10, paddingTop: 6 }]}>
-        <Pressable onPress={onSend} style={{ flex: 1, height: 52, borderRadius: 14, backgroundColor: '#0ea5e9', alignItems: 'center', justifyContent: 'center' }}>
+        <Pressable onPress={onSend} style={{ flex: 1, height: 52, borderRadius: 14, backgroundColor: palette.accent, alignItems: 'center', justifyContent: 'center' }}>
           <View style={[s.row, { gap: 8 }]}>
             <Ionicons name="arrow-up" size={17} color="white" />
             <Text style={{ color: 'white', fontWeight: '800', fontSize: 16 }}>{t('Send')}</Text>
           </View>
         </Pressable>
-        <Pressable onPress={onReceive} style={{ flex: 1, height: 52, borderRadius: 14, backgroundColor: '#16a34a', alignItems: 'center', justifyContent: 'center' }}>
+        <Pressable onPress={onReceive} style={{ flex: 1, height: 52, borderRadius: 14, backgroundColor: palette.accentBtn, alignItems: 'center', justifyContent: 'center' }}>
           <View style={[s.row, { gap: 8 }]}>
             <Ionicons name="arrow-down" size={17} color="white" />
             <Text style={{ color: 'white', fontWeight: '800', fontSize: 16 }}>{t('Receive')}</Text>

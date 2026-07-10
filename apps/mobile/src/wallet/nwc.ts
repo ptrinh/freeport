@@ -136,7 +136,7 @@ export class NwcProvider implements WalletProvider {
     return { kind: 'unknown', raw };
   }
 
-  async usdRate(): Promise<number | null> {
+  async fiatRate(_coin: string): Promise<number | null> {
     return null; // NIP-47 has no rate feed
   }
 

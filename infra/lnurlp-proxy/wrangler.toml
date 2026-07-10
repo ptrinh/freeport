@@ -1,0 +1,8 @@
+name = "freeport-lnurlp-proxy"
+main = "worker.js"
+compatibility_date = "2026-07-01"
+account_id = "2edc401e8f3f074f198d7290691817a3"
+
+routes = [
+  { pattern = "freeport.network/.well-known/lnurlp/*", zone_name = "freeport.network" },
+]

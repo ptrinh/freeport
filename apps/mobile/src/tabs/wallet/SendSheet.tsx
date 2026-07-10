@@ -4,6 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
 import type { ParsedDest, WalletProvider } from '../../wallet';
+import { ScanSheet, scanSupported } from './ScanSheet';
+
+export interface WalletContact { name: string; address: string }
 
 type Step = 'input' | 'amount' | 'confirm' | 'paying' | 'done' | 'error';
 
@@ -18,6 +21,7 @@ export function SendSheet({
   usdRate,
   initialInput,
   hint,
+  contacts = [],
   onClose,
   onPaid,
 }: {
@@ -26,6 +30,8 @@ export function SendSheet({
   usdRate: number | null;
   initialInput?: string;
   hint?: string;
+  /** Saved counterparties (from deals that shared a wallet address). */
+  contacts?: WalletContact[];
   onClose: () => void;
   onPaid: () => void;
 }) {
@@ -35,6 +41,10 @@ export function SendSheet({
   const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
+  const [contactsOpen, setContactsOpen] = useState(false);
+  const [canScan, setCanScan] = useState(false);
+  useEffect(() => { scanSupported().then(setCanScan).catch(() => {}); }, []);
 
   useEffect(() => {
     if (visible) {
@@ -97,7 +107,7 @@ export function SendSheet({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' }} onPress={onClose} />
-      <View style={{ backgroundColor: palette.bg, borderTopLeftRadius: 18, borderTopRightRadius: 18, paddingBottom: 26 }}>
+      <View style={{ backgroundColor: palette.bg, borderTopLeftRadius: 18, borderTopRightRadius: 18, paddingBottom: 26, width: '100%', maxWidth: 560, alignSelf: 'center' }}>
         <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: palette.border, marginTop: 8 }} />
         <View style={[s.row, { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 }]}>
           <Ionicons name="arrow-up" size={16} color={palette.accent} style={{ marginEnd: 8 }} />
@@ -119,13 +129,41 @@ export function SendSheet({
                 autoCorrect={false}
               />
               {!!hint && <Text style={s.dim}>{t('Agreed price')}: {hint}</Text>}
-              {Platform.OS === 'web' && (
-                <Pressable onPress={paste} style={[s.btnGhost, { alignSelf: 'stretch' }]}>
-                  <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
-                    <Ionicons name="clipboard-outline" size={14} color={palette.text2} />
-                    <Text style={s.btnGhostText}>{t('Paste')}</Text>
-                  </View>
-                </Pressable>
+              <View style={[s.row, { gap: 8 }]}>
+                {Platform.OS === 'web' && (
+                  <Pressable onPress={paste} style={[s.btnGhost, { flex: 1 }]}>
+                    <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
+                      <Ionicons name="clipboard-outline" size={14} color={palette.text2} />
+                      <Text style={s.btnGhostText}>{t('Paste')}</Text>
+                    </View>
+                  </Pressable>
+                )}
+                {canScan && (
+                  <Pressable onPress={() => setScanOpen(true)} style={[s.btnGhost, { flex: 1 }]}>
+                    <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
+                      <Ionicons name="qr-code-outline" size={14} color={palette.text2} />
+                      <Text style={s.btnGhostText}>{t('Scan')}</Text>
+                    </View>
+                  </Pressable>
+                )}
+                {contacts.length > 0 && (
+                  <Pressable onPress={() => setContactsOpen(true)} style={[s.btnGhost, { flex: 1 }]}>
+                    <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
+                      <Ionicons name="people-outline" size={14} color={palette.text2} />
+                      <Text style={s.btnGhostText}>{t('Contacts')}</Text>
+                    </View>
+                  </Pressable>
+                )}
+              </View>
+              {contactsOpen && (
+                <View style={[s.card, { gap: 2 }]}>
+                  {contacts.slice(0, 12).map((c, i) => (
+                    <Pressable key={i} onPress={() => { setInput(c.address); setContactsOpen(false); setError(''); }} style={{ paddingVertical: 9 }}>
+                      <Text style={s.toggleTitle} numberOfLines={1}>{c.name}</Text>
+                      <Text style={s.dim} numberOfLines={1}>{c.address}</Text>
+                    </Pressable>
+                  ))}
+                </View>
               )}
               {!!error && <Text style={[s.dim, { color: palette.danger }]}>{error}</Text>}
               <Pressable onPress={cont} disabled={busy || !input.trim()} style={[s.btnAccept, (busy || !input.trim()) && { opacity: 0.5 }]}>
@@ -203,6 +241,11 @@ export function SendSheet({
           )}
         </ScrollView>
       </View>
+      <ScanSheet
+        visible={scanOpen}
+        onClose={() => setScanOpen(false)}
+        onCode={(v) => { setInput(v); setScanOpen(false); setError(''); }}
+      />
     </Modal>
   );
 }

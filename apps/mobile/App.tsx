@@ -40,7 +40,9 @@ import {
   type Intent,
   type Negotiation,
 } from '@freeport/protocol';
-import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf } from './src/identity';
+import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, restoreNsec } from './src/identity';
+import { createPasskeyIdentity, signInWithPasskey } from './src/passkey';
+import { nsecEncode } from 'nostr-tools/nip19';
 import { restoreBackupText, buildCloudBundle, restoreFromBundleText } from './src/backup';
 import { cloudAvailable, cloudSave, cloudRestore, cloudClear } from './src/cloudBackup';
 import { LocalSigner, Nip07Signer, hasNip07, type Signer } from './src/signer';
@@ -54,7 +56,7 @@ import { initNotifications, notify, notificationGranted } from './src/notify';
 import { loadProfile, saveProfile, defaultAvatarUrl, type UserProfile } from './src/profile';
 import { normalizePhone } from './src/phone';
 import { locationGranted, requestLocationPermission, detectRawLocationGPS, detectRawLocationIP, effectiveUnit } from './src/maps';
-import { messagesViewForNewActivity } from './src/deals';
+import { messagesViewForNewActivity, walletContacts } from './src/deals';
 import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
 import { loadPrefs, savePrefs, type UserLocation } from './src/prefs';
 import { systemLanguage, systemCountry } from './src/language';
@@ -1071,7 +1073,9 @@ function AppInner() {
           <StatusBar style={effectiveTheme === 'light' ? 'dark' : 'light'} />
           <Onboarding
             onCreate={async (chosenRole, chosenServices, name, phone, vehicleModel, plateNumber) => {
-              const sk = await createKey();
+              // The passkey flow stores the derived key BEFORE this step —
+              // reuse it instead of minting a fresh one.
+              const sk = (await loadKey()) ?? (await createKey());
               // The chooser decides the lane: Customer/Provider start with the
               // Service/Product UI on; Passenger/Driver start rideshare-only. Set it
               // explicitly so a prior account's state on this device doesn't carry over.
@@ -1098,6 +1102,15 @@ function AppInner() {
             onFinish={finishOnboarding}
             onRestore={async (text, passphrase) => {
               await restoreBackupText(text, passphrase); // throws on bad file/passphrase
+              finishOnboarding();
+            }}
+            onPasskeyCreate={async () => {
+              const sk = await createPasskeyIdentity(t('Freeport account'));
+              await restoreNsec(nsecEncode(sk)); // store; onCreate reuses it
+            }}
+            onPasskeySignIn={async () => {
+              const sk = await signInWithPasskey();
+              await restoreBackupText(nsecEncode(sk), ''); // same path as a bare-nsec restore
               finishOnboarding();
             }}
             onCloudRestore={async () => {
@@ -1171,6 +1184,8 @@ function AppInner() {
       {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onPayDeal={(n) => { setWalletPrefill({ dest: n.theirPayAddress ?? '', hint: n.terms?.payment }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
       {tab === 'wallet' && (
         <WalletTab
+          localCurrency={currencyForCountry(location.country)}
+          contacts={walletContacts(negos)}
           prefill={walletPrefill}
           onPrefillConsumed={() => setWalletPrefill(null)}
           nwcUrl={walletNwcUrl}

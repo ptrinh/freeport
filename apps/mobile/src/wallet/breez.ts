@@ -88,6 +88,7 @@ async function loadSdk(mnemonic: string): Promise<any> {
     await mod.default({ module_or_path: await loadWasmBytes() });
     const config = mod.defaultConfig('mainnet');
     config.apiKey = API_KEY;
+    config.lnurlDomain = 'freeport.network';
     return await mod.connect({
       config,
       seed: { type: 'mnemonic', mnemonic, passphrase: undefined },
@@ -101,6 +102,7 @@ async function loadSdk(mnemonic: string): Promise<any> {
   const dir = String(FS.documentDirectory || '').replace(/^file:\/\//, '') + 'breez';
   const config = mod.defaultConfig(mod.Network.Mainnet);
   config.apiKey = API_KEY;
+    config.lnurlDomain = 'freeport.network';
   const seed = new mod.Seed.Mnemonic({ mnemonic, passphrase: undefined });
   return await mod.connect({ config, seed, storageDir: dir });
 }
@@ -187,20 +189,37 @@ export class BreezSparkProvider implements WalletProvider {
     }
   }
 
-  private rateCache: { at: number; usd: number | null } | null = null;
-  async usdRate(): Promise<number | null> {
-    if (this.rateCache && Date.now() - this.rateCache.at < 60_000) return this.rateCache.usd;
-    try {
-      const rates: Array<{ coin: string; value: number }> = await this.sdk.fetchFiatRates();
-      const usd = rates?.find((r) => r.coin?.toUpperCase() === 'USD')?.value ?? null;
-      this.rateCache = { at: Date.now(), usd };
-      return usd;
-    } catch { return null; }
+  private rateCache: { at: number; rates: Map<string, number> } | null = null;
+  async fiatRate(coin: string): Promise<number | null> {
+    if (!this.rateCache || Date.now() - this.rateCache.at > 60_000) {
+      try {
+        const rates: Array<{ coin: string; value: number }> = await this.sdk.fetchFiatRates();
+        this.rateCache = { at: Date.now(), rates: new Map((rates ?? []).map((r) => [r.coin?.toUpperCase(), r.value])) };
+      } catch { return null; }
+    }
+    return this.rateCache.rates.get(coin.toUpperCase()) ?? null;
   }
 
   async receiveOnchain(): Promise<string | null> {
     const r = await this.sdk.receivePayment({ paymentMethod: { type: 'bitcoinAddress' } });
     return r?.paymentRequest || null;
+  }
+
+  async lightningAddress(): Promise<{ address: string; lnurl?: string } | null> {
+    try {
+      const info = await this.sdk.getLightningAddress();
+      return info?.lightningAddress ? { address: info.lightningAddress, lnurl: info.lnurl?.bech32 } : null;
+    } catch { return null; }
+  }
+
+  async registerLightningAddress(username: string): Promise<{ address: string; lnurl?: string }> {
+    const info = await this.sdk.registerLightningAddress({ username, description: 'Freeport' });
+    return { address: info.lightningAddress, lnurl: info.lnurl?.bech32 };
+  }
+
+  async checkUsername(username: string): Promise<boolean> {
+    try { return !!(await this.sdk.checkLightningAddressAvailable({ username })); }
+    catch { return false; }
   }
 
   /** The built-in wallet stays connected for the app's lifetime (it keeps

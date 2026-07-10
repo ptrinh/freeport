@@ -95,3 +95,22 @@ export function searchableText(i: Intent, client: MobileClient | null): string {
     p.location?.name, p.notes, p.payment, p.category, p.subcategory,
   ].filter(Boolean).join(' ').toLowerCase();
 }
+
+
+/**
+ * Wallet Send contacts: one entry per counterparty that shared a wallet
+ * address on a confirmed deal — newest first, deduped by address.
+ */
+export function walletContacts(
+  negos: Array<Pick<Negotiation, 'state' | 'updatedAt' | 'theirContact' | 'theirPayAddress'>>,
+): Array<{ name: string; address: string }> {
+  const seen = new Set<string>();
+  const out: Array<{ name: string; address: string }> = [];
+  for (const n of [...negos].sort((x, y) => y.updatedAt - x.updatedAt)) {
+    const addr = n.theirPayAddress;
+    if (!addr || seen.has(addr) || n.state !== 'confirmed') continue;
+    seen.add(addr);
+    out.push({ name: (n.theirContact || '').split('\u00b7')[0].trim() || addr.slice(0, 16) + '\u2026', address: addr });
+  }
+  return out;
+}

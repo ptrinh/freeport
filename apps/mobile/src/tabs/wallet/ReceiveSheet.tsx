@@ -31,6 +31,11 @@ export function ReceiveSheet({
   const [copied, setCopied] = useState(false);
   // Lightning specific-amount form
   const [askAmount, setAskAmount] = useState(!isBreez); // NWC invoices need an amount
+  // Lightning address (user@freeport.network) — the reusable identity glow
+  // shows first. null = none registered yet; undefined = still loading.
+  const [lnAddr, setLnAddr] = useState<{ address: string; lnurl?: string } | null | undefined>(undefined);
+  const [claiming, setClaiming] = useState(false);
+  const [username, setUsername] = useState('');
   const [amount, setAmount] = useState('');
   const [memo, setMemo] = useState('');
 
@@ -38,6 +43,9 @@ export function ReceiveSheet({
     if (!visible) return;
     setTab('lightning'); setValue(''); setError(''); setCopied(false);
     setAskAmount(provider?.kind !== 'breez-spark'); setAmount(''); setMemo('');
+    setLnAddr(undefined); setUsername(''); setClaiming(false);
+    if (provider?.lightningAddress) provider.lightningAddress().then(setLnAddr).catch(() => setLnAddr(null));
+    else setLnAddr(null);
   }, [visible, provider]);
 
   // Static payloads per tab: Spark address / on-chain address / (breez)
@@ -76,6 +84,22 @@ export function ReceiveSheet({
     } finally { setLoading(false); }
   };
 
+  const claim = async () => {
+    if (!provider?.registerLightningAddress) return;
+    const u = username.trim().toLowerCase();
+    if (!/^[a-z0-9][a-z0-9._-]{1,30}$/.test(u)) { setError(t('Pick a username: letters and numbers only')); return; }
+    setClaiming(true); setError('');
+    try {
+      if (provider.checkUsername && !(await provider.checkUsername(u))) {
+        setError(t('That username is taken'));
+        return;
+      }
+      setLnAddr(await provider.registerLightningAddress(u));
+    } catch (e) {
+      setError(e instanceof Error && e.message ? e.message : t('Lightning addresses are not available yet'));
+    } finally { setClaiming(false); }
+  };
+
   const copy = async () => {
     try {
       if (Platform.OS === 'web' && (navigator as any)?.clipboard) {
@@ -94,7 +118,7 @@ export function ReceiveSheet({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' }} onPress={onClose} />
-      <View style={{ backgroundColor: palette.bg, borderTopLeftRadius: 18, borderTopRightRadius: 18, paddingBottom: 26 }}>
+      <View style={{ backgroundColor: palette.bg, borderTopLeftRadius: 18, borderTopRightRadius: 18, paddingBottom: 26, width: '100%', maxWidth: 560, alignSelf: 'center' }}>
         <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: palette.border, marginTop: 8 }} />
         <View style={[s.row, { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 }]}>
           <Ionicons name="arrow-down" size={16} color={palette.accent} style={{ marginEnd: 8 }} />
@@ -116,7 +140,59 @@ export function ReceiveSheet({
             </View>
           )}
 
-          {tab === 'lightning' && askAmount ? (
+          {tab === 'lightning' && lnAddr ? (
+            <View style={{ alignItems: 'center', gap: 12 }}>
+              <View style={{ backgroundColor: 'white', borderRadius: 14, padding: 8 }}>
+                <Image source={{ uri: qrDataUrl((lnAddr.lnurl || lnAddr.address).toUpperCase()) }} style={{ width: 230, height: 230 }} />
+              </View>
+              <Text selectable style={[s.codeText, { textAlign: 'center', color: palette.accent }]}>{lnAddr.address}</Text>
+              <View style={[s.row, { gap: 8 }]}>
+                <Pressable
+                  onPress={async () => {
+                    try {
+                      if (Platform.OS === 'web' && (navigator as any)?.clipboard) { await (navigator as any).clipboard.writeText(lnAddr.address); setCopied(true); }
+                      else await Share.share({ message: lnAddr.address });
+                    } catch { /* ignore */ }
+                  }}
+                  style={[s.btnAccept, { paddingHorizontal: 18 }]}
+                >
+                  <View style={[s.row, { gap: 6 }]}>
+                    <Ionicons name="copy-outline" size={14} color="white" />
+                    <Text style={s.btnText}>{copied ? t('Copied') : t('Copy')}</Text>
+                  </View>
+                </Pressable>
+                <Pressable onPress={async () => { try { await Share.share({ message: lnAddr.address }); } catch { /* ignore */ } }} style={[s.btnGhost, { paddingHorizontal: 18 }]}>
+                  <View style={[s.row, { gap: 6 }]}>
+                    <Ionicons name="share-social-outline" size={14} color={palette.text2} />
+                    <Text style={s.btnGhostText}>{t('Share')}</Text>
+                  </View>
+                </Pressable>
+              </View>
+              <Pressable hitSlop={8} onPress={() => { setLnAddr(null); setAskAmount(true); }}>
+                <Text style={s.cancelLink}>{t('Create invoice with specific amount')} →</Text>
+              </Pressable>
+            </View>
+          ) : tab === 'lightning' && lnAddr === null && isBreez && provider?.registerLightningAddress && !askAmount && !value && !loading ? (
+            <View style={{ gap: 10 }}>
+              <Text style={s.dim}>{t('Claim your lightning address — anyone can pay you at')} user@freeport.network</Text>
+              <TextInput
+                style={{ borderWidth: 1, borderColor: palette.border, borderRadius: 12, padding: 12, minHeight: 44, color: palette.text }}
+                value={username}
+                onChangeText={(v) => { setUsername(v); setError(''); }}
+                placeholder={t('username')}
+                placeholderTextColor={palette.placeholder}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {!!error && <Text style={[s.dim, { color: palette.danger }]}>{error}</Text>}
+              <Pressable onPress={claim} disabled={claiming || !username.trim()} style={[s.btnAccept, (claiming || !username.trim()) && { opacity: 0.6 }]}>
+                {claiming ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Claim')}</Text>}
+              </Pressable>
+              <Pressable hitSlop={8} style={{ alignItems: 'center' }} onPress={() => setAskAmount(true)}>
+                <Text style={s.cancelLink}>{t('Create invoice with specific amount')} →</Text>
+              </Pressable>
+            </View>
+          ) : tab === 'lightning' && askAmount ? (
             <>
               <TextInput
                 style={{ borderWidth: 1, borderColor: palette.border, borderRadius: 12, padding: 12, minHeight: 48, color: palette.text, fontSize: 22, fontWeight: '700' }}

@@ -18,12 +18,18 @@ import { ReceiveSheet } from './wallet/ReceiveSheet';
 function WalletTab({
   nwcUrl,
   onNwcUrlChange,
+  localCurrency = 'USD',
+  contacts = [],
   prefill,
   onPrefillConsumed,
   onScroll,
 }: {
   nwcUrl: string;
   onNwcUrlChange: (url: string) => void;
+  /** ISO code of the user's local currency (from their selected country). */
+  localCurrency?: string;
+  /** Saved counterparties (from deals that shared a wallet address). */
+  contacts?: Array<{ name: string; address: string }>;
   /** Deal Pay flow: destination (counterparty's address) + agreed-price hint. */
   prefill?: { dest: string; hint?: string } | null;
   onPrefillConsumed?: () => void;
@@ -34,7 +40,8 @@ function WalletTab({
   const [booting, setBooting] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
   const [usdRate, setUsdRate] = useState<number | null>(null);
-  const [unit, setUnit] = useState<'sats' | 'usd'>('sats');
+  const [localRate, setLocalRate] = useState<number | null>(null);
+  const [unit, setUnit] = useState<'sats' | 'usd' | 'local'>('sats');
   const [txs, setTxs] = useState<WalletTx[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
@@ -52,10 +59,15 @@ function WalletTab({
   const refresh = async (p: WalletProvider) => {
     setRefreshing(true);
     try {
-      const [b, list, rate] = await Promise.all([p.balance(), p.transactions(50), p.usdRate()]);
+      const wantLocal = localCurrency && localCurrency !== 'USD';
+      const [b, list, usd, local] = await Promise.all([
+        p.balance(), p.transactions(50), p.fiatRate('USD'),
+        wantLocal ? p.fiatRate(localCurrency) : Promise.resolve(null),
+      ]);
       setBalance(b.sats);
       setTxs(list);
-      setUsdRate(rate);
+      setUsdRate(usd);
+      setLocalRate(local);
       setError('');
     } catch (e) {
       setError(e instanceof Error ? e.message : t('Could not reach the wallet'));
@@ -167,8 +179,11 @@ function WalletTab({
       <WalletHome
         balanceSats={balance}
         usdRate={usdRate}
+        localRate={localRate}
+        localCurrency={localCurrency}
         unit={unit}
-        onToggleUnit={() => setUnit((u) => (u === 'sats' ? 'usd' : 'sats'))}
+        onToggleUnit={() => setUnit((u) =>
+          u === 'sats' ? 'usd' : u === 'usd' && localRate != null ? 'local' : 'sats')}
         txs={txs}
         refreshing={refreshing}
         onRefresh={() => provider.current && refresh(provider.current)}
@@ -199,6 +214,7 @@ function WalletTab({
         usdRate={usdRate}
         initialInput={sendPrefill?.dest}
         hint={sendPrefill?.hint}
+        contacts={contacts}
         onClose={() => setSendOpen(false)}
         onPaid={() => provider.current && refresh(provider.current)}
       />

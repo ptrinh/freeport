@@ -74,10 +74,17 @@ export interface WalletProvider {
   transactions(limit?: number): Promise<WalletTx[]>;
   /** Classify a Send destination. Falls back to local heuristics (NWC). */
   parse(input: string): Promise<ParsedDest>;
-  /** BTC price in `usd` per BTC, or null when the provider has no rate feed. */
-  usdRate(): Promise<number | null>;
+  /** BTC price in the given fiat (ISO code, e.g. 'USD', 'VND') per BTC, or
+   *  null when the provider has no rate feed or doesn't know the coin. */
+  fiatRate(coin: string): Promise<number | null>;
   /** A fresh on-chain deposit address, or null when unsupported (NWC). */
   receiveOnchain(): Promise<string | null>;
+  /** Registered lightning address (user@domain), when the provider supports it. */
+  lightningAddress?(): Promise<{ address: string; lnurl?: string } | null>;
+  /** Claim a username under the app's lightning-address domain. */
+  registerLightningAddress?(username: string): Promise<{ address: string; lnurl?: string }>;
+  /** True when the username is still free. */
+  checkUsername?(username: string): Promise<boolean>;
   /** Tear down sockets/subscriptions. */
   close(): void;
 }

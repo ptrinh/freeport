@@ -14,7 +14,10 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "19"
+      "buildNumber": "19",
+      "associatedDomains": [
+        "webcredentials:freeport.network"
+      ]
     },
     "android": {
       "package": "uk.trinh.freeport",
@@ -95,7 +98,13 @@
           "project": "freeport"
         }
       ],
-      "@breeztech/breez-sdk-spark-react-native"
+      "@breeztech/breez-sdk-spark-react-native",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Freeport uses the camera to scan payment QR codes."
+        }
+      ]
     ],
     "extra": {
       "eas": {

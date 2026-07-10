@@ -28,6 +28,7 @@ import { pushUnavailableForOnboarding } from '../pushAvailability';
 import { LANGUAGE_CODES, languageLabel } from '../language';
 import { COUNTRY_NAME, COUNTRY_CODES_AZ, statesOf, citiesOf, levelsOf, flagEmoji } from '../locations';
 import { s, palette } from '../ui/theme';
+import { passkeySupported } from '../passkey';
 import { uiAlert } from '../ui/alerts';
 import { SelectField, RoleGroupHeader, Field, QuickLocationSearch } from '../ui/fields';
 
@@ -40,6 +41,8 @@ export function Onboarding({
   onCreate,
   onFinish,
   onRestore,
+  onPasskeyCreate,
+  onPasskeySignIn,
   onCloudRestore,
   language,
   onLanguageChange,
@@ -49,6 +52,10 @@ export function Onboarding({
   onCreate: (role: 'passenger' | 'driver', services: boolean, name: string, phone: string, vehicleModel: string, plateNumber: string) => Promise<void>;
   onFinish: () => void;
   onRestore: (text: string, passphrase: string) => Promise<void>;
+  /** Register a passkey and stage the derived key; the normal create flow continues after. */
+  onPasskeyCreate: () => Promise<void>;
+  /** Re-derive an account from an existing (synced) passkey and finish onboarding. */
+  onPasskeySignIn: () => Promise<void>;
   onCloudRestore: () => Promise<boolean>;
   language: string;
   onLanguageChange: (l: string) => void;
@@ -56,7 +63,28 @@ export function Onboarding({
   onLocationChange: (loc: UserLocation) => void;
 }) {
   const [step, setStep] = useState<'choose' | 'role' | 'location' | 'welcome'>('choose');
-  const [busy, setBusy] = useState<'create' | 'restore' | 'cloud' | null>(null);
+  const [busy, setBusy] = useState<'create' | 'restore' | 'cloud' | 'passkey' | 'passkeyIn' | null>(null);
+  const [passkeyOk, setPasskeyOk] = useState(false);
+  const [passkeyErr, setPasskeyErr] = useState('');
+  useEffect(() => { passkeySupported().then(setPasskeyOk).catch(() => {}); }, []);
+  const passkeyErrText = (e: unknown) => {
+    const m = e instanceof Error ? e.message : '';
+    if (m === 'passkey-no-prf') return t('This passkey provider does not support key derivation (PRF). Try a platform passkey (Face ID / fingerprint).');
+    if (/NotAllowed|abort/i.test(m)) return ''; // user cancelled — not an error
+    return t('Passkey failed. You can still create a normal account.');
+  };
+  const passkeyCreate = async () => {
+    setBusy('passkey'); setPasskeyErr('');
+    try { await onPasskeyCreate(); setStep('role'); }
+    catch (e) { setPasskeyErr(passkeyErrText(e)); }
+    finally { setBusy(null); }
+  };
+  const passkeySignIn = async () => {
+    setBusy('passkeyIn'); setPasskeyErr('');
+    try { await onPasskeySignIn(); }
+    catch (e) { setPasskeyErr(passkeyErrText(e)); }
+    finally { setBusy(null); }
+  };
   // Only offer cloud restore when a backup actually EXISTS on this device's
   // iCloud Keychain (iOS) / Google Block Store (Android). Both reads are silent
   // (no account picker), so we check at load and hide the button otherwise —
@@ -275,6 +303,24 @@ export function Onboarding({
           <Pressable style={[s.btnAccept, { marginTop: 18 }]} onPress={() => setStep('role')} disabled={busy !== null}>
             <Text style={s.btnText}>{t("Create new account")}</Text>
           </Pressable>
+          {passkeyOk && (
+            <>
+              <Pressable style={[s.btnCounter, { marginTop: 12 }, busy === 'passkey' && { opacity: 0.6 }]} onPress={passkeyCreate} disabled={busy !== null}>
+                {busy === 'passkey' ? <ActivityIndicator color="white" /> : (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+                    <Ionicons name="finger-print" size={16} color="white" />
+                    <Text style={s.btnText}>{t('Create with passkey')}</Text>
+                  </View>
+                )}
+              </Pressable>
+              <Pressable style={[s.btnTextOnly, { marginTop: 8, alignItems: 'center' }]} onPress={passkeySignIn} disabled={busy !== null}>
+                {busy === 'passkeyIn' ? <ActivityIndicator color={palette.dim} /> : (
+                  <Text style={[s.dim, { textDecorationLine: 'underline' }]}>{t('Sign in with passkey')}</Text>
+                )}
+              </Pressable>
+              {!!passkeyErr && <Text style={[s.dim, { color: palette.danger, textAlign: 'center', marginTop: 6 }]}>{passkeyErr}</Text>}
+            </>
+          )}
           <Text style={[s.dim, { textAlign: 'center', marginVertical: 16 }]}>— or —</Text>
           {showCloud && (
             <Pressable style={[s.btnCounter, { marginBottom: 12 }, busy === 'cloud' && { opacity: 0.6 }]} onPress={cloudRestoreNow} disabled={busy !== null}>

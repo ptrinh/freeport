@@ -69,12 +69,33 @@ https://www.freeport.network/* https://freeport.network/:splat 301
 REDIR
 sed -i '' 's#<head>#<head><script>if(location.hostname==="www.freeport.network")location.replace("https://freeport.network"+location.pathname+location.search+location.hash);</script>#' dist/index.html
 
+# Passkey domain association: iOS (AASA) + Android (assetlinks) must be able
+# to verify freeport.network before native passkeys work. The Android cert
+# fingerprint is Play App Signing's — printed in Play Console → App integrity.
+echo "▸ Writing passkey well-known files…"
+mkdir -p dist/.well-known
+cat > dist/.well-known/apple-app-site-association <<'AASA'
+{ "webcredentials": { "apps": ["84T567KMYD.uk.trinh.freeport"] } }
+AASA
+cat > dist/.well-known/assetlinks.json <<'ALINKS'
+[{
+  "relation": ["delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "uk.trinh.freeport",
+    "sha256_cert_fingerprints": ["REPLACE_WITH_PLAY_APP_SIGNING_SHA256"]
+  }
+}]
+ALINKS
+
 # The offline single-file build fetches the wallet wasm from here (file://
 # has a null origin) — allow it and let clients cache the 11MB blob.
 cat > dist/_headers <<'HDRS'
 /breez_sdk_spark_wasm_bg.wasm
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=86400
+/.well-known/apple-app-site-association
+  Content-Type: application/json
 HDRS
 
 # Use our own PNG favicon. Expo's generated /favicon.ico ignores web.favicon
