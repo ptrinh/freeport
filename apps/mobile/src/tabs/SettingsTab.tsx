@@ -35,7 +35,7 @@ import { LANGUAGE_CODES, languageLabel } from '../language';
 import { SERVICE_CATEGORIES, RIDESHARE_CATEGORY, DEFAULT_RIDESHARE_SUBCATEGORY, categoryIcon, subcategoryIcon, subcategoriesFor } from '../categories';
 import { browseTopic } from '../topics';
 import { type FareConfig } from '../pricing';
-import { COUNTRIES, currencySymbol, flagEmoji, levelsOf, statesOf, citiesOf, type Currency } from '../locations';
+import { COUNTRY_NAME, COUNTRY_CODES_AZ, currencySymbol, flagEmoji, levelsOf, statesOf, citiesOf, type Currency } from '../locations';
 import { versionLabel, checkForUpdate, applyUpdate, getTrack, setTrack, trackSupported, type UpdateTrack } from '../updates';
 import { isTauri, hostStart, hostStop, hostStatus, type HostStatus } from '../desktopHost';
 import { s, palette } from '../ui/theme';
@@ -43,10 +43,6 @@ import { isIOSWeb, isStandalonePWA, shortNpub } from '../ui/format';
 import { uiAlert, confirmAsync } from '../ui/alerts';
 import { Field, SelectField, ImagePickerField, NumberField, QuickLocationSearch } from '../ui/fields';
 import { SelfStats } from './MessagesTab';
-
-// Country codes sorted A–Z by name, plus a code→name lookup, for the Location picker.
-const COUNTRY_CODES_AZ: string[] = [...COUNTRIES].sort((a, b) => a.name.localeCompare(b.name)).map((c) => c.code);
-const COUNTRY_NAME: Record<string, string> = Object.fromEntries(COUNTRIES.map((c) => [c.code, c.name]));
 
 // ─── Key tab ─────────────────────────────────────────────────────────────────
 

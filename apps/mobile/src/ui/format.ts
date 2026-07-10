@@ -1,10 +1,13 @@
 import { Platform } from 'react-native';
 import { t, tn, getI18nLang } from '../i18n';
-import { currencyFractionDigits, type Currency } from '../locations';
+import { currencyFractionDigits, fmtMoney, type Currency } from '../locations';
 import { parseAmountWithK } from '../money';
 import { VEHICLE_SEATERS } from '../categories';
 import type { Intent } from '@freeport/protocol';
 import { s } from './theme';
+
+/** Payment display formatter — alias of fmtMoney (single home for the name used across tabs). */
+export const fmtPayment = fmtMoney;
 
 // iOS Safari has no per-site permission icon in the address bar; once a site is
 // denied, getCurrentPosition/Notification.requestPermission never re-prompt and

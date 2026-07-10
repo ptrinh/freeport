@@ -35,15 +35,13 @@ import { SERVICE_CATEGORIES, SERVICE_SUBCATEGORIES, RIDESHARE_CATEGORY, RIDESHAR
 import { geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, reverseGeocode, distanceKmBetweenGeohashes, suggest } from '../maps';
 import { intentTopics } from '../topics';
 import { suggestPrice, estimateFare } from '../pricing';
-import { COUNTRIES, fmtMoney, type Currency } from '../locations';
+import { COUNTRY_NAME, type Currency } from '../locations';
 import { scrollNodeIntoView, type ScrollableNode } from '../scrollToNode';
 import { s, palette } from '../ui/theme';
-import { defaultIntentTime, fmtClock, fmtClockTitle, timeToWindow, snapToStep, shortPlace, myPostTitle, vehicleLabel } from '../ui/format';
+import { defaultIntentTime, fmtClock, fmtClockTitle, timeToWindow, snapToStep, shortPlace, myPostTitle, vehicleLabel, fmtPayment } from '../ui/format';
 import { Field, SelectField, SideToggle, PostButton, ImagePickerField, TimeField, DurationField, PaymentField, WaitingBar } from '../ui/fields';
 
 type PostType = 'rideshare' | 'service';
-const COUNTRY_NAME: Record<string, string> = Object.fromEntries(COUNTRIES.map((c) => [c.code, c.name]));
-const fmtPayment = fmtMoney;
 
 // ─── Post tab ────────────────────────────────────────────────────────────────
 

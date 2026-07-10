@@ -35,14 +35,11 @@ import { createTripSession, tripLink, tripSecret, restoreTripSession, publishTri
 import { webBase } from '../webBase';
 import { dirIcon } from '../rtl';
 import { categoryOf, subcategoryOf } from '../categories';
-import { currencyForMarket, fmtMoney, type Currency } from '../locations';
+import { currencyForMarket, type Currency } from '../locations';
 import { s, palette } from '../ui/theme';
-import { defaultIntentTime, fmtClock, timeToWindow, parsePayment, fmtWindow, extractPhone, contactWithoutPhone, stateLabel, stateColor, formatAge } from '../ui/format';
+import { defaultIntentTime, fmtClock, timeToWindow, parsePayment, fmtWindow, extractPhone, contactWithoutPhone, stateLabel, stateColor, formatAge, fmtPayment } from '../ui/format';
 import { uiAlert, runDealAction, confirmAsync, openMaps } from '../ui/alerts';
-import { SystemNotice, SlideToConfirm, Field, ReadonlyField, DurationField, TimeField, PaymentField, Row } from '../ui/fields';
-
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-const fmtPayment = fmtMoney;
+import { SystemNotice, SlideToConfirm, Field, ReadonlyField, DurationField, TimeField, PaymentField, Row, type IoniconName } from '../ui/fields';
 
 // ─── Deals tab ───────────────────────────────────────────────────────────────
 
@@ -1549,29 +1546,5 @@ function KarmaRater({
         <Pressable style={s.btnDecline} onPress={onCancel}><Text style={s.btnText}>{t("Skip")}</Text></Pressable>
       </View>
     </Animated.View>
-  );
-}
-
-function TermsSummary({ terms, schema }: { terms: ProposedTerms; schema: string }) {
-  const isRide = schema.startsWith('rideshare');
-  return (
-    <View style={s.termsBox}>
-      <Text style={s.termsTitle}>{t("Proposed terms")}</Text>
-      {isRide ? (
-        <>
-          {terms.from && <Row label={t("From")} value={terms.from} />}
-          {terms.to && <Row label={t("To")} value={terms.to} />}
-        </>
-      ) : (
-        <>
-          {terms.location && <Row label={t("Location")} value={terms.location} />}
-          {terms.service && <Row label={t("Service")} value={terms.service} />}
-          {terms.duration_minutes && <Row label={t("Duration")} value={`${terms.duration_minutes} min`} />}
-        </>
-      )}
-      {terms.window && <Row label={t("Time")} value={fmtWindow(terms.window)} />}
-      {terms.payment && <Row label={t("Payment")} value={terms.payment} />}
-      {terms.note && <Row label={t("Note")} value={terms.note} />}
-    </View>
   );
 }

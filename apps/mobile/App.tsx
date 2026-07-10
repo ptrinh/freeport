@@ -2,28 +2,20 @@
  * Freeport — P2P marketplace client.
  * Tabs: Market · Post · Deals · Key
  */
-import React, { useDeferredValue, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Animated,
   AppState,
   Easing,
-  FlatList,
-  findNodeHandle,
   Image,
-  KeyboardAvoidingView,
   LayoutAnimation,
-  PanResponder,
   Linking,
   Modal,
   Platform,
   Pressable,
-  ScrollView,
-  Share,
-  StyleSheet,
   Text,
-  TextInput,
   UIManager,
   useColorScheme,
   View,
@@ -35,90 +27,63 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AreaMap, PickerMap } from './src/Map';
-import { t, tn, setI18nLang, getI18nLang, ensureI18nLang, onI18nLoaded } from './src/i18n';
-import { TimeSpinner } from './src/TimeSpinner';
-import { Picker } from '@react-native-picker/picker';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
+import { AreaMap } from './src/Map';
+import { t, setI18nLang, ensureI18nLang, onI18nLoaded } from './src/i18n';
+import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import {
   DEMO_MARKET,
-  DEMO_SCHEMA,
   SERVICE_MARKET,
-  SERVICE_SCHEMA,
-  KIND_KARMA,
-  geohashPrefixes,
   MSG_COUNTER,
   MSG_ACCEPT,
   MSG_CHAT,
   type Intent,
   type Negotiation,
-  type ProposedTerms,
 } from '@freeport/protocol';
-import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, getStoredNsec, bundleNeedsPassphrase } from './src/identity';
-import { backupToFile, pickBackupText, restoreBackupText, buildCloudBundle, restoreFromBundleText } from './src/backup';
-import { cloudAvailable, cloudSave, cloudRestore, cloudClear, cloudName } from './src/cloudBackup';
+import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf } from './src/identity';
+import { restoreBackupText, buildCloudBundle, restoreFromBundleText } from './src/backup';
+import { cloudAvailable, cloudSave, cloudRestore, cloudClear } from './src/cloudBackup';
 import { LocalSigner, Nip07Signer, hasNip07, type Signer } from './src/signer';
-import { karmaLabel, type KarmaScore } from './src/karma';
-import { query } from './src/query';
-import { fetchReputation } from './src/reputation';
 import { kvGet, kvSet } from './src/kv';
 import { MobileClient } from './src/client';
-import { wheelTick, eventAlert } from './src/haptics';
-import { onWheelDemo, triggerWheelDemo } from './src/wheelDemo';
+import { eventAlert } from './src/haptics';
+import { triggerWheelDemo } from './src/wheelDemo';
 import { Fireworks } from './src/Fireworks';
 import { installDebugApi, registerDebugClient } from './src/debug';
-import { locQuery, locRefSeed, locRefStore, locRefHas, userGeohashSeed, userGeohashStore } from './src/localityRef';
-import { passesDistance, passesCategory, matchesKeywords } from './src/browseFilter';
-import { initNotifications, notify, notificationGranted, requestNotifications, onNotificationTap } from './src/notify';
+import { initNotifications, notify, notificationGranted, onNotificationTap } from './src/notify';
 import { beginBackgroundTask, endBackgroundTask } from './src/backgroundTask';
-import { uploadImage, uploadFile, UploadError } from './src/upload';
-import { startRecording, stopRecording, playAudio } from './src/voice';
-import { loadAddressBook, addRecent, togglePinned, isPinned, type AddressBook } from './src/addressbook';
-import { loadProfile, saveProfile, maskPhone, maskPlate, isDisplayablePhone, defaultAvatarUrl, type UserProfile, type PhoneDisplay } from './src/profile';
-import { normalizePhone, detectDialCode, dialForCountry } from './src/phone';
-import { routeUrl, placeUrl, placeParam, dirUrl, appleMapsScheme, geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, locationGranted, requestLocationPermission, reverseGeocode, detectRawLocationGPS, detectRawLocationIP, detectCoordsIP, distanceKmBetweenGeohashes, formatDistance, effectiveUnit, suggest } from './src/maps';
-import { parseAmountWithK } from './src/money';
-import { negoIsDone, messagesViewForNewActivity, searchableText, isPendingOffer, offerSummary } from './src/deals';
+import { loadProfile, saveProfile, defaultAvatarUrl, type UserProfile } from './src/profile';
+import { normalizePhone } from './src/phone';
+import { locationGranted, requestLocationPermission, detectRawLocationGPS, detectRawLocationIP, effectiveUnit } from './src/maps';
+import { messagesViewForNewActivity } from './src/deals';
 import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
-import { loadPrefs, savePrefs, type Prefs, type UserLocation } from './src/prefs';
-import { LANGUAGE_CODES, languageLabel, systemLanguage, systemCountry } from './src/language';
-import { SERVICE_CATEGORIES, SERVICE_SUBCATEGORIES, RIDESHARE_CATEGORY, RIDESHARE_SUBCATEGORIES, DEFAULT_RIDESHARE_SUBCATEGORY, VEHICLE_ICONS, VEHICLE_SEATERS, CATEGORY_ICONS, SUBCATEGORY_ICONS, categoryIcon, subcategoryIcon, categoryOf, subcategoryOf, subcategoriesFor } from './src/categories';
-import { intentTopics, browseTopic } from './src/topics';
+import { loadPrefs, savePrefs, type UserLocation } from './src/prefs';
+import { systemLanguage, systemCountry } from './src/language';
+import { RIDESHARE_CATEGORY, categoryOf, subcategoryOf } from './src/categories';
 import { applySideBackdrop } from './src/sideBackdrop';
-import { suggestPrice, estimateFare, setFareConfig, defaultFareConfig, type PriceSuggestion, type FareConfig } from './src/pricing';
-import { pushSupported, enablePush, updatePush, disablePush, pushStatus, type PushStatus, type PushFilters } from './src/push';
-import { pushUnavailableForOnboarding } from './src/pushAvailability';
-import { scrollNodeIntoView, type ScrollableNode } from './src/scrollToNode';
-import { isTauri, hostStart, hostStop, hostStatus, type HostStatus } from './src/desktopHost';
+import { setFareConfig, defaultFareConfig, type FareConfig } from './src/pricing';
+import { pushSupported, enablePush, disablePush } from './src/push';
 import { installDesktopLinkOpener } from './src/desktopNative';
 // Desktop shell: window.open() to external origins is silently dropped by the
 // WebView, so route Linking.openURL through the system opener plugin instead.
 installDesktopLinkOpener(Linking);
-import { requestTelegramLink, telegramLinkStatus } from './src/telegramLink';
-import { createTripSession, tripLink, tripSecret, restoreTripSession, decodeTripHash, publishTripLocation, subscribeTrip, type TripStatic, type TripSession, type TripView, type TripUpdate } from './src/livetrip';
-import { webBase } from './src/webBase';
-import { versionLabel, checkForUpdate, applyUpdate, useUpdateState, getTrack, applyTrack, setTrack, trackSupported, reloadApp, type UpdateTrack } from './src/updates';
-import { initLayoutDirection, applyLayoutDirection, dirIcon } from './src/rtl';
+import { decodeTripHash, subscribeTrip, type TripView, type TripUpdate } from './src/livetrip';
+import { checkForUpdate, useUpdateState, getTrack, applyTrack, trackSupported, reloadApp } from './src/updates';
+import { initLayoutDirection, applyLayoutDirection } from './src/rtl';
 import { useWebUpdateAvailable } from './src/webUpdate';
 import { SimplePool } from 'nostr-tools/pool';
-import { getPow } from 'nostr-tools/nip13';
-import { statesOf, citiesOf, currencyForCountry, currencyForMarket, offerCurrency, currencyFractionDigits, currencySymbol, fmtMoney, matchLocation, levelsOf, flagEmoji, type Currency } from './src/locations';
-import { reverseRaw } from './src/nominatim';
-import { s, palette, applyTheme, type Palette } from './src/ui/theme';
-import { isIOSWeb, isStandalonePWA, roundTo15, defaultIntentTime, fmtClock, fmtClockTitle, dayHint, dayLabel, timeToWindow, stepFor, snapToStep, parsePayment, symbolIsSuffix, compactAmount, formatAmountInput, shortNpub, fmtWindow, extractPhone, contactWithoutPhone, stateLabel, formatAge, shortPlace, vehicleLabel, primaryGeohash, myPostTitle, stateColor } from './src/ui/format';
-import { uiAlert, runDealAction, confirmAsync, openMaps } from './src/ui/alerts';
-import { RoleGroupHeader, WaitingBar, SlideToConfirm, SystemNotice, StatusDot, SelectField, Field, ReadonlyField, NumberField, SideToggle, PostButton, ImagePickerField, Row, TimeField, DurationField, AmountWheel, PaymentField } from './src/ui/fields';
+import { currencyForCountry, matchLocation, flagEmoji, type Currency } from './src/locations';
+import { s, palette, applyTheme } from './src/ui/theme';
+import { isStandalonePWA, myPostTitle } from './src/ui/format';
+import { StatusDot, type IoniconName } from './src/ui/fields';
 import { MarketTab } from './src/tabs/BrowseTab';
 import { PostTab } from './src/tabs/PostTab';
-import { DealsTab, SelfStats, isImageMsg, isAudioMsg, isTripMsg } from './src/tabs/MessagesTab';
+import { DealsTab, isImageMsg, isAudioMsg, isTripMsg } from './src/tabs/MessagesTab';
 import { SettingsTab } from './src/tabs/SettingsTab';
 import { Onboarding } from './src/tabs/Onboarding';
 
 type Tab = 'post' | 'messages' | 'browse' | 'settings';
 
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 // [inactive (outline), active (filled)] per tab
 const TAB_ICONS: Record<Tab, [IoniconName, IoniconName]> = {
   post: ['add-circle-outline', 'add-circle'],
@@ -138,8 +103,6 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
     document.head.appendChild(st);
   } catch { /* best-effort */ }
 }
-
-
 
 // Apply the RTL/LTR layout direction before the tree renders (see rtl.ts).
 // Runs once at module load; on web it reads a sync hint so the first paint is
@@ -1552,6 +1515,4 @@ function AppInner() {
     </View>
   );
 }
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 

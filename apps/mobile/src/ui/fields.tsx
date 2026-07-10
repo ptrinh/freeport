@@ -19,15 +19,15 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { TimeSpinner } from '../TimeSpinner';
 import { t } from '../i18n';
-import { currencySymbol, fmtMoney, searchLocations, type Currency } from '../locations';
+import { currencySymbol, searchLocations, type Currency } from '../locations';
 import { type PriceSuggestion } from '../pricing';
 import { wheelTick } from '../haptics';
 import { onWheelDemo } from '../wheelDemo';
 import { uploadImage, UploadError } from '../upload';
-import { roundTo15, fmtClock, dayLabel, stepFor, snapToStep, symbolIsSuffix, compactAmount, formatAmountInput } from './format';
+import { roundTo15, fmtClock, dayLabel, stepFor, snapToStep, symbolIsSuffix, compactAmount, formatAmountInput, fmtPayment } from './format';
 import { s, palette } from './theme';
 
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+export type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
 function RoleGroupHeader({ icon, label, note, open, onPress, disabled, style }: {
   icon: IoniconName;
@@ -551,8 +551,6 @@ function DurationField({
     </View>
   );
 }
-
-const fmtPayment = fmtMoney;
 
 /**
  * Horizontal wheel (ruler) picker — SwiftUI "custom horizontal wheel" style.

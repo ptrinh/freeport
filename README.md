@@ -24,7 +24,7 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 | `packages/protocol` | Spec as code: event build/parse, negotiation state machine, matching, geohash |
 | `packages/agent` | CLI personal agent (`freeport run`): subscribe, auto-match, negotiate, human confirm |
 | `packages/nostr-mcp` | Read-only MCP server for agents + self-hostable notifier: Web Push / Expo push and the **Telegram bridge** (feed, listen mode, pings, guest mode) |
-| `apps/mobile` | Expo/React Native + PWA client (post intent, negotiate, confirm deals, key backup, 55 locales incl. RTL) |
+| `apps/mobile` | Expo/React Native + PWA client (post intent, negotiate, confirm deals, key backup, 55 locales incl. RTL). UI is split into `apps/mobile/src/tabs/*` (one file per tab) + `apps/mobile/src/ui/*` (theme, shared fields, formatters, alerts); see [`apps/mobile/CONTRIBUTING.md`](apps/mobile/CONTRIBUTING.md) |
 | `relay/` | Self-hosted strfry relay (docker-compose, Proxmox-LXC-sized, Uptime-Kuma health) |
 | `demo/` | Two-agent rideshare demo configs + script |
 

@@ -341,6 +341,16 @@ export const COUNTRIES: CountryData[] = [
   { code: 'VE', name: 'Venezuela', levels: 2, states: ms('Caracas', 'Maracaibo', 'Valencia') },
 ];
 
+/** Country codes sorted A–Z by localized country name (for pickers). */
+export const COUNTRY_CODES_AZ: string[] = [...COUNTRIES]
+  .sort((a, b) => a.name.localeCompare(b.name))
+  .map((c) => c.code);
+
+/** ISO 3166-1 alpha-2 code → country name. */
+export const COUNTRY_NAME: Record<string, string> = Object.fromEntries(
+  COUNTRIES.map((c) => [c.code, c.name]),
+);
+
 export function countryByCode(code: string): CountryData | undefined {
   return COUNTRIES.find((c) => c.code === code);
 }

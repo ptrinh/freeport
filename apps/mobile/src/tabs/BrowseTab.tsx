@@ -23,18 +23,14 @@ import { searchableText } from '../deals';
 import { geohashToCoords, coordsToGeohash, getCurrentCoords, detectCoordsIP, geohashForPlace, routeUrl, placeUrl, placeParam, distanceKmBetweenGeohashes, formatDistance, effectiveUnit } from '../maps';
 import { SERVICE_CATEGORIES, RIDESHARE_CATEGORY, DEFAULT_RIDESHARE_SUBCATEGORY, VEHICLE_ICONS, categoryIcon, subcategoryIcon, subcategoriesFor } from '../categories';
 import { reverseRaw } from '../nominatim';
-import { COUNTRIES, currencyForMarket, offerCurrency, fmtMoney, type Currency } from '../locations';
+import { COUNTRY_NAME, currencyForMarket, offerCurrency, type Currency } from '../locations';
 import { dirIcon } from '../rtl';
 import { maskPhone, isDisplayablePhone } from '../profile';
 import { getPow } from 'nostr-tools/nip13';
 import { s, palette } from '../ui/theme';
-import { defaultIntentTime, timeToWindow, parsePayment, fmtWindow, extractPhone, myPostTitle, primaryGeohash } from '../ui/format';
+import { defaultIntentTime, timeToWindow, parsePayment, fmtWindow, extractPhone, myPostTitle, primaryGeohash, fmtPayment } from '../ui/format';
 import { uiAlert, openMaps } from '../ui/alerts';
-import { Row, DurationField, TimeField, PaymentField, Field } from '../ui/fields';
-
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-const COUNTRY_NAME: Record<string, string> = Object.fromEntries(COUNTRIES.map((c) => [c.code, c.name]));
-const fmtPayment = fmtMoney;
+import { Row, DurationField, TimeField, PaymentField, Field, type IoniconName } from '../ui/fields';
 
 export function MarketTab({
   intents,
