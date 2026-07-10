@@ -104,7 +104,8 @@ import { initLayoutDirection, applyLayoutDirection, dirIcon } from './src/rtl';
 import { useWebUpdateAvailable } from './src/webUpdate';
 import { SimplePool } from 'nostr-tools/pool';
 import { getPow } from 'nostr-tools/nip13';
-import { COUNTRIES, statesOf, citiesOf, currencyForCountry, currencyForMarket, currencyFractionDigits, currencySymbol, fmtMoney, matchLocation, levelsOf, flagEmoji, searchLocations, type Currency } from './src/locations';
+import { COUNTRIES, statesOf, citiesOf, currencyForCountry, currencyForMarket, offerCurrency, currencyFractionDigits, currencySymbol, fmtMoney, matchLocation, levelsOf, flagEmoji, searchLocations, type Currency } from './src/locations';
+import { reverseRaw } from './src/nominatim';
 
 // Country codes sorted A–Z by name, plus a code→name lookup, for the Location picker.
 const COUNTRY_CODES_AZ: string[] = [...COUNTRIES].sort((a, b) => a.name.localeCompare(b.name)).map((c) => c.code);
@@ -4806,6 +4807,26 @@ function RespondEditor({
   const [durMinutes, setDurMinutes] = useState(intentDur % 60);
   const [note, setNote] = useState('');
   const [sending, setSending] = useState(false);
+
+  // Unpriced ride: the market topic can carry the POSTER's selected country,
+  // not the pickup's (a Vietnam pickup posted into an SG market showed S$).
+  // Resolve the pickup geohash to its country (cached Nominatim lookup) and
+  // switch the offer currency — unless the user already changed it.
+  useEffect(() => {
+    if (intentPay.amount > 0 || !isRide) return; // priced → poster's currency stands
+    const gh = p.from?.geohash;
+    const coords = gh ? geohashToCoords(gh) : null;
+    if (!coords) return;
+    let cancelled = false;
+    (async () => {
+      const raw = await reverseRaw(coords.latitude, coords.longitude);
+      if (cancelled || !raw?.countryCode) return;
+      const derived = offerCurrency(null, raw.countryCode, intent.content.market);
+      setPayCurrency((cur) => (cur === intentPay.currency ? derived : cur));
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const send = async () => {
     const terms: ProposedTerms = {

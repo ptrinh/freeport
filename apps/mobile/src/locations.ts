@@ -380,6 +380,23 @@ export function currencyForMarket(market: string | undefined, fallback: Currency
   return (cc.length === 2 && COUNTRY_CURRENCY[cc]) || fallback;
 }
 
+/** Currency to prefill in an offer/respond form. Priority:
+ *  1. The post's explicit asking price → its currency (poster's choice).
+ *  2. The PICKUP's country — a ride is paid at the curb in the pickup
+ *     country's money (user report: a Vietnam-pickup post that landed in an
+ *     SG market offered S$; it must offer ₫).
+ *  3. The market topic's country, else USD. */
+export function offerCurrency(
+  explicit: Currency | null | undefined,
+  pickupCountry: string | null | undefined,
+  market: string | undefined,
+): Currency {
+  if (explicit) return explicit;
+  const cc = (pickupCountry || '').toUpperCase();
+  if (cc && COUNTRY_CURRENCY[cc]) return COUNTRY_CURRENCY[cc];
+  return currencyForMarket(market, 'USD');
+}
+
 /** Minor-unit count for a currency (0 for VND/JPY/KRW…, usually 2). */
 export function currencyFractionDigits(currency: Currency): number {
   try {
