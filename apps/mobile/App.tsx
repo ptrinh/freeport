@@ -50,12 +50,11 @@ import { eventAlert } from './src/haptics';
 import { triggerWheelDemo } from './src/wheelDemo';
 import { Fireworks } from './src/Fireworks';
 import { installDebugApi, registerDebugClient } from './src/debug';
-import { initNotifications, notify, notificationGranted, onNotificationTap } from './src/notify';
-import { beginBackgroundTask, endBackgroundTask } from './src/backgroundTask';
+import { initNotifications, notify, notificationGranted } from './src/notify';
 import { loadProfile, saveProfile, defaultAvatarUrl, type UserProfile } from './src/profile';
 import { normalizePhone } from './src/phone';
 import { locationGranted, requestLocationPermission, detectRawLocationGPS, detectRawLocationIP, effectiveUnit } from './src/maps';
-import { messagesViewForNewActivity, needsContactBackflow, shouldPokeForContact } from './src/deals';
+import { messagesViewForNewActivity } from './src/deals';
 import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
 import { loadPrefs, savePrefs, type UserLocation } from './src/prefs';
 import { systemLanguage, systemCountry } from './src/language';
@@ -76,6 +75,11 @@ import { currencyForCountry, matchLocation, flagEmoji, type Currency } from './s
 import { s, palette, applyTheme } from './src/ui/theme';
 import { isStandalonePWA, myPostTitle } from './src/ui/format';
 import { StatusDot, type IoniconName } from './src/ui/fields';
+import { useResumeReconnect } from './src/hooks/useResumeReconnect';
+import { useRelayStatus } from './src/hooks/useRelayStatus';
+import { useContactHandshake } from './src/hooks/useContactHandshake';
+import { useDeepLinkNav } from './src/hooks/useDeepLinkNav';
+import { useBackgroundGrace } from './src/hooks/useBackgroundGrace';
 import { MarketTab } from './src/tabs/BrowseTab';
 import { PostTab } from './src/tabs/PostTab';
 import { DealsTab, isImageMsg, isAudioMsg, isTripMsg } from './src/tabs/MessagesTab';
@@ -412,134 +416,20 @@ function AppInner() {
   // web is a no-op and uses PWA push instead).
   useEffect(() => { initNotifications(); }, []);
 
-  // iOS has no foreground service, so once it suspends the app (~seconds after
-  // backgrounding) the relay socket dies and no more alerts arrive. If the user
-  // has a live post waiting for offers, warn them just before that suspension so
-  // they know to keep the app open / check back. Fires shortly after backgrounding
-  // (our proxy for the suspension signal, which managed RN can't observe directly)
-  // and is cancelled if they return. Throttled to avoid repeat nags.
-  const suspendNotifiedRef = useRef(0);
-  // Persist the last "updates paused" nag time so a reload/cold start doesn't
-  // reset the throttle and re-nag on the next open→close.
-  useEffect(() => {
-    kvGet('freeport.suspendNotifiedAt').then((v) => { const n = parseInt(v || '0', 10); if (n) suspendNotifiedRef.current = n; }).catch(() => {});
-  }, []);
-  useEffect(() => {
-    if (Platform.OS !== 'ios') return;
-    let nagTimer: ReturnType<typeof setTimeout> | null = null;
-    let releaseTimer: ReturnType<typeof setTimeout> | null = null;
-    const clearTimers = () => {
-      if (nagTimer) { clearTimeout(nagTimer); nagTimer = null; }
-      if (releaseTimer) { clearTimeout(releaseTimer); releaseTimer = null; }
-    };
-    const sub = AppState.addEventListener('change', (state) => {
-      clearTimers();
-      if (state !== 'background') { endBackgroundTask(); return; } // returned to foreground
-      // ALWAYS hold the ~30s extended-background window the instant we background.
-      // Without it iOS suspends the process in ~5s, killing the relay socket
-      // before an inbound DM arrives AND dropping any just-scheduled local
-      // notification before UNUserNotificationCenter presents it — which is why
-      // alerts only appeared on reopen. Holding the window keeps the socket alive
-      // so the DM lands, and lets the 1s time-interval trigger in notify() fire
-      // on the lock screen / banner while still backgrounded. Crucially this runs
-      // for everyone (e.g. a Driver with no open post who is about to receive a
-      // confirm), not just users with a live post awaiting offers.
-      beginBackgroundTask();
-      const nowSec = Math.floor(Date.now() / 1000);
-      const hasOpenPost = myIntents.some(
-        (i) => !(i.content.payload as any)?.withdrawn
-          && i.content.expires_at >= nowSec
-          && !(i.content.window && i.content.window.start < nowSec)
-          && !negos.some((n) => n.intent.id === i.id && n.state === 'confirmed'),
-      );
-      // Skip entirely when the push notification server is on — it keeps
-      // delivering in the background, so "alerts paused" would be misleading.
-      // Otherwise throttle to at most once per hour, persisted across reloads.
-      const wantNag = hasOpenPost && !pushOnRef.current && Date.now() - suspendNotifiedRef.current >= 60 * 60_000;
-      // Fire the "updates paused" nag EARLY (5s) — iOS doesn't always grant the
-      // full ~30s window, so a notification scheduled at 25s often never presents
-      // and only appears on reopen. 5s is safely inside even the minimal window.
-      if (wantNag) {
-        nagTimer = setTimeout(() => {
-          suspendNotifiedRef.current = Date.now();
-          kvSet('freeport.suspendNotifiedAt', String(suspendNotifiedRef.current)).catch(() => {});
-          notify(t('Updates paused'), t('Freeport was paused in the background, so new-offer alerts have stopped. Keep the app open or check back periodically for updates.'), { tab: 'browse' });
-        }, 5000);
-      }
-      // Hold the extended-background window longer (~25s) so the relay socket
-      // stays alive to catch inbound DMs, then release it.
-      releaseTimer = setTimeout(() => { endBackgroundTask(); }, 25000);
-    });
-    return () => { sub.remove(); clearTimers(); endBackgroundTask(); };
-  }, [myIntents, negos]);
+  // iOS background keepalive + "updates paused" nag (see hook).
+  useBackgroundGrace(myIntents, negos, pushOnRef);
 
-  // Bumped whenever the app returns to the foreground. Drives re-subscription
-  // of the relay feeds so missed events (offers, messages) backfill on resume.
-  const [resumeTick, setResumeTick] = useState(0);
-  // Alert sounds are muted for a few seconds around a resume: reconnecting
-  // relays REPLAY recent events (a relay that hadn't delivered a message yet,
-  // an overlapping backfill window) and those replays rang the "new message"
-  // ding on every tab reopen with nothing new to show (user report).
-  const alertsMutedUntil = useRef(0);
-  useEffect(() => {
-    const sub = AppState.addEventListener('change', (state) => {
-      if (state !== 'active') return;
-      alertsMutedUntil.current = Date.now() + 5000;
-      // Re-open any sockets the OS killed while we were backgrounded, then
-      // nudge the feeds to re-subscribe (fresh REQ → backfills the gap).
-      client?.reconnect().catch(() => {});
-      setResumeTick((n) => n + 1);
-    });
-    return () => sub.remove();
-  }, [client]);
+  // AppState "active" listener: reconnect relays + bump resumeTick + mute alerts.
+  const { resumeTick, alertsMutedUntil } = useResumeReconnect(client);
 
-  // Live relay connectivity for the header status pill.
-  const [netStatus, setNetStatus] = useState<'connecting' | 'online' | 'offline'>('connecting');
   // Signed DMs waiting for a relay (offline sends). Surfaced in the status pill
   // so a "Confirmed" card the counterparty hasn't received yet is never silent.
   const [outboxPending, setOutboxPending] = useState(0);
   const { updating } = useUpdateState();
   const webUpdate = useWebUpdateAvailable();
-  useEffect(() => {
-    if (!client) { setNetStatus('connecting'); return; }
-    let everUp = false;
-    let t0 = Date.now();
-    // Exponential backoff between reconnect dials while offline: redialing all
-    // relays every 2.5s drains the battery on a dead network. Resets the
-    // moment a socket comes back (and on resume, since this effect re-runs).
-    let nextDialAt = 0;
-    let dialDelay = 2500;
-    const tick = () => {
-      const n = client.connectedRelayCount();
-      if (n > 0) { everUp = true; dialDelay = 2500; nextDialAt = 0; setNetStatus('online'); }
-      else {
-        // No live socket: surface offline and actively try to re-open it,
-        // rather than sitting on a stale "No network" forever.
-        setNetStatus(everUp || Date.now() - t0 > 5000 ? 'offline' : 'connecting');
-        if (Date.now() >= nextDialAt) {
-          nextDialAt = Date.now() + dialDelay;
-          dialDelay = Math.min(dialDelay * 2, 60_000);
-          client.reconnect().catch(() => {});
-        }
-      }
-    };
-    tick();
-    const id = setInterval(tick, 2500);
-    // Re-arm the connecting grace window on resume so a brief reconnect after
-    // returning to the foreground doesn't flash "No network".
-    t0 = Date.now(); everUp = false;
-    return () => clearInterval(id);
-  }, [client, resumeTick]);
 
-  // Settle the StatusDot to a static dot once the connection has been 'online'
-  // continuously for 5s — keeps the pulse/glow only while connecting/offline or
-  // during the first few seconds of being connected (reduces idle UI noise).
-  const [netSteady, setNetSteady] = useState(false);
-  useEffect(() => {
-    if (netStatus !== 'online') { setNetSteady(false); return; }
-    const id = setTimeout(() => setNetSteady(true), 5000);
-    return () => clearTimeout(id);
-  }, [netStatus]);
+  // Live relay connectivity for the header status pill.
+  const { netStatus, netSteady } = useRelayStatus(client, resumeTick);
 
   // Scroll-driven collapse of the header + tab bar. These are LAYOUT props
   // (padding/size/font), which the native animation driver can't touch — the
@@ -692,24 +582,8 @@ function AppInner() {
     return () => clearTimeout(id);
   }, [initVersion]);
 
-  // Deep-link on notification tap. Native: a tapped local/push notification
-  // (incl. cold start). Web: the service worker postMessages an open client.
-  useEffect(() => {
-    const go = (t: unknown) => {
-      if (t === 'messages' || t === 'browse' || t === 'post' || t === 'settings') {
-        deepLinkedRef.current = true;
-        if (t === 'messages') { const v = pickMessagesViewRef.current(); if (v) setMessagesView(v); }
-        setTab(t);
-      }
-    };
-    if (Platform.OS !== 'web') {
-      return onNotificationTap((data) => go(data?.tab));
-    }
-    if (typeof navigator === 'undefined' || !navigator.serviceWorker) return;
-    const handler = (e: MessageEvent) => { if (e.data?.type === 'freeport-nav') go(e.data.tab); };
-    navigator.serviceWorker.addEventListener('message', handler);
-    return () => navigator.serviceWorker.removeEventListener('message', handler);
-  }, []);
+  // Deep-link on notification tap (native / web SW) — see hook.
+  useDeepLinkNav(setTab, setMessagesView, deepLinkedRef, () => pickMessagesViewRef.current());
 
   // Currency follows the set location; before one is set (or when GPS/IP
   // detection returns empty), fall back to the device locale's region rather
@@ -1046,50 +920,8 @@ function AppInner() {
     return parts.filter(Boolean).join(' · ') || (client?.pubkey.slice(0, 12) ?? '');
   };
   const buildContactFor = (n: Negotiation): string => buildContact(n.intent, n.weInitiated);
-  // Auto-send our contact back (the confirm back-flow). The old logic guarded
-  // this with a PERSISTED once-ever set and kept the id even when accept()
-  // threw (e.g. the signer failing mid-background on iOS) — one bad moment
-  // permanently stranded the deal at "waiting for the other party" on the peer
-  // (field report). The `!n.ourContact` condition already prevents re-sends
-  // after a successful local commit (accept() commits before publishing, and
-  // relay failures go to the persisted outbox), so the persisted guard added
-  // nothing but that failure mode. Keep only an in-session backoff so a
-  // persistently-broken signer can't hot-loop.
-  const autoContactSent = useRef<Set<string>>(new Set());
-  const autoContactLastTry = useRef<Map<string, number>>(new Map());
-  const [autoContactReady, setAutoContactReady] = useState(false);
-  useEffect(() => {
-    kvGet('freeport.autoContactSent')
-      .then((v) => { try { if (v) for (const id of JSON.parse(v) as string[]) autoContactSent.current.add(id); } catch { /* ignore */ } })
-      .finally(() => setAutoContactReady(true));
-  }, []);
-  // Re-evaluate the handshake healer even when nothing else changes: a stuck
-  // deal is by definition IDLE (no nego updates to retrigger the effect), and
-  // each chat resets updatedAt which defers the poke grace window.
-  const [handshakeTick, setHandshakeTick] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setHandshakeTick((n) => n + 1), 60_000);
-    return () => clearInterval(id);
-  }, []);
-  useEffect(() => {
-    if (!client || !autoContactReady) return;
-    const nowSec = Math.floor(Date.now() / 1000);
-    for (const n of negos) {
-      if (needsContactBackflow(n)) {
-        const last = autoContactLastTry.current.get(n.id) ?? 0;
-        if (Date.now() - last < 30_000) continue; // backoff between attempts
-        autoContactLastTry.current.set(n.id, Date.now());
-        client.accept(n.id, buildContactFor(n)).catch(() => {});
-      } else if (shouldPokeForContact(n, nowSec) && !autoContactSent.current.has('poke:' + n.id)) {
-        // Waiting side: our contact went out but theirs never arrived — the
-        // peer either lost our accept or failed their back-flow. Re-send our
-        // accept once per session; their client applies it or, on the
-        // duplicate, re-sends their contact (see client.processDM).
-        autoContactSent.current.add('poke:' + n.id);
-        client.accept(n.id, n.ourContact!).catch(() => {});
-      }
-    }
-  }, [negos, client, profile, autoContactReady, resumeTick, handshakeTick]);
+  // The confirm back-flow / poke healer (auto-reply with our contact) — see hook.
+  useContactHandshake(client, negos, profile, buildContactFor, resumeTick);
 
   // A pure passenger only posts ride requests and waits for drivers — Browse
   // (where you pick listings) is noise. Show it for drivers, or once the
