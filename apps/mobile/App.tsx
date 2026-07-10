@@ -476,9 +476,15 @@ function AppInner() {
   // Bumped whenever the app returns to the foreground. Drives re-subscription
   // of the relay feeds so missed events (offers, messages) backfill on resume.
   const [resumeTick, setResumeTick] = useState(0);
+  // Alert sounds are muted for a few seconds around a resume: reconnecting
+  // relays REPLAY recent events (a relay that hadn't delivered a message yet,
+  // an overlapping backfill window) and those replays rang the "new message"
+  // ding on every tab reopen with nothing new to show (user report).
+  const alertsMutedUntil = useRef(0);
   useEffect(() => {
     const sub = AppState.addEventListener('change', (state) => {
       if (state !== 'active') return;
+      alertsMutedUntil.current = Date.now() + 5000;
       // Re-open any sockets the OS killed while we were backgrounded, then
       // nudge the feeds to re-subscribe (fresh REQ → backfills the gap).
       client?.reconnect().catch(() => {});
@@ -752,7 +758,8 @@ function AppInner() {
         // Alert on a genuinely-new request that lands while the user is here:
         // not a known listing, past the initial backfill, recently posted, app
         // foregrounded. (eventAlert self-throttles bursts.)
-        const isNewLive = !cur && feedReady.current && i.createdAt >= Math.floor(Date.now() / 1000) - 120;
+        const isNewLive = !cur && feedReady.current && Date.now() >= alertsMutedUntil.current
+          && i.createdAt >= Math.floor(Date.now() / 1000) - 120;
         if (isNewLive && AppState.currentState === 'active') {
           eventAlert();
         }
@@ -785,7 +792,11 @@ function AppInner() {
       // Local notification for a new inbound DM. Only when backgrounded — the
       // in-app Messages badge already covers the foreground. Content-blind body.
       c.onIncomingMessage = (_nego, msg) => {
-        if (AppState.currentState === 'active') { eventAlert(); return; } // in-app sound+haptic
+        if (AppState.currentState === 'active') {
+          // Resume replays are silent; only ding while alerts are live.
+          if (Date.now() >= alertsMutedUntil.current) eventAlert();
+          return;
+        }
         if (pushOnRef.current) return; // the notification server handles background → avoid a double alert
         // The app can decrypt, so show the actual chat text (media types as a
         // friendly label). Server pushes stay content-blind for privacy.
