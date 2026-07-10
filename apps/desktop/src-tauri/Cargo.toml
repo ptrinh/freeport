@@ -1,6 +1,6 @@
 [package]
 name = "freeport-desktop"
-version = "1.4.1"
+version = "1.4.2"
 description = "Freeport — decentralized P2P marketplace on Nostr"
 authors = ["Freeport"]
 edition = "2021"
