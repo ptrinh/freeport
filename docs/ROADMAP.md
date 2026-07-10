@@ -117,5 +117,46 @@ relay data. Roughly ordered by value-for-effort:
   opt-in per chat (it leaks message content to a third party — surface that).
 
 ### Non-goals (need a central operator)
-Wallet/in-app payments, surge pricing (Freeport is free negotiation), loyalty
-programs, trip insurance, centralized driver vetting.
+CUSTODIAL wallets/escrow (self-custodial payments are planned — see below),
+surge pricing (Freeport is free negotiation), loyalty programs, trip
+insurance, centralized driver vetting.
+
+## In-app wallet — Breez SDK (Spark), self-custodial BTC + stablecoin
+
+Settlement without becoming a money transmitter: the app NEVER holds funds.
+The protocol's reserved `payment` field (v1) makes this additive.
+
+**Chosen stack: Breez SDK — Nodeless (Spark implementation).**
+- One wallet, two assets: Lightning BTC + native stablecoins (USDT/USDB on
+  Spark); balance can be HELD in USD — the right default for ride/service
+  pricing (no BTC volatility between deal and settle).
+- Spark↔Spark transfers are instant and zero-fee — ideal when both deal
+  parties use the Freeport wallet; Lightning interop covers everyone else.
+- Self-custodial and nodeless (no channel management); wallet key derived
+  from the user's existing Nostr key — the current account backup already
+  backs up the wallet (one seed story).
+- Verified v0.18.0 (2026-07): official WASM builds exist → all four surfaces
+  work (iOS/Android/web/desktop). Web lazy-loads the 4.5 MB gz core only when
+  the wallet is opened. Size impact per platform ≈ +5–8 MB download
+  (iOS arm64 slice / Android per-ABI); exclude from the offline single-file
+  build.
+
+**Trust caveat (document honestly in-app):** Spark is a young (2025)
+statechain-based L2 — trust-MINIMIZED, not trustless (operators must delete
+old keys). Acceptable for spending-wallet amounts; nudge users to keep
+balances small ("this is a spending wallet").
+
+**Rollout:**
+1. PoC first: EAS build one target, measure real IPA/AAB delta, send/receive
+   USDT between two devices, verify WASM on web + Tauri.
+2. Ship behind a feature flag in ONE pilot market; soft balance-cap nudge.
+3. Also ship the trivial fallback everywhere: payment address (lud16 / Spark
+   address) in the profile + "Pay" deep link on confirmed deals — covers
+   users of external wallets and any surface where the SDK lags.
+4. GATE: written legal sign-off (self-custody software exemptions, e.g. SG
+   PSA) BEFORE any public rollout. No escrow, ever — that flips the model to
+   custodial.
+
+Deliberately skipped: NWC (NIP-47) as a middle tier — redundant once the
+embedded wallet exists; revisit as a power-user option. Custodial options
+(Cashu mints, exchange APIs) conflict with the no-operator model.
