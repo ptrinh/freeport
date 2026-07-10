@@ -78,7 +78,7 @@ import { startRecording, stopRecording, playAudio } from './src/voice';
 import { loadAddressBook, addRecent, togglePinned, isPinned, type AddressBook } from './src/addressbook';
 import { loadProfile, saveProfile, maskPhone, maskPlate, isDisplayablePhone, defaultAvatarUrl, type UserProfile, type PhoneDisplay } from './src/profile';
 import { normalizePhone, detectDialCode, dialForCountry } from './src/phone';
-import { routeUrl, placeUrl, placeParam, dirUrl, appleMapsScheme, geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, locationGranted, requestLocationPermission, reverseGeocode, detectRawLocationGPS, detectRawLocationIP, detectCoordsIP, distanceKmBetweenGeohashes, formatDistance, suggest } from './src/maps';
+import { routeUrl, placeUrl, placeParam, dirUrl, appleMapsScheme, geohashForPlace, geohashToCoords, coordsToGeohash, getCurrentCoords, forwardGeocode, locationGranted, requestLocationPermission, reverseGeocode, detectRawLocationGPS, detectRawLocationIP, detectCoordsIP, distanceKmBetweenGeohashes, formatDistance, effectiveUnit, suggest } from './src/maps';
 import { parseAmountWithK } from './src/money';
 import { negoIsDone, messagesViewForNewActivity, searchableText } from './src/deals';
 import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
@@ -665,9 +665,9 @@ function AppInner() {
     theme === 'system'
       ? (isStandalonePWA ? 'dark' : (systemScheme === 'light' ? 'light' : 'dark'))
       : theme;
-  // Resolve the distance unit: 'auto' → miles only for a US location, km elsewhere.
-  const effectiveDistanceUnit: 'km' | 'mi' =
-    distanceUnit === 'auto' ? (location.country === 'US' ? 'mi' : 'km') : distanceUnit;
+  // Resolve the distance unit through the shared helper (single source of
+  // truth with Settings/Browse so labels and values can never disagree).
+  const effectiveDistanceUnit: 'km' | 'mi' = effectiveUnit(distanceUnit, location.country);
   const appliedThemeRef = useRef<string>('');
   if (appliedThemeRef.current !== effectiveTheme) {
     applyTheme(effectiveTheme);
@@ -1362,7 +1362,7 @@ function AppInner() {
           </Pressable>
         ) : null}
       </Animated.View>
-      {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnit={effectiveDistanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
+      {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
       {tab === 'post' && <PostTab client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
       {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
       {tab === 'settings' && (
@@ -2153,7 +2153,7 @@ function MarketTab({
   location,
   myContact,
   doneListingKeys,
-  distanceUnit,
+  distanceUnitPref,
   defaultCategory,
   defaultSubcategory,
   maxDistance,
@@ -2165,13 +2165,17 @@ function MarketTab({
   location: UserLocation;
   myContact: (intent: Intent) => string;
   doneListingKeys: Set<string>;
-  distanceUnit: 'km' | 'mi';
+  distanceUnitPref: 'auto' | 'km' | 'mi';
   defaultCategory: string;
   defaultSubcategory: string;
   maxDistance: number;
   onScroll?: (e: any) => void;
 }) {
   const country = location.country;
+  // Resolve the unit HERE from the raw preference + this tab's own location —
+  // the same inputs and helper the Settings label uses — so Browse can never
+  // show miles while Settings says km (user report).
+  const distanceUnit = effectiveUnit(distanceUnitPref, country);
   const [mapOpenId, setMapOpenId] = useState<string | null>(null);
   const [respondingId, setRespondingId] = useState<string | null>(null);
   const [respondedIds, setRespondedIds] = useState<Set<string>>(new Set());
@@ -5364,7 +5368,7 @@ function SettingsTab({
   const browseEffSub = browseSubcategory && browseSubOptions.includes(browseSubcategory)
     ? browseSubcategory
     : (browseCat === RIDESHARE_CATEGORY ? DEFAULT_RIDESHARE_SUBCATEGORY : (browseSubOptions[0] ?? ''));
-  const browseUnit = distanceUnit === 'auto' ? (location.country === 'US' ? 'mi' : 'km') : distanceUnit;
+  const browseUnit = effectiveUnit(distanceUnit, location.country);
   const dialCode = useRef('+84');
   const autoFilledDial = useRef('');
 

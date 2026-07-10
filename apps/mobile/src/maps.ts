@@ -126,18 +126,30 @@ export function usesMiles(countryCode?: string): boolean {
   return !!countryCode && MILE_COUNTRIES.has(countryCode.toUpperCase());
 }
 
+/** Resolve the user's distance-unit preference against their location.
+ *  'auto' (or a missing/legacy pref) follows the country (miles for US/GB/LR/MM,
+ *  km elsewhere). The single source of truth — Browse, Settings labels, and
+ *  chips must all resolve through here so they can never disagree. */
+export function effectiveUnit(pref: string | undefined | null, countryCode?: string | null): 'km' | 'mi' {
+  if (pref === 'km' || pref === 'mi') return pref;
+  return usesMiles(countryCode || undefined) ? 'mi' : 'km';
+}
+
 /** Human distance label, localized: "14,5 km" / "9 mi". The unit is the user's
  *  explicit choice (`'km'`/`'mi'`) when given, else country-derived. */
 export function formatDistance(km: number, countryCode?: string, unit?: 'km' | 'mi'): string {
   const mile = unit ? unit === 'mi' : usesMiles(countryCode);
-  const value = mile ? km * 0.621371 : km;
-  const maximumFractionDigits = value < 10 ? 1 : 0;
+  // Round BEFORE Intl: some engines (Hermes) ignore maximumFractionDigits for
+  // style:'unit' and rendered "194.53mi" instead of "195 mi".
+  const raw = mile ? km * 0.621371 : km;
+  const value = raw < 10 ? Math.round(raw * 10) / 10 : Math.round(raw);
+  const maximumFractionDigits = raw < 10 ? 1 : 0;
   try {
     return new Intl.NumberFormat(getI18nLang(), {
       style: 'unit', unit: mile ? 'mile' : 'kilometer', unitDisplay: 'short', maximumFractionDigits,
     }).format(value);
   } catch {
-    return `${value < 10 ? value.toFixed(1) : Math.round(value)} ${mile ? 'mi' : 'km'}`;
+    return `${value} ${mile ? 'mi' : 'km'}`;
   }
 }
 
