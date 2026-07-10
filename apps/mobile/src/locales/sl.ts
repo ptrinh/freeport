@@ -642,5 +642,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Ponudili ste {terms}. Lahko sprejmejo, dajo protiponudbo ali zavrnejo.",
   "They can accept, counter, or decline.": "Lahko sprejmejo, dajo protiponudbo ali zavrnejo.",
   "Install the native app for the best experience": "Za najboljšo izkušnjo namestite aplikacijo",
+  "Experimental": "Poskusno",
+  "Early features that may change or break. Off by default.": "Zgodnje funkcije, ki se lahko spremenijo ali prenehajo delovati. Privzeto izklopljeno.",
+  "Wallet": "Denarnica",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Samoskrbniška denarnica za Bitcoin in stabilne kovance – kmalu na voljo.",
 };
 export default c;

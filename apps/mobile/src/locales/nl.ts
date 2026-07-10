@@ -636,5 +636,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Je hebt {terms} geboden. Zij kunnen accepteren, een tegenbod doen of weigeren.",
   "They can accept, counter, or decline.": "Zij kunnen accepteren, een tegenbod doen of weigeren.",
   "Install the native app for the best experience": "Installeer de app voor de beste ervaring",
+  "Experimental": "Experimenteel",
+  "Early features that may change or break. Off by default.": "Vroege functies die kunnen veranderen of stukgaan. Standaard uit.",
+  "Wallet": "Wallet",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Self-custodial wallet voor Bitcoin en stablecoins — binnenkort beschikbaar.",
 };
 export default c;

@@ -636,5 +636,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Tegid pakkumise {terms}. Teine pool saab nõustuda, teha vastupakkumise või keelduda.",
   "They can accept, counter, or decline.": "Teine pool saab nõustuda, teha vastupakkumise või keelduda.",
   "Install the native app for the best experience": "Parima kogemuse saamiseks paigalda rakendus",
+  "Experimental": "Katseline",
+  "Early features that may change or break. Off by default.": "Varajased funktsioonid, mis võivad muutuda või katki minna. Vaikimisi väljas.",
+  "Wallet": "Rahakott",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Isehallatav Bitcoini ja stabiilmüntide rahakott – peagi tulekul.",
 };
 export default c;

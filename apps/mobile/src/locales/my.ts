@@ -633,5 +633,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "သင် {terms} ကို ကမ်းလှမ်းခဲ့သည်။ သူတို့သည် လက်ခံနိုင်သည်၊ ပြန်လည်ကမ်းလှမ်းနိုင်သည် သို့မဟုတ် ငြင်းပယ်နိုင်သည်။",
   "They can accept, counter, or decline.": "သူတို့သည် လက်ခံနိုင်သည်၊ ပြန်လည်ကမ်းလှမ်းနိုင်သည် သို့မဟုတ် ငြင်းပယ်နိုင်သည်။",
   "Install the native app for the best experience": "အကောင်းဆုံးအသုံးပြုမှုအတွက် အက်ပ်ကို ထည့်သွင်းပါ",
+  "Experimental": "စမ်းသပ်ဆဲ",
+  "Early features that may change or break. Off by default.": "ပြောင်းလဲနိုင် သို့မဟုတ် ချို့ယွင်းနိုင်သော အစောပိုင်း အင်္ဂါရပ်များ။ မူရင်းအတိုင်း ပိတ်ထားသည်။",
+  "Wallet": "ပိုက်ဆံအိတ်",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "ကိုယ်တိုင်ထိန်းချုပ်သော Bitcoin နှင့် stablecoin ပိုက်ဆံအိတ် — မကြာမီလာမည်။",
 };
 export default c;

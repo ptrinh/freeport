@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Erlenmeyer flask with rising bubbles + liquid level ticks (Experimental) -->
+  <!-- neck + conical body, one outline -->
+  <path d="M36 18 c3 4 4 8 4 11 v20 c0 2 -0.5 3 -2 5 C30 64 18 76 13 86 c-4 8 1 10 9 10 h52 c8 0 13 -2 9 -10 C78 76 66 64 58 54 c-1.5 -2 -2 -3 -2 -5 v-20 c0 -3 1 -7 4 -11 z"/>
+  <!-- liquid level ticks (right side) -->
+  <line x1="50" y1="62" x2="64" y2="62"/>
+  <line x1="54" y1="73" x2="72" y2="73"/>
+  <line x1="58" y1="84" x2="79" y2="84"/>
+  <!-- bubbles above the neck -->
+  <circle cx="21" cy="9" r="7" fill="currentColor" stroke="none"/>
+  <circle cx="42" cy="7" r="5.5" fill="currentColor" stroke="none"/>
+  <circle cx="26" cy="26" r="4.5" fill="currentColor" stroke="none"/>
+</svg>

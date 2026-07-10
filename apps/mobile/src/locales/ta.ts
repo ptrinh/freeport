@@ -636,5 +636,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "நீங்கள் {terms} முன்மொழிந்தீர்கள். அவர்கள் ஏற்கலாம், எதிர்மொழிவு தரலாம் அல்லது நிராகரிக்கலாம்.",
   "They can accept, counter, or decline.": "அவர்கள் ஏற்கலாம், எதிர்மொழிவு தரலாம் அல்லது நிராகரிக்கலாம்.",
   "Install the native app for the best experience": "சிறந்த அனுபவத்திற்கு நேட்டிவ் ஆப்பை நிறுவுங்கள்",
+  "Experimental": "சோதனை அம்சங்கள்",
+  "Early features that may change or break. Off by default.": "மாறக்கூடிய அல்லது செயலிழக்கக்கூடிய ஆரம்பநிலை அம்சங்கள். இயல்பாக அணைக்கப்பட்டிருக்கும்.",
+  "Wallet": "பணப்பை",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "நீங்களே சாவியை வைத்திருக்கும் பிட்காயின் & ஸ்டேபிள்காயின் பணப்பை — விரைவில் வருகிறது.",
 };
 export default c;

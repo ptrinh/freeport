@@ -338,6 +338,7 @@ function AppInner() {
   const [negos, setNegos] = useState<Negotiation[]>([]);
   const [profile, setProfile] = useState<UserProfile>({ name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' });
   const [servicesEnabled, setServicesEnabled] = useState(false);
+  const [experimentalWallet, setExperimentalWallet] = useState(false);
   const [location, setLocation] = useState<UserLocation>({ country: '', state: '', city: '' });
   // Mirror the latest location so the async launch auto-detect can tell whether
   // the user has manually changed it (e.g. picked a place during onboarding)
@@ -505,6 +506,7 @@ function AppInner() {
     (async () => {
       const p = await loadPrefs();
       setServicesEnabled(p.servicesEnabled);
+      setExperimentalWallet(p.experimentalWallet);
       setLocation(p.location);
       setUseNip07(p.useNip07);
       setThemeState(p.theme); // palette applied by the effective-theme resolver above
@@ -1157,6 +1159,11 @@ function AppInner() {
           client={client}
           onOpenFeedback={() => { setMessagesView('completed'); setTab('messages'); }}
           onReplayTour={() => goToTourStep(0)}
+          experimentalWallet={experimentalWallet}
+          onExperimentalWalletChange={(v) => {
+            setExperimentalWallet(v);
+            savePrefs({ experimentalWallet: v }).catch(() => {});
+          }}
           requiredLocOk={locOk}
           requiredNotifOk={notifSatisfied}
           onDismissNotif={dismissNotif}

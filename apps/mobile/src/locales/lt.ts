@@ -637,5 +637,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Pasiūlėte {terms}. Kita šalis gali priimti, pateikti kontrpasiūlymą arba atmesti.",
   "They can accept, counter, or decline.": "Kita šalis gali priimti, pateikti kontrpasiūlymą arba atmesti.",
   "Install the native app for the best experience": "Įdiekite programėlę, kad patirtis būtų geriausia",
+  "Experimental": "Eksperimentinės",
+  "Early features that may change or break. Off by default.": "Ankstyvosios funkcijos, kurios gali keistis arba neveikti. Pagal numatytuosius nustatymus išjungta.",
+  "Wallet": "Piniginė",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Savarankiškai valdoma Bitcoin ir stabiliųjų monetų piniginė — netrukus.",
 };
 export default c;

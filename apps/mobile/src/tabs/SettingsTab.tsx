@@ -44,6 +44,7 @@ import { DesktopHostPanel } from './settings/DesktopHostPanel';
 import { NotificationsSection } from './settings/NotificationsSection';
 import { FareEstimator } from './settings/FareEstimator';
 import { AboutSection } from './settings/AboutSection';
+import { ExperimentalSection } from './settings/ExperimentalSection';
 
 function SettingsTab({
   npub,
@@ -52,6 +53,8 @@ function SettingsTab({
   client,
   onOpenFeedback,
   onReplayTour,
+  experimentalWallet,
+  onExperimentalWalletChange,
   requiredLocOk,
   requiredNotifOk,
   onDismissNotif,
@@ -96,6 +99,8 @@ function SettingsTab({
   client: MobileClient | null;
   onOpenFeedback: () => void;
   onReplayTour: () => void;
+  experimentalWallet: boolean;
+  onExperimentalWalletChange: (v: boolean) => void;
   requiredLocOk: boolean;
   requiredNotifOk: boolean;
   onDismissNotif: () => void;
@@ -863,6 +868,8 @@ function SettingsTab({
           by default like the other Settings sections. The OTA update flow lives
           here as a small "Check now" link (native gets a real OTA swap; web just
           hard-reloads to the newest deploy). */}
+      <ExperimentalSection walletEnabled={experimentalWallet} onWalletEnabledChange={onExperimentalWalletChange} />
+
       <AboutSection onReplayTour={onReplayTour} />
 
       {/* Identity — collapsed by default; tap header to expand */}

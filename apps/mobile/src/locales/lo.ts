@@ -633,5 +633,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "ທ່ານໄດ້ສະເໜີ {terms}. ອີກຝ່າຍສາມາດຮັບ, ຕໍ່ລອງ, ຫຼືປະຕິເສດໄດ້.",
   "They can accept, counter, or decline.": "ອີກຝ່າຍສາມາດຮັບ, ຕໍ່ລອງ, ຫຼືປະຕິເສດໄດ້.",
   "Install the native app for the best experience": "ຕິດຕັ້ງແອັບເພື່ອປະສົບການທີ່ດີທີ່ສຸດ",
+  "Experimental": "ທົດລອງ",
+  "Early features that may change or break. Off by default.": "ຄຸນສົມບັດໃໝ່ໃນຂັ້ນເລີ່ມຕົ້ນທີ່ອາດປ່ຽນແປງ ຫຼື ໃຊ້ບໍ່ໄດ້. ປິດໄວ້ຕາມຄ່າເລີ່ມຕົ້ນ.",
+  "Wallet": "ກະເປົາເງິນ",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "ກະເປົາເງິນ Bitcoin ແລະ stablecoin ແບບຖືກະແຈເອງ — ໃກ້ຈະເປີດໃຫ້ໃຊ້.",
 };
 export default c;

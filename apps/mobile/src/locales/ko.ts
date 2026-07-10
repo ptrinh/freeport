@@ -676,5 +676,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "{terms}을(를) 제안했습니다. 상대방은 수락, 맞제안 또는 거절할 수 있습니다.",
   "They can accept, counter, or decline.": "상대방은 수락, 맞제안 또는 거절할 수 있습니다.",
   "Install the native app for the best experience": "최고의 경험을 위해 네이티브 앱을 설치하세요",
+  "Experimental": "실험적 기능",
+  "Early features that may change or break. Off by default.": "변경되거나 중단될 수 있는 초기 기능입니다. 기본적으로 꺼져 있습니다.",
+  "Wallet": "지갑",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "자기수탁형 비트코인 및 스테이블코인 지갑 — 곧 제공됩니다.",
 };
 export default c;

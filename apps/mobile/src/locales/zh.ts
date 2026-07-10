@@ -676,5 +676,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "你已报价 {terms}。对方可以接受、还价或拒绝。",
   "They can accept, counter, or decline.": "对方可以接受、还价或拒绝。",
   "Install the native app for the best experience": "安装原生应用，体验更佳",
+  "Experimental": "实验性功能",
+  "Early features that may change or break. Off by default.": "可能会变动或失效的早期功能。默认关闭。",
+  "Wallet": "钱包",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "自托管的比特币与稳定币钱包 — 即将推出。",
 };
 export default c;

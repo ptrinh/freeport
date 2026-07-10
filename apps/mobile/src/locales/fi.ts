@@ -636,5 +636,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Tarjosit {terms}. Toinen osapuoli voi hyväksyä, tehdä vastatarjouksen tai hylätä.",
   "They can accept, counter, or decline.": "Toinen osapuoli voi hyväksyä, tehdä vastatarjouksen tai hylätä.",
   "Install the native app for the best experience": "Asenna natiivisovellus parhaan käyttökokemuksen saamiseksi",
+  "Experimental": "Kokeellinen",
+  "Early features that may change or break. Off by default.": "Uusia ominaisuuksia, jotka voivat muuttua tai lakata toimimasta. Oletuksena pois käytöstä.",
+  "Wallet": "Lompakko",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Omahallintainen Bitcoin- ja stablecoin-lompakko – tulossa pian.",
 };
 export default c;

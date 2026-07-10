@@ -636,5 +636,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Ajánlatod: {terms}. Elfogadhatja, ellenajánlatot tehet, vagy elutasíthatja.",
   "They can accept, counter, or decline.": "Elfogadhatja, ellenajánlatot tehet, vagy elutasíthatja.",
   "Install the native app for the best experience": "Telepítsd az appot a legjobb élményért",
+  "Experimental": "Kísérleti",
+  "Early features that may change or break. Off by default.": "Korai funkciók, amelyek változhatnak vagy hibásak lehetnek. Alapértelmezetten kikapcsolva.",
+  "Wallet": "Tárca",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Saját kezelésű Bitcoin- és stablecoin-tárca – hamarosan.",
 };
 export default c;

@@ -636,5 +636,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Προσφέρατε {terms}. Μπορούν να αποδεχτούν, να κάνουν αντιπροσφορά ή να απορρίψουν.",
   "They can accept, counter, or decline.": "Μπορούν να αποδεχτούν, να κάνουν αντιπροσφορά ή να απορρίψουν.",
   "Install the native app for the best experience": "Εγκαταστήστε την εφαρμογή για την καλύτερη εμπειρία",
+  "Experimental": "Πειραματικό",
+  "Early features that may change or break. Off by default.": "Πρώιμες λειτουργίες που μπορεί να αλλάξουν ή να μη λειτουργούν. Ανενεργό από προεπιλογή.",
+  "Wallet": "Πορτοφόλι",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Αυτοφυλασσόμενο πορτοφόλι Bitcoin & stablecoin — έρχεται σύντομα.",
 };
 export default c;

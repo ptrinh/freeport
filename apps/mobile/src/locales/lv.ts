@@ -636,5 +636,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Jūs piedāvājāt {terms}. Otra puse var to pieņemt, iesniegt pretpiedāvājumu vai noraidīt.",
   "They can accept, counter, or decline.": "Otra puse var to pieņemt, iesniegt pretpiedāvājumu vai noraidīt.",
   "Install the native app for the best experience": "Instalējiet lietotni labākai pieredzei",
+  "Experimental": "Eksperimentāls",
+  "Early features that may change or break. Off by default.": "Agrīnas funkcijas, kas var mainīties vai pārstāt darboties. Pēc noklusējuma izslēgtas.",
+  "Wallet": "Maks",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Pašpārvaldīts Bitcoin un stabilo monētu maks — drīzumā.",
 };
 export default c;

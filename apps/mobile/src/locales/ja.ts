@@ -676,5 +676,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "{terms} でオファーしました。相手は承諾・カウンター・辞退のいずれかを選べます。",
   "They can accept, counter, or decline.": "相手は承諾・カウンター・辞退のいずれかを選べます。",
   "Install the native app for the best experience": "最適な体験にはアプリをインストール",
+  "Experimental": "実験的機能",
+  "Early features that may change or break. Off by default.": "変更や不具合が起きる可能性のある先行機能です。デフォルトではオフになっています。",
+  "Wallet": "ウォレット",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "自分で鍵を管理する（自己管理型）ビットコイン・ステーブルコイン対応ウォレット。近日公開。",
 };
 export default c;

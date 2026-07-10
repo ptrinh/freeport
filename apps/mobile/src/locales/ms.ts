@@ -633,5 +633,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Anda menawarkan {terms}. Mereka boleh terima, buat tawaran balas, atau tolak.",
   "They can accept, counter, or decline.": "Mereka boleh terima, buat tawaran balas, atau tolak.",
   "Install the native app for the best experience": "Pasang aplikasi asli untuk pengalaman terbaik",
+  "Experimental": "Eksperimen",
+  "Early features that may change or break. Off by default.": "Ciri awal yang mungkin berubah atau tidak berfungsi. Dimatikan secara lalai.",
+  "Wallet": "Dompet",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Dompet Bitcoin & stablecoin jagaan sendiri — akan datang.",
 };
 export default c;

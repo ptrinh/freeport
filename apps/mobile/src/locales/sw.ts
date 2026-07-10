@@ -633,5 +633,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Umetoa ofa ya {terms}. Wanaweza kukubali, kutoa ofa mbadala, au kukataa.",
   "They can accept, counter, or decline.": "Wanaweza kukubali, kutoa ofa mbadala, au kukataa.",
   "Install the native app for the best experience": "Sakinisha programu asili kwa matumizi bora zaidi",
+  "Experimental": "Majaribio",
+  "Early features that may change or break. Off by default.": "Vipengele vya awali vinavyoweza kubadilika au kuvunjika. Vimezimwa kwa chaguomsingi.",
+  "Wallet": "Pochi",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Pochi ya Bitcoin na sarafu-thabiti unayoimiliki mwenyewe — inakuja hivi karibuni.",
 };
 export default c;

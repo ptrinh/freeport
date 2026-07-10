@@ -44,6 +44,8 @@ export interface Prefs {
   browseCategory: string;
   /** Browse default subcategory. '' = unset → falls back to the default vehicle / first subcat. */
   browseSubcategory: string;
+  /** Experimental: show the in-app wallet UI (Breez Spark / NWC). Off by default. */
+  experimentalWallet: boolean;
   /** Play a sound when a new post lands in the default browse subcategory. */
   browseAlertSound: boolean;
   /** Send a notification when a new post lands in the default browse subcategory. */
@@ -61,6 +63,7 @@ export interface Prefs {
 
 const DEFAULTS: Prefs = {
   servicesEnabled: false,
+  experimentalWallet: false,
   location: { country: '', state: '', city: '' },
   locationManual: false,
   useNip07: false,

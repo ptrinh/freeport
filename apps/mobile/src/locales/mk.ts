@@ -636,5 +636,9 @@ const c: Record<string, string> = {
   "You offered {terms}. They can accept, counter, or decline.": "Понудивте {terms}. Другата страна може да прифати, да даде контрапонуда или да одбие.",
   "They can accept, counter, or decline.": "Другата страна може да прифати, да даде контрапонуда или да одбие.",
   "Install the native app for the best experience": "Инсталирајте ја апликацијата за најдобро искуство",
+  "Experimental": "Експериментално",
+  "Early features that may change or break. Off by default.": "Рани функции што може да се променат или да откажат. Стандардно исклучени.",
+  "Wallet": "Паричник",
+  "Self-custodial Bitcoin & stablecoin wallet — coming soon.": "Паричник за биткоин и стабилни монети со самостојно чување — наскоро.",
 };
 export default c;
