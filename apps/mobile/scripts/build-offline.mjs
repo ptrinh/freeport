@@ -286,26 +286,52 @@ html = html.replace(/<head[^>]*>/, (m) => m + '\n' + shim);
 // evergreen browser (Chrome 80+, Safari 16.4+, Firefox 113+); older ones get
 // a plain-text hint instead of a broken page.
 const gz = zlib.gzipSync(Buffer.from(html, 'utf8'), { level: 9 });
-const stub = `<!doctype html>
-<html><head><meta charset="utf-8"><title>Freeport</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>html,body{height:100%;margin:0;background:#06080c;color:#e7ecf3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-#u{display:flex;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:12px}</style>
-</head><body><div id="u"><div style="font-size:28px;font-weight:800">Freeport</div><div id="m" style="color:#8b97a6;font-size:14px">Unpacking…</div></div>
-<script type="text/plain" id="z">${gz.toString('base64')}</script>
-<script>
-(async function(){
-  try{
-    var b=atob(document.getElementById("z").textContent.trim());
-    var a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);
-    var html=await new Response(new Blob([a]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
-    document.open();document.write(html);document.close();
-  }catch(e){
-    document.getElementById("m").textContent="This browser can't unpack the offline app (needs Chrome 80+/Safari 16.4+/Firefox 113+): "+e;
+
+// Pack the gzip bytes into UTF-16 code units, 15 bits per character mapped
+// into 0x3000..0xB7FF — a contiguous BMP range with no surrogates, no JS
+// string specials and no '<'. Written as a UTF-16LE file (BOM up front) each
+// character costs exactly 2 bytes, so the payload carries 15 data bits per
+// 16 stored bits: ~6.7% overhead instead of base64's 33% (9.6 MB → 7.7 MB).
+function pack15(buf) {
+  const codes = [];
+  let acc = 0, nb = 0;
+  for (const byte of buf) {
+    acc = ((acc << 8) | byte) & 0x7fffff; nb += 8;
+    while (nb >= 15) { nb -= 15; codes.push(0x3000 + ((acc >>> nb) & 0x7fff)); }
   }
-})();
-</script>
-</body></html>
-`;
-fs.writeFileSync(out, stub);
-console.log(`  wrote ${out} (${(fs.statSync(out).size / 1024 / 1024).toFixed(1)} MB — inner html ${(html.length / 1024 / 1024).toFixed(1)} MB, gzip ${(gz.length / 1024 / 1024).toFixed(1)} MB)`);
+  if (nb > 0) codes.push(0x3000 + ((acc << (15 - nb)) & 0x7fff));
+  let s = '';
+  for (let i = 0; i < codes.length; i += 65536) s += String.fromCharCode.apply(null, codes.slice(i, i + 65536));
+  return s;
+}
+const packed = pack15(gz);
+const stub =
+  '<!doctype html>\n' +
+  '<html><head><title>Freeport</title>\n' +
+  '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+  "<style>html,body{height:100%;margin:0;background:#06080c;color:#e7ecf3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}\n" +
+  '#u{display:flex;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:12px}</style>\n' +
+  '</head><body><div id="u"><div style="font-size:28px;font-weight:800">Freeport</div><div id="m" style="color:#8b97a6;font-size:14px">Unpacking…</div></div>\n' +
+  '<script>\n' +
+  '(async function(){\n' +
+  '  try{\n' +
+  '    var s=P,n=' + gz.length + ';\n' +
+  '    var a=new Uint8Array(n),acc=0,nb=0,j=0;\n' +
+  '    for(var i=0;i<s.length;i++){\n' +
+  '      acc=((acc<<15)|(s.charCodeAt(i)-0x3000))&0x7fffff;nb+=15;\n' +
+  '      while(nb>=8&&j<n){nb-=8;a[j++]=(acc>>>nb)&255;}\n' +
+  '    }\n' +
+  '    var html=await new Response(new Blob([a]).stream().pipeThrough(new DecompressionStream("gzip"))).text();\n' +
+  '    document.open();document.write(html);document.close();\n' +
+  '  }catch(e){\n' +
+  '    document.getElementById("m").textContent="This browser can\'t unpack the offline app (needs Chrome 80+/Safari 16.4+/Firefox 113+): "+e;\n' +
+  '  }\n' +
+  '})();\n' +
+  '<\/script>\n' +
+  '</body></html>\n';
+// The payload rides in its own script as a global — kept out of the main stub
+// string so neither side needs escaping.
+const payloadScript = '<script>var P="' + packed + '";<\/script>\n';
+const full = stub.replace('<script>\n(async', payloadScript + '<script>\n(async');
+fs.writeFileSync(out, Buffer.concat([Buffer.from('\ufeff', 'utf16le'), Buffer.from(full, 'utf16le')]));
+console.log(`  wrote ${out} (${(fs.statSync(out).size / 1024 / 1024).toFixed(1)} MB — inner html ${(html.length / 1024 / 1024).toFixed(1)} MB, gzip ${(gz.length / 1024 / 1024).toFixed(1)} MB, utf16-packed)`);
