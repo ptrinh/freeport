@@ -1,6 +1,6 @@
 {
   "name": "freeport-self-hosted",
-  "version": "0.6.9",
+  "version": "0.7.0",
   "description": "Self-hosted Freeport in a box: the web app + read-only MCP server + content-blind push notifier + Nostr relay + Telegram bridge, one process, default port 1988.",
   "type": "module",
   "mcpName": "io.github.ptrinh/freeport-nostr",

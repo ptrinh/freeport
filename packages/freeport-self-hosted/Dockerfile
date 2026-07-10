@@ -15,7 +15,9 @@ RUN npm install --no-audit --no-fund \
 
 # The web app itself (served at /). Its own stage so server-only changes reuse
 # the cached export; drop this stage + its COPY in runtime for API-only images.
-FROM node:22-alpine AS web
+# Runs on the BUILD platform: the exported bundle is platform-independent JS,
+# and Metro under qemu (arm64 cross-builds) is painfully slow.
+FROM --platform=$BUILDPLATFORM node:22-alpine AS web
 WORKDIR /repo
 COPY package.json package-lock.json tsconfig.base.json ./
 COPY packages/protocol packages/protocol

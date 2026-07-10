@@ -1,0 +1,46 @@
+name: Self-hosted image
+
+# Build + publish the freeport-self-hosted Docker image (web app + MCP +
+# notifier + relay + Telegram bridge) to GHCR, multi-arch for Umbrel boxes
+# (Raspberry Pi / amd64 servers).
+#  - push a tag `self-hosted-v*`: publish ghcr.io/ptrinh/freeport-self-hosted:<version> + :latest
+#  - workflow_dispatch: build only (no push) as validation.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['self-hosted-v*']
+
+jobs:
+  image:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        if: startsWith(github.ref, 'refs/tags/self-hosted-v')
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve version from tag
+        id: v
+        run: echo "version=${GITHUB_REF_NAME#self-hosted-v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build (and push on tag)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: packages/freeport-self-hosted/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ startsWith(github.ref, 'refs/tags/self-hosted-v') }}
+          tags: |
+            ghcr.io/ptrinh/freeport-self-hosted:${{ steps.v.outputs.version || 'ci' }}
+            ghcr.io/ptrinh/freeport-self-hosted:latest
