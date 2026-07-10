@@ -659,5 +659,6 @@ const c: Record<string, string> = {
   "Sent": "Imetumwa",
   "pending": "inasubiri",
   "Disconnect wallet": "Tenganisha pochi",
+  "Emergency Call": "Simu ya dharura",
 };
 export default c;

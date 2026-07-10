@@ -702,5 +702,6 @@ const c: Record<string, string> = {
   "Sent": "已发送",
   "pending": "处理中",
   "Disconnect wallet": "断开钱包连接",
+  "Emergency Call": "紧急呼叫",
 };
 export default c;

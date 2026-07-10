@@ -659,5 +659,6 @@ const c: Record<string, string> = {
   "Sent": "ተልኳል",
   "pending": "በመጠባበቅ ላይ",
   "Disconnect wallet": "ዋሌት ግንኙነት አቋርጥ",
+  "Emergency Call": "የአደጋ ጊዜ ጥሪ",
 };
 export default c;

@@ -662,5 +662,6 @@ const c: Record<string, string> = {
   "Sent": "Elküldve",
   "pending": "függőben",
   "Disconnect wallet": "Tárca leválasztása",
+  "Emergency Call": "Segélyhívás",
 };
 export default c;

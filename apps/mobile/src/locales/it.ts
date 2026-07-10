@@ -662,5 +662,6 @@ const c: Record<string, string> = {
   "Sent": "Inviato",
   "pending": "in sospeso",
   "Disconnect wallet": "Scollega wallet",
+  "Emergency Call": "Chiamata di emergenza",
 };
 export default c;

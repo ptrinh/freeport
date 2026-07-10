@@ -668,5 +668,6 @@ const c: Record<string, string> = {
   "Sent": "Poslano",
   "pending": "v obdelavi",
   "Disconnect wallet": "Prekini povezavo z denarnico",
+  "Emergency Call": "Klic v sili",
 };
 export default c;

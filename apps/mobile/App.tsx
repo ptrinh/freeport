@@ -1156,7 +1156,7 @@ function AppInner() {
       </Animated.View>
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
       {tab === 'post' && <PostTab client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
       {tab === 'wallet' && (
         <WalletTab
           nwcUrl={walletNwcUrl}

@@ -702,5 +702,6 @@ const c: Record<string, string> = {
   "Sent": "Đã gửi",
   "pending": "đang chờ",
   "Disconnect wallet": "Ngắt kết nối ví",
+  "Emergency Call": "Gọi khẩn cấp",
 };
 export default c;

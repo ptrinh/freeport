@@ -662,5 +662,6 @@ const c: Record<string, string> = {
   "Sent": "بھیجا گیا",
   "pending": "زیرِ التوا",
   "Disconnect wallet": "والٹ منقطع کریں",
+  "Emergency Call": "ہنگامی کال",
 };
 export default c;

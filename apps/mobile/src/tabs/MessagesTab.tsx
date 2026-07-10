@@ -23,6 +23,7 @@ import { type TripStatic } from '../livetrip';
 import { categoryOf, subcategoryOf } from '../categories';
 import { s, palette } from '../ui/theme';
 import { fmtClock, extractPhone, contactWithoutPhone, stateLabel, stateColor } from '../ui/format';
+import { policeNumberFor } from '../emergency';
 import { uiAlert, runDealAction, confirmAsync, openMaps } from '../ui/alerts';
 import { SystemNotice, SlideToConfirm } from '../ui/fields';
 import { ChatThread, CounterEditor, ReportModal, isTripMsg } from './messages/Chat';
@@ -50,6 +51,7 @@ export function DealsTab({
   glowDealId = null,
   glowCompleted = false,
   role,
+  country = '',
   sendLocationOnDeal = true,
   blockedPubkeys,
   onToggleBlock,
@@ -60,6 +62,8 @@ export function DealsTab({
   profile: UserProfile;
   /** Current user's side: 'passenger' = rider/customer (buyer), 'driver' = driver/provider. */
   role: 'passenger' | 'driver' | '';
+  /** User's selected country (ISO code) — resolves the local police number. */
+  country?: string;
   onScroll?: (e: any) => void;
   view: 'active' | 'completed';
   onViewChange: (v: 'active' | 'completed') => void;
@@ -525,7 +529,27 @@ export function DealsTab({
                         )
                       )}
                       {st === 'picked_up' && (
-                        <SlideToConfirm label={doneLabel} onConfirm={() => runDealAction(client?.setStage(item.id, 'completed'), t('Could not update the deal'))} />
+                        <>
+                          <SlideToConfirm label={doneLabel} onConfirm={() => runDealAction(client?.setStage(item.id, 'completed'), t('Could not update the deal'))} />
+                          {/* Passenger safety: while in transit, one tap dials the
+                              local police. The pickup is in the passenger's own
+                              selected area, so the number resolves offline from
+                              their country — no geocoding when seconds matter. */}
+                          {isRide && role === 'passenger' && (() => {
+                            const police = policeNumberFor(country);
+                            return (
+                              <Pressable
+                                style={[s.btnAccept, { backgroundColor: '#dc2626', marginTop: 8 }]}
+                                onPress={() => Linking.openURL('tel:' + police)}
+                              >
+                                <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
+                                  <Ionicons name="call" size={15} color="white" />
+                                  <Text style={s.btnText}>{t('Emergency Call')} · {police}</Text>
+                                </View>
+                              </Pressable>
+                            );
+                          })()}
+                        </>
                       )}
                       {/* Trip done → the rater opens automatically. Skipping shows a
                           button to reopen it; once submitted it's locked. */}

@@ -665,5 +665,6 @@ const c: Record<string, string> = {
   "Sent": "Odoslané",
   "pending": "čaká sa",
   "Disconnect wallet": "Odpojiť peňaženku",
+  "Emergency Call": "Tiesňové volanie",
 };
 export default c;

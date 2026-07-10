@@ -659,5 +659,6 @@ const c: Record<string, string> = {
   "Sent": "পাঠানো হয়েছে",
   "pending": "মুলতুবি",
   "Disconnect wallet": "ওয়ালেট সংযোগ বিচ্ছিন্ন করুন",
+  "Emergency Call": "জরুরি কল",
 };
 export default c;

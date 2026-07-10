@@ -659,5 +659,6 @@ const c: Record<string, string> = {
   "Sent": "Yuborildi",
   "pending": "kutilmoqda",
   "Disconnect wallet": "Hamyonni uzish",
+  "Emergency Call": "Favqulodda qo‘ng‘iroq",
 };
 export default c;

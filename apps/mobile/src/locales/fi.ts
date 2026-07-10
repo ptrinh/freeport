@@ -662,5 +662,6 @@ const c: Record<string, string> = {
   "Sent": "Lähetetty",
   "pending": "odottaa",
   "Disconnect wallet": "Katkaise lompakon yhteys",
+  "Emergency Call": "Hätäpuhelu",
 };
 export default c;

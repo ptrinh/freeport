@@ -663,5 +663,6 @@ const c: Record<string, string> = {
   "Sent": "Išsiųsta",
   "pending": "laukiama",
   "Disconnect wallet": "Atjungti piniginę",
+  "Emergency Call": "Skubusis skambutis",
 };
 export default c;

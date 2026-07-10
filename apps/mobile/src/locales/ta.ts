@@ -662,5 +662,6 @@ const c: Record<string, string> = {
   "Sent": "அனுப்பப்பட்டது",
   "pending": "நிலுவையில்",
   "Disconnect wallet": "வாலட்டைத் துண்டிக்கவும்",
+  "Emergency Call": "அவசர அழைப்பு",
 };
 export default c;

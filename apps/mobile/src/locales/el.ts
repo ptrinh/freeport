@@ -662,5 +662,6 @@ const c: Record<string, string> = {
   "Sent": "Στάλθηκε",
   "pending": "σε εκκρεμότητα",
   "Disconnect wallet": "Αποσύνδεση πορτοφολιού",
+  "Emergency Call": "Κλήση έκτακτης ανάγκης",
 };
 export default c;

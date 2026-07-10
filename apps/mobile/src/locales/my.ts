@@ -659,5 +659,6 @@ const c: Record<string, string> = {
   "Sent": "ပို့ပြီး",
   "pending": "စောင့်ဆိုင်းဆဲ",
   "Disconnect wallet": "ပိုက်ဆံအိတ် ချိတ်ဆက်မှု ဖြုတ်ရန်",
+  "Emergency Call": "အရေးပေါ်ခေါ်ဆိုမှု",
 };
 export default c;

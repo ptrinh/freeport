@@ -702,5 +702,6 @@ const c: Record<string, string> = {
   "Sent": "送金",
   "pending": "保留中",
   "Disconnect wallet": "ウォレットを切断",
+  "Emergency Call": "緊急通報",
 };
 export default c;

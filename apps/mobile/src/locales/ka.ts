@@ -659,5 +659,6 @@ const c: Record<string, string> = {
   "Sent": "გაგზავნილი",
   "pending": "მოლოდინში",
   "Disconnect wallet": "საფულის გათიშვა",
+  "Emergency Call": "გადაუდებელი ზარი",
 };
 export default c;

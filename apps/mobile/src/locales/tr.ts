@@ -705,5 +705,6 @@ const c: Record<string, string> = {
   "Sent": "Gönderildi",
   "pending": "beklemede",
   "Disconnect wallet": "Cüzdan bağlantısını kes",
+  "Emergency Call": "Acil Arama",
 };
 export default c;
