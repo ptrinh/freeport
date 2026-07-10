@@ -41,6 +41,10 @@ export async function initTelemetry(on: boolean): Promise<void> {
         'Java object is gone',                 // FB Android IAB bridge torn down
         /__gCrWeb/i,                           // Chrome-iOS injected script
         'window.webkit.messageHandlers',       // iOS WKWebView bridge noise
+        // expo-font's fontfaceobserver rejects unhandled inside the library
+        // when the icon font takes >6s (slow first paint / flaky network);
+        // the font still applies when it arrives (GlitchTip issue 11).
+        /^\d+ms timeout exceeded$/,
       ],
       beforeSend: (event) => (enabled ? (scrubEvent(event as any) as any) : null),
       beforeBreadcrumb: (b) => (enabled ? (scrubBreadcrumb(b as any) as any) : null),
