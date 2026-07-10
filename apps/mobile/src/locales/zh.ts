@@ -675,5 +675,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "报价已发送 — 正在等待对方回应…",
   "You offered {terms}. They can accept, counter, or decline.": "你已报价 {terms}。对方可以接受、还价或拒绝。",
   "They can accept, counter, or decline.": "对方可以接受、还价或拒绝。",
+  "Install the native app for the best experience": "安装原生应用，体验更佳",
 };
 export default c;

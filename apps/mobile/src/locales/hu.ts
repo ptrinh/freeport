@@ -635,5 +635,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "Ajánlat elküldve — várakozás a másik fél válaszára…",
   "You offered {terms}. They can accept, counter, or decline.": "Ajánlatod: {terms}. Elfogadhatja, ellenajánlatot tehet, vagy elutasíthatja.",
   "They can accept, counter, or decline.": "Elfogadhatja, ellenajánlatot tehet, vagy elutasíthatja.",
+  "Install the native app for the best experience": "Telepítsd az appot a legjobb élményért",
 };
 export default c;

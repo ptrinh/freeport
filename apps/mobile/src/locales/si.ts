@@ -632,5 +632,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "යෝජනාව යවන ලදී — අනෙක් පාර්ශ්වය ප්‍රතිචාර දක්වන තෙක් රැඳී සිටී…",
   "You offered {terms}. They can accept, counter, or decline.": "ඔබ {terms} යෝජනා කළා. ඔවුන්ට පිළිගැනීමට, ප්‍රතියෝජනා කිරීමට, හෝ ප්‍රතික්ෂේප කිරීමට හැකිය.",
   "They can accept, counter, or decline.": "ඔවුන්ට පිළිගැනීමට, ප්‍රතියෝජනා කිරීමට, හෝ ප්‍රතික්ෂේප කිරීමට හැකිය.",
+  "Install the native app for the best experience": "හොඳම අත්දැකීම සඳහා native යෙදුම ස්ථාපනය කරන්න",
 };
 export default c;

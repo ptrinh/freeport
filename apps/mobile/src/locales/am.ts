@@ -632,5 +632,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "ቅናሽ ተልኳል — ሌላኛው ወገን ምላሽ እስኪሰጥ በመጠበቅ ላይ…",
   "You offered {terms}. They can accept, counter, or decline.": "{terms} አቅርበዋል። ሊቀበሉት፣ አጸፋዊ ቅናሽ ሊያቀርቡ ወይም ውድቅ ሊያደርጉ ይችላሉ።",
   "They can accept, counter, or decline.": "ሊቀበሉት፣ አጸፋዊ ቅናሽ ሊያቀርቡ ወይም ውድቅ ሊያደርጉ ይችላሉ።",
+  "Install the native app for the best experience": "ለተሻለ ተሞክሮ መተግበሪያውን ይጫኑ",
 };
 export default c;

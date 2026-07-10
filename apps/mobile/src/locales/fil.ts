@@ -632,5 +632,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "Naipadala na ang alok — hinihintay ang tugon ng kabilang panig…",
   "You offered {terms}. They can accept, counter, or decline.": "Nag-alok ka ng {terms}. Puwede nilang tanggapin, sagutan ng kontra-alok, o tanggihan.",
   "They can accept, counter, or decline.": "Puwede nilang tanggapin, sagutan ng kontra-alok, o tanggihan.",
+  "Install the native app for the best experience": "I-install ang app para sa pinakamagandang karanasan",
 };
 export default c;

@@ -635,5 +635,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "Oferta u dërgua — në pritje të përgjigjes së palës tjetër…",
   "You offered {terms}. They can accept, counter, or decline.": "Ju ofruat {terms}. Ata mund të pranojnë, të bëjnë kundërofertë ose të refuzojnë.",
   "They can accept, counter, or decline.": "Ata mund të pranojnë, të bëjnë kundërofertë ose të refuzojnë.",
+  "Install the native app for the best experience": "Instalo aplikacionin për përvojën më të mirë",
 };
 export default c;

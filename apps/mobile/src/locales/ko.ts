@@ -675,5 +675,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "제안을 보냈습니다 — 상대방의 응답을 기다리는 중…",
   "You offered {terms}. They can accept, counter, or decline.": "{terms}을(를) 제안했습니다. 상대방은 수락, 맞제안 또는 거절할 수 있습니다.",
   "They can accept, counter, or decline.": "상대방은 수락, 맞제안 또는 거절할 수 있습니다.",
+  "Install the native app for the best experience": "최고의 경험을 위해 네이티브 앱을 설치하세요",
 };
 export default c;

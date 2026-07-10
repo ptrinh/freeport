@@ -632,5 +632,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "Ұсыныс жіберілді — екінші тараптың жауабын күтудеміз…",
   "You offered {terms}. They can accept, counter, or decline.": "Сіз {terms} ұсындыңыз. Ол қабылдай, қарсы ұсыныс жасай немесе бас тарта алады.",
   "They can accept, counter, or decline.": "Ол қабылдай, қарсы ұсыныс жасай немесе бас тарта алады.",
+  "Install the native app for the best experience": "Ең жақсы тәжірибе үшін қолданбаны орнатыңыз",
 };
 export default c;

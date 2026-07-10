@@ -35,6 +35,7 @@ import { type FareConfig } from '../pricing';
 import { COUNTRY_NAME, COUNTRY_CODES_AZ, flagEmoji, levelsOf, statesOf, citiesOf, type Currency } from '../locations';
 import { isTauri } from '../desktopHost';
 import { s, palette } from '../ui/theme';
+import { dirIcon } from '../rtl';
 import { isIOSWeb, isStandalonePWA, shortNpub } from '../ui/format';
 import { uiAlert } from '../ui/alerts';
 import { Field, SelectField, ImagePickerField, NumberField, QuickLocationSearch } from '../ui/fields';
@@ -405,6 +406,19 @@ function SettingsTab({
 
   return (
     <ScrollView ref={settingsScroll} contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
+      {/* Web visitors: one quiet line pointing at the native apps. Hidden in
+          the Tauri desktop shell (that IS an installed app). */}
+      {Platform.OS === 'web' && !isTauri() && (
+        <Pressable
+          style={[s.row, { gap: 8, paddingVertical: 10, alignItems: 'center' }]}
+          onPress={() => Linking.openURL('https://freeport.network/intro')}
+          accessibilityRole="link"
+        >
+          <Ionicons name="phone-portrait-outline" size={16} color={palette.link} />
+          <Text style={[s.link, { fontSize: 13, flex: 1 }]}>{t('Install the native app for the best experience')}</Text>
+          <Ionicons name={dirIcon('chevron-forward', 'chevron-back')} size={14} color={palette.dim} />
+        </Pressable>
+      )}
       {hasRequiredActions && (
         <View style={s.requiredBox}>
           <Text style={s.requiredTitle}>{t("⚠️ Required actions")}</Text>

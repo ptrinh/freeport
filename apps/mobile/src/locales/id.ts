@@ -675,5 +675,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "Penawaran terkirim — menunggu pihak lain merespons…",
   "You offered {terms}. They can accept, counter, or decline.": "Anda menawarkan {terms}. Mereka dapat menerima, mengajukan tawaran balik, atau menolak.",
   "They can accept, counter, or decline.": "Mereka dapat menerima, mengajukan tawaran balik, atau menolak.",
+  "Install the native app for the best experience": "Instal aplikasi native untuk pengalaman terbaik",
 };
 export default c;

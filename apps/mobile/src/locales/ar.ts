@@ -678,5 +678,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "تم إرسال العرض — بانتظار رد الطرف الآخر…",
   "You offered {terms}. They can accept, counter, or decline.": "لقد عرضتَ {terms}. يمكنه القبول أو تقديم عرض مقابل أو الرفض.",
   "They can accept, counter, or decline.": "يمكنه القبول أو تقديم عرض مقابل أو الرفض.",
+  "Install the native app for the best experience": "ثبّت التطبيق للحصول على أفضل تجربة",
 };
 export default c;

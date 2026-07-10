@@ -635,5 +635,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "Piedāvājums nosūtīts — gaida otras puses atbildi…",
   "You offered {terms}. They can accept, counter, or decline.": "Jūs piedāvājāt {terms}. Otra puse var to pieņemt, iesniegt pretpiedāvājumu vai noraidīt.",
   "They can accept, counter, or decline.": "Otra puse var to pieņemt, iesniegt pretpiedāvājumu vai noraidīt.",
+  "Install the native app for the best experience": "Instalējiet lietotni labākai pieredzei",
 };
 export default c;

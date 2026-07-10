@@ -632,5 +632,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "Ofa imetumwa — inasubiri upande mwingine ajibu…",
   "You offered {terms}. They can accept, counter, or decline.": "Umetoa ofa ya {terms}. Wanaweza kukubali, kutoa ofa mbadala, au kukataa.",
   "They can accept, counter, or decline.": "Wanaweza kukubali, kutoa ofa mbadala, au kukataa.",
+  "Install the native app for the best experience": "Sakinisha programu asili kwa matumizi bora zaidi",
 };
 export default c;

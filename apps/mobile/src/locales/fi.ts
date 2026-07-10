@@ -635,5 +635,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "Tarjous lähetetty — odotetaan toisen osapuolen vastausta…",
   "You offered {terms}. They can accept, counter, or decline.": "Tarjosit {terms}. Toinen osapuoli voi hyväksyä, tehdä vastatarjouksen tai hylätä.",
   "They can accept, counter, or decline.": "Toinen osapuoli voi hyväksyä, tehdä vastatarjouksen tai hylätä.",
+  "Install the native app for the best experience": "Asenna natiivisovellus parhaan käyttökokemuksen saamiseksi",
 };
 export default c;

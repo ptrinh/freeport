@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  Linking,
   ActivityIndicator,
   Alert,
   Animated,
@@ -15,6 +16,7 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { isTauri } from '../desktopHost';
 import { t } from '../i18n';
 import { loadPrefs, type UserLocation } from '../prefs';
 import { cloudAvailable, cloudRestore, cloudName } from '../cloudBackup';
@@ -302,6 +304,16 @@ export function Onboarding({
           ) : (
             <Pressable style={[s.btnCounter, { marginTop: 12 }, busy === 'restore' && { opacity: 0.6 }]} onPress={restore} disabled={busy !== null}>
               {busy === 'restore' ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t("Restore from backup file")}</Text>}
+            </Pressable>
+          )}
+          {/* Web visitors: nudge toward the native app (not shown in the Tauri
+              desktop shell — that IS an installed app). */}
+          {Platform.OS === 'web' && !isTauri() && (
+            <Pressable style={{ marginTop: 22, alignItems: 'center' }} hitSlop={8}
+              onPress={() => Linking.openURL('https://freeport.network/intro')}>
+              <Text style={[s.dim, { textDecorationLine: 'underline' }]}>
+                {t('Install the native app for the best experience')}
+              </Text>
             </Pressable>
           )}
         </>

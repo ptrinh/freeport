@@ -635,5 +635,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "Pakkumine saadetud — ootame teise poole vastust…",
   "You offered {terms}. They can accept, counter, or decline.": "Tegid pakkumise {terms}. Teine pool saab nõustuda, teha vastupakkumise või keelduda.",
   "They can accept, counter, or decline.": "Teine pool saab nõustuda, teha vastupakkumise või keelduda.",
+  "Install the native app for the best experience": "Parima kogemuse saamiseks paigalda rakendus",
 };
 export default c;

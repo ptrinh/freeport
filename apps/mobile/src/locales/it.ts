@@ -635,5 +635,6 @@ const c: Record<string, string> = {
   "Offer sent — waiting for the other party to respond…": "Offerta inviata — in attesa della risposta dell'altra persona…",
   "You offered {terms}. They can accept, counter, or decline.": "Hai offerto {terms}. Può accettare, fare una controfferta o rifiutare.",
   "They can accept, counter, or decline.": "Può accettare, fare una controfferta o rifiutare.",
+  "Install the native app for the best experience": "Scarica l'app nativa per la migliore esperienza",
 };
 export default c;
