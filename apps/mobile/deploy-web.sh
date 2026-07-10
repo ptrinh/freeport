@@ -69,6 +69,14 @@ https://www.freeport.network/* https://freeport.network/:splat 301
 REDIR
 sed -i '' 's#<head>#<head><script>if(location.hostname==="www.freeport.network")location.replace("https://freeport.network"+location.pathname+location.search+location.hash);</script>#' dist/index.html
 
+# The offline single-file build fetches the wallet wasm from here (file://
+# has a null origin) — allow it and let clients cache the 11MB blob.
+cat > dist/_headers <<'HDRS'
+/breez_sdk_spark_wasm_bg.wasm
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=86400
+HDRS
+
 # Use our own PNG favicon. Expo's generated /favicon.ico ignores web.favicon
 # here (stale default), so serve assets/favicon.png and point the link at it.
 echo "▸ Overriding favicon with our logo…"

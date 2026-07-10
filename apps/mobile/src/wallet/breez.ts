@@ -24,6 +24,54 @@ import type { WalletBalance, WalletCapabilities, WalletInvoice, WalletProvider, 
 
 const API_KEY = process.env.EXPO_PUBLIC_BREEZ_API_KEY || '';
 const WASM_URL = '/breez_sdk_spark_wasm_bg.wasm';
+// The offline single-file build can't serve the wasm from file:// — fetch it
+// from the canonical host instead (CORS-open, see deploy-web.sh _headers) and
+// keep a copy in IndexedDB so the wallet still works fully offline afterwards.
+const REMOTE_WASM_URL = 'https://freeport.network/breez_sdk_spark_wasm_bg.wasm';
+const WASM_CACHE_DB = 'freeport-wallet-wasm';
+
+async function fetchWasm(url: string): Promise<ArrayBuffer | null> {
+  try {
+    const r = await fetch(url);
+    return r.ok ? await r.arrayBuffer() : null;
+  } catch { return null; }
+}
+
+function wasmCache(mode: 'get' | 'put', bytes?: ArrayBuffer): Promise<ArrayBuffer | null> {
+  return new Promise((resolve) => {
+    try {
+      const open = indexedDB.open(WASM_CACHE_DB, 1);
+      open.onupgradeneeded = () => open.result.createObjectStore('files');
+      open.onerror = () => resolve(null);
+      open.onsuccess = () => {
+        const db = open.result;
+        const tx = db.transaction('files', mode === 'get' ? 'readonly' : 'readwrite');
+        const store = tx.objectStore('files');
+        if (mode === 'get') {
+          const req = store.get('wasm');
+          req.onsuccess = () => resolve(req.result instanceof ArrayBuffer ? req.result : null);
+          req.onerror = () => resolve(null);
+        } else {
+          store.put(bytes!, 'wasm');
+          tx.oncomplete = () => resolve(null);
+          tx.onerror = () => resolve(null);
+        }
+      };
+    } catch { resolve(null); }
+  });
+}
+
+/** Same-origin asset → canonical host (cached to IndexedDB) → offline cache. */
+async function loadWasmBytes(): Promise<ArrayBuffer> {
+  let bytes = await fetchWasm(WASM_URL);
+  if (!bytes) {
+    bytes = await fetchWasm(REMOTE_WASM_URL);
+    if (bytes) void wasmCache('put', bytes);
+    else bytes = await wasmCache('get');
+  }
+  if (!bytes) throw new Error('wallet wasm unavailable');
+  return bytes;
+}
 
 async function loadSdk(mnemonic: string): Promise<any> {
   if (Platform.OS === 'web') {
@@ -35,14 +83,7 @@ async function loadSdk(mnemonic: string): Promise<any> {
       const storage: any = await import('@breeztech/breez-sdk-spark/storage');
       (globalThis as any).createDefaultStorage = storage.createDefaultStorage;
     } catch { /* SDK warns and uses its fallback */ }
-    const resp = await fetch(WASM_URL);
-    if (!resp.ok) throw new Error(`wallet wasm unavailable (${resp.status})`);
-    let module: WebAssembly.Module;
-    try {
-      module = await WebAssembly.compileStreaming(resp.clone());
-    } catch {
-      module = new WebAssembly.Module(await resp.arrayBuffer());
-    }
+    const module = await WebAssembly.compile(await loadWasmBytes());
     mod.initSync({ module });
     const config = mod.defaultConfig('mainnet');
     config.apiKey = API_KEY;
