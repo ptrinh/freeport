@@ -74,7 +74,7 @@ describe('signInWithPasskey', () => {
     const get = vi.fn(async () => credWithPrf(PRF7));
     mockCredentials({ get });
     await signInWithPasskey();
-    const arg = get.mock.calls[0][0].publicKey;
+    const arg = (get.mock.calls[0] as any[])[0].publicKey;
     expect(arg.rpId).toBe('freeport.network');
     expect(hex(arg.extensions.prf.eval.first)).toBe(SALT_HEX);
     expect(arg.challenge).toHaveLength(32); // fresh random challenge
@@ -102,7 +102,7 @@ describe('createPasskeyIdentity', () => {
     const sk = await createPasskeyIdentity('Freeport account');
     expect(hex(sk)).toBe(SK_FOR_PRF7);
     expect(get).not.toHaveBeenCalled();
-    const req = create.mock.calls[0][0].publicKey;
+    const req = (create.mock.calls[0] as any[])[0].publicKey;
     expect(req.rp).toEqual({ name: 'Freeport', id: 'freeport.network' });
     expect(req.authenticatorSelection.residentKey).toBe('required'); // discoverable → sign-in works with no username
   });
