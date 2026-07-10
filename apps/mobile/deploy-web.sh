@@ -83,7 +83,7 @@ cat > dist/.well-known/assetlinks.json <<'ALINKS'
   "target": {
     "namespace": "android_app",
     "package_name": "uk.trinh.freeport",
-    "sha256_cert_fingerprints": ["REPLACE_WITH_PLAY_APP_SIGNING_SHA256"]
+    "sha256_cert_fingerprints": ["98:94:05:78:38:F1:6A:7D:46:F6:38:41:9D:8F:43:38:14:CC:38:85:93:FA:E0:EA:FB:D9:9A:06:90:57:2F:F8"]
   }
 }]
 ALINKS
