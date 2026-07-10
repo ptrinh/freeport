@@ -32,8 +32,10 @@ describe('COUNTRY_CODES_AZ (codes sorted A–Z by name)', () => {
     for (const c of COUNTRIES) expect(COUNTRY_CODES_AZ).toContain(c.code);
   });
 
-  it('is ordered A–Z by country name', () => {
-    const names = COUNTRY_CODES_AZ.map((code) => COUNTRY_NAME[code]);
+  it('pins "Other" first, then A–Z by country name', () => {
+    expect(COUNTRY_CODES_AZ[0]).toBe('XX');
+    expect(COUNTRY_NAME['XX']).toBe('Other');
+    const names = COUNTRY_CODES_AZ.slice(1).map((code) => COUNTRY_NAME[code]);
     const sorted = [...names].sort((a, b) => a.localeCompare(b));
     expect(names).toEqual(sorted);
   });

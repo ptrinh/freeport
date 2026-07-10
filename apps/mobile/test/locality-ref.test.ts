@@ -39,6 +39,10 @@ describe('locQuery', () => {
     expect(locQuery({}, countryName)).toBe('');
     expect(locRefSeed('').settled).toBe(true);
   });
+
+  it('"Other" (XX) has nothing to geocode — behaves like no location', () => {
+    expect(locQuery({ country: 'XX' }, countryName)).toBe('');
+  });
 });
 
 describe('cold start (the reported flicker)', () => {

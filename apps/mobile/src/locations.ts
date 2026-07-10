@@ -55,6 +55,10 @@ const ms = (...names: string[]): Record<string, string[]> =>
   Object.fromEntries(names.map((n) => [n, []]));
 
 export const COUNTRIES: CountryData[] = [
+  // Catch-all for countries not (or no longer) in the curated list. Shown
+  // FIRST in pickers, rendered with a globe instead of a flag. levels: 1 →
+  // no state/city drill-down; currency falls back to USD.
+  { code: 'XX', name: 'Other', levels: 1, states: {} },
   // Vietnam is hidden from the location picker for now (pending legal review
   // of the VN market). Functional per-country data (currency, dial codes,
   // reverse-geocode language) is intentionally kept so posts/deals originating
@@ -345,10 +349,14 @@ export const COUNTRIES: CountryData[] = [
   { code: 'VE', name: 'Venezuela', levels: 2, states: ms('Caracas', 'Maracaibo', 'Valencia') },
 ];
 
-/** Country codes sorted A–Z by localized country name (for pickers). */
-export const COUNTRY_CODES_AZ: string[] = [...COUNTRIES]
-  .sort((a, b) => a.name.localeCompare(b.name))
-  .map((c) => c.code);
+/** Country codes for pickers: "Other" (XX) pinned first, the rest A–Z. */
+export const COUNTRY_CODES_AZ: string[] = [
+  'XX',
+  ...[...COUNTRIES]
+    .filter((c) => c.code !== 'XX')
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((c) => c.code),
+];
 
 /** ISO 3166-1 alpha-2 code → country name. */
 export const COUNTRY_NAME: Record<string, string> = Object.fromEntries(
@@ -361,6 +369,7 @@ export function countryByCode(code: string): CountryData | undefined {
 
 /** Flag emoji from an ISO 3166-1 alpha-2 code via Unicode regional indicators. */
 export function flagEmoji(code: string): string {
+  if (code?.toUpperCase() === 'XX') return '\u{1F310}'; // "Other" → globe, no flag exists
   if (!/^[A-Za-z]{2}$/.test(code)) return '';
   const base = 0x1f1e6;
   const cc = code.toUpperCase();

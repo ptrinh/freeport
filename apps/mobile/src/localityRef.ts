@@ -23,7 +23,10 @@ export function locQuery(
   location: { country?: string; state?: string; city?: string },
   countryName: (code: string) => string,
 ): string {
-  if (!location.country) return '';
+  // 'XX' = the "Other" catch-all — there is nothing meaningful to geocode
+  // (querying the literal word "Other" could pin a random place and filter
+  // the feed against it), so it behaves like no selected location.
+  if (!location.country || location.country === 'XX') return '';
   return [location.city, location.state, countryName(location.country)]
     .filter(Boolean)
     .join(', ');
