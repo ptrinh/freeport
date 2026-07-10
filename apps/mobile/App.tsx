@@ -70,6 +70,7 @@ import { onWheelDemo, triggerWheelDemo } from './src/wheelDemo';
 import { Fireworks } from './src/Fireworks';
 import { installDebugApi, registerDebugClient } from './src/debug';
 import { locQuery, locRefSeed, locRefStore, locRefHas, userGeohashSeed, userGeohashStore } from './src/localityRef';
+import { passesDistance } from './src/browseFilter';
 import { initNotifications, notify, notificationGranted, requestNotifications, onNotificationTap } from './src/notify';
 import { beginBackgroundTask, endBackgroundTask } from './src/backgroundTask';
 import { uploadImage, uploadFile, UploadError } from './src/upload';
@@ -2283,32 +2284,19 @@ function MarketTab({
           return true;
         })
       : visible;
-    // Locality: a ride is inherently local, so hide requests far from the user's
-    // area (by their SELECTED location, falling back to GPS). Skipped when we have
-    // no reference, or the post carries no pickup geohash — so discovery never
-    // silently breaks. Services/goods aren't distance-bound, so they're exempt.
-    const NEAR_KM = 200;
-    const local = ref
+    // Distance filter (see src/browseFilter.ts): rides default to NEAR_KM, but
+    // the user's explicit Max distance preference overrides it in BOTH
+    // directions — raising it to 1000 km must actually show farther rides.
+    // Skipped entirely without a reference point; posts without a geohash are
+    // never hidden — so discovery never silently breaks.
+    const withinMax = ref
       ? byCategory.filter((i) => {
-          if (!i.content.schema.startsWith('rideshare')) return true;
-          const gh = (i.content.payload as any)?.from?.geohash;
-          if (!gh) return true;
-          const km = distKm(gh);
-          return km == null || km <= NEAR_KM;
+          const pl = i.content.payload as any;
+          const isRide = i.content.schema.startsWith('rideshare');
+          const gh = isRide ? pl?.from?.geohash : pl?.location?.geohash;
+          return passesDistance(isRide, gh ? distKm(gh) : null, maxDistance, distanceUnit);
         })
       : byCategory;
-    // Max-distance preference: hide posts farther than the user's chosen radius
-    // (in their distance unit). Posts without a location aren't hidden.
-    const maxKm = distanceUnit === 'mi' ? maxDistance * 1.60934 : maxDistance;
-    const withinMax = ref && maxDistance > 0
-      ? local.filter((i) => {
-          const pl = i.content.payload as any;
-          const gh = i.content.schema.startsWith('rideshare') ? pl?.from?.geohash : pl?.location?.geohash;
-          if (!gh) return true;
-          const km = distKm(gh);
-          return km == null || km <= maxKm;
-        })
-      : local;
     // Keyword filter across title, locations, payment, notes, and author name
     const filtered = kw ? withinMax.filter((i) => searchableText(i, client).includes(kw)) : withinMax;
     // Posts that exist but were hidden by the locality/max-distance filters —
