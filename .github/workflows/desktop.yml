@@ -69,9 +69,16 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev patchelf libayatana-appindicator3-dev libxdo-dev libssl-dev build-essential file
 
       - name: Install deps + build workspace packages
+        # --ignore-scripts on the mobile install: the Breez react-native
+        # package's postinstall is a shell script Windows npm can't spawn
+        # (cmd.exe: "'.' is not recognized"), and its codegen only matters
+        # for native iOS/Android builds. Our own postinstall
+        # (copy-breez-wasm.mjs: wasm → public/, glue patches) DOES matter for
+        # the web bundle, so run it explicitly on every platform.
         run: |
           npm ci
-          npm ci --prefix apps/mobile
+          npm ci --prefix apps/mobile --ignore-scripts
+          node apps/mobile/scripts/copy-breez-wasm.mjs
           npm run build        # compile @freeport/protocol + agent → dist (expo export needs them)
           npm --prefix apps/desktop install
 
@@ -94,6 +101,9 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Built-in wallet (Breez Spark) — embeddable distribution key; without
+          # it the desktop web bundle ships wallet-less (NWC only).
+          EXPO_PUBLIC_BREEZ_API_KEY: ${{ secrets.EXPO_PUBLIC_BREEZ_API_KEY }}
           # Minisign key for tauri-plugin-updater artifacts (.tar.gz.sig etc.).
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -140,6 +150,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/desktop-v') && matrix.platform == 'ubuntu-22.04'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPO_PUBLIC_BREEZ_API_KEY: ${{ secrets.EXPO_PUBLIC_BREEZ_API_KEY }}
         run: |
           VERSION="${GITHUB_REF_NAME#desktop-v}"
           node apps/mobile/scripts/build-offline.mjs apps/desktop/dist "Freeport_${VERSION}-offline.html"
