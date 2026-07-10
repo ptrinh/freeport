@@ -2203,12 +2203,19 @@ function MarketTab({
 
   // Locality reference: geocode the user's SELECTED location (Singapore, etc.)
   // as a fallback "where am I" point when the device gives us nothing.
+  // `locRefSettled` marks the geocode as finished (found or not): until then we
+  // hold the feed back rather than render it unfiltered and yank far posts away
+  // half a second later when the reference arrives (user-reported flicker).
   const [locRef, setLocRef] = useState<string | null>(null);
+  const [locRefSettled, setLocRefSettled] = useState(false);
   useEffect(() => {
-    if (!location.country) { setLocRef(null); return; }
+    if (!location.country) { setLocRef(null); setLocRefSettled(true); return; }
     const q = [location.city, location.state, COUNTRY_NAME[location.country] ?? location.country].filter(Boolean).join(', ');
     let cancelled = false;
-    geohashForPlace(q, '').then((gh) => { if (!cancelled) setLocRef(gh || null); });
+    setLocRefSettled(false);
+    geohashForPlace(q, '')
+      .then((gh) => { if (!cancelled) setLocRef(gh || null); })
+      .finally(() => { if (!cancelled) setLocRefSettled(true); });
     return () => { cancelled = true; };
   }, [location.country, location.state, location.city]);
   // Distance reference: prefer the PRECISE device point (GPS, else coarse IP) over
@@ -2217,6 +2224,10 @@ function MarketTab({
   // listing's exact pin yielded misleading distances (e.g. "31 km" between parties
   // in the same town). Region/market filtering still uses `location` separately.
   const ref = userGeohash ?? locRef;
+  // Feed is "settling" while the user HAS a selected location but its geocode
+  // hasn't resolved yet (and no device point either). Rendering during this
+  // window would show far-away posts unfiltered, then hide them on resolve.
+  const refSettling = !ref && !!location.country && !locRefSettled;
 
   // Distance from the user's reference point to a post's geohash, computed once
   // per geohash and cached (rebuilt only when `ref` changes). Filter, sort, and
@@ -2296,8 +2307,23 @@ function MarketTab({
       : local;
     // Keyword filter across title, locations, payment, notes, and author name
     const filtered = kw ? withinMax.filter((i) => searchableText(i, client).includes(kw)) : withinMax;
+    // Posts that exist but were hidden by the locality/max-distance filters —
+    // surfaced in the empty state so a distance-filtered feed doesn't
+    // masquerade as an empty network ("waiting for posts…" while posts exist).
+    const hiddenFar = byCategory.length - withinMax.length;
+    let nearestHiddenKm: number | null = null;
+    if (hiddenFar > 0) {
+      const kept = new Set(withinMax.map((i) => i.id));
+      for (const i of byCategory) {
+        if (kept.has(i.id)) continue;
+        const pl = i.content.payload as any;
+        const gh = i.content.schema.startsWith('rideshare') ? pl?.from?.geohash : pl?.location?.geohash;
+        const km = distKm(gh);
+        if (km != null && (nearestHiddenKm == null || km < nearestHiddenKm)) nearestHiddenKm = km;
+      }
+    }
     // Multi-level sort by the chosen first/second/third criteria
-    return [...filtered].sort((a, b) => {
+    const list = [...filtered].sort((a, b) => {
       for (const key of sortPrefs) {
         if (key === 'none') continue;
         const c = compareBy(key, a, b, client, ref, distKm);
@@ -2305,10 +2331,11 @@ function MarketTab({
       }
       return 0;
     });
+    return { list, hiddenFar, nearestHiddenKm };
   }, [intents, servicesEnabled, filterCat, filterSub, kw, sortPrefs, ref, client, nowTick, doneListingKeys, maxDistance, distanceUnit, distKm]);
 
-  const paged = shown.slice(0, limit);
-  const hasMore = shown.length > paged.length;
+  const paged = refSettling ? [] : shown.list.slice(0, limit);
+  const hasMore = shown.list.length > paged.length;
   const activeSortKeys = sortPrefs.filter((k) => k !== 'none');
   // When the icon+label row wraps to 2 lines, collapse to icon-only to stay
   // compact. Reset to full whenever the active set changes (then re-measure),
@@ -2436,16 +2463,31 @@ function MarketTab({
       updateCellsBatchingPeriod={50}
       ListEmptyComponent={
         <View style={s.emptyWrap}>
-          <Ionicons name={kw ? 'search-outline' : 'radio-outline'} size={40} color={palette.dim} />
+          <Ionicons
+            name={kw ? 'search-outline' : refSettling ? 'locate-outline' : shown.hiddenFar > 0 ? 'compass-outline' : 'radio-outline'}
+            size={40}
+            color={palette.dim}
+          />
           <Text style={s.emptyText}>
-            {kw ? t('No matches for your filter.') : t('Waiting for posts/requests on the network…')}
+            {kw ? t('No matches for your filter.')
+              : refSettling ? t('Finding posts near you…')
+              : shown.hiddenFar > 0
+                ? (shown.nearestHiddenKm != null
+                    ? t('{n} posts are outside your area — the nearest is {dist} away.', { n: shown.hiddenFar, dist: formatDistance(shown.nearestHiddenKm, location.country || undefined, distanceUnit) })
+                    : t('{n} posts are outside your area.', { n: shown.hiddenFar }))
+                : t('Waiting for posts/requests on the network…')}
           </Text>
+          {!kw && !refSettling && shown.hiddenFar > 0 ? (
+            <Text style={[s.emptyText, { fontSize: 12, marginTop: 6 }]}>
+              {t('Increase Max distance in Settings to see posts farther away.')}
+            </Text>
+          ) : null}
         </View>
       }
       ListFooterComponent={
-        shown.length > 0 ? (
+        paged.length > 0 ? (
           <Text style={[s.dim, { textAlign: 'center', padding: 12 }]}>
-            {hasMore ? t('Showing {n} of {m} — scroll for more', { n: paged.length, m: shown.length }) : tn(shown.length, '{n} result', '{n} results')}
+            {hasMore ? t('Showing {n} of {m} — scroll for more', { n: paged.length, m: shown.list.length }) : tn(shown.list.length, '{n} result', '{n} results')}
           </Text>
         ) : null
       }
