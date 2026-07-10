@@ -24,135 +24,25 @@ import { loadPrefs, savePrefs, type UserLocation } from '../prefs';
 import { getStoredNsec } from '../identity';
 import { backupToFile, buildCloudBundle } from '../backup';
 import { cloudAvailable, cloudSave, cloudRestore, cloudName } from '../cloudBackup';
-import { kvSet } from '../kv';
 import { uploadImage, UploadError } from '../upload';
 import { normalizePhone, detectDialCode, dialForCountry } from '../phone';
 import { requestLocationPermission, effectiveUnit } from '../maps';
 import { requestNotifications } from '../notify';
-import { pushSupported, enablePush, updatePush, disablePush, pushStatus, type PushStatus, type PushFilters } from '../push';
-import { requestTelegramLink, telegramLinkStatus } from '../telegramLink';
+import { pushSupported } from '../push';
 import { LANGUAGE_CODES, languageLabel } from '../language';
 import { SERVICE_CATEGORIES, RIDESHARE_CATEGORY, DEFAULT_RIDESHARE_SUBCATEGORY, categoryIcon, subcategoryIcon, subcategoriesFor } from '../categories';
-import { browseTopic } from '../topics';
 import { type FareConfig } from '../pricing';
-import { COUNTRY_NAME, COUNTRY_CODES_AZ, currencySymbol, flagEmoji, levelsOf, statesOf, citiesOf, type Currency } from '../locations';
-import { versionLabel, checkForUpdate, applyUpdate, getTrack, setTrack, trackSupported, type UpdateTrack } from '../updates';
-import { isTauri, hostStart, hostStop, hostStatus, type HostStatus } from '../desktopHost';
+import { COUNTRY_NAME, COUNTRY_CODES_AZ, flagEmoji, levelsOf, statesOf, citiesOf, type Currency } from '../locations';
+import { isTauri } from '../desktopHost';
 import { s, palette } from '../ui/theme';
 import { isIOSWeb, isStandalonePWA, shortNpub } from '../ui/format';
-import { uiAlert, confirmAsync } from '../ui/alerts';
+import { uiAlert } from '../ui/alerts';
 import { Field, SelectField, ImagePickerField, NumberField, QuickLocationSearch } from '../ui/fields';
 import { SelfStats } from './MessagesTab';
-
-// ─── Key tab ─────────────────────────────────────────────────────────────────
-
-/** Desktop-only: run a built-in HTTP server that serves the Freeport web app
- *  (this same bundle) on a chosen port, so anyone on the LAN can open it in a
- *  browser — a zero-infra way to share/self-host Freeport. Rendered only when
- *  isTauri(). The Rust side lives in apps/desktop/src-tauri. */
-function DesktopHostPanel() {
-  const [portText, setPortText] = useState('1988');
-  const [withNotify, setWithNotify] = useState(false);
-  const [tgToken, setTgToken] = useState('');
-  const [tgPass, setTgPass] = useState('');
-  const [tgOpen, setTgOpen] = useState(false);
-  const [status, setStatus] = useState<HostStatus>({ running: false, port: 0, notify: false, telegram: false, notify_available: false, urls: [], relay_urls: [] });
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => { hostStatus().then(setStatus).catch(() => {}); }, []);
-
-  const toggle = async () => {
-    setError(null);
-    setBusy(true);
-    try {
-      if (status.running) {
-        setStatus(await hostStop());
-      } else {
-        const port = parseInt(portText.trim(), 10);
-        if (!Number.isFinite(port) || port < 1024 || port > 65535) {
-          setError(t('Enter a port between 1024 and 65535.'));
-          return;
-        }
-        const useNotify = withNotify && status.notify_available;
-        setStatus(await hostStart(port, useNotify, useNotify ? tgToken : '', useNotify ? tgPass : ''));
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <View style={{ marginTop: 22 }}>
-      <Text style={s.sectionTitle}>{t('Host Freeport for others')}</Text>
-      <Text style={[s.dim, { marginTop: 4 }]}>{t('Serve this app on your network so anyone nearby can open it in a browser — no install, no store. The shared app still connects directly to the public relays.')}</Text>
-
-      {!status.running ? (
-        <>
-          <View style={{ marginTop: 12 }}>
-            <Field label={t('Port')} value={portText} onChange={setPortText} placeholder="1988" keyboardType="number-pad" />
-          </View>
-          {status.notify_available && (
-            <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 }} onPress={() => setWithNotify((v) => !v)}>
-              <Ionicons name={withNotify ? 'checkbox' : 'square-outline'} size={22} color={withNotify ? palette.accent : palette.text3} />
-              <View style={{ flex: 1 }}>
-                <Text style={s.toggleTitle}>{t('Also host notifications, MCP + a relay')}</Text>
-                <Text style={[s.dim, { fontSize: 12 }]}>{t('Runs the push notifier, MCP endpoint and a Nostr relay too — a full node. Best on an always-on machine.')}</Text>
-              </View>
-            </Pressable>
-          )}
-          {status.notify_available && withNotify && (
-            <View style={{ marginTop: 10, marginStart: 32 }}>
-              <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }} onPress={() => setTgOpen((v) => !v)}>
-                <Ionicons name={tgOpen ? 'chevron-down' : 'chevron-forward'} size={16} color={palette.text3} />
-                <Text style={s.dim}>{t('Telegram bridge (optional)')}</Text>
-              </Pressable>
-              {tgOpen && (
-                <View style={{ marginTop: 8 }}>
-                  <Field label={t('Telegram bot token')} value={tgToken} onChange={setTgToken} placeholder="123456:AA…" secure />
-                  <Text style={[s.dim, { fontSize: 12, marginTop: 4 }]}>{t('From @BotFather. Relays a market feed into groups and sends content-blind pings.')}</Text>
-                  <View style={{ marginTop: 10 }}>
-                    <Field label={t('Guest-mode passphrase (advanced)')} value={tgPass} onChange={setTgPass} placeholder={t('leave empty to keep guest mode off')} secure />
-                  </View>
-                  <Text style={[s.fieldError, { fontSize: 12, marginTop: 4 }]}>{t('Guest mode is custodial: your node holds an encrypted key for each Telegram user who posts. Only enable if you accept that responsibility.')}</Text>
-                </View>
-              )}
-            </View>
-          )}
-          <Pressable style={[s.btnAccept, { marginTop: 8 }, busy && { opacity: 0.6 }]} disabled={busy} onPress={toggle}>
-            {busy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Start hosting')}</Text>}
-          </Pressable>
-        </>
-      ) : (
-        <>
-          <Text style={[s.dim, { marginTop: 12 }]}>{t('Hosting on port {port}. Share one of these links (same Wi-Fi/network):', { port: String(status.port) })}</Text>
-          <View style={s.codeBox}>
-            <Text style={s.codeText} selectable>{(status.urls.length ? status.urls : [t('No network address found — are you online?')]).join('\n')}</Text>
-          </View>
-          {status.notify && status.urls[0] && (
-            <Text style={[s.dim, { marginTop: 6, fontSize: 12 }]}>{t('Notification + MCP server on too — set the Notification service URL to {url}', { url: status.urls[0] })}</Text>
-          )}
-          {status.notify && status.relay_urls.length > 0 && (
-            <>
-              <Text style={[s.dim, { marginTop: 8 }]}>{t('Relay running — add to the app’s relay list:')}</Text>
-              <View style={s.codeBox}>
-                <Text style={s.codeText} selectable>{status.relay_urls.join('\n')}</Text>
-              </View>
-            </>
-          )}
-          {status.telegram && <Text style={[s.dim, { marginTop: 6, fontSize: 12 }]}>{'🤖 ' + t('Telegram bridge active.')}</Text>}
-          <Text style={[s.dim, { marginTop: 6, fontSize: 12 }]}>{t('Your OS firewall may ask to allow incoming connections the first time.')}</Text>
-          <Pressable style={[s.btnCounter, { marginTop: 8 }, busy && { opacity: 0.6 }]} disabled={busy} onPress={toggle}>
-            {busy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Stop hosting')}</Text>}
-          </Pressable>
-        </>
-      )}
-      {error && <Text style={[s.fieldError, { marginTop: 8 }]}>{error}</Text>}
-    </View>
-  );
-}
+import { DesktopHostPanel } from './settings/DesktopHostPanel';
+import { NotificationsSection } from './settings/NotificationsSection';
+import { FareEstimator } from './settings/FareEstimator';
+import { AboutSection } from './settings/AboutSection';
 
 function SettingsTab({
   npub,
@@ -422,126 +312,10 @@ function SettingsTab({
   // in the Required-actions box — the one place users actually look.
   const backupMissing = cloudOn && !cloudBackedUp;
   const hasRequiredActions = !requiredLocOk || !requiredNotifOk || vehicleMissing || backupMissing;
-  const [fareOpen, setFareOpen] = useState(false);
-  const [aboutOpen, setAboutOpen] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  // On a mobile-browser web session (not the installed PWA / native app),
-  // suggest the native app — shown as a passive notice in About.
-  const nativeOS = useMemo<'ios' | 'android' | null>(() => {
-    if (Platform.OS !== 'web' || typeof navigator === 'undefined') return null;
-    const w: any = typeof window !== 'undefined' ? window : undefined;
-    const standalone = !!(w?.matchMedia?.('(display-mode: standalone)')?.matches) || (navigator as any).standalone === true;
-    if (standalone) return null;
-    const ua = navigator.userAgent || '';
-    if (/iPhone|iPad|iPod/.test(ua) || ((navigator as any).platform === 'MacIntel' && (navigator as any).maxTouchPoints > 1)) return 'ios';
-    if (/Android/.test(ua)) return 'android';
-    return null;
-  }, []);
-  // Web Push (PWA) — opt-in "new message" notifications via a content-blind sender.
-  const [notifyOpen, setNotifyOpen] = useState(false);
-  const [notifyHelpOpen, setNotifyHelpOpen] = useState(false);
-  const [notifyEndpoint, setNotifyEndpoint] = useState('');
-  const [pushState, setPushState] = useState<PushStatus>('off');
-  const [pushBusy, setPushBusy] = useState(false);
-  const [telegramLinked, setTelegramLinked] = useState(false);
-  const [telegramBusy, setTelegramBusy] = useState(false);
-  // Android background service toggle.
-  const [updBusy, setUpdBusy] = useState(false);
-  const [updMsg, setUpdMsg] = useState('');
-  const [updTrack, setUpdTrack] = useState<UpdateTrack>('latest');
-  const changeTrack = async (track: UpdateTrack) => {
-    if (track === updTrack || updBusy) return;
-    const ok = await confirmAsync(
-      t('Switch update track?'),
-      t('This downloads the selected release and restarts the app.'),
-      t('Switch'),
-    );
-    if (!ok) return;
-    setUpdBusy(true); setUpdMsg('');
-    setUpdTrack(track);
-    const r = await setTrack(track);
-    if (r.outcome === 'updated') { setUpdMsg(t('Update found — restarting…')); await applyUpdate(); return; }
-    setUpdMsg(r.outcome === 'up-to-date' ? t("You're on the latest version.") : t('Could not check for updates.'));
-    setUpdBusy(false);
-  };
-  const checkUpdates = async () => {
-    setUpdBusy(true); setUpdMsg('');
-    const r = await checkForUpdate();
-    if (r.outcome === 'updated') { setUpdMsg(t('Update found — restarting…')); await applyUpdate(); return; }
-    setUpdMsg(
-      r.outcome === 'up-to-date' ? t("You're on the latest version.")
-        : r.outcome === 'unsupported' ? t('Updates aren\'t available in this build.')
-        : t('Could not check for updates.')
-    );
-    setUpdBusy(false);
-  };
-  React.useEffect(() => {
-    loadPrefs().then((p) => { setNotifyEndpoint(p.notifyEndpoint ?? ''); });
-    pushStatus().then(setPushState);
-    getTrack().then(setUpdTrack).catch(() => {});
-  }, []);
-  const myPubkeyHex = client?.pubkey ?? '';
-  // Reflect whether Telegram is linked (best-effort; only if the server offers it).
-  // Debounced so editing the Notification-service-URL field doesn't fire a
-  // request per keystroke — it settles, then checks once.
-  React.useEffect(() => {
-    if (!notifyEndpoint.trim() || !myPubkeyHex) return;
-    let cancelled = false;
-    const id = setTimeout(() => {
-      telegramLinkStatus(notifyEndpoint.trim(), myPubkeyHex).then((v) => { if (!cancelled) setTelegramLinked(v); });
-    }, 600);
-    return () => { cancelled = true; clearTimeout(id); };
-  }, [notifyEndpoint, myPubkeyHex, telegramBusy]);
-  // Intent-alert filters for push: only when the user opted into Browse alerts.
-  // Topic mirrors what Browse subscribes to (area + default category/subcat), so
-  // pushes track new posts in the slice they care about.
-  const pushFilters = React.useMemo<PushFilters | undefined>(() => {
-    if (!browseAlertNotify) return undefined;
-    // Use the EFFECTIVE category/subcategory the Browse UI shows (browseCat/
-    // browseEffSub), not the raw pref — otherwise an unset pref ('') fell back to
-    // 'All' here while Browse showed Ridesharing, so the push topic was area-only
-    // ("sg") and matched every category. This keeps the alert scoped to the slice
-    // the user actually sees.
-    const topic = browseTopic(location, {
-      servicesEnabled,
-      filterCat: browseCat,
-      filterSub: browseEffSub || null,
-    });
-    return { topics: [topic] };
-  }, [browseAlertNotify, location, servicesEnabled, browseCat, browseEffSub]);
-  const togglePush = async () => {
-    setPushBusy(true);
-    try {
-      await savePrefs({ notifyEndpoint: notifyEndpoint.trim() });
-      if (pushState === 'on') {
-        await disablePush(myPubkeyHex, notifyEndpoint.trim());
-        setPushState('off');
-        await kvSet('freeport.pushOn', '0').catch(() => {});
-      } else {
-        const st = await enablePush(myPubkeyHex, notifyEndpoint.trim(), pushFilters);
-        setPushState(st);
-        // Mark the server as the active notifier so the app skips its local
-        // fallback notification (avoids a second alert when you open the app).
-        await kvSet('freeport.pushOn', st === 'on' ? '1' : '0').catch(() => {});
-      }
-    } finally { setPushBusy(false); }
-  };
-  // Keep the sender's filters in sync when Browse-alert prefs change (cheap —
-  // re-registers the existing subscription, no permission prompt / resubscribe).
-  React.useEffect(() => {
-    if (pushState === 'on' && notifyEndpoint.trim()) {
-      void updatePush(myPubkeyHex, notifyEndpoint.trim(), pushFilters);
-    }
-  }, [pushFilters, pushState]);
-  // Editor works off the active config; falls back to the built-in defaults
-  // for the current currency/country until the user customizes.
-  const fc = fareConfig ?? fareDefaults;
-  const setFare = (patch: Partial<FareConfig>) =>
-    onFareConfigChange({ ...fc, ...patch, vehicle: { ...fc.vehicle, ...(patch.vehicle ?? {}) } });
-  const fareSym = currencySymbol(fareCurrency);
   const [backedUp, setBackedUp] = useState(false);
 
   // Sync when profile loads from storage after mount
@@ -1053,169 +827,29 @@ function SettingsTab({
       {/* Notifications — remote push (when the app is closed) via a content-blind
           sender. Web PWA uses Web Push; native (iOS/Android) uses Expo Push. */}
       {pushSupported() && (
-        <>
-          <Pressable style={s.collapseHeader} onPress={() => setNotifyOpen((v) => !v)}>
-            <View style={s.collapseLeft}>
-              <Ionicons name="notifications-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-              <Text style={s.collapseTitle}>{t("Notifications")}</Text>
-            </View>
-            <Text style={s.collapseChevron}>{notifyOpen ? '▾' : '▸'}</Text>
-          </Pressable>
-          {notifyOpen && (
-            <>
-              <Text style={s.dim}>{Platform.OS === 'web'
-                ? t("Get notified about new messages and nearby posts, even when the app is closed. On iOS, add Freeport to your Home Screen first. Delivered by a content-blind sender you set below — it never sees your messages.")
-                : t("Get notified about new messages and nearby posts, even when the app is closed. Delivered by a content-blind sender you set below — it never sees your messages.")}</Text>
-              <Pressable onPress={() => setNotifyHelpOpen(true)} hitSlop={6} style={{ marginTop: 6 }}>
-                <Text style={{ color: palette.link, fontWeight: '600' }}>{'ⓘ ' + t("What's a notification server?")}</Text>
-              </Pressable>
-              <Field label={t("Notification service URL")} value={notifyEndpoint} onChange={setNotifyEndpoint} placeholder="https://mcp.freeport.network" />
-              <Text style={s.dim}>{t("Leave the default to use the public sender, or point to your own self-hosted one.")}</Text>
-              <Pressable
-                style={[s.btnAccept, { marginTop: 4 }, (pushBusy || !notifyEndpoint.trim() || !myPubkeyHex) && { opacity: 0.6 }]}
-                disabled={pushBusy || !notifyEndpoint.trim() || !myPubkeyHex}
-                onPress={() => { togglePush(); }}
-              >
-                {pushBusy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{pushState === 'on' ? t("Disable notifications") : t("Enable notifications")}</Text>}
-              </Pressable>
-              {pushState === 'on' && <Text style={s.dim}>{t("Notifications enabled.")}</Text>}
-              {pushState === 'denied' && <Text style={s.fieldError}>{t("Notifications are blocked — enable them in your device/browser settings.")}</Text>}
-              {pushState === 'error' && <Text style={s.fieldError}>{t("Couldn't reach the notification service — check the URL.")}</Text>}
-
-              {/* Telegram: content-blind activity pings via the same server. Useful
-                  where push is flaky (iOS PWA) or the user just prefers Telegram. */}
-              <Text style={[s.toggleTitle, { marginTop: 16 }]}>{t("Telegram alerts")}</Text>
-              <Text style={s.dim}>{telegramLinked
-                ? t("Telegram is linked. Send /stop to the bot to unlink.")
-                : t("Get the same content-blind alerts as a Telegram message. Opens the bot to link your account.")}</Text>
-              <Pressable
-                style={[s.btnCounter, { marginTop: 6 }, (telegramBusy || !notifyEndpoint.trim() || !myPubkeyHex) && { opacity: 0.6 }]}
-                disabled={telegramBusy || !notifyEndpoint.trim() || !myPubkeyHex}
-                onPress={async () => {
-                  setTelegramBusy(true);
-                  const ok = await requestTelegramLink(notifyEndpoint.trim(), myPubkeyHex);
-                  if (!ok) uiAlert(t("Telegram alerts unavailable"), t("This notification server doesn't offer Telegram alerts."));
-                  setTelegramBusy(false);
-                }}
-              >
-                {telegramBusy ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{telegramLinked ? t("Re-link Telegram") : t("Link Telegram")}</Text>}
-              </Pressable>
-            </>
-          )}
-        </>
+        <NotificationsSection
+          client={client}
+          location={location}
+          servicesEnabled={servicesEnabled}
+          browseAlertNotify={browseAlertNotify}
+          browseCat={browseCat}
+          browseEffSub={browseEffSub}
+        />
       )}
-
-      {/* "What's a notification server?" explainer + self-host instructions. */}
-      <Modal visible={notifyHelpOpen} transparent animationType="fade" onRequestClose={() => setNotifyHelpOpen(false)}>
-        <Pressable style={s.sortBackdrop} onPress={() => setNotifyHelpOpen(false)}>
-          <Pressable style={s.sortSheet} onPress={() => {}}>
-            <ScrollView style={{ maxHeight: 460 }} showsVerticalScrollIndicator={false}>
-              <Text style={s.sectionTitle}>{t("What's a notification server?")}</Text>
-              <Text style={[s.dim, { marginTop: 4 }]}>{t("Freeport has no central server. To alert you when the app is closed, a small notification server watches the public relays for events addressed to you and forwards a push to your device.")}</Text>
-              <Text style={[s.dim, { marginTop: 10 }]}>{t("It is content-blind: your messages are end-to-end encrypted, so it only knows that something arrived for you — never what it says.")}</Text>
-              <Text style={[s.dim, { marginTop: 10 }]}>{t("Use the public one (the default URL), or run your own in one command and point the URL above at it:")}</Text>
-              <View style={s.codeBox}>
-                <Text style={s.codeText} selectable>{'git clone https://github.com/ptrinh/freeport.git\ncd freeport/packages/nostr-mcp\ndocker compose up -d'}</Text>
-              </View>
-              <Text style={[s.dim, { marginTop: 10 }]}>{t("Then set the URL above to your server (for example http://your-host:1988). On Umbrel, install it from the Freeport community app store.")}</Text>
-              <Pressable style={[s.mapLink, { marginTop: 12 }]} onPress={() => Linking.openURL('https://github.com/ptrinh/freeport/tree/main/packages/nostr-mcp')}>
-                <Text style={s.mapLinkText}>{'🔗 ' + t("Self-hosting guide on GitHub")}</Text>
-              </Pressable>
-              <Pressable style={[s.btnAccept, { marginTop: 12 }]} onPress={() => setNotifyHelpOpen(false)}>
-                <Text style={s.btnText}>{t("Got it")}</Text>
-              </Pressable>
-            </ScrollView>
-          </Pressable>
-        </Pressable>
-      </Modal>
 
       {/* Fare Estimator — user-tunable coefficients for the ride-fare estimate */}
-      <Pressable style={s.collapseHeader} onPress={() => setFareOpen((v) => !v)}>
-        <View style={s.collapseLeft}>
-          <Ionicons name="calculator-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-          <Text style={s.collapseTitle}>{t("Fare Estimator")}</Text>
-        </View>
-        <Text style={s.collapseChevron}>{fareOpen ? '▾' : '▸'}</Text>
-      </Pressable>
-      {fareOpen && (
-        <>
-          <Text style={s.dim}>{t("Adjust the coefficients used to estimate ride fares.")}</Text>
-          <NumberField label={`${t("Base fare")} (${fareSym})`} value={fc.base} onCommit={(n) => setFare({ base: n })} />
-          <NumberField label={`${t("Per kilometer")} (${fareSym})`} value={fc.perKm} onCommit={(n) => setFare({ perKm: n })} />
-          <NumberField label={`${t("Road distance factor")} (×)`} value={fc.roadFactor} onCommit={(n) => setFare({ roadFactor: n })} />
-          <Text style={[s.label, { marginTop: 6 }]}>{t("Vehicle multipliers")} (×)</Text>
-          {(['Motorbike', 'Compact Car', 'Large Car', 'Luxury Car'] as const).map((v) => (
-            <NumberField key={v} label={t(v)} value={fc.vehicle[v] ?? 1} onCommit={(n) => setFare({ vehicle: { [v]: n } })} />
-          ))}
-          <NumberField label={`${t("Peak-hour surge")} (+)`} value={fc.peakSurge} onCommit={(n) => setFare({ peakSurge: n })} />
-          <NumberField label={`${t("Late-night factor")} (×)`} value={fc.nightFactor} onCommit={(n) => setFare({ nightFactor: n })} />
-          {fareConfig && (
-            <Pressable style={[s.btnDecline, { marginTop: 12 }]} onPress={() => onFareConfigChange(null)}>
-              <Text style={s.btnText}>{t("Reset to defaults")}</Text>
-            </Pressable>
-          )}
-        </>
-      )}
+      <FareEstimator
+        fareConfig={fareConfig}
+        fareDefaults={fareDefaults}
+        fareCurrency={fareCurrency}
+        onFareConfigChange={onFareConfigChange}
+      />
 
       {/* About — version, low-key update check, credits & feedback. Collapsed
           by default like the other Settings sections. The OTA update flow lives
           here as a small "Check now" link (native gets a real OTA swap; web just
           hard-reloads to the newest deploy). */}
-      <Pressable style={s.collapseHeader} onPress={() => setAboutOpen((v) => !v)}>
-        <View style={s.collapseLeft}>
-          <Ionicons name="information-circle-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-          <Text style={s.collapseTitle}>{t("About")}</Text>
-        </View>
-        <Text style={s.collapseChevron}>{aboutOpen ? '▾' : '▸'}</Text>
-      </Pressable>
-      {aboutOpen && (
-        <>
-          <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
-            <Text style={s.mono}>{versionLabel()}</Text>
-            <Pressable hitSlop={8} disabled={updBusy} onPress={() => { checkUpdates(); }}>
-              {updBusy
-                ? <ActivityIndicator size="small" color={palette.accent} />
-                : <Text style={[s.link, { fontSize: 13 }]}>{t('Check now')}</Text>}
-            </Pressable>
-          </View>
-          {!!updMsg && <Text style={s.dim}>{updMsg}</Text>}
-          {trackSupported() && (
-            <View style={{ marginTop: 12 }}>
-              <Text style={s.label}>{t('Update track')}</Text>
-              <View style={s.segRow}>
-                {(['latest', 'stable'] as UpdateTrack[]).map((tk) => (
-                  <Pressable key={tk} disabled={updBusy} onPress={() => { changeTrack(tk); }} style={[s.seg, updTrack === tk && s.segActive]}>
-                    <Ionicons
-                      name={tk === 'latest' ? 'rocket-outline' : 'shield-checkmark-outline'}
-                      size={15}
-                      color={updTrack === tk ? palette.chipBlueText : palette.dim}
-                      style={{ marginEnd: 6 }}
-                    />
-                    <Text style={[s.segText, updTrack === tk && s.segTextActive]}>{t(tk === 'latest' ? 'Latest' : 'Stable')}</Text>
-                  </Pressable>
-                ))}
-              </View>
-              <Text style={s.dim}>{t('Latest receives updates first. Stable stays one release behind for extra safety.')}</Text>
-            </View>
-          )}
-          {nativeOS && (
-            <Text style={[s.dim, { marginTop: 8 }]}>
-              📱 {nativeOS === 'ios' ? t('Use the iOS app for the best experience.') : t('Use the Android app for the best experience.')}
-            </Text>
-          )}
-          <Pressable style={[s.btnDecline, { marginTop: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }]} onPress={() => onReplayTour()}>
-            <Ionicons name="help-circle-outline" size={16} color="white" />
-            <Text style={s.btnText}>{t('Replay guided tour')}</Text>
-          </Pressable>
-          <Text style={[s.dim, { marginTop: 10 }]}>© Phil T</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 4 }}>
-            <Text style={s.dim}>{t('Feedback')}: </Text>
-            <Pressable hitSlop={6} onPress={() => Linking.openURL('mailto:hi@freeport.network')}>
-              <Text style={s.link}>hi@freeport.network</Text>
-            </Pressable>
-          </View>
-        </>
-      )}
+      <AboutSection onReplayTour={onReplayTour} />
 
       {/* Identity — collapsed by default; tap header to expand */}
       <Pressable style={s.collapseHeader} onPress={() => setIdentityOpen((v) => !v)}>
