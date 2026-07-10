@@ -20,14 +20,12 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import subsetFont from 'subset-font';
+import { usedGlyphText, FONT_STEMS } from './subset-fonts.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const dist = path.resolve(process.argv[2] ?? path.join(root, 'dist'));
 const out = path.resolve(process.argv[3] ?? path.join(root, 'offline-freeport.html'));
 
-// Only the icon sets the app actually imports (keeps the file small; the other
-// vector-icon fonts in dist/assets are never registered at runtime).
-const FONT_STEMS = ['Ionicons', 'MaterialCommunityIcons'];
 
 const MIME = {
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif',
@@ -99,47 +97,44 @@ html = html.replace(/(href|src)="(\/(?:favicon|icons)[^"]+)"/g, (m, attr, ref) =
 html = html.replace(/<link rel="manifest"[^>]*>\n?/, '');
 html = html.replace(/<script>if\("serviceWorker" in navigator\)[\s\S]*?<\/script>\n?/, '');
 
-// ── Icon fonts: SUBSET to the glyphs the app can actually render, then embed
-// as woff2 data URIs + a runtime shim that rewrites the @font-face styles
-// Expo injects, so registration succeeds offline. Full icon fonts are ~1.7 MB;
-// the app uses a few dozen glyphs. Used names are collected as every string
-// literal in the app source that is a key of the icon set's glyphmap — this
-// over-includes (any word that happens to be a glyph name) but each glyph is
-// tiny, and it safely covers icons picked via data tables (SORT_ICON,
-// categoryIcon()…) since those are string literals somewhere in the source.
-const srcFiles = [
-  path.join(root, 'App.tsx'),
-  ...findFiles(path.join(root, 'src'), (p) => /\.(ts|tsx)$/.test(p)),
-];
-const literals = new Set();
-const litRe = /(['"`])((?:\\.|(?!\1)[^\\\n])*)\1/g;
-for (const f of srcFiles) {
-  const txt = fs.readFileSync(f, 'utf8');
-  for (const m of txt.matchAll(litRe)) literals.add(m[2]);
-}
-const glyphmapsDir = path.join(root, 'node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/glyphmaps');
-
+// ── Icon fonts: SUBSET to the glyphs the app can actually render (see
+// scripts/subset-fonts.mjs for the shared literal-scan), embedded as woff2
+// data URIs + a runtime shim that rewrites the @font-face styles Expo
+// injects, so registration succeeds offline. Idempotent when the dist fonts
+// were already subset by deploy: subsetting to the same glyph set again is a
+// no-op size-wise.
 const fontFiles = findFiles(path.join(dist, 'assets'), (p) =>
   FONT_STEMS.some((s) => path.basename(p).startsWith(s + '.')) && p.endsWith('.ttf'));
 const fontMap = {};
 for (const f of fontFiles) {
   const stem = path.basename(f).split('.')[0];
-  const glyphmap = JSON.parse(fs.readFileSync(path.join(glyphmapsDir, `${stem}.json`), 'utf8'));
-  const used = Object.keys(glyphmap).filter((name) => literals.has(name));
-  const text = used.map((name) => String.fromCodePoint(glyphmap[name])).join('');
+  const { text, count } = usedGlyphText(stem, root);
   const woff2 = await subsetFont(fs.readFileSync(f), text, { targetFormat: 'woff2' });
   fontMap[stem] = `data:font/woff2;base64,${woff2.toString('base64')}`;
-  console.log(`  embedded font ${stem}: ${used.length} glyphs, ${(woff2.length / 1024).toFixed(0)} kB (was ${(fs.statSync(f).size / 1024).toFixed(0)} kB ttf)`);
+  console.log(`  embedded font ${stem}: ${count} glyphs, ${(woff2.length / 1024).toFixed(0)} kB (dist ttf ${(fs.statSync(f).size / 1024).toFixed(0)} kB)`);
 }
 const missing = FONT_STEMS.filter((s) => !fontMap[s]);
 if (missing.length) throw new Error(`icon fonts not found in dist/assets: ${missing.join(', ')}`);
 
+// ── Runtime image assets (the in-app logo, etc.): the bundle sets
+// <img src="/assets/…png"> at runtime, which can't resolve from file://.
+// Embed every non-font asset (currently just the logo, ~195 kB) and let the
+// shim rewrite img srcs as React inserts them.
+const assetMap = {};
+for (const f of findFiles(path.join(dist, 'assets'), (p) => !p.endsWith('.ttf'))) {
+  const rel = '/' + path.relative(dist, f).split(path.sep).join('/');
+  assetMap[rel] = dataUri(f);
+  console.log(`  embedded asset ${rel} (${(fs.statSync(f).size / 1024).toFixed(0)} kB)`);
+}
+
 const shim = `<script>
-/* offline copy: swap runtime-injected icon-font URLs for embedded data URIs */
+/* offline copy: swap runtime-injected icon-font URLs and /assets/ image srcs
+   for embedded data URIs */
 (function(){
   var FONTS=${JSON.stringify(fontMap)};
-  function fix(node){
-    if(!node||node.tagName!=='STYLE'||!node.textContent||node.textContent.indexOf('@font-face')===-1)return;
+  var ASSETS=${JSON.stringify(assetMap)};
+  function fixStyle(node){
+    if(!node.textContent||node.textContent.indexOf('@font-face')===-1)return;
     var t=node.textContent,changed=false;
     for(var stem in FONTS){
       var re=new RegExp('url\\\\((["\\']?)[^)"\\']*'+stem+'[^)"\\']*\\\\1\\\\)','g');
@@ -147,13 +142,46 @@ const shim = `<script>
     }
     if(changed)node.textContent=t;
   }
+  function fixImg(el){
+    var src=el.getAttribute('src');
+    if(src&&ASSETS[src.split('?')[0]])el.setAttribute('src',ASSETS[src.split('?')[0]]);
+  }
+  /* react-native-web preloads images on a DETACHED new Image() before ever
+     inserting a node — a MutationObserver never sees it, and a failed preload
+     renders nothing (the missing-logo bug). Rewrite at the property setter. */
+  try{
+    var desc=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');
+    Object.defineProperty(HTMLImageElement.prototype,'src',{
+      configurable:true,
+      get:desc.get,
+      set:function(v){var k=(''+v).split('?')[0];desc.set.call(this,ASSETS[k]||v);}
+    });
+  }catch(_){}
+  /* react-native-web renders Image as a div with an inline background-image */
+  function fixBg(el){
+    var bg=el.style&&el.style.backgroundImage;
+    if(!bg||bg.indexOf('/assets/')===-1)return;
+    var m=bg.match(/url\\(["']?([^"')]+)["']?\\)/);
+    if(m){var k=m[1].split('?')[0];if(ASSETS[k])el.style.backgroundImage='url("'+ASSETS[k]+'")';}
+  }
+  function fix(node){
+    if(!node||!node.tagName)return;
+    if(node.tagName==='STYLE'){fixStyle(node);return;}
+    if(node.tagName==='IMG')fixImg(node);
+    fixBg(node);
+    if(node.querySelectorAll){
+      node.querySelectorAll('img').forEach(fixImg);
+      node.querySelectorAll('[style*="background-image"]').forEach(fixBg);
+    }
+  }
   new MutationObserver(function(muts){
     for(var i=0;i<muts.length;i++){
       var m=muts[i];
-      if(m.type==='characterData'){fix(m.target.parentNode);continue;}
+      if(m.type==='characterData'){if(m.target.parentNode&&m.target.parentNode.tagName==='STYLE')fixStyle(m.target.parentNode);continue;}
+      if(m.type==='attributes'){if(m.attributeName==='style')fixBg(m.target);else fixImg(m.target);continue;}
       for(var j=0;j<m.addedNodes.length;j++)fix(m.addedNodes[j]);
     }
-  }).observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+  }).observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['src','style']});
 })();
 </script>
 `;

@@ -28,6 +28,11 @@ if [ -d "$OUT/assets/node_modules" ]; then
   find "$OUT" -name '*.js' -exec sed -i.bak 's#assets/node_modules/#assets/nm/#g' {} + && find "$OUT" -name '*.bak' -delete
 fi
 
+# Subset icon fonts to the glyphs the app uses (~1.7 MB → ~50 kB) — shrinks
+# the desktop binary and the LAN-hosted bundle alike.
+echo "▸ Subsetting icon fonts to used glyphs…"
+( cd "$MOBILE" && node scripts/subset-fonts.mjs "$OUT" )
+
 # Own favicon (Expo ships a stale default).
 cp "$MOBILE/assets/favicon.png" "$OUT/favicon.png" 2>/dev/null || true
 

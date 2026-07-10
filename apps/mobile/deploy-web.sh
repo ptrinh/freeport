@@ -46,6 +46,12 @@ if [ -d dist/assets/node_modules ]; then
   sed -i '' 's#assets/node_modules/#assets/nm/#g' dist/_expo/static/js/web/*.js
 fi
 
+# Icon fonts ship ~1.7 MB but the app renders a few dozen glyphs — subset them
+# in place (same hashed filenames, still TrueType) so first-time visitors don't
+# download ~97% dead glyphs. Fails the deploy if the used-glyph scan breaks.
+echo "▸ Subsetting icon fonts to used glyphs…"
+node scripts/subset-fonts.mjs dist
+
 # Use our own PNG favicon. Expo's generated /favicon.ico ignores web.favicon
 # here (stale default), so serve assets/favicon.png and point the link at it.
 echo "▸ Overriding favicon with our logo…"
