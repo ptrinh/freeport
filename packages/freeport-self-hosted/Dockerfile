@@ -18,6 +18,7 @@ RUN npm install --no-audit --no-fund \
 # Runs on the BUILD platform: the exported bundle is platform-independent JS,
 # and Metro under qemu (arm64 cross-builds) is painfully slow.
 FROM --platform=$BUILDPLATFORM node:22-alpine AS web
+RUN apk add --no-cache bash
 WORKDIR /repo
 COPY package.json package-lock.json tsconfig.base.json ./
 COPY packages/protocol packages/protocol
