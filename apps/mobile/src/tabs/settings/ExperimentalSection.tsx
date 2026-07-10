@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { t } from '../../i18n';
-import { s } from '../../ui/theme';
-import { FlaskIcon } from '../../ui/FlaskIcon';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { s, palette } from '../../ui/theme';
 
 /**
  * Experimental features — early, opt-in, OFF by default. Each toggle only
@@ -24,7 +24,7 @@ function ExperimentalSection({
     <>
       <Pressable style={s.collapseHeader} onPress={() => setOpen((v) => !v)}>
         <View style={s.collapseLeft}>
-          <FlaskIcon size={20} style={s.collapseIcon} />
+          <MaterialCommunityIcons name="flask-outline" size={20} color={palette.text2} style={s.collapseIcon} />
           <Text style={s.collapseTitle}>{t('Experimental')}</Text>
         </View>
         <Text style={s.collapseChevron}>{open ? '▾' : '▸'}</Text>
