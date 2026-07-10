@@ -67,28 +67,27 @@ export function WalletHome({
     <View style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 12 }} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
         {/* Balance header */}
+        {/* The whole header (label + chip + amount) is one tap target — the
+            tiny chip alone was fiddly to hit. Refresh stays its own button. */}
         <View style={{ alignItems: 'center', paddingTop: 26, paddingBottom: 22 }}>
-          <View style={[s.row, { gap: 8 }]}>
-            <Text style={{ color: palette.dim, fontSize: 12, letterSpacing: 2 }}>{t('BALANCE')}</Text>
-            <Pressable
-              hitSlop={8}
-              onPress={onToggleUnit}
-              disabled={usdRate == null}
-              style={{ backgroundColor: palette.card, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 2 }}
-            >
-              <Text style={{ color: palette.dim, fontSize: 11, letterSpacing: 2 }}>
-                {(unit === 'usd' && usdRate != null ? 'USD' : unit === 'local' && localRate != null ? localCurrency : 'SATS') + ' \u21cc'}
-              </Text>
-            </Pressable>
-            <Pressable hitSlop={8} onPress={onRefresh}>
-              {refreshing
-                ? <ActivityIndicator size="small" color={palette.dim} />
-                : <Ionicons name="refresh" size={13} color={palette.dim} />}
-            </Pressable>
-          </View>
-          <Text style={{ color: palette.text, fontSize: 46, fontWeight: '800', marginTop: 6 }} numberOfLines={1} adjustsFontSizeToFit>
-            {balanceSats == null ? '…' : fiatValue ?? balanceSats.toLocaleString()}
-          </Text>
+          <Pressable onPress={onToggleUnit} disabled={usdRate == null} style={{ alignItems: 'center' }} hitSlop={10}>
+            <View style={[s.row, { gap: 8 }]}>
+              <Text style={{ color: palette.dim, fontSize: 12, letterSpacing: 2 }}>{t('BALANCE')}</Text>
+              <View style={{ backgroundColor: palette.card, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 2 }}>
+                <Text style={{ color: palette.dim, fontSize: 11, letterSpacing: 2 }}>
+                  {(unit === 'usd' && usdRate != null ? 'USD' : unit === 'local' && localRate != null ? localCurrency : 'SATS') + ' \u21cc'}
+                </Text>
+              </View>
+              <Pressable hitSlop={8} onPress={onRefresh}>
+                {refreshing
+                  ? <ActivityIndicator size="small" color={palette.dim} />
+                  : <Ionicons name="refresh" size={13} color={palette.dim} />}
+              </Pressable>
+            </View>
+            <Text style={{ color: palette.text, fontSize: 46, fontWeight: '800', marginTop: 6 }} numberOfLines={1} adjustsFontSizeToFit>
+              {balanceSats == null ? '…' : fiatValue ?? balanceSats.toLocaleString()}
+            </Text>
+          </Pressable>
           <Text style={{ color: palette.dim, fontSize: 12, marginTop: 2 }}>{walletLabel}</Text>
         </View>
 
