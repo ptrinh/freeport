@@ -668,5 +668,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Tiesňové volanie",
   "Starting the built-in wallet…": "Spúšťa sa vstavaná peňaženka…",
   "Use your own wallet (NWC) instead": "Použite radšej vlastnú peňaženku (NWC)",
+  "Invoice, Lightning address or Spark address": "Faktúra, adresa Lightning alebo adresa Spark",
+  "This wallet can't pay this type of address": "Táto peňaženka nedokáže zaplatiť tento typ adresy",
+  "Agreed price": "Dohodnutá cena",
 };
 export default c;

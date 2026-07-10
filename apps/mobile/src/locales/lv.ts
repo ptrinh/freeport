@@ -665,5 +665,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Ārkārtas zvans",
   "Starting the built-in wallet…": "Notiek iebūvētā maka palaišana…",
   "Use your own wallet (NWC) instead": "Tā vietā izmantojiet savu maku (NWC)",
+  "Invoice, Lightning address or Spark address": "Rēķins, Lightning adrese vai Spark adrese",
+  "This wallet can't pay this type of address": "Šis maks nevar veikt maksājumu uz šāda veida adresi",
+  "Agreed price": "Saskaņotā cena",
 };
 export default c;

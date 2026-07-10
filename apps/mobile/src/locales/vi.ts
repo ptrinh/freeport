@@ -705,5 +705,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Gọi khẩn cấp",
   "Starting the built-in wallet…": "Đang khởi động ví tích hợp…",
   "Use your own wallet (NWC) instead": "Dùng ví của riêng bạn (NWC) thay thế",
+  "Invoice, Lightning address or Spark address": "Hóa đơn, địa chỉ Lightning hoặc địa chỉ Spark",
+  "This wallet can't pay this type of address": "Ví này không thể thanh toán loại địa chỉ này",
+  "Agreed price": "Giá đã đồng ý",
 };
 export default c;

@@ -662,5 +662,8 @@ const c: Record<string, string> = {
   "Emergency Call": "ការហៅបន្ទាន់",
   "Starting the built-in wallet…": "កំពុងចាប់ផ្តើមកាបូបដែលភ្ជាប់មកជាមួយ…",
   "Use your own wallet (NWC) instead": "ប្រើកាបូបផ្ទាល់ខ្លួនរបស់អ្នក (NWC) ជំនួសវិញ",
+  "Invoice, Lightning address or Spark address": "វិក្កយបត្រ អាសយដ្ឋាន Lightning ឬ អាសយដ្ឋាន Spark",
+  "This wallet can't pay this type of address": "កាបូបនេះមិនអាចទូទាត់ទៅអាសយដ្ឋានប្រភេទនេះបានទេ",
+  "Agreed price": "តម្លៃដែលបានព្រមព្រៀង",
 };
 export default c;

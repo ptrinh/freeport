@@ -662,5 +662,8 @@ const c: Record<string, string> = {
   "Emergency Call": "জরুরি কল",
   "Starting the built-in wallet…": "অন্তর্নির্মিত ওয়ালেট চালু হচ্ছে…",
   "Use your own wallet (NWC) instead": "পরিবর্তে আপনার নিজের ওয়ালেট (NWC) ব্যবহার করুন",
+  "Invoice, Lightning address or Spark address": "ইনভয়েস, Lightning ঠিকানা বা Spark ঠিকানা",
+  "This wallet can't pay this type of address": "এই ওয়ালেট এই ধরনের ঠিকানায় পেমেন্ট করতে পারে না",
+  "Agreed price": "সম্মত মূল্য",
 };
 export default c;

@@ -16,10 +16,15 @@ import { walletProviderFor, defaultWalletProvider, parseNwcUrl, type WalletProvi
 function WalletTab({
   nwcUrl,
   onNwcUrlChange,
+  prefill,
+  onPrefillConsumed,
   onScroll,
 }: {
   nwcUrl: string;
   onNwcUrlChange: (url: string) => void;
+  /** Deal Pay flow: destination (counterparty's address) + agreed-price hint. */
+  prefill?: { dest: string; hint?: string } | null;
+  onPrefillConsumed?: () => void;
   onScroll?: (e: any) => void;
 }) {
   const provider = useRef<WalletProvider | null>(null);
@@ -40,7 +45,19 @@ function WalletTab({
   const [copied, setCopied] = useState(false);
   // Send
   const [payDraft, setPayDraft] = useState('');
+  const [payAmount, setPayAmount] = useState('');
+  const [payHint, setPayHint] = useState('');
   const [payResult, setPayResult] = useState<'ok' | 'fail' | null>(null);
+
+  // Deal Pay flow hands us the counterparty's address + the agreed price.
+  useEffect(() => {
+    if (!prefill?.dest) return;
+    setPayDraft(prefill.dest);
+    setPayAmount('');
+    setPayHint(prefill.hint || '');
+    setPayResult(null);
+    onPrefillConsumed?.();
+  }, [prefill]);
 
   const refresh = async (p: WalletProvider) => {
     setBusy('refresh');
@@ -124,17 +141,24 @@ function WalletTab({
     } catch { /* ignore */ }
   };
 
+  const destIsBolt11 = /^ln(bc|tbs|tb|bcrt)/i.test(payDraft.trim());
   const payInvoice = async () => {
     const p = provider.current; if (!p || !payDraft.trim()) return;
+    const sats = parseInt(payAmount, 10);
+    if (!destIsBolt11 && (!Number.isFinite(sats) || sats <= 0)) { setError(t('Enter an amount in sats')); return; }
     setBusy('pay'); setError(''); setPayResult(null);
     try {
-      await p.pay(payDraft);
+      await p.pay(payDraft, destIsBolt11 ? undefined : sats);
       setPayResult('ok');
-      setPayDraft('');
+      setPayDraft(''); setPayAmount(''); setPayHint('');
       void refresh(p);
     } catch (e) {
       setPayResult('fail');
-      setError(e instanceof Error ? e.message : t('Payment failed'));
+      const msg = e instanceof Error ? e.message : '';
+      setError(
+        msg === 'unsupported-address' ? t("This wallet can't pay this type of address")
+        : msg === 'amount-required' ? t('Enter an amount in sats')
+        : msg || t('Payment failed'));
     } finally { setBusy(null); }
   };
 
@@ -242,11 +266,22 @@ function WalletTab({
           style={[{ borderWidth: 1, borderColor: palette.border, borderRadius: 10, marginTop: 8, paddingHorizontal: 10, minHeight: 44, color: palette.text }]}
           value={payDraft}
           onChangeText={(v) => { setPayDraft(v); setPayResult(null); }}
-          placeholder={t('Paste a Lightning invoice')}
+          placeholder={t('Invoice, Lightning address or Spark address')}
           placeholderTextColor={palette.placeholder}
           autoCapitalize="none"
           autoCorrect={false}
         />
+        {!!payDraft.trim() && !destIsBolt11 && (
+          <TextInput
+            style={[{ borderWidth: 1, borderColor: palette.border, borderRadius: 10, marginTop: 8, paddingHorizontal: 10, minHeight: 44, color: palette.text }]}
+            value={payAmount}
+            onChangeText={(v) => { setPayAmount(v); setPayResult(null); }}
+            placeholder={t('Amount (sats)')}
+            placeholderTextColor={palette.placeholder}
+            keyboardType="numeric"
+          />
+        )}
+        {!!payHint && <Text style={[s.dim, { marginTop: 6 }]}>{t('Agreed price')}: {payHint}</Text>}
         <Pressable style={[s.btnAccept, { marginTop: 10 }, busy === 'pay' && { opacity: 0.6 }]} onPress={payInvoice} disabled={busy !== null || !payDraft.trim()}>
           {busy === 'pay' ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Pay')}</Text>}
         </Pressable>

@@ -665,5 +665,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Итен повик",
   "Starting the built-in wallet…": "Се стартува вградениот паричник…",
   "Use your own wallet (NWC) instead": "Наместо тоа користете сопствен паричник (NWC)",
+  "Invoice, Lightning address or Spark address": "Фактура, Lightning адреса или Spark адреса",
+  "This wallet can't pay this type of address": "Овој паричник не може да плати на овој тип адреса",
+  "Agreed price": "Договорена цена",
 };
 export default c;

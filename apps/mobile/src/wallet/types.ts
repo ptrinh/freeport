@@ -50,8 +50,17 @@ export interface WalletProvider {
   balance(): Promise<WalletBalance>;
   /** Create a bolt11 invoice to RECEIVE `sats` (0 = any-amount invoice). */
   receive(sats: number, description?: string): Promise<WalletInvoice>;
-  /** Pay a bolt11 invoice. Resolves once the wallet reports success. */
-  pay(invoice: string): Promise<{ preimage?: string }>;
+  /**
+   * A static receive address to share with a counterparty, if the provider
+   * has one (Spark address for breez-spark, lud16 for NWC). Null otherwise.
+   */
+  address(): Promise<string | null>;
+  /**
+   * Pay a bolt11 invoice, lightning address or Spark address. `sats` is
+   * required for address destinations (they carry no amount); for bolt11 the
+   * invoice amount wins. Resolves once the wallet reports success.
+   */
+  pay(destination: string, sats?: number): Promise<{ preimage?: string }>;
   /** Recent transactions, newest first. Empty if unsupported. */
   transactions(limit?: number): Promise<WalletTx[]>;
   /** Tear down sockets/subscriptions. */

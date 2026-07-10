@@ -12,6 +12,7 @@ import { SimplePool } from 'nostr-tools/pool';
 import { finalizeEvent, getPublicKey, type Event } from 'nostr-tools/pure';
 import { encrypt as nip04Encrypt, decrypt as nip04Decrypt } from 'nostr-tools/nip04';
 import type { WalletBalance, WalletCapabilities, WalletInvoice, WalletProvider, WalletTx } from './types';
+import { isLightningAddress, lnurlPayInvoice } from './lnurl';
 
 const REQUEST_KIND = 23194;
 const RESPONSE_KIND = 23195;
@@ -119,8 +120,20 @@ export class NwcProvider implements WalletProvider {
     return { invoice: r.invoice, sats };
   }
 
-  async pay(invoice: string): Promise<{ preimage?: string }> {
-    const r = await this.rpc<{ preimage?: string }>('pay_invoice', { invoice: invoice.trim() });
+  async address(): Promise<string | null> {
+    return this.conn.lud16 ?? null;
+  }
+
+  async pay(destination: string, sats?: number): Promise<{ preimage?: string }> {
+    let invoice = destination.trim();
+    if (!/^ln/i.test(invoice)) {
+      // NWC speaks bolt11 only. A lightning address resolves to one; anything
+      // else (e.g. a Spark address) is out of reach for this wallet.
+      if (!isLightningAddress(invoice)) throw new Error('unsupported-address');
+      if (!sats || sats <= 0) throw new Error('amount-required');
+      invoice = await lnurlPayInvoice(invoice, sats);
+    }
+    const r = await this.rpc<{ preimage?: string }>('pay_invoice', { invoice });
     return { preimage: r?.preimage };
   }
 

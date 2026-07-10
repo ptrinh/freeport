@@ -81,7 +81,7 @@ export function makeCounter(nego: Negotiation, terms: ProposedTerms, contact?: s
   };
 }
 
-export function makeAccept(nego: Negotiation, contact: string): NegotiationMessage {
+export function makeAccept(nego: Negotiation, contact: string, payAddress?: string): NegotiationMessage {
   // A single Accept now confirms the deal. Sending an accept while already
   // `confirmed` is allowed too — that's the automatic contact back-flow: when
   // the peer accepts our proposal we auto-reply with our own contact so both
@@ -99,6 +99,7 @@ export function makeAccept(nego: Negotiation, contact: string): NegotiationMessa
     market: nego.intent.content.market,
     terms: nego.terms,
     contact,
+    ...(payAddress ? { payAddress } : {}),
     ts: now(),
   };
 }
@@ -284,13 +285,15 @@ function applyInboundUnchecked(
   if (msg.type === MSG_ACCEPT) {
     if (nego.state === 'cancelled' || nego.state === 'expired') return null;
     if (!msg.contact) return null;
-    if (nego.state === 'confirmed' && nego.theirContact === msg.contact) return null;
+    if (nego.state === 'confirmed' && nego.theirContact === msg.contact && (!msg.payAddress || nego.theirPayAddress === msg.payAddress)) return null;
     return {
       ...nego,
       peer: nego.peer || peerPubkey,
       updatedAt: now(),
       log: [...nego.log, { dir: 'in' as const, msg }],
       theirContact: msg.contact,
+      // Never clear a known address with a re-sent accept that lacks one.
+      theirPayAddress: msg.payAddress || nego.theirPayAddress,
       // The accept echoes the full agreed terms; layer them over our local view
       // so a confirm never drops a field we'd already negotiated.
       terms: msg.terms ? mergeTerms(nego.terms, msg.terms) : nego.terms,

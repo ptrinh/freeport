@@ -705,5 +705,8 @@ const c: Record<string, string> = {
   "Emergency Call": "긴급 전화",
   "Starting the built-in wallet…": "내장 지갑을 시작하는 중…",
   "Use your own wallet (NWC) instead": "대신 내 지갑(NWC) 사용",
+  "Invoice, Lightning address or Spark address": "인보이스, Lightning 주소 또는 Spark 주소",
+  "This wallet can't pay this type of address": "이 지갑은 이 유형의 주소로 결제할 수 없습니다",
+  "Agreed price": "합의된 가격",
 };
 export default c;

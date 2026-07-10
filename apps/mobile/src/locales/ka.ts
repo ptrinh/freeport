@@ -662,5 +662,8 @@ const c: Record<string, string> = {
   "Emergency Call": "გადაუდებელი ზარი",
   "Starting the built-in wallet…": "ჩაშენებული საფულის გაშვება…",
   "Use your own wallet (NWC) instead": "სანაცვლოდ გამოიყენეთ საკუთარი საფულე (NWC)",
+  "Invoice, Lightning address or Spark address": "ინვოისი, Lightning მისამართი ან Spark მისამართი",
+  "This wallet can't pay this type of address": "ამ საფულეს არ შეუძლია ამ ტიპის მისამართზე გადახდა",
+  "Agreed price": "შეთანხმებული ფასი",
 };
 export default c;

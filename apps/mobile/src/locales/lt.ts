@@ -666,5 +666,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Skubusis skambutis",
   "Starting the built-in wallet…": "Paleidžiama integruota piniginė…",
   "Use your own wallet (NWC) instead": "Verčiau naudokite savo piniginę (NWC)",
+  "Invoice, Lightning address or Spark address": "Sąskaita, Lightning adresas arba Spark adresas",
+  "This wallet can't pay this type of address": "Ši piniginė negali mokėti šio tipo adresui",
+  "Agreed price": "Sutarta kaina",
 };
 export default c;

@@ -665,5 +665,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Hitni poziv",
   "Starting the built-in wallet…": "Pokretanje ugrađenog novčanika…",
   "Use your own wallet (NWC) instead": "Umjesto toga koristi vlastiti novčanik (NWC)",
+  "Invoice, Lightning address or Spark address": "Račun, Lightning adresa ili Spark adresa",
+  "This wallet can't pay this type of address": "Ovaj novčanik ne može platiti ovu vrstu adrese",
+  "Agreed price": "Dogovorena cijena",
 };
 export default c;

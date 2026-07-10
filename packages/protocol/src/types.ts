@@ -82,6 +82,10 @@ export interface NegotiationMessage {
   terms?: ProposedTerms;
   /** Only present on accept — never sent before a deal is sealed. */
   contact?: string;
+  /** Wallet receive address (Spark address / lightning address), sent on
+   *  accept when the sender has the in-app wallet enabled. Lets the payer
+   *  side show a Pay button on the confirmed deal. */
+  payAddress?: string;
   reason?: string; // for cancel
   text?: string; // free-text chat message (for chat type)
   /** Fulfillment progress on a confirmed deal (for status type). */
@@ -132,6 +136,8 @@ export interface Negotiation {
   /** True if we initiated (responded to their public intent). */
   weInitiated: boolean;
   state: NegotiationState;
+  /** Counterparty's wallet receive address from their accept, if any. */
+  theirPayAddress?: string;
   /** Last terms on the table and who proposed them. */
   terms?: ProposedTerms;
   termsBy?: 'us' | 'them';

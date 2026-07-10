@@ -662,5 +662,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Շտապ զանգ",
   "Starting the built-in wallet…": "Ներկառուցված դրամապանակի գործարկում…",
   "Use your own wallet (NWC) instead": "Փոխարենը օգտագործեք ձեր սեփական դրամապանակը (NWC)",
+  "Invoice, Lightning address or Spark address": "Հաշիվ-ապրանքագիր, Lightning հասցե կամ Spark հասցե",
+  "This wallet can't pay this type of address": "Այս դրամապանակը չի կարող վճարել այս տեսակի հասցեին",
+  "Agreed price": "Համաձայնեցված գին",
 };
 export default c;

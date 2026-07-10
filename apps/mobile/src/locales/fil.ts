@@ -662,5 +662,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Tawag sa Emergency",
   "Starting the built-in wallet…": "Sinisimulan ang built-in na wallet…",
   "Use your own wallet (NWC) instead": "Gamitin na lang ang sarili mong wallet (NWC)",
+  "Invoice, Lightning address or Spark address": "Invoice, Lightning address, o Spark address",
+  "This wallet can't pay this type of address": "Hindi kayang magbayad ng wallet na ito sa ganitong uri ng address",
+  "Agreed price": "Napagkasunduang presyo",
 };
 export default c;

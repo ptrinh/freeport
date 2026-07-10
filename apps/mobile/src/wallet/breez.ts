@@ -94,13 +94,23 @@ export class BreezSparkProvider implements WalletProvider {
     return { invoice: r.paymentRequest, sats };
   }
 
-  async pay(invoice: string): Promise<{ preimage?: string }> {
+  async address(): Promise<string | null> {
+    const r = await this.sdk.receivePayment({ paymentMethod: { type: 'sparkAddress' } });
+    return r?.paymentRequest || null;
+  }
+
+  async pay(destination: string, sats?: number): Promise<{ preimage?: string }> {
+    const input = destination.trim();
+    const isBolt11 = /^ln(bc|tbs|tb|bcrt)/i.test(input);
+    if (!isBolt11 && (!sats || sats <= 0)) throw new Error('amount-required');
+    // The SDK's parser handles bolt11 / lightning address / Spark address.
     const prepared = await this.sdk.prepareSendPayment({
-      paymentRequest: { type: 'input', input: invoice.trim() },
+      paymentRequest: { type: 'input', input },
+      ...(isBolt11 ? {} : { amount: BigInt(Math.round(sats!)) }),
     });
     const r = await this.sdk.sendPayment({
       prepareResponse: prepared,
-      options: { type: 'bolt11Invoice', preferSpark: false, completionTimeoutSecs: 30 },
+      ...(isBolt11 ? { options: { type: 'bolt11Invoice', preferSpark: false, completionTimeoutSecs: 30 } } : {}),
     });
     if (r?.payment?.status === 'failed') throw new Error('payment failed');
     return {};

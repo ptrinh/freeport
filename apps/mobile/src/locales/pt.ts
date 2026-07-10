@@ -708,5 +708,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Chamada de emergência",
   "Starting the built-in wallet…": "Iniciando a carteira integrada…",
   "Use your own wallet (NWC) instead": "Use sua própria carteira (NWC) em vez disso",
+  "Invoice, Lightning address or Spark address": "Fatura, endereço Lightning ou endereço Spark",
+  "This wallet can't pay this type of address": "Esta carteira não pode pagar este tipo de endereço",
+  "Agreed price": "Preço acordado",
 };
 export default c;

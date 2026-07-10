@@ -82,6 +82,7 @@ import { useDeepLinkNav } from './src/hooks/useDeepLinkNav';
 import { useBackgroundGrace } from './src/hooks/useBackgroundGrace';
 import { MarketTab } from './src/tabs/BrowseTab';
 import { WalletTab } from './src/tabs/WalletTab';
+import { activeWalletProvider } from './src/wallet';
 import { PostTab } from './src/tabs/PostTab';
 import { DealsTab, isImageMsg, isAudioMsg, isTripMsg } from './src/tabs/MessagesTab';
 import { SettingsTab } from './src/tabs/SettingsTab';
@@ -342,6 +343,7 @@ function AppInner() {
   const [servicesEnabled, setServicesEnabled] = useState(false);
   const [experimentalWallet, setExperimentalWallet] = useState(false);
   const [walletNwcUrl, setWalletNwcUrl] = useState('');
+  const [walletPrefill, setWalletPrefill] = useState<{ dest: string; hint?: string } | null>(null);
   const [location, setLocation] = useState<UserLocation>({ country: '', state: '', city: '' });
   // Mirror the latest location so the async launch auto-detect can tell whether
   // the user has manually changed it (e.g. picked a place during onboarding)
@@ -926,6 +928,16 @@ function AppInner() {
     return parts.filter(Boolean).join(' · ') || (client?.pubkey.slice(0, 12) ?? '');
   };
   const buildContactFor = (n: Negotiation): string => buildContact(n.intent, n.weInitiated);
+
+  // Wallet experiment: our accepts carry a receive address so the counterparty
+  // gets a Pay button. Resolved lazily at accept time (the callback boots the
+  // wallet only then); client.resolvePayAddress caps the wait at 8s.
+  useEffect(() => {
+    if (!client) return;
+    client.getPayAddress = experimentalWallet
+      ? async () => (await activeWalletProvider(walletNwcUrl))?.address() ?? null
+      : undefined;
+  }, [client, experimentalWallet, walletNwcUrl]);
   // The confirm back-flow / poke healer (auto-reply with our contact) — see hook.
   useContactHandshake(client, negos, profile, buildContactFor, resumeTick);
 
@@ -1156,9 +1168,11 @@ function AppInner() {
       </Animated.View>
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
       {tab === 'post' && <PostTab client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onPayDeal={(n) => { setWalletPrefill({ dest: n.theirPayAddress ?? '', hint: n.terms?.payment }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
       {tab === 'wallet' && (
         <WalletTab
+          prefill={walletPrefill}
+          onPrefillConsumed={() => setWalletPrefill(null)}
           nwcUrl={walletNwcUrl}
           onNwcUrlChange={(url) => {
             setWalletNwcUrl(url);

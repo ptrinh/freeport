@@ -665,5 +665,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Κλήση έκτακτης ανάγκης",
   "Starting the built-in wallet…": "Εκκίνηση του ενσωματωμένου πορτοφολιού…",
   "Use your own wallet (NWC) instead": "Χρησιμοποιήστε το δικό σας πορτοφόλι (NWC) αντ' αυτού",
+  "Invoice, Lightning address or Spark address": "Τιμολόγιο, διεύθυνση Lightning ή διεύθυνση Spark",
+  "This wallet can't pay this type of address": "Αυτό το πορτοφόλι δεν μπορεί να πληρώσει αυτόν τον τύπο διεύθυνσης",
+  "Agreed price": "Συμφωνημένη τιμή",
 };
 export default c;

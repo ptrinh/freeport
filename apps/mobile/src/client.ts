@@ -124,6 +124,12 @@ export class MobileClient {
   /** Fires for our own intents — both freshly posted and echoed back from relays on startup. */
   onOwnIntent?: (intent: Intent) => void;
   onNegotiationUpdate?: (nego: Negotiation) => void;
+  /**
+   * Resolves our wallet receive address to attach to accept messages (set by
+   * the app when the Wallet experiment is on). Kept as a callback so the
+   * wallet only boots when a deal is actually being sealed — never at startup.
+   */
+  getPayAddress?: () => Promise<string | null>;
   /** Fires for a genuinely NEW inbound DM (not the startup backfill) — drives local notifications. */
   onIncomingMessage?: (nego: Negotiation, msg: NegotiationMessage) => void;
   onProfileFetched?: (pubkey: string) => void;
@@ -728,7 +734,9 @@ export class MobileClient {
       // back-flow effect runs. Heals deals stranded by a lost accept DM.
       if (msg.type === MSG_ACCEPT && nego.state === 'confirmed' && createdAt >= this.watchStartTs - 5) {
         if (nego.ourContact) {
-          this.sendDM(nego.peer, JSON.stringify(makeAccept(nego, nego.ourContact))).catch(() => {});
+          this.resolvePayAddress()
+            .then((pa) => this.sendDM(nego.peer, JSON.stringify(makeAccept(nego, nego.ourContact!, pa))))
+            .catch(() => {});
         } else {
           this.onNegotiationUpdate?.(nego);
         }
@@ -824,13 +832,28 @@ export class MobileClient {
    * up confirmed with each other's details. Returns the negotiation id, or null
    * if one already exists (don't double-open).
    */
+  /** Best-effort wallet address for makeAccept — bounded so a slow wallet
+   *  boot (web WASM download) can never stall sealing a deal. */
+  private async resolvePayAddress(): Promise<string | undefined> {
+    if (!this.getPayAddress) return undefined;
+    try {
+      const addr = await Promise.race([
+        this.getPayAddress(),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+      ]);
+      return addr || undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
   async acceptIntent(intent: Intent, terms: ProposedTerms, contact: string): Promise<string | null> {
     const base = openNegotiation(intent, this.pubkey, true, intent.pubkey);
     if (this.negotiations.has(base.id)) return null;
     // Terms originate from the intent owner ("them"); seating them lets
     // makeAccept (which accepts `nego.terms`) build a valid confirming message.
     const seeded: Negotiation = { ...base, terms, termsBy: 'them' };
-    const msg = makeAccept(seeded, contact);
+    const msg = makeAccept(seeded, contact, await this.resolvePayAddress());
     const updated = applyOutbound(seeded, msg);
     this.commitNego(updated);
     await this.sendDM(updated.peer, JSON.stringify(msg));
@@ -849,7 +872,7 @@ export class MobileClient {
   async accept(negoId: string, contact: string): Promise<void> {
     const nego = this.negotiations.get(negoId);
     if (!nego) return;
-    const msg = makeAccept(nego, contact);
+    const msg = makeAccept(nego, contact, await this.resolvePayAddress());
     const updated = applyOutbound(nego, msg);
     this.commitNego(updated);
     await this.sendDM(updated.peer, JSON.stringify(msg));

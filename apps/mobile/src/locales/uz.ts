@@ -662,5 +662,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Favqulodda qo‘ng‘iroq",
   "Starting the built-in wallet…": "O‘rnatilgan hamyon ishga tushirilmoqda…",
   "Use your own wallet (NWC) instead": "Buning o‘rniga o‘z hamyoningizdan (NWC) foydalaning",
+  "Invoice, Lightning address or Spark address": "Hisob-faktura, Lightning manzili yoki Spark manzili",
+  "This wallet can't pay this type of address": "Bu hamyon bunday turdagi manzilga toʻlov qila olmaydi",
+  "Agreed price": "Kelishilgan narx",
 };
 export default c;

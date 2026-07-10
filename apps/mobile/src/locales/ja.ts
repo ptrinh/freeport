@@ -705,5 +705,8 @@ const c: Record<string, string> = {
   "Emergency Call": "緊急通報",
   "Starting the built-in wallet…": "内蔵ウォレットを起動しています…",
   "Use your own wallet (NWC) instead": "代わりに自分のウォレット（NWC）を使う",
+  "Invoice, Lightning address or Spark address": "インボイス、Lightning アドレスまたは Spark アドレス",
+  "This wallet can't pay this type of address": "このウォレットではこの種類のアドレスに支払えません",
+  "Agreed price": "合意した価格",
 };
 export default c;

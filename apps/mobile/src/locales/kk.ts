@@ -662,5 +662,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Шұғыл қоңырау",
   "Starting the built-in wallet…": "Кірістірілген әмиян іске қосылуда…",
   "Use your own wallet (NWC) instead": "Оның орнына өз әмияныңызды (NWC) пайдаланыңыз",
+  "Invoice, Lightning address or Spark address": "Инвойс, Lightning мекенжайы немесе Spark мекенжайы",
+  "This wallet can't pay this type of address": "Бұл әмиян мұндай мекенжай түріне төлей алмайды",
+  "Agreed price": "Келісілген баға",
 };
 export default c;

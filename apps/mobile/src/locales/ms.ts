@@ -662,5 +662,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Panggilan Kecemasan",
   "Starting the built-in wallet…": "Memulakan dompet terbina dalam…",
   "Use your own wallet (NWC) instead": "Gunakan dompet anda sendiri (NWC) sebaliknya",
+  "Invoice, Lightning address or Spark address": "Invois, alamat Lightning atau alamat Spark",
+  "This wallet can't pay this type of address": "Dompet ini tidak boleh membayar jenis alamat ini",
+  "Agreed price": "Harga yang dipersetujui",
 };
 export default c;

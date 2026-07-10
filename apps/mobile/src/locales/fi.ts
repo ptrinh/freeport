@@ -665,5 +665,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Hätäpuhelu",
   "Starting the built-in wallet…": "Käynnistetään sisäänrakennettua lompakkoa…",
   "Use your own wallet (NWC) instead": "Käytä sen sijaan omaa lompakkoasi (NWC)",
+  "Invoice, Lightning address or Spark address": "Lasku, Lightning-osoite tai Spark-osoite",
+  "This wallet can't pay this type of address": "Tämä lompakko ei voi maksaa tämän tyyppiseen osoitteeseen",
+  "Agreed price": "Sovittu hinta",
 };
 export default c;

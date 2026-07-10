@@ -665,5 +665,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Nødanrop",
   "Starting the built-in wallet…": "Starter den innebygde lommeboken…",
   "Use your own wallet (NWC) instead": "Bruk din egen lommebok (NWC) i stedet",
+  "Invoice, Lightning address or Spark address": "Faktura, Lightning-adresse eller Spark-adresse",
+  "This wallet can't pay this type of address": "Denne lommeboka kan ikke betale denne typen adresse",
+  "Agreed price": "Avtalt pris",
 };
 export default c;

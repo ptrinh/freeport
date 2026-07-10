@@ -705,5 +705,8 @@ const c: Record<string, string> = {
   "Emergency Call": "โทรฉุกเฉิน",
   "Starting the built-in wallet…": "กำลังเริ่มกระเป๋าเงินในตัว…",
   "Use your own wallet (NWC) instead": "ใช้กระเป๋าเงินของคุณเอง (NWC) แทน",
+  "Invoice, Lightning address or Spark address": "ใบแจ้งหนี้ ที่อยู่ Lightning หรือที่อยู่ Spark",
+  "This wallet can't pay this type of address": "กระเป๋าเงินนี้ไม่สามารถจ่ายให้ที่อยู่ประเภทนี้ได้",
+  "Agreed price": "ราคาที่ตกลงกัน",
 };
 export default c;

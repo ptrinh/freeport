@@ -52,6 +52,8 @@ export function DealsTab({
   glowCompleted = false,
   role,
   country = '',
+  walletEnabled = false,
+  onPayDeal,
   sendLocationOnDeal = true,
   blockedPubkeys,
   onToggleBlock,
@@ -64,6 +66,10 @@ export function DealsTab({
   role: 'passenger' | 'driver' | '';
   /** User's selected country (ISO code) — resolves the local police number. */
   country?: string;
+  /** Wallet experiment on for THIS user (the counterparty signals theirs via payAddress). */
+  walletEnabled?: boolean;
+  /** Open the Wallet tab's Send flow prefilled for this deal. */
+  onPayDeal?: (n: Negotiation) => void;
   onScroll?: (e: any) => void;
   view: 'active' | 'completed';
   onViewChange: (v: 'active' | 'completed') => void;
@@ -530,6 +536,14 @@ export function DealsTab({
                       )}
                       {st === 'picked_up' && (
                         <>
+                          {/* Settle in-app: only when BOTH sides have the wallet
+                              (ours = walletEnabled, theirs = they attached a
+                              payAddress to their accept) and only the buyer pays. */}
+                          {role === 'passenger' && walletEnabled && !!item.theirPayAddress && onPayDeal && (
+                            <Pressable style={[s.btnAccept, { marginBottom: 8 }]} onPress={() => onPayDeal(item)}>
+                              <Text style={s.btnText}>{'⚡ ' + t('Pay')}</Text>
+                            </Pressable>
+                          )}
                           <SlideToConfirm label={doneLabel} onConfirm={() => runDealAction(client?.setStage(item.id, 'completed'), t('Could not update the deal'))} />
                           {/* Passenger safety: while in transit, one tap dials the
                               local police. The pickup is in the passenger's own

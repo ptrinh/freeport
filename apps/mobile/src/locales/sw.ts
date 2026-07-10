@@ -662,5 +662,8 @@ const c: Record<string, string> = {
   "Emergency Call": "Simu ya dharura",
   "Starting the built-in wallet…": "Inaanzisha pochi iliyojengwa ndani…",
   "Use your own wallet (NWC) instead": "Tumia pochi yako mwenyewe (NWC) badala yake",
+  "Invoice, Lightning address or Spark address": "Ankara, anwani ya Lightning au anwani ya Spark",
+  "This wallet can't pay this type of address": "Pochi hii haiwezi kulipa aina hii ya anwani",
+  "Agreed price": "Bei iliyokubaliwa",
 };
 export default c;

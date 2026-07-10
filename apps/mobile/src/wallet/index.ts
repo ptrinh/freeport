@@ -14,6 +14,24 @@ export function walletProviderFor(nwcUrl: string): WalletProvider | null {
 }
 
 /**
+ * Provider for background wallet operations (sharing our receive address on
+ * accept, paying a deal): the stored NWC wallet when configured, otherwise
+ * the built-in one. NWC instances are cached per connection string.
+ */
+let nwcCache: { url: string; provider: WalletProvider } | null = null;
+export async function activeWalletProvider(nwcUrl: string): Promise<WalletProvider | null> {
+  if (nwcUrl) {
+    if (nwcCache?.url !== nwcUrl) {
+      nwcCache?.provider.close();
+      const p = walletProviderFor(nwcUrl);
+      nwcCache = p ? { url: nwcUrl, provider: p } : null;
+    }
+    return nwcCache?.provider ?? null;
+  }
+  return defaultWalletProvider();
+}
+
+/**
  * Default provider: the built-in Breez-Spark wallet, lazy-loaded on first
  * use and kept as an app-lifetime singleton (it syncs in the background;
  * BreezSparkProvider.close() is a no-op). Resolves null when unavailable —

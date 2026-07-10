@@ -662,5 +662,8 @@ const c: Record<string, string> = {
   "Emergency Call": "የአደጋ ጊዜ ጥሪ",
   "Starting the built-in wallet…": "አብሮ የተሰራውን ዋሌት በማስጀመር ላይ…",
   "Use your own wallet (NWC) instead": "በምትኩ የራስዎን ዋሌት (NWC) ይጠቀሙ",
+  "Invoice, Lightning address or Spark address": "ደረሰኝ፣ የLightning አድራሻ ወይም የSpark አድራሻ",
+  "This wallet can't pay this type of address": "ይህ ቦርሳ ይህን ዓይነት አድራሻ መክፈል አይችልም",
+  "Agreed price": "የተስማሙበት ዋጋ",
 };
 export default c;
