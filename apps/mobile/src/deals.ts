@@ -60,6 +60,30 @@ export function offerSummary(
 }
 
 /**
+ * Contact-handshake healing. A confirmed deal is only mutual once BOTH sides
+ * hold each other's contact; a single lost accept DM (signer hiccup, relay
+ * drop) stranded deals at "waiting for the other party to come online" forever
+ * (field report). Two self-healing moves, both idempotent for the peer:
+ */
+
+/** We received their contact but never (successfully) sent ours → send it. */
+export function needsContactBackflow(n: Pick<Negotiation, 'state' | 'theirContact' | 'ourContact'>): boolean {
+  return n.state === 'confirmed' && !!n.theirContact && !n.ourContact;
+}
+
+/** We sent ours but theirs never arrived and the deal has sat stuck for a
+ *  while → re-send our accept as a poke. The peer either applies it (they
+ *  never got it) or, on the duplicate, re-sends their own contact. The grace
+ *  period avoids poking during the normal seconds-long handshake. */
+export function shouldPokeForContact(
+  n: Pick<Negotiation, 'state' | 'theirContact' | 'ourContact' | 'updatedAt'>,
+  nowSec: number,
+  graceSec = 60,
+): boolean {
+  return n.state === 'confirmed' && !!n.ourContact && !n.theirContact && nowSec - n.updatedAt > graceSec;
+}
+
+/**
  * Lowercased haystack for keyword search over a post: title, author name, route
  * (from/to), service, location, notes, payment, category, subcategory.
  */

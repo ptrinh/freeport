@@ -55,7 +55,7 @@ import { beginBackgroundTask, endBackgroundTask } from './src/backgroundTask';
 import { loadProfile, saveProfile, defaultAvatarUrl, type UserProfile } from './src/profile';
 import { normalizePhone } from './src/phone';
 import { locationGranted, requestLocationPermission, detectRawLocationGPS, detectRawLocationIP, effectiveUnit } from './src/maps';
-import { messagesViewForNewActivity } from './src/deals';
+import { messagesViewForNewActivity, needsContactBackflow, shouldPokeForContact } from './src/deals';
 import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
 import { loadPrefs, savePrefs, type UserLocation } from './src/prefs';
 import { systemLanguage, systemCountry } from './src/language';
@@ -1046,14 +1046,17 @@ function AppInner() {
     return parts.filter(Boolean).join(' · ') || (client?.pubkey.slice(0, 12) ?? '');
   };
   const buildContactFor = (n: Negotiation): string => buildContact(n.intent, n.weInitiated);
-  // Auto-send our contact back exactly ONCE per deal. The guard is persisted to
-  // kv (not just an in-memory ref) so an app reload / OTA update doesn't re-send,
-  // and we deliberately do NOT un-guard on a publish error — accept() commits our
-  // contact locally and best-effort-publishes to the relays; re-firing on every
-  // transient failure or reload re-publishes the same DM (new event id) and spams
-  // the other party with "New message". Send once; if it truly failed, the user
-  // can message manually.
+  // Auto-send our contact back (the confirm back-flow). The old logic guarded
+  // this with a PERSISTED once-ever set and kept the id even when accept()
+  // threw (e.g. the signer failing mid-background on iOS) — one bad moment
+  // permanently stranded the deal at "waiting for the other party" on the peer
+  // (field report). The `!n.ourContact` condition already prevents re-sends
+  // after a successful local commit (accept() commits before publishing, and
+  // relay failures go to the persisted outbox), so the persisted guard added
+  // nothing but that failure mode. Keep only an in-session backoff so a
+  // persistently-broken signer can't hot-loop.
   const autoContactSent = useRef<Set<string>>(new Set());
+  const autoContactLastTry = useRef<Map<string, number>>(new Map());
   const [autoContactReady, setAutoContactReady] = useState(false);
   useEffect(() => {
     kvGet('freeport.autoContactSent')
@@ -1062,14 +1065,23 @@ function AppInner() {
   }, []);
   useEffect(() => {
     if (!client || !autoContactReady) return;
+    const nowSec = Math.floor(Date.now() / 1000);
     for (const n of negos) {
-      if (n.state === 'confirmed' && n.theirContact && !n.ourContact && !autoContactSent.current.has(n.id)) {
-        autoContactSent.current.add(n.id);
-        kvSet('freeport.autoContactSent', JSON.stringify([...autoContactSent.current])).catch(() => {});
+      if (needsContactBackflow(n)) {
+        const last = autoContactLastTry.current.get(n.id) ?? 0;
+        if (Date.now() - last < 30_000) continue; // backoff between attempts
+        autoContactLastTry.current.set(n.id, Date.now());
         client.accept(n.id, buildContactFor(n)).catch(() => {});
+      } else if (shouldPokeForContact(n, nowSec) && !autoContactSent.current.has('poke:' + n.id)) {
+        // Waiting side: our contact went out but theirs never arrived — the
+        // peer either lost our accept or failed their back-flow. Re-send our
+        // accept once per session; their client applies it or, on the
+        // duplicate, re-sends their contact (see client.processDM).
+        autoContactSent.current.add('poke:' + n.id);
+        client.accept(n.id, n.ourContact!).catch(() => {});
       }
     }
-  }, [negos, client, profile, autoContactReady]);
+  }, [negos, client, profile, autoContactReady, resumeTick]);
 
   // A pure passenger only posts ride requests and waits for drivers — Browse
   // (where you pick listings) is noise. Show it for drivers, or once the

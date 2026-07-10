@@ -721,7 +721,20 @@ export class MobileClient {
       return;
     }
     const updated = applyInbound(nego, msg, from, eventId);
-    if (!updated) return;
+    if (!updated) {
+      // A DUPLICATE inbound accept on a confirmed deal is the peer poking:
+      // they still haven't received our contact. Re-send it (idempotent on
+      // their side); without a contact of our own yet, nudge the app so its
+      // back-flow effect runs. Heals deals stranded by a lost accept DM.
+      if (msg.type === MSG_ACCEPT && nego.state === 'confirmed' && createdAt >= this.watchStartTs - 5) {
+        if (nego.ourContact) {
+          this.sendDM(nego.peer, JSON.stringify(makeAccept(nego, nego.ourContact))).catch(() => {});
+        } else {
+          this.onNegotiationUpdate?.(nego);
+        }
+      }
+      return;
+    }
     this.commitNego(updated);
     this.maybePublishReceipt(updated);
     this.onNegotiationUpdate?.(updated);
