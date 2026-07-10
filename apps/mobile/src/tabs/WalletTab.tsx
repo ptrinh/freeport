@@ -166,7 +166,9 @@ function WalletTab({
 
   if (busy === 'boot') {
     return (
-      <View style={[s.pad, { alignItems: 'center', paddingTop: 48 }]}>
+      // flex:1 keeps the tab content filling the viewport — without it the
+      // bar below collapses up to mid-screen while the wallet boots.
+      <View style={[s.pad, { flex: 1, alignItems: 'center', paddingTop: 48 }]}>
         <ActivityIndicator color={palette.dim} />
         <Text style={[s.dim, { marginTop: 12 }]}>{t('Starting the built-in wallet…')}</Text>
       </View>

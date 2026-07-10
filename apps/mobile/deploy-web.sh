@@ -59,6 +59,16 @@ node scripts/subset-fonts.mjs dist
 echo "▸ Content-hashing JS bundles…"
 node scripts/hash-bundles.mjs dist
 
+# Canonical host: send www to the apex. The _redirects host rule is kept for
+# when Pages honors it; the inline script below is the working fallback (the
+# API token here can't create a zone-level 301 Redirect Rule — add one in the
+# CF dashboard under Rules → Redirect Rules for a true 301).
+echo "▸ Writing _redirects + inline www→apex redirect…"
+cat > dist/_redirects <<'REDIR'
+https://www.freeport.network/* https://freeport.network/:splat 301
+REDIR
+sed -i '' 's#<head>#<head><script>if(location.hostname==="www.freeport.network")location.replace("https://freeport.network"+location.pathname+location.search+location.hash);</script>#' dist/index.html
+
 # Use our own PNG favicon. Expo's generated /favicon.ico ignores web.favicon
 # here (stale default), so serve assets/favicon.png and point the link at it.
 echo "▸ Overriding favicon with our logo…"
