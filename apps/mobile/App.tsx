@@ -70,7 +70,7 @@ import { onWheelDemo, triggerWheelDemo } from './src/wheelDemo';
 import { Fireworks } from './src/Fireworks';
 import { installDebugApi, registerDebugClient } from './src/debug';
 import { locQuery, locRefSeed, locRefStore, locRefHas, userGeohashSeed, userGeohashStore } from './src/localityRef';
-import { passesDistance, passesCategory } from './src/browseFilter';
+import { passesDistance, passesCategory, matchesKeywords } from './src/browseFilter';
 import { initNotifications, notify, notificationGranted, requestNotifications, onNotificationTap } from './src/notify';
 import { beginBackgroundTask, endBackgroundTask } from './src/backgroundTask';
 import { uploadImage, uploadFile, UploadError } from './src/upload';
@@ -2297,7 +2297,7 @@ function MarketTab({
         })
       : byCategory;
     // Keyword filter across title, locations, payment, notes, and author name
-    const filtered = kw ? withinMax.filter((i) => searchableText(i, client).includes(kw)) : withinMax;
+    const filtered = kw ? withinMax.filter((i) => matchesKeywords(searchableText(i, client), kw)) : withinMax;
     // Posts that exist but were hidden by the locality/max-distance filters —
     // surfaced in the empty state so a distance-filtered feed doesn't
     // masquerade as an empty network ("waiting for posts…" while posts exist).
@@ -3849,7 +3849,7 @@ function DealsTab({
     .filter((n) => {
       if (view !== 'completed') return !isDone(n);
       if (!isDone(n) || n.updatedAt < completedCutoff) return false;
-      if (completedKw && !negoText(n).includes(completedKw)) return false;
+      if (completedKw && !matchesKeywords(negoText(n), completedKw)) return false;
       return true;
     })
     .sort((a, b) => b.updatedAt - a.updatedAt);

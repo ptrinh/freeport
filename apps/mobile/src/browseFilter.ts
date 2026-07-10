@@ -13,6 +13,17 @@
 
 import { categoryOf, subcategoryOf } from './categories';
 
+/** Multi-keyword filter: comma-separated terms, ALL of which must appear
+ *  (case-insensitive substring each) — "158, Nẵng" matches a post containing
+ *  both "158" and "Nẵng" anywhere in its searchable text. An empty query (or
+ *  only commas/spaces) matches everything. */
+export function matchesKeywords(text: string, query: string): boolean {
+  const terms = query.toLowerCase().split(',').map((t) => t.trim()).filter(Boolean);
+  if (!terms.length) return true;
+  const hay = text.toLowerCase();
+  return terms.every((t) => hay.includes(t));
+}
+
 /** Default locality radius for rides when the user has no Max distance set. */
 export const NEAR_KM = 200;
 
