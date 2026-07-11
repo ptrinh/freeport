@@ -20,6 +20,8 @@ import { ScanSheet, scanSupported } from './wallet/ScanSheet';
 function WalletTab({
   nwcUrl,
   onNwcUrlChange,
+  unit = 'local',
+  onUnitChange,
   localCurrency = 'USD',
   contacts = [],
   prefill,
@@ -28,6 +30,9 @@ function WalletTab({
 }: {
   nwcUrl: string;
   onNwcUrlChange: (url: string) => void;
+  /** Persisted balance unit + setter (prefs-backed). */
+  unit?: 'sats' | 'usd' | 'local';
+  onUnitChange?: (u: 'sats' | 'usd' | 'local') => void;
   /** ISO code of the user's local currency (from their selected country). */
   localCurrency?: string;
   /** Saved counterparties (from deals that shared a wallet address). */
@@ -45,7 +50,6 @@ function WalletTab({
   const [balance, setBalance] = useState<number | null>(null);
   const [usdRate, setUsdRate] = useState<number | null>(null);
   const [localRate, setLocalRate] = useState<number | null>(null);
-  const [unit, setUnit] = useState<'sats' | 'usd' | 'local'>('sats');
   const [txs, setTxs] = useState<WalletTx[]>([]);
   const [tokens, setTokens] = useState<TokenBalanceInfo[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -210,8 +214,8 @@ function WalletTab({
         localRate={localRate}
         localCurrency={localCurrency}
         unit={unit}
-        onToggleUnit={() => setUnit((u) =>
-          u === 'sats' ? 'usd' : u === 'usd' && localRate != null ? 'local' : 'sats')}
+        onToggleUnit={() => onUnitChange?.(
+          unit === 'sats' ? 'usd' : unit === 'usd' && localRate != null && localCurrency !== 'USD' ? 'local' : 'sats')}
         txs={txs}
         refreshing={refreshing}
         onRefresh={() => provider.current && refresh(provider.current)}

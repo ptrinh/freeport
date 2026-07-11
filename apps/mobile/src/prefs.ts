@@ -49,6 +49,9 @@ export interface Prefs {
   /** NWC connection string for the bring-your-own wallet ('' = not connected).
    *  Device-only, never published — treat like a credential. */
   walletNwcUrl: string;
+  /** Balance display unit in the Wallet tab. Defaults to the user's local
+   *  currency; falls back to sats whenever no rate is available. */
+  walletUnit: 'sats' | 'usd' | 'local';
   /** Play a sound when a new post lands in the default browse subcategory. */
   browseAlertSound: boolean;
   /** Send a notification when a new post lands in the default browse subcategory. */
@@ -68,6 +71,7 @@ const DEFAULTS: Prefs = {
   servicesEnabled: false,
   experimentalWallet: false,
   walletNwcUrl: '',
+  walletUnit: 'local',
   location: { country: '', state: '', city: '' },
   locationManual: false,
   useNip07: false,
