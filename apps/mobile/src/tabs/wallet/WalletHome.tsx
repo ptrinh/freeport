@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
 import type { TokenBalanceInfo, WalletTx } from '../../wallet';
-import { totalFiat, formatFiat, formatPillAmount, effectiveUnit } from '../../wallet/portfolio';
+import { totalFiat, formatFiat, effectiveUnit, buildAssetPills } from '../../wallet/portfolio';
 
 /**
  * Glow-style wallet home (adapted from breez/glow-web, MIT): centered balance
@@ -94,10 +94,7 @@ export function WalletHome({
           {(() => {
             // One pill per asset with a balance: BTC in sats first, then each
             // stablecoin. Zero balances stay hidden; two decimals max.
-            const pills = [
-              ...(balanceSats ? [{ key: 'sats', label: `${formatPillAmount(balanceSats)} sats` }] : []),
-              ...tokens.filter((tk) => tk.amount > 0).map((tk) => ({ key: tk.id, label: `${formatPillAmount(tk.amount)} ${tk.ticker}` })),
-            ];
+            const pills = buildAssetPills(balanceSats, tokens);
             return pills.length > 0 ? (
               <View style={[s.row, { gap: 8, marginTop: 10, flexWrap: 'wrap', justifyContent: 'center' }]}>
                 {pills.map((p) => (

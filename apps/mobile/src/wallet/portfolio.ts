@@ -59,3 +59,22 @@ export function effectiveUnit(
   if (unit === 'usd') return usdRate != null ? 'usd' : 'sats';
   return 'sats';
 }
+
+
+/**
+ * The asset pills under the balance, in display order: BTC (sats) first,
+ * then each token. Zero balances are hidden; amounts cap at 2 fraction
+ * digits with locale separators.
+ */
+export function buildAssetPills(
+  balanceSats: number | null,
+  tokens: TokenBalanceInfo[],
+  locale?: string,
+): Array<{ key: string; label: string }> {
+  return [
+    ...(balanceSats ? [{ key: 'sats', label: `${formatPillAmount(balanceSats, locale)} sats` }] : []),
+    ...tokens
+      .filter((t) => t.amount > 0)
+      .map((t) => ({ key: t.id, label: `${formatPillAmount(t.amount, locale)} ${t.ticker}` })),
+  ];
+}
