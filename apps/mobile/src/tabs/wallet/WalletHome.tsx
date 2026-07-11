@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
 import type { TokenBalanceInfo, WalletTx } from '../../wallet';
+import { totalFiat, formatFiat, formatPillAmount } from '../../wallet/portfolio';
 
 /**
  * Glow-style wallet home (adapted from breez/glow-web, MIT): centered balance
@@ -48,18 +49,13 @@ export function WalletHome({
   footer?: React.ReactNode;
   onScroll?: (e: any) => void;
 }) {
-  const fiatFmt = (rate: number, code: string) => {
-    const v = (balanceSats! / 1e8) * rate;
-    try {
-      return new Intl.NumberFormat(undefined, { style: 'currency', currency: code }).format(v);
-    } catch {
-      return `${v.toLocaleString(undefined, { maximumFractionDigits: 0 })} ${code}`;
-    }
-  };
-  const fiatValue = balanceSats == null ? null
-    : unit === 'usd' && usdRate ? fiatFmt(usdRate, 'USD')
-    : unit === 'local' && localRate ? fiatFmt(localRate, localCurrency)
-    : null;
+  // Fiat modes total the whole portfolio (BTC + USD-pegged stablecoins);
+  // sats mode stays BTC-only — summing tokens into sats would mislead.
+  const fiatValue = (() => {
+    if (unit === 'sats') return null;
+    const total = totalFiat(unit, balanceSats, tokens, usdRate, localRate);
+    return total == null ? null : formatFiat(total, unit === 'usd' ? 'USD' : localCurrency);
+  })();
   const fmtTime = (ts: number) => {
     const d = new Date(ts * 1000);
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) +
@@ -92,17 +88,23 @@ export function WalletHome({
             </Text>
           </Pressable>
           <Text style={{ color: palette.dim, fontSize: 12, marginTop: 2 }}>{walletLabel}</Text>
-          {tokens.filter((tk) => tk.amount > 0).length > 0 && (
-            <View style={[s.row, { gap: 8, marginTop: 10, flexWrap: 'wrap', justifyContent: 'center' }]}>
-              {tokens.filter((tk) => tk.amount > 0).map((tk) => (
-                <View key={tk.id} style={{ backgroundColor: palette.card, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5 }}>
-                  <Text style={{ color: palette.text2, fontSize: 13, fontWeight: '700' }}>
-                    {tk.amount.toLocaleString(undefined, { maximumFractionDigits: 2 })} {tk.ticker}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          )}
+          {(() => {
+            // One pill per asset with a balance: BTC in sats first, then each
+            // stablecoin. Zero balances stay hidden; two decimals max.
+            const pills = [
+              ...(balanceSats ? [{ key: 'sats', label: `${formatPillAmount(balanceSats)} sats` }] : []),
+              ...tokens.filter((tk) => tk.amount > 0).map((tk) => ({ key: tk.id, label: `${formatPillAmount(tk.amount)} ${tk.ticker}` })),
+            ];
+            return pills.length > 0 ? (
+              <View style={[s.row, { gap: 8, marginTop: 10, flexWrap: 'wrap', justifyContent: 'center' }]}>
+                {pills.map((p) => (
+                  <View key={p.key} style={{ backgroundColor: palette.card, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5 }}>
+                    <Text style={{ color: palette.text2, fontSize: 13, fontWeight: '700' }}>{p.label}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : null;
+          })()}
         </View>
 
         {/* Payment history */}
