@@ -91,6 +91,20 @@ async function prfFromAssertion(): Promise<Uint8Array> {
   return typeof first === 'string' ? fromB64url(first) : new Uint8Array(first);
 }
 
+/**
+ * Device-local hint that a passkey for Freeport was created or used in this
+ * browser. Survives sign-out on purpose: it lets the Welcome screen fall back
+ * to a normal passkey prompt on browsers without "immediate" mediation,
+ * without nagging users who never made a passkey.
+ */
+const HAS_PASSKEY_KEY = 'freeport.hasPasskey';
+function markHasPasskey(): void {
+  try { if (Platform.OS === 'web') localStorage.setItem(HAS_PASSKEY_KEY, '1'); } catch { /* ignore */ }
+}
+function hasLocalPasskeyHint(): boolean {
+  try { return Platform.OS === 'web' && localStorage.getItem(HAS_PASSKEY_KEY) === '1'; } catch { return false; }
+}
+
 /** Register a new passkey, then derive the account key from its PRF. */
 export async function createPasskeyIdentity(accountLabel: string): Promise<Uint8Array> {
   const userId = crypto.getRandomValues(new Uint8Array(16));
@@ -105,8 +119,9 @@ export async function createPasskeyIdentity(accountLabel: string): Promise<Uint8
   if (Platform.OS === 'web') {
     const cred: any = await (navigator as any).credentials.create({ publicKey: common });
     const ext = cred?.getClientExtensionResults?.()?.prf;
-    if (ext?.results?.first) return deriveSk(new Uint8Array(ext.results.first));
     if (ext?.enabled === false) throw new Error('passkey-no-prf');
+    markHasPasskey();
+    if (ext?.results?.first) return deriveSk(new Uint8Array(ext.results.first));
     // PRF exists but only evaluates on get() on this platform — assert once.
     return deriveSk(await prfFromAssertion());
   }
@@ -123,7 +138,9 @@ export async function createPasskeyIdentity(accountLabel: string): Promise<Uint8
 
 /** Sign in with an existing (possibly synced) passkey. */
 export async function signInWithPasskey(): Promise<Uint8Array> {
-  return deriveSk(await prfFromAssertion());
+  const sk = deriveSk(await prfFromAssertion());
+  markHasPasskey();
+  return sk;
 }
 
 /**
@@ -146,10 +163,21 @@ export async function attemptImmediatePasskeySignIn(): Promise<Uint8Array | null
       mediation: 'immediate',
     });
     const first = cred?.getClientExtensionResults?.()?.prf?.results?.first;
-    return first ? deriveSk(new Uint8Array(first)) : null;
-  } catch {
-    // TypeError (mediation unsupported), NotAllowedError (no credential /
-    // dismissed), SecurityError… — all mean "no auto sign-in", never fatal.
+    if (first) { markHasPasskey(); return deriveSk(new Uint8Array(first)); }
+    return null;
+  } catch (e) {
+    // NotAllowedError (no credential / user dismissed), SecurityError… —
+    // "no auto sign-in", never fatal. One exception: a TypeError means this
+    // browser doesn't know "immediate" mediation at all (it's very new). If
+    // this device used a Freeport passkey before, fall back to the regular
+    // modal prompt — that's still the sign-in the user expects on arrival.
+    if (e instanceof TypeError && hasLocalPasskeyHint()) {
+      try {
+        const sk = await signInWithPasskey();
+        markHasPasskey();
+        return sk;
+      } catch { return null; }
+    }
     return null;
   }
 }

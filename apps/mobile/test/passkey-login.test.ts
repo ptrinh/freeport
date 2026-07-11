@@ -168,3 +168,66 @@ describe('attemptImmediatePasskeySignIn (Welcome auto-prompt)', () => {
     expect(await attemptImmediatePasskeySignIn()).toBeNull();
   });
 });
+
+describe('fallback when "immediate" mediation is unsupported (older browsers)', () => {
+  const mockStorage = (init: Record<string, string> = {}) => {
+    const store: Record<string, string> = { ...init };
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem: (k: string) => store[k] ?? null,
+        setItem: (k: string, v: string) => { store[k] = v; },
+      },
+    });
+    return store;
+  };
+
+  it('device that used a passkey before → regular modal prompt instead', async () => {
+    webEnv();
+    mockStorage({ 'freeport.hasPasskey': '1' });
+    const get = vi.fn(async (req: any) => {
+      if (req.mediation === 'immediate') throw new TypeError('mediation');
+      return credWithPrf(PRF7); // the plain modal assertion
+    });
+    mockCredentials({ get });
+    const sk = await attemptImmediatePasskeySignIn();
+    expect(sk && hex(sk)).toBe(SK_FOR_PRF7);
+    expect(get).toHaveBeenCalledTimes(2);
+  });
+
+  it('device with NO passkey history → stays silent (no nagging modal)', async () => {
+    webEnv();
+    mockStorage();
+    const get = vi.fn(async () => { throw new TypeError('mediation'); });
+    mockCredentials({ get });
+    expect(await attemptImmediatePasskeySignIn()).toBeNull();
+    expect(get).toHaveBeenCalledTimes(1); // never opened the modal
+  });
+
+  it('signInWithPasskey records the device hint for future visits', async () => {
+    webEnv();
+    const store = mockStorage();
+    mockCredentials({ get: async () => credWithPrf(PRF7) });
+    await signInWithPasskey();
+    expect(store['freeport.hasPasskey']).toBe('1');
+  });
+
+  it('createPasskeyIdentity records the device hint too', async () => {
+    webEnv();
+    const store = mockStorage();
+    mockCredentials({ create: async () => credWithPrf(PRF7), get: async () => credWithPrf(PRF7) });
+    await createPasskeyIdentity('Test');
+    expect(store['freeport.hasPasskey']).toBe('1');
+  });
+
+  it('user dismissing the fallback modal is not fatal', async () => {
+    webEnv();
+    mockStorage({ 'freeport.hasPasskey': '1' });
+    const get = vi.fn(async (req: any) => {
+      if (req.mediation === 'immediate') throw new TypeError('mediation');
+      throw new DOMException('dismissed', 'NotAllowedError');
+    });
+    mockCredentials({ get });
+    expect(await attemptImmediatePasskeySignIn()).toBeNull();
+  });
+});
