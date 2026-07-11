@@ -751,5 +751,6 @@ const c: Record<string, string> = {
   "Edit Address": "アドレスを編集",
   "Save": "保存",
   "Send BTC or USD": "BTC または USD を送金",
+  "Repost": "再投稿",
 };
 export default c;

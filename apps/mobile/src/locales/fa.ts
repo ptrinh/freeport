@@ -711,5 +711,6 @@ const c: Record<string, string> = {
   "Edit Address": "ویرایش آدرس",
   "Save": "ذخیره",
   "Send BTC or USD": "ارسال BTC یا USD",
+  "Repost": "بازنشر",
 };
 export default c;

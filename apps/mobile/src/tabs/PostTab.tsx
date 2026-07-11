@@ -38,7 +38,7 @@ import { suggestPrice, estimateFare } from '../pricing';
 import { COUNTRY_NAME, type Currency } from '../locations';
 import { scrollNodeIntoView, type ScrollableNode } from '../scrollToNode';
 import { s, palette } from '../ui/theme';
-import { defaultIntentTime, fmtClock, fmtClockTitle, timeToWindow, snapToStep, shortPlace, myPostTitle, vehicleLabel, fmtPayment } from '../ui/format';
+import { defaultIntentTime, fmtClock, fmtClockTitle, timeToWindow, snapToStep, shortPlace, myPostTitle, vehicleLabel, fmtPayment, parsePayment } from '../ui/format';
 import { Field, SelectField, SideToggle, PostButton, ImagePickerField, TimeField, DurationField, PaymentField, WaitingBar } from '../ui/fields';
 
 type PostType = 'rideshare' | 'service';
@@ -56,6 +56,8 @@ export function PostTab({
   role,
   browseCategory,
   browseSubcategory,
+  draft = null,
+  onDraftConsumed,
   onScroll,
 }: {
   client: MobileClient | null;
@@ -68,8 +70,18 @@ export function PostTab({
   role: 'passenger' | 'driver' | '';
   browseCategory?: string;
   browseSubcategory?: string;
+  /** Repost: prefill the form from a completed post (time excluded). */
+  draft?: import('../deals').RepostDraft | null;
+  onDraftConsumed?: () => void;
   onScroll?: (e: any) => void;
 }) {
+  // Repost draft: land on the matching form type with it open.
+  useEffect(() => {
+    if (!draft) return;
+    setType(draft.schema.startsWith('rideshare') ? 'rideshare' : 'service');
+    setFormOpen(true);
+  }, [draft]);
+
   // Pre-select the post type + category from the user's Browse preference, so a
   // new post defaults to whatever they're set up to browse. A service category
   // opens the Service/Product form; anything else (incl. Ridesharing) stays on
@@ -160,8 +172,8 @@ export function PostTab({
             )}
             <Animated.View style={{ opacity: formAnim, transform: [{ translateY: formAnim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }] }}>
               {activeType === 'rideshare'
-                ? <RideshareForm client={client} profile={profile} defaultCurrency={defaultCurrency} location={location} onPosted={markPosted} myIntents={myIntents} negos={negos} scrollRef={formScroll} />
-                : <ServiceForm client={client} profile={profile} defaultCurrency={defaultCurrency} location={location} onPosted={markPosted} defaultCategory={browseIsService ? browseCategory : undefined} defaultSubcategory={browseIsService ? browseSubcategory : undefined} scrollRef={formScroll} />}
+                ? <RideshareForm client={client} profile={profile} defaultCurrency={defaultCurrency} location={location} onPosted={markPosted} myIntents={myIntents} negos={negos} scrollRef={formScroll} draft={draft?.schema.startsWith('rideshare') ? draft : null} onDraftConsumed={onDraftConsumed} />
+                : <ServiceForm client={client} profile={profile} defaultCurrency={defaultCurrency} location={location} onPosted={markPosted} defaultCategory={browseIsService ? browseCategory : undefined} defaultSubcategory={browseIsService ? browseSubcategory : undefined} scrollRef={formScroll} draft={draft && !draft.schema.startsWith('rideshare') ? draft : null} onDraftConsumed={onDraftConsumed} />}
             </Animated.View>
           </>
         )}
@@ -305,7 +317,7 @@ function useRequiredFields(scrollRef?: React.RefObject<ScrollView | null>) {
   return { register, focus, flag };
 }
 
-function RideshareForm({ client, profile, defaultCurrency, location, onPosted, myIntents, negos, scrollRef }: { client: MobileClient | null; profile: UserProfile; defaultCurrency: Currency; location: UserLocation; onPosted?: () => void; myIntents: Intent[]; negos: Negotiation[]; scrollRef?: React.RefObject<ScrollView | null> }) {
+function RideshareForm({ client, profile, defaultCurrency, location, onPosted, myIntents, negos, scrollRef, draft, onDraftConsumed }: { client: MobileClient | null; profile: UserProfile; defaultCurrency: Currency; location: UserLocation; onPosted?: () => void; myIntents: Intent[]; negos: Negotiation[]; scrollRef?: React.RefObject<ScrollView | null>; draft?: import('../deals').RepostDraft | null; onDraftConsumed?: () => void }) {
   // Rideshare is one-directional: passengers post ride requests; drivers pick
   // them from the market and respond. Drivers never post, so no offer side.
   const [from, setFrom] = useState('');
@@ -326,6 +338,20 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const [time, setTime] = useState<Date>(defaultIntentTime);
+  // Repost: copy everything from the completed post except the TIME (kept at
+  // the form default — reposting a past departure would be born-expired).
+  useEffect(() => {
+    if (!draft) return;
+    if (draft.from) setFrom(draft.from);
+    setFromGeohash(draft.fromGeohash ?? null);
+    if (draft.to) setTo(draft.to);
+    if (draft.category) setCategory(draft.category);
+    if (draft.payment) setPayAmount(parsePayment(draft.payment, defaultCurrency).amount);
+    setNote(draft.note ?? '');
+    setImages(draft.images ?? []);
+    onDraftConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft]);
   const [flexible, setFlexible] = useState(false);
   const [payAmount, setPayAmount] = useState(0);
   const [payCurrency, setPayCurrency] = useState<Currency>(defaultCurrency);
@@ -477,7 +503,7 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
   );
 }
 
-function ServiceForm({ client, profile, defaultCurrency, location: userLocation, onPosted, defaultCategory, defaultSubcategory, scrollRef }: { client: MobileClient | null; profile: UserProfile; defaultCurrency: Currency; location: UserLocation; onPosted?: () => void; defaultCategory?: string; defaultSubcategory?: string; scrollRef?: React.RefObject<ScrollView | null> }) {
+function ServiceForm({ client, profile, defaultCurrency, location: userLocation, onPosted, defaultCategory, defaultSubcategory, scrollRef, draft, onDraftConsumed }: { client: MobileClient | null; profile: UserProfile; defaultCurrency: Currency; location: UserLocation; onPosted?: () => void; defaultCategory?: string; defaultSubcategory?: string; scrollRef?: React.RefObject<ScrollView | null>; draft?: import('../deals').RepostDraft | null; onDraftConsumed?: () => void }) {
   // Service convention: the provider posts their offering; customers respond.
   // Seed Category/Subcategory from the user's Browse preference when it names a
   // real service category, falling back to the first category. Subcategory only
@@ -494,6 +520,21 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
   const [category, setCategory] = useState(initialCat);
   const [subcategory, setSubcategory] = useState(initialSub);
   const [time, setTime] = useState<Date>(defaultIntentTime);
+  // Repost: copy everything from the completed post except the TIME.
+  useEffect(() => {
+    if (!draft) return;
+    if (draft.location) setLocation(draft.location);
+    setLocationGeohash(draft.locationGeohash ?? null);
+    if (draft.service) setService(draft.service);
+    if (draft.category) setCategory(draft.category);
+    if (draft.subcategory) setSubcategory(draft.subcategory);
+    if (draft.payment) setPayAmount(parsePayment(draft.payment, defaultCurrency).amount);
+    if (draft.durationMinutes) { setDurHours(Math.floor(draft.durationMinutes / 60)); setDurMinutes(draft.durationMinutes % 60); }
+    setNotes(draft.note ?? '');
+    setImages(draft.images ?? []);
+    onDraftConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft]);
   // Provider offers default to flexible (a standing offer); customer requests
   // default to a specific time. Toggling side resets to that side's default.
   const [flexible, setFlexible] = useState(true);

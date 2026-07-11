@@ -751,5 +751,6 @@ const c: Record<string, string> = {
   "Edit Address": "주소 편집",
   "Save": "저장",
   "Send BTC or USD": "BTC 또는 USD 보내기",
+  "Repost": "다시 게시",
 };
 export default c;

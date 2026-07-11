@@ -55,6 +55,7 @@ export function DealsTab({
   walletEnabled = false,
   onPayDeal,
   onReceiveDeal,
+  onRepost,
   sendLocationOnDeal = true,
   blockedPubkeys,
   onToggleBlock,
@@ -73,6 +74,8 @@ export function DealsTab({
   onPayDeal?: (n: Negotiation) => void;
   /** Seller side: open the Wallet tab's Receive flow (Pay QR) for this deal. */
   onReceiveDeal?: (n: Negotiation) => void;
+  /** Poster of a completed deal: prefill New Post with this intent (sans time). */
+  onRepost?: (n: Negotiation) => void;
   onScroll?: (e: any) => void;
   view: 'active' | 'completed';
   onViewChange: (v: 'active' | 'completed') => void;
@@ -358,17 +361,31 @@ export function DealsTab({
                 const to = item.terms?.to && item.terms.to !== p.to.name
                   ? item.terms.to : placeParam(p.to?.geohash, p.to.name);
                 return (
-                  <Pressable style={s.mapLink} onPress={() => openMaps(routeUrl(from, to))}>
-                    <Text style={s.mapLinkText}>{'🗺 ' + t('View route in Google Maps')}</Text>
-                  </Pressable>
+                  <View style={[s.row, { gap: 8, flexWrap: 'wrap' }]}>
+                    <Pressable style={s.mapLink} onPress={() => openMaps(routeUrl(from, to))}>
+                      <Text style={s.mapLinkText}>{'🗺 ' + t('View route in Google Maps')}</Text>
+                    </Pressable>
+                    {item.stage === 'completed' && item.intent.pubkey === client?.pubkey && onRepost && (
+                      <Pressable style={s.mapLink} onPress={() => onRepost(item)}>
+                        <Text style={s.mapLinkText}>{'🔁 ' + t('Repost')}</Text>
+                      </Pressable>
+                    )}
+                  </View>
                 );
               }
               if (item.intent.content.schema.startsWith('service') && p.location?.name) {
                 const loc = item.terms?.location ?? p.location.name;
                 return (
-                  <Pressable style={s.mapLink} onPress={() => openMaps(placeUrl(loc, p.location?.geohash))}>
-                    <Text style={s.mapLinkText}>{'🗺 ' + t('View location in Google Maps')}</Text>
-                  </Pressable>
+                  <View style={[s.row, { gap: 8, flexWrap: 'wrap' }]}>
+                    <Pressable style={s.mapLink} onPress={() => openMaps(placeUrl(loc, p.location?.geohash))}>
+                      <Text style={s.mapLinkText}>{'🗺 ' + t('View location in Google Maps')}</Text>
+                    </Pressable>
+                    {item.stage === 'completed' && item.intent.pubkey === client?.pubkey && onRepost && (
+                      <Pressable style={s.mapLink} onPress={() => onRepost(item)}>
+                        <Text style={s.mapLinkText}>{'🔁 ' + t('Repost')}</Text>
+                      </Pressable>
+                    )}
+                  </View>
                 );
               }
               return null;

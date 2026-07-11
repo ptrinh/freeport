@@ -751,5 +751,6 @@ const c: Record<string, string> = {
   "Edit Address": "编辑地址",
   "Save": "保存",
   "Send BTC or USD": "发送 BTC 或 USD",
+  "Repost": "重新发布",
 };
 export default c;

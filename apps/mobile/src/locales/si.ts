@@ -708,5 +708,6 @@ const c: Record<string, string> = {
   "Edit Address": "ලිපිනය සංස්කරණය",
   "Save": "සුරකින්න",
   "Send BTC or USD": "BTC හෝ USD යවන්න",
+  "Repost": "නැවත පළ කරන්න",
 };
 export default c;

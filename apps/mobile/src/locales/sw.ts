@@ -708,5 +708,6 @@ const c: Record<string, string> = {
   "Edit Address": "Hariri anwani",
   "Save": "Hifadhi",
   "Send BTC or USD": "Tuma BTC au USD",
+  "Repost": "Chapisha tena",
 };
 export default c;

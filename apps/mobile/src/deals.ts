@@ -114,3 +114,55 @@ export function walletContacts(
   }
   return out;
 }
+
+
+/**
+ * Repost: everything from a completed post carries over to a fresh New Post
+ * form EXCEPT the time (chosen anew — reposting yesterday's 08:30 would be
+ * born-expired). Field names mirror each form's payload shape.
+ */
+export interface RepostDraft {
+  schema: string;
+  // rideshare
+  from?: string;
+  fromGeohash?: string | null;
+  to?: string;
+  category?: string;
+  payment?: string;
+  note?: string;
+  images?: string[];
+  // service / product
+  location?: string;
+  locationGeohash?: string | null;
+  service?: string;
+  subcategory?: string;
+  durationMinutes?: number;
+}
+
+export function repostDraft(intent: Intent): RepostDraft {
+  const p = (intent.content.payload ?? {}) as Record<string, any>;
+  const base = {
+    schema: intent.content.schema,
+    category: p.category,
+    payment: p.payment,
+    images: Array.isArray(p.images) ? p.images : undefined,
+  };
+  if (intent.content.schema.startsWith('rideshare')) {
+    return {
+      ...base,
+      from: p.from?.name,
+      fromGeohash: p.from?.geohash ?? null,
+      to: p.to?.name,
+      note: p.note,
+    };
+  }
+  return {
+    ...base,
+    location: p.location?.name,
+    locationGeohash: p.location?.geohash ?? null,
+    service: p.service,
+    subcategory: p.subcategory,
+    durationMinutes: p.duration_minutes,
+    note: p.notes,
+  };
+}

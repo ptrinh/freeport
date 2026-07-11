@@ -708,5 +708,6 @@ const c: Record<string, string> = {
   "Edit Address": "მისამართის რედაქტირება",
   "Save": "შენახვა",
   "Send BTC or USD": "BTC ან USD გაგზავნა",
+  "Repost": "ხელახლა გამოქვეყნება",
 };
 export default c;
