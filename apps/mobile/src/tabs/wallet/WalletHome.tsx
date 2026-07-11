@@ -149,7 +149,7 @@ export function WalletHome({
       <View style={[s.row, { gap: 10, paddingHorizontal: 12, paddingBottom: 10, paddingTop: 6 }]}>
         <Pressable onPress={onSend} style={{ flex: 1, height: 52, borderRadius: 14, backgroundColor: palette.accent, alignItems: 'center', justifyContent: 'center' }}>
           <View style={[s.row, { gap: 8 }]}>
-            <Ionicons name="arrow-up" size={17} color="white" />
+            <Ionicons name="paper-plane" size={17} color="white" />
             <Text style={{ color: 'white', fontWeight: '800', fontSize: 16 }}>{t('Send')}</Text>
           </View>
         </Pressable>
@@ -160,7 +160,7 @@ export function WalletHome({
         )}
         <Pressable onPress={onReceive} style={{ flex: 1, height: 52, borderRadius: 14, backgroundColor: palette.accentBtn, alignItems: 'center', justifyContent: 'center' }}>
           <View style={[s.row, { gap: 8 }]}>
-            <Ionicons name="arrow-down" size={17} color="white" />
+            <Ionicons name="add-circle" size={17} color="white" />
             <Text style={{ color: 'white', fontWeight: '800', fontSize: 16 }}>{t('Receive')}</Text>
           </View>
         </Pressable>
