@@ -51,7 +51,7 @@ export function WalletHome({
   const fiatFmt = (rate: number, code: string) => {
     const v = (balanceSats! / 1e8) * rate;
     try {
-      return new Intl.NumberFormat(undefined, { style: 'currency', currency: code, maximumFractionDigits: code === 'USD' ? 2 : 0 }).format(v);
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: code }).format(v);
     } catch {
       return `${v.toLocaleString(undefined, { maximumFractionDigits: 0 })} ${code}`;
     }

@@ -223,7 +223,7 @@ export function SendSheet({
                   {[
                     usd != null ? `≈ $${usd.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : '',
                     localRate && localCurrency !== 'USD' && Number.isFinite(sats)
-                      ? '≈ ' + (() => { try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: localCurrency, maximumFractionDigits: 0 }).format((sats / 1e8) * localRate); } catch { return `${((sats / 1e8) * localRate).toLocaleString(undefined, { maximumFractionDigits: 0 })} ${localCurrency}`; } })()
+                      ? '≈ ' + (() => { try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: localCurrency }).format((sats / 1e8) * localRate); } catch { return `${((sats / 1e8) * localRate).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${localCurrency}`; } })()
                       : '',
                   ].filter(Boolean).join(' · ')}
                 </Text>
