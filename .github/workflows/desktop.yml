@@ -157,11 +157,25 @@ jobs:
           # Stable-named alias so README/links can point at releases/latest.
           cp "Freeport_${VERSION}-offline.html" Freeport-offline.html
           gh release upload "$GITHUB_REF_NAME" "Freeport_${VERSION}-offline.html" Freeport-offline.html --clobber
-          # Mirror to IPFS so the file outlives the git hosting (skips
-          # gracefully when the PINATA_JWT secret is absent).
-          PINATA_JWT="${{ secrets.PINATA_JWT }}" node apps/mobile/scripts/pin-ipfs.mjs Freeport-offline.html || true
+          # Mirror to IPFS so the files outlive the git hosting (skips
+          # gracefully when the PINATA_JWT secret is absent), then surface
+          # the gateway links in the release notes.
+          export PINATA_JWT="${{ secrets.PINATA_JWT }}"
+          HTML_CID=$(node apps/mobile/scripts/pin-ipfs.mjs Freeport-offline.html | tee /dev/stderr | awk '/CID:/{print $2}') || true
           git archive --format=zip -o freeport-source.zip HEAD
-          PINATA_JWT="${{ secrets.PINATA_JWT }}" node apps/mobile/scripts/pin-ipfs.mjs freeport-source.zip freeport-source.zip || true
+          SRC_CID=$(node apps/mobile/scripts/pin-ipfs.mjs freeport-source.zip freeport-source.zip | tee /dev/stderr | awk '/CID:/{print $2}') || true
+          if [ -n "$HTML_CID" ] && [ -n "$SRC_CID" ]; then
+            gh release view "$GITHUB_REF_NAME" --json body -q .body > notes.md
+            {
+              echo ""
+              echo "### IPFS mirrors (survive even if this repo disappears)"
+              echo "- App, single-file HTML: https://ipfs.io/ipfs/${HTML_CID}/Freeport-offline.html"
+              echo "- Source code: https://ipfs.io/ipfs/${SRC_CID}/freeport-source.zip"
+              echo ""
+              echo "Any IPFS gateway or node works — the CIDs are the content addresses."
+            } >> notes.md
+            gh release edit "$GITHUB_REF_NAME" --notes-file notes.md || true
+          fi
 
       - name: Upload artifacts (dispatch validation builds)
         if: github.event_name == 'workflow_dispatch'
