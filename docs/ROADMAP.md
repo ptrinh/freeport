@@ -121,7 +121,42 @@ CUSTODIAL wallets/escrow (self-custodial payments are planned — see below),
 surge pricing (Freeport is free negotiation), loyalty programs, trip
 insurance, centralized driver vetting.
 
-## In-app wallet — Breez SDK (Spark), self-custodial BTC + stablecoin
+## Self-hosted OTA updates on Cloudflare (drop the EAS Update dependency)
+
+**Goal:** serve JS OTA updates from our own Cloudflare infrastructure instead
+of Expo's EAS Update service — no MAU/bandwidth limits, no dependency on
+Expo staying up (or friendly), same censorship-resilience story as the rest
+of the stack (web on CF Pages, mirrors on IPFS).
+
+**Why it works:** the client side is open. `expo-updates` speaks the
+documented **Expo Updates protocol** (protocol v1) against any conforming
+server — `updates.url` in app.json can point anywhere. Expo's hosted service
+is convenience, not lock-in.
+
+**Sketch:**
+1. **Server = static files + a thin Worker.** `npx expo export` produces the
+   update bundles/assets. Upload to R2 (or straight onto Pages); a small
+   Worker implements the manifest endpoint (headers: runtime version →
+   pick the right update; `expo-protocol-version: 1`, multipart manifest).
+   Community reference implementations exist (`expo-updates-server`,
+   `custom-expo-updates-server`) — port one to Workers/R2.
+2. **Code signing (the important part):** generate our own key pair, ship the
+   cert in the binary (`updates.codeSigningCertificate`), sign every manifest.
+   Clients then verify updates cryptographically — a compromised CDN/domain
+   cannot push code, which matters extra since wallet keys live in the app.
+3. **Deploy script:** extend `deploy-web.sh` / a sibling `deploy-ota.sh` —
+   export per runtime (1.4.1 / 1.5.0 / 1.5.1 …), sign, upload to R2, purge
+   cache. Keep channels (production/preview) as URL paths.
+4. **Migration:** needs a NEW binary release with `updates.url` pointed at
+   e.g. `https://ota.freeport.network/manifest` + our cert. Old installs keep
+   pulling from EAS until they upgrade — run both rails during the overlap
+   (the deploy script pushes to EAS *and* R2 until EAS-pointing installs age out).
+5. Nice-to-have once live: pin each update bundle to IPFS like the other
+   artifacts; a self-hosted binary could even fall back to a gateway.
+
+**Effort:** medium — the export/protocol pieces are documented; the real work
+is the Worker manifest endpoint, signing setup, and a careful two-rail
+migration. Zero app-code changes beyond app.json config.
 
 Settlement without becoming a money transmitter: the app NEVER holds funds.
 The protocol's reserved `payment` field (v1) makes this additive.
