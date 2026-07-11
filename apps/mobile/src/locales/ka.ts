@@ -699,5 +699,9 @@ const c: Record<string, string> = {
   "Connect": "დაკავშირება",
   "Choose from photos": "აირჩიეთ ფოტოებიდან",
   "No QR code found in that photo": "ამ ფოტოში QR კოდი ვერ მოიძებნა",
+  "Available": "ხელმისაწვდომი",
+  "Not enough balance": "არასაკმარისი ბალანსი",
+  "Enter an amount": "შეიყვანეთ თანხა",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "ეს მისამართი იღებს როგორც Bitcoin-ს, ასევე stablecoin-ებს (USDT/USDB).",
 };
 export default c;

@@ -708,5 +708,9 @@ const c: Record<string, string> = {
   "Connect": "Підключити",
   "Choose from photos": "Вибрати з фотографій",
   "No QR code found in that photo": "QR-код не знайдено на цьому фото",
+  "Available": "Доступно",
+  "Not enough balance": "Недостатньо коштів",
+  "Enter an amount": "Введіть суму",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Ця адреса приймає і Bitcoin, і стейблкоїни (USDT/USDB).",
 };
 export default c;

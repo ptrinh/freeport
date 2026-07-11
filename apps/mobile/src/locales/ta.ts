@@ -702,5 +702,9 @@ const c: Record<string, string> = {
   "Connect": "இணை",
   "Choose from photos": "படங்களிலிருந்து தேர்ந்தெடு",
   "No QR code found in that photo": "அந்தப் படத்தில் QR குறியீடு எதுவும் இல்லை",
+  "Available": "கிடைக்கும் இருப்பு",
+  "Not enough balance": "போதிய இருப்பு இல்லை",
+  "Enter an amount": "தொகையை உள்ளிடவும்",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "இந்த முகவரி Bitcoin மற்றும் stablecoins (USDT/USDB) இரண்டையும் பெறும்.",
 };
 export default c;

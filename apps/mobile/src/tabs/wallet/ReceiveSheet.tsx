@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
 import { qrDataUrl } from '../../wallet/qr';
-import type { WalletProvider } from '../../wallet';
+import type { TokenBalanceInfo, WalletProvider } from '../../wallet';
 
 type Tab = 'lightning' | 'spark' | 'bitcoin';
 
@@ -16,10 +16,13 @@ type Tab = 'lightning' | 'spark' | 'bitcoin';
 export function ReceiveSheet({
   visible,
   provider,
+  tokens = [],
   onClose,
 }: {
   visible: boolean;
   provider: WalletProvider | null;
+  /** Known stablecoins — offered when creating a specific-amount invoice. */
+  tokens?: TokenBalanceInfo[];
   onClose: () => void;
 }) {
   const isBreez = provider?.kind === 'breez-spark';
@@ -37,6 +40,7 @@ export function ReceiveSheet({
   const [claiming, setClaiming] = useState(false);
   const [username, setUsername] = useState('');
   const [amount, setAmount] = useState('');
+  const [asset, setAsset] = useState<TokenBalanceInfo | null>(null); // null = BTC
   const [memo, setMemo] = useState('');
 
   useEffect(() => {
@@ -73,11 +77,18 @@ export function ReceiveSheet({
 
   const createInvoice = async () => {
     if (!provider) return;
-    const sats = parseInt(amount, 10);
-    if (!Number.isFinite(sats) || sats <= 0) { setError(t('Enter an amount in sats')); return; }
     setLoading(true); setError('');
     try {
-      const inv = await provider.receive(sats, memo.trim() || undefined);
+      let inv;
+      if (asset && provider.receiveToken) {
+        const amt = parseFloat(amount);
+        if (!Number.isFinite(amt) || amt <= 0) { setError(t('Enter an amount')); setLoading(false); return; }
+        inv = await provider.receiveToken(asset, amount.trim(), memo.trim() || undefined);
+      } else {
+        const sats = parseInt(amount, 10);
+        if (!Number.isFinite(sats) || sats <= 0) { setError(t('Enter an amount in sats')); setLoading(false); return; }
+        inv = await provider.receive(sats, memo.trim() || undefined);
+      }
       setValue(inv.invoice); setAskAmount(false); setCopied(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : t('Could not reach the wallet'));
@@ -194,11 +205,26 @@ export function ReceiveSheet({
             </View>
           ) : tab === 'lightning' && askAmount ? (
             <>
+              {isBreez && tokens.length > 0 && (
+                <View style={[s.row, { gap: 8, flexWrap: 'wrap' }]}>
+                  {[null, ...tokens].map((tk) => (
+                    <Pressable
+                      key={tk ? tk.id : 'btc'}
+                      onPress={() => { setAsset(tk); setError(''); }}
+                      style={{ paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999, backgroundColor: (tk ? asset?.id === tk.id : !asset) ? palette.accent : palette.card }}
+                    >
+                      <Text style={{ color: (tk ? asset?.id === tk.id : !asset) ? 'white' : palette.text2, fontWeight: '700', fontSize: 13 }}>
+                        {tk ? tk.ticker : 'BTC (sats)'}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
               <TextInput
                 style={{ borderWidth: 1, borderColor: palette.border, borderRadius: 12, padding: 12, minHeight: 48, color: palette.text, fontSize: 22, fontWeight: '700' }}
                 value={amount}
                 onChangeText={setAmount}
-                placeholder={t('Amount (sats)')}
+                placeholder={asset ? `${t('Amount')} (${asset.ticker})` : t('Amount (sats)')}
                 placeholderTextColor={palette.placeholder}
                 keyboardType="numeric"
               />
@@ -248,6 +274,9 @@ export function ReceiveSheet({
             <Text style={[s.dim, { color: error ? palette.danger : palette.dim, textAlign: 'center', paddingVertical: 24 }]}>
               {error || t('Not available for this wallet')}
             </Text>
+          )}
+          {tab === 'spark' && !!value && (
+            <Text style={[s.dim, { textAlign: 'center' }]}>{t('This address receives both Bitcoin and stablecoins (USDT/USDB).')}</Text>
           )}
         </ScrollView>
       </View>

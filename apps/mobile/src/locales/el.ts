@@ -702,5 +702,9 @@ const c: Record<string, string> = {
   "Connect": "Σύνδεση",
   "Choose from photos": "Επιλογή από φωτογραφίες",
   "No QR code found in that photo": "Δεν βρέθηκε κωδικός QR σε αυτή τη φωτογραφία",
+  "Available": "Διαθέσιμο",
+  "Not enough balance": "Ανεπαρκές υπόλοιπο",
+  "Enter an amount": "Εισαγάγετε ποσό",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Αυτή η διεύθυνση λαμβάνει τόσο Bitcoin όσο και stablecoins (USDT/USDB).",
 };
 export default c;

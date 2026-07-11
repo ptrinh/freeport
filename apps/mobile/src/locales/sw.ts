@@ -699,5 +699,9 @@ const c: Record<string, string> = {
   "Connect": "Unganisha",
   "Choose from photos": "Chagua kutoka kwenye picha",
   "No QR code found in that photo": "Hakuna msimbo wa QR uliopatikana katika picha hiyo",
+  "Available": "Inapatikana",
+  "Not enough balance": "Salio halitoshi",
+  "Enter an amount": "Weka kiasi",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Anwani hii inapokea Bitcoin na stablecoin (USDT/USDB).",
 };
 export default c;

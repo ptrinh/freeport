@@ -699,5 +699,9 @@ const c: Record<string, string> = {
   "Connect": "አገናኝ",
   "Choose from photos": "ከፎቶዎች ምረጥ",
   "No QR code found in that photo": "በዚያ ፎቶ ውስጥ QR ኮድ አልተገኘም",
+  "Available": "የሚገኝ",
+  "Not enough balance": "በቂ ቀሪ ሂሳብ የለም",
+  "Enter an amount": "መጠን ያስገቡ",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "ይህ አድራሻ ቢትኮይንንም ሆነ ስቴብልኮይኖችን (USDT/USDB) ይቀበላል።",
 };
 export default c;

@@ -742,5 +742,9 @@ const c: Record<string, string> = {
   "Connect": "接続",
   "Choose from photos": "写真から選択",
   "No QR code found in that photo": "その写真にQRコードが見つかりません",
+  "Available": "利用可能",
+  "Not enough balance": "残高が不足しています",
+  "Enter an amount": "金額を入力",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "このアドレスはBitcoinとステーブルコイン（USDT/USDB）の両方を受け取れます。",
 };
 export default c;

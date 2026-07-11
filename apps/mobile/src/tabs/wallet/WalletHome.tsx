@@ -3,7 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
-import type { WalletTx } from '../../wallet';
+import type { TokenBalanceInfo, WalletTx } from '../../wallet';
 
 /**
  * Glow-style wallet home (adapted from breez/glow-web, MIT): centered balance
@@ -12,6 +12,7 @@ import type { WalletTx } from '../../wallet';
  */
 export function WalletHome({
   balanceSats,
+  tokens = [],
   usdRate,
   localRate,
   localCurrency,
@@ -28,6 +29,8 @@ export function WalletHome({
   onScroll,
 }: {
   balanceSats: number | null;
+  /** Stablecoin balances shown under the BTC balance (nonzero only). */
+  tokens?: TokenBalanceInfo[];
   usdRate: number | null;
   /** BTC price in the user's local currency (null when unknown / same as USD). */
   localRate: number | null;
@@ -89,6 +92,17 @@ export function WalletHome({
             </Text>
           </Pressable>
           <Text style={{ color: palette.dim, fontSize: 12, marginTop: 2 }}>{walletLabel}</Text>
+          {tokens.filter((tk) => tk.amount > 0).length > 0 && (
+            <View style={[s.row, { gap: 8, marginTop: 10, flexWrap: 'wrap', justifyContent: 'center' }]}>
+              {tokens.filter((tk) => tk.amount > 0).map((tk) => (
+                <View key={tk.id} style={{ backgroundColor: palette.card, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5 }}>
+                  <Text style={{ color: palette.text2, fontSize: 13, fontWeight: '700' }}>
+                    {tk.amount.toLocaleString(undefined, { maximumFractionDigits: 2 })} {tk.ticker}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Payment history */}
@@ -120,7 +134,9 @@ export function WalletHome({
                   <Text style={s.dim}>{fmtTime(tx.ts)}{tx.settled ? '' : ' · ' + t('pending')}</Text>
                 </View>
                 <Text style={{ fontWeight: '700', color: tx.direction === 'in' ? palette.success : palette.text2 }}>
-                  {(tx.direction === 'in' ? '+' : '−') + tx.sats.toLocaleString()}
+                  {(tx.direction === 'in' ? '+' : '−') + (tx.token
+                    ? `${tx.token.amount.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${tx.token.ticker}`
+                    : tx.sats.toLocaleString())}
                 </Text>
               </View>
             ))}

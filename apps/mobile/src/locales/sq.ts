@@ -702,5 +702,9 @@ const c: Record<string, string> = {
   "Connect": "Lidh",
   "Choose from photos": "Zgjidh nga fotot",
   "No QR code found in that photo": "Nuk u gjet asnjë kod QR në atë foto",
+  "Available": "Në dispozicion",
+  "Not enough balance": "Balancë e pamjaftueshme",
+  "Enter an amount": "Fut një shumë",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Kjo adresë pranon si Bitcoin ashtu edhe stablecoin (USDT/USDB).",
 };
 export default c;

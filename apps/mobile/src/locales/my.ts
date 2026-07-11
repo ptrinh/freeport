@@ -699,5 +699,9 @@ const c: Record<string, string> = {
   "Connect": "ချိတ်ဆက်မည်",
   "Choose from photos": "ဓာတ်ပုံများမှ ရွေးရန်",
   "No QR code found in that photo": "ထိုဓာတ်ပုံတွင် QR ကုဒ် မတွေ့ပါ",
+  "Available": "သုံးစွဲနိုင်သည်",
+  "Not enough balance": "လက်ကျန်ငွေ မလုံလောက်ပါ",
+  "Enter an amount": "ပမာဏ ထည့်ပါ",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "ဤလိပ်စာသည် Bitcoin နှင့် stablecoin (USDT/USDB) နှစ်မျိုးလုံးကို လက်ခံသည်။",
 };
 export default c;

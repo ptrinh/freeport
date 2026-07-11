@@ -3,7 +3,7 @@ import { ActivityIndicator, Modal, Platform, Pressable, ScrollView, Text, TextIn
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
-import type { ParsedDest, WalletProvider } from '../../wallet';
+import type { ParsedDest, TokenBalanceInfo, WalletProvider } from '../../wallet';
 import { ScanSheet, scanSupported } from './ScanSheet';
 
 export interface WalletContact { name: string; address: string }
@@ -22,6 +22,7 @@ export function SendSheet({
   initialInput,
   hint,
   contacts = [],
+  tokens = [],
   onClose,
   onPaid,
 }: {
@@ -32,12 +33,16 @@ export function SendSheet({
   hint?: string;
   /** Saved counterparties (from deals that shared a wallet address). */
   contacts?: WalletContact[];
+  /** Stablecoin balances — offered as Send assets for Spark destinations. */
+  tokens?: TokenBalanceInfo[];
   onClose: () => void;
   onPaid: () => void;
 }) {
   const [step, setStep] = useState<Step>('input');
   const [input, setInput] = useState('');
   const [dest, setDest] = useState<ParsedDest | null>(null);
+  // null = BTC (sats); otherwise the chosen stablecoin.
+  const [asset, setAsset] = useState<TokenBalanceInfo | null>(null);
   const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -48,7 +53,7 @@ export function SendSheet({
 
   useEffect(() => {
     if (visible) {
-      setStep('input'); setInput(initialInput ?? ''); setDest(null); setAmount(''); setError(''); setBusy(false);
+      setStep('input'); setInput(initialInput ?? ''); setDest(null); setAsset(null); setAmount(''); setError(''); setBusy(false);
     }
   }, [visible, initialInput]);
 
@@ -75,13 +80,18 @@ export function SendSheet({
   };
 
   const sats = dest?.kind === 'bolt11' && dest.sats != null ? dest.sats : parseInt(amount, 10);
-  const usd = Number.isFinite(sats) && usdRate ? (sats / 1e8) * usdRate : null;
+  const tokenAmount = asset ? parseFloat(amount) : NaN;
+  const usd = asset
+    ? (Number.isFinite(tokenAmount) && /USD/i.test(asset.ticker) ? tokenAmount : null)
+    : Number.isFinite(sats) && usdRate ? (sats / 1e8) * usdRate : null;
+  const spendable = asset && Number.isFinite(tokenAmount) ? tokenAmount <= asset.amount : true;
 
   const pay = async () => {
     if (!provider || !dest) return;
     setStep('paying'); setError('');
     try {
-      await provider.pay(dest.raw, dest.kind === 'bolt11' && dest.sats != null ? undefined : sats);
+      if (asset && provider.payToken) await provider.payToken(dest.raw, asset, amount.trim());
+      else await provider.pay(dest.raw, dest.kind === 'bolt11' && dest.sats != null ? undefined : sats);
       setStep('done');
       onPaid();
     } catch (e) {
@@ -175,19 +185,41 @@ export function SendSheet({
           {step === 'amount' && dest && (
             <>
               <Text style={s.dim}>{destLabel} · {dest.raw.length > 34 ? dest.raw.slice(0, 17) + '…' + dest.raw.slice(-14) : dest.raw}</Text>
+              {dest.kind === 'sparkAddress' && tokens.filter((tk) => tk.amount > 0).length > 0 && (
+                <View style={[s.row, { gap: 8, flexWrap: 'wrap' }]}>
+                  {[null, ...tokens.filter((tk) => tk.amount > 0)].map((tk) => (
+                    <Pressable
+                      key={tk ? tk.id : 'btc'}
+                      onPress={() => { setAsset(tk as TokenBalanceInfo | null); setError(''); }}
+                      style={{ paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999, backgroundColor: (tk ? asset?.id === tk.id : !asset) ? palette.accent : palette.card }}
+                    >
+                      <Text style={{ color: (tk ? asset?.id === tk.id : !asset) ? 'white' : palette.text2, fontWeight: '700', fontSize: 13 }}>
+                        {tk ? (tk as TokenBalanceInfo).ticker : 'BTC (sats)'}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
               <TextInput
                 style={{ borderWidth: 1, borderColor: palette.border, borderRadius: 12, padding: 12, minHeight: 48, color: palette.text, fontSize: 22, fontWeight: '700' }}
                 value={amount}
                 onChangeText={setAmount}
-                placeholder={t('Amount (sats)')}
+                placeholder={asset ? `${t('Amount')} (${asset.ticker})` : t('Amount (sats)')}
                 placeholderTextColor={palette.placeholder}
                 keyboardType="numeric"
                 autoFocus
               />
-              {usd != null && <Text style={s.dim}>≈ ${usd.toLocaleString(undefined, { maximumFractionDigits: 2 })}</Text>}
+              {asset && <Text style={s.dim}>{t('Available')}: {asset.amount.toLocaleString(undefined, { maximumFractionDigits: 2 })} {asset.ticker}</Text>}
+              {usd != null && !asset && <Text style={s.dim}>≈ ${usd.toLocaleString(undefined, { maximumFractionDigits: 2 })}</Text>}
               {!!error && <Text style={[s.dim, { color: palette.danger }]}>{error}</Text>}
               <Pressable
-                onPress={() => { if (!Number.isFinite(sats) || sats <= 0) { setError(t('Enter an amount in sats')); return; } setStep('confirm'); }}
+                onPress={() => {
+                  if (asset) {
+                    if (!Number.isFinite(tokenAmount) || tokenAmount <= 0) { setError(t('Enter an amount')); return; }
+                    if (!spendable) { setError(t('Not enough balance')); return; }
+                  } else if (!Number.isFinite(sats) || sats <= 0) { setError(t('Enter an amount in sats')); return; }
+                  setStep('confirm');
+                }}
                 style={[s.btnAccept, !amount.trim() && { opacity: 0.5 }]}
                 disabled={!amount.trim()}
               >
@@ -199,7 +231,9 @@ export function SendSheet({
           {step === 'confirm' && dest && (
             <>
               <View style={[s.card, { gap: 6 }]}>
-                <Text style={{ color: palette.text, fontSize: 30, fontWeight: '800', textAlign: 'center' }}>{Number(sats).toLocaleString()} sats</Text>
+                <Text style={{ color: palette.text, fontSize: 30, fontWeight: '800', textAlign: 'center' }}>
+                  {asset ? `${tokenAmount.toLocaleString(undefined, { maximumFractionDigits: asset.decimals })} ${asset.ticker}` : `${Number(sats).toLocaleString()} sats`}
+                </Text>
                 {usd != null && <Text style={[s.dim, { textAlign: 'center' }]}>≈ ${usd.toLocaleString(undefined, { maximumFractionDigits: 2 })}</Text>}
                 <Text style={[s.dim, { textAlign: 'center' }]} numberOfLines={2}>
                   {destLabel} · {dest.raw.length > 44 ? dest.raw.slice(0, 22) + '…' + dest.raw.slice(-18) : dest.raw}

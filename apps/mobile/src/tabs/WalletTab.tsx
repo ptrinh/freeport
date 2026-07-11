@@ -3,7 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../i18n';
 import { s, palette } from '../ui/theme';
-import { walletProviderFor, defaultWalletProvider, parseNwcUrl, type WalletProvider, type WalletTx } from '../wallet';
+import { walletProviderFor, defaultWalletProvider, parseNwcUrl, type TokenBalanceInfo, type WalletProvider, type WalletTx } from '../wallet';
 import { WalletHome } from './wallet/WalletHome';
 import { SendSheet } from './wallet/SendSheet';
 import { ReceiveSheet } from './wallet/ReceiveSheet';
@@ -44,6 +44,7 @@ function WalletTab({
   const [localRate, setLocalRate] = useState<number | null>(null);
   const [unit, setUnit] = useState<'sats' | 'usd' | 'local'>('sats');
   const [txs, setTxs] = useState<WalletTx[]>([]);
+  const [tokens, setTokens] = useState<TokenBalanceInfo[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
 
@@ -64,12 +65,13 @@ function WalletTab({
     setRefreshing(true);
     try {
       const wantLocal = localCurrency && localCurrency !== 'USD';
-      const [b, list, usd, local] = await Promise.all([
-        p.balance(), p.transactions(50), p.fiatRate('USD'),
+      const [b, list, tks, usd, local] = await Promise.all([
+        p.balance(), p.transactions(50), p.tokenBalances(), p.fiatRate('USD'),
         wantLocal ? p.fiatRate(localCurrency) : Promise.resolve(null),
       ]);
       setBalance(b.sats);
       setTxs(list);
+      setTokens(tks);
       setUsdRate(usd);
       setLocalRate(local);
       setError('');
@@ -84,7 +86,7 @@ function WalletTab({
     let cancelled = false;
     provider.current?.close();
     provider.current = null;
-    setConnected(false); setBalance(null); setTxs([]); setUsdRate(null); setError(''); setShowNwcForm(false);
+    setConnected(false); setBalance(null); setTxs([]); setTokens([]); setUsdRate(null); setError(''); setShowNwcForm(false);
     const boot = async () => {
       let p: WalletProvider | null = null;
       if (nwcUrl) {
@@ -182,6 +184,7 @@ function WalletTab({
     <View style={{ flex: 1 }}>
       <WalletHome
         balanceSats={balance}
+        tokens={tokens}
         usdRate={usdRate}
         localRate={localRate}
         localCurrency={localCurrency}
@@ -220,12 +223,14 @@ function WalletTab({
         initialInput={sendPrefill?.dest}
         hint={sendPrefill?.hint}
         contacts={contacts}
+        tokens={tokens}
         onClose={() => setSendOpen(false)}
         onPaid={() => provider.current && refresh(provider.current)}
       />
       <ReceiveSheet
         visible={receiveOpen}
         provider={provider.current}
+        tokens={tokens}
         onClose={() => { setReceiveOpen(false); provider.current && refresh(provider.current); }}
       />
       <ScanSheet

@@ -702,5 +702,9 @@ const c: Record<string, string> = {
   "Connect": "Savienot",
   "Choose from photos": "Izvēlēties no fotoattēliem",
   "No QR code found in that photo": "Šajā fotoattēlā QR kods nav atrasts",
+  "Available": "Pieejams",
+  "Not enough balance": "Nepietiek līdzekļu",
+  "Enter an amount": "Ievadiet summu",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Šī adrese saņem gan Bitcoin, gan stabilās monētas (USDT/USDB).",
 };
 export default c;

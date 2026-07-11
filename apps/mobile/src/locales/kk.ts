@@ -699,5 +699,9 @@ const c: Record<string, string> = {
   "Connect": "Қосылу",
   "Choose from photos": "Фотодан таңдау",
   "No QR code found in that photo": "Бұл фотодан QR коды табылмады",
+  "Available": "Қолжетімді",
+  "Not enough balance": "Баланс жеткіліксіз",
+  "Enter an amount": "Соманы енгізіңіз",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Бұл мекенжай Bitcoin-ды да, стейблкоиндерді де (USDT/USDB) қабылдайды.",
 };
 export default c;

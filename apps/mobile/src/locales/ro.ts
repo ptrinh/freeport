@@ -702,5 +702,9 @@ const c: Record<string, string> = {
   "Connect": "Conectează",
   "Choose from photos": "Alege din fotografii",
   "No QR code found in that photo": "Niciun cod QR găsit în acea fotografie",
+  "Available": "Disponibil",
+  "Not enough balance": "Sold insuficient",
+  "Enter an amount": "Introdu o sumă",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Această adresă primește atât Bitcoin, cât și stablecoin-uri (USDT/USDB).",
 };
 export default c;

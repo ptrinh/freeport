@@ -742,5 +742,9 @@ const c: Record<string, string> = {
   "Connect": "연결",
   "Choose from photos": "사진에서 선택",
   "No QR code found in that photo": "해당 사진에서 QR 코드를 찾을 수 없습니다",
+  "Available": "사용 가능",
+  "Not enough balance": "잔액이 부족합니다",
+  "Enter an amount": "금액을 입력하세요",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "이 주소는 Bitcoin과 스테이블코인(USDT/USDB)을 모두 받을 수 있습니다.",
 };
 export default c;

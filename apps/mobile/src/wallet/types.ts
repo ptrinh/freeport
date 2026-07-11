@@ -32,9 +32,22 @@ export interface WalletInvoice {
   sats: number;
 }
 
+export interface TokenBalanceInfo {
+  /** Spark token identifier (metadata.identifier). */
+  id: string;
+  ticker: string;
+  name: string;
+  decimals: number;
+  /** Human units (base units / 10^decimals). */
+  amount: number;
+}
+
 export interface WalletTx {
   direction: 'in' | 'out';
   sats: number;
+  /** Present when this was a token (stablecoin) payment — amount in human
+   *  units; `sats` is 0 in that case. */
+  token?: { ticker: string; amount: number };
   description?: string;
   /** Unix seconds. */
   ts: number;
@@ -79,6 +92,12 @@ export interface WalletProvider {
   fiatRate(coin: string): Promise<number | null>;
   /** A fresh on-chain deposit address, or null when unsupported (NWC). */
   receiveOnchain(): Promise<string | null>;
+  /** Stablecoin balances (Spark tokens). Empty for providers without them. */
+  tokenBalances(): Promise<TokenBalanceInfo[]>;
+  /** Spark invoice to RECEIVE `amount` (human units) of a token. */
+  receiveToken?(token: TokenBalanceInfo, amount: number | string, description?: string): Promise<WalletInvoice>;
+  /** Pay a Spark destination in a token instead of sats. */
+  payToken?(destination: string, token: TokenBalanceInfo, amount: number | string): Promise<{ preimage?: string }>;
   /** Registered lightning address (user@domain), when the provider supports it. */
   lightningAddress?(): Promise<{ address: string; lnurl?: string } | null>;
   /** Claim a username under the app's lightning-address domain. */

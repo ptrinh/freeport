@@ -702,5 +702,9 @@ const c: Record<string, string> = {
   "Connect": "منسلک کریں",
   "Choose from photos": "تصاویر سے منتخب کریں",
   "No QR code found in that photo": "اس تصویر میں کوئی QR کوڈ نہیں ملا",
+  "Available": "دستیاب",
+  "Not enough balance": "بیلنس ناکافی ہے",
+  "Enter an amount": "رقم درج کریں",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "یہ ایڈریس Bitcoin اور stablecoins (USDT/USDB) دونوں وصول کرتا ہے۔",
 };
 export default c;

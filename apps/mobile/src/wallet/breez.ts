@@ -20,7 +20,8 @@ import { Platform } from 'react-native';
 import { loadKey } from '../identity';
 import { deriveWalletMnemonic } from './seed';
 import { mapSparkPayments } from './breezMap';
-import type { ParsedDest, WalletBalance, WalletCapabilities, WalletInvoice, WalletProvider, WalletTx } from './types';
+import { toBaseUnits, fromBaseUnits } from './tokens';
+import type { ParsedDest, TokenBalanceInfo, WalletBalance, WalletCapabilities, WalletInvoice, WalletProvider, WalletTx } from './types';
 
 const API_KEY = process.env.EXPO_PUBLIC_BREEZ_API_KEY || '';
 const WASM_URL = '/breez_sdk_spark_wasm_bg.wasm';
@@ -167,6 +168,51 @@ export class BreezSparkProvider implements WalletProvider {
     } catch {
       return [];
     }
+  }
+
+  async tokenBalances(): Promise<TokenBalanceInfo[]> {
+    try {
+      const info = await this.sdk.getInfo({ ensureSynced: false });
+      const out: TokenBalanceInfo[] = [];
+      const entries: Iterable<[string, any]> =
+        info?.tokenBalances instanceof Map ? info.tokenBalances.entries() : Object.entries(info?.tokenBalances ?? {});
+      for (const [, tb] of entries) {
+        const md = tb?.tokenMetadata;
+        if (!md) continue;
+        out.push({
+          id: md.identifier,
+          ticker: md.ticker || md.name || 'TOKEN',
+          name: md.name || md.ticker || 'Token',
+          decimals: Number(md.decimals ?? 0),
+          amount: fromBaseUnits(tb.balance ?? 0n, Number(md.decimals ?? 0)),
+        });
+      }
+      return out;
+    } catch { return []; }
+  }
+
+  async receiveToken(token: TokenBalanceInfo, amount: number | string, description?: string): Promise<WalletInvoice> {
+    const r = await this.sdk.receivePayment({
+      paymentMethod: {
+        type: 'sparkInvoice',
+        tokenIdentifier: token.id,
+        amount: toBaseUnits(amount, token.decimals).toString(),
+        ...(description ? { description } : {}),
+      },
+    });
+    if (!r?.paymentRequest) throw new Error('wallet returned no invoice');
+    return { invoice: r.paymentRequest, sats: 0 };
+  }
+
+  async payToken(destination: string, token: TokenBalanceInfo, amount: number | string): Promise<{ preimage?: string }> {
+    const prepared = await this.sdk.prepareSendPayment({
+      paymentRequest: { type: 'input', input: destination.trim() },
+      amount: toBaseUnits(amount, token.decimals),
+      tokenIdentifier: token.id,
+    });
+    const r = await this.sdk.sendPayment({ prepareResponse: prepared });
+    if (r?.payment?.status === 'failed') throw new Error('payment failed');
+    return {};
   }
 
   async parse(input: string): Promise<ParsedDest> {

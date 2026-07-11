@@ -703,5 +703,9 @@ const c: Record<string, string> = {
   "Connect": "Prijungti",
   "Choose from photos": "Pasirinkti iš nuotraukų",
   "No QR code found in that photo": "Toje nuotraukoje QR kodas nerastas",
+  "Available": "Galima",
+  "Not enough balance": "Nepakanka lėšų",
+  "Enter an amount": "Įveskite sumą",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Šis adresas priima ir Bitcoin, ir stabiliąsias monetas (USDT/USDB).",
 };
 export default c;

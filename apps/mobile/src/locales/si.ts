@@ -699,5 +699,9 @@ const c: Record<string, string> = {
   "Connect": "සම්බන්ධ කරන්න",
   "Choose from photos": "ඡායාරූප වලින් තෝරන්න",
   "No QR code found in that photo": "එම ඡායාරූපයේ QR කේතයක් හමු නොවීය",
+  "Available": "ලබා ගත හැකි",
+  "Not enough balance": "ශේෂය ප්‍රමාණවත් නැත",
+  "Enter an amount": "මුදලක් ඇතුළත් කරන්න",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "මෙම ලිපිනය Bitcoin සහ stablecoin (USDT/USDB) යන දෙකම ලබා ගනී.",
 };
 export default c;

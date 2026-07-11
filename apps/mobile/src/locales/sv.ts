@@ -702,5 +702,9 @@ const c: Record<string, string> = {
   "Connect": "Anslut",
   "Choose from photos": "Välj bland foton",
   "No QR code found in that photo": "Ingen QR-kod hittades i den bilden",
+  "Available": "Tillgängligt",
+  "Not enough balance": "Otillräckligt saldo",
+  "Enter an amount": "Ange ett belopp",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Den här adressen tar emot både Bitcoin och stablecoins (USDT/USDB).",
 };
 export default c;

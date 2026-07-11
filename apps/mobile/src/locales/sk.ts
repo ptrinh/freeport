@@ -705,5 +705,9 @@ const c: Record<string, string> = {
   "Connect": "Pripojiť",
   "Choose from photos": "Vybrať z fotiek",
   "No QR code found in that photo": "V tejto fotke sa nenašiel žiadny QR kód",
+  "Available": "Dostupné",
+  "Not enough balance": "Nedostatočný zostatok",
+  "Enter an amount": "Zadajte sumu",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Táto adresa prijíma Bitcoin aj stablecoiny (USDT/USDB).",
 };
 export default c;

@@ -699,5 +699,9 @@ const c: Record<string, string> = {
   "Connect": "Ikonekta",
   "Choose from photos": "Pumili mula sa mga larawan",
   "No QR code found in that photo": "Walang QR code na nakita sa larawang iyon",
+  "Available": "Magagamit",
+  "Not enough balance": "Hindi sapat ang balanse",
+  "Enter an amount": "Maglagay ng halaga",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Tumatanggap ang address na ito ng Bitcoin at mga stablecoin (USDT/USDB).",
 };
 export default c;

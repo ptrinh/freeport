@@ -702,5 +702,9 @@ const c: Record<string, string> = {
   "Connect": "Csatlakozás",
   "Choose from photos": "Választás a fényképek közül",
   "No QR code found in that photo": "Nem található QR-kód a fényképen",
+  "Available": "Elérhető",
+  "Not enough balance": "Nincs elég egyenleg",
+  "Enter an amount": "Adjon meg egy összeget",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Erre a címre Bitcoint és stablecoinokat (USDT/USDB) is fogadhat.",
 };
 export default c;

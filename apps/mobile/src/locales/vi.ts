@@ -742,5 +742,9 @@ const c: Record<string, string> = {
   "Send": "Gửi",
   "Choose from photos": "Chọn từ ảnh",
   "No QR code found in that photo": "Không tìm thấy mã QR trong ảnh đó",
+  "Available": "Khả dụng",
+  "Not enough balance": "Không đủ số dư",
+  "Enter an amount": "Nhập số tiền",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Địa chỉ này nhận được cả Bitcoin lẫn stablecoin (USDT/USDB).",
 };
 export default c;

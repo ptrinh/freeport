@@ -699,5 +699,9 @@ const c: Record<string, string> = {
   "Connect": "সংযোগ করুন",
   "Choose from photos": "ফটো থেকে বেছে নিন",
   "No QR code found in that photo": "সেই ফটোতে কোনো QR কোড পাওয়া যায়নি",
+  "Available": "উপলব্ধ",
+  "Not enough balance": "পর্যাপ্ত ব্যালেন্স নেই",
+  "Enter an amount": "একটি পরিমাণ লিখুন",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "এই ঠিকানাটি Bitcoin এবং স্টেবলকয়েন (USDT/USDB) উভয়ই গ্রহণ করে।",
 };
 export default c;

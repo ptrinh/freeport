@@ -140,6 +140,10 @@ export class NwcProvider implements WalletProvider {
     return null; // NIP-47 has no rate feed
   }
 
+  async tokenBalances() {
+    return []; // Lightning-only — no Spark tokens over NWC
+  }
+
   async receiveOnchain(): Promise<string | null> {
     return null;
   }

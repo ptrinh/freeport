@@ -699,5 +699,9 @@ const c: Record<string, string> = {
   "Connect": "जडान गर्नुहोस्",
   "Choose from photos": "फोटोहरूबाट छान्नुहोस्",
   "No QR code found in that photo": "त्यो फोटोमा कुनै QR कोड भेटिएन",
+  "Available": "उपलब्ध",
+  "Not enough balance": "पर्याप्त ब्यालेन्स छैन",
+  "Enter an amount": "रकम प्रविष्ट गर्नुहोस्",
+  "This address receives both Bitcoin and stablecoins (USDT/USDB).": "यो ठेगानाले Bitcoin र stablecoin (USDT/USDB) दुवै प्राप्त गर्छ।",
 };
 export default c;
