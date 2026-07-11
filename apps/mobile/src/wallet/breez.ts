@@ -20,6 +20,7 @@ import { Platform } from 'react-native';
 import { loadKey } from '../identity';
 import { deriveWalletMnemonic } from './seed';
 import { mapSparkPayments } from './breezMap';
+import { importBreezNative } from './breezNative';
 import { toBaseUnits, fromBaseUnits } from './tokens';
 import type { ParsedDest, TokenBalanceInfo, WalletBalance, WalletCapabilities, WalletInvoice, WalletProvider, WalletTx } from './types';
 
@@ -96,8 +97,10 @@ async function loadSdk(mnemonic: string): Promise<any> {
       storageDir: 'freeport-wallet',
     });
   }
-  // Native: TurboModule — throws on binaries that don't include it yet.
-  const mod: any = await import('@breeztech/breez-sdk-spark-react-native');
+  // Native: guarded — importing the package on a binary without the
+  // TurboModule hard-crashes the app (see breezNative.ts).
+  const mod: any = await importBreezNative();
+  if (!mod) throw new Error('wallet-unavailable-in-binary');
   await mod.uniffiInitAsync?.();
   const FS: any = await import('expo-file-system/legacy');
   const dir = String(FS.documentDirectory || '').replace(/^file:\/\//, '') + 'breez';
