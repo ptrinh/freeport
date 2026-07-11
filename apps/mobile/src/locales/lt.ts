@@ -713,5 +713,14 @@ const c: Record<string, string> = {
   "Save": "Išsaugoti",
   "Send BTC or USD": "Siųsti BTC arba USD",
   "Repost": "Skelbti iš naujo",
+  "Custom message": "Individualus pranešimas",
+  "One-tap reply in deal chats — e.g. your payment details.": "Atsakymas vienu bakstelėjimu sandorių pokalbiuose, pvz., jūsų mokėjimo informacija.",
+  "Auto-send custom message": "Automatiškai siųsti individualų pranešimą",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Automatiškai išsiųsti jį į pokalbį, kai tik sandoris patvirtinamas.",
+  "I am here": "Aš čia",
+  "Please wait": "Palaukite",
+  "Payment method": "Mokėjimo būdas",
+  "Cash": "Grynieji",
+  "Please rate me after the deal": "Įvertinkite mane po sandorio",
 };
 export default c;

@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "Yadda saxla",
   "Send BTC or USD": "BTC və ya USD göndər",
   "Repost": "Yenidən paylaş",
+  "Custom message": "Fərdi mesaj",
+  "One-tap reply in deal chats — e.g. your payment details.": "Sövdələşmə söhbətlərində bir toxunuşla cavab, məsələn, ödəniş məlumatlarınız.",
+  "Auto-send custom message": "Fərdi mesajı avtomatik göndər",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Sövdələşmə təsdiqlənən kimi söhbətə avtomatik göndərilir.",
+  "I am here": "Buradayam",
+  "Please wait": "Zəhmət olmasa gözləyin",
+  "Payment method": "Ödəniş üsulu",
+  "Cash": "Nağd",
+  "Please rate me after the deal": "Zəhmət olmasa sövdələşmədən sonra məni qiymətləndirin",
 };
 export default c;

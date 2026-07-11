@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "Lagre",
   "Send BTC or USD": "Send BTC eller USD",
   "Repost": "Legg ut på nytt",
+  "Custom message": "Egendefinert melding",
+  "One-tap reply in deal chats — e.g. your payment details.": "Hurtigsvar i handelschatter, f.eks. betalingsdetaljene dine.",
+  "Auto-send custom message": "Send egendefinert melding automatisk",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Send den automatisk i chatten når en handel bekreftes.",
+  "I am here": "Jeg er her",
+  "Please wait": "Vent litt",
+  "Payment method": "Betalingsmåte",
+  "Cash": "Kontant",
+  "Please rate me after the deal": "Vurder meg gjerne etter handelen",
 };
 export default c;

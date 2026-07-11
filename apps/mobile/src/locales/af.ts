@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "Stoor",
   "Send BTC or USD": "Stuur BTC of USD",
   "Repost": "Herplaas",
+  "Custom message": "Pasgemaakte boodskap",
+  "One-tap reply in deal chats — e.g. your payment details.": "Een-tik antwoord in transaksie-geselsies, bv. jou betalingsbesonderhede.",
+  "Auto-send custom message": "Stuur pasgemaakte boodskap outomaties",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Word outomaties in die geselsie gestuur sodra 'n transaksie bevestig word.",
+  "I am here": "Ek is hier",
+  "Please wait": "Wag asseblief",
+  "Payment method": "Betaalmetode",
+  "Cash": "Kontant",
+  "Please rate me after the deal": "Gradeer my asseblief ná die transaksie",
 };
 export default c;

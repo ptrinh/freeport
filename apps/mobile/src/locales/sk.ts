@@ -715,5 +715,14 @@ const c: Record<string, string> = {
   "Save": "Uložiť",
   "Send BTC or USD": "Odoslať BTC alebo USD",
   "Repost": "Uverejniť znova",
+  "Custom message": "Vlastná správa",
+  "One-tap reply in deal chats — e.g. your payment details.": "Rýchla odpoveď v chatoch obchodov, napr. tvoje platobné údaje.",
+  "Auto-send custom message": "Automaticky odoslať vlastnú správu",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Odošle sa do chatu automaticky po potvrdení obchodu.",
+  "I am here": "Som tu",
+  "Please wait": "Chvíľu počkaj",
+  "Payment method": "Spôsob platby",
+  "Cash": "Hotovosť",
+  "Please rate me after the deal": "Ohodnoť ma po obchode, prosím",
 };
 export default c;

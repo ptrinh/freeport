@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "Spara",
   "Send BTC or USD": "Skicka BTC eller USD",
   "Repost": "Lägg upp igen",
+  "Custom message": "Anpassat meddelande",
+  "One-tap reply in deal chats — e.g. your payment details.": "Svar med ett tryck i affärschattar, t.ex. dina betalningsuppgifter.",
+  "Auto-send custom message": "Skicka anpassat meddelande automatiskt",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Skicka det automatiskt i chatten när en affär bekräftas.",
+  "I am here": "Jag är här",
+  "Please wait": "Vänta lite",
+  "Payment method": "Betalningsmetod",
+  "Cash": "Kontant",
+  "Please rate me after the deal": "Betygsätt mig gärna efter affären",
 };
 export default c;

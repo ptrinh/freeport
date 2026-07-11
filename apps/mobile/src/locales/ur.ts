@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "محفوظ کریں",
   "Send BTC or USD": "BTC یا USD بھیجیں",
   "Repost": "دوبارہ پوسٹ کریں",
+  "Custom message": "اپنی مرضی کا پیغام",
+  "One-tap reply in deal chats — e.g. your payment details.": "ڈیل چیٹس میں ایک ٹیپ سے جواب، مثلاً آپ کی ادائیگی کی تفصیلات۔",
+  "Auto-send custom message": "اپنی مرضی کا پیغام خودکار بھیجیں",
+  "Send it into the chat automatically whenever a deal is confirmed.": "جب بھی کوئی ڈیل کنفرم ہو، اسے خودکار طور پر چیٹ میں بھیج دیں۔",
+  "I am here": "میں پہنچ گیا ہوں",
+  "Please wait": "براہ کرم انتظار کریں",
+  "Payment method": "ادائیگی کا طریقہ",
+  "Cash": "نقد",
+  "Please rate me after the deal": "براہ کرم ڈیل کے بعد مجھے ریٹنگ دیں",
 };
 export default c;

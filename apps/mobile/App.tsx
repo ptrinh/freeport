@@ -59,6 +59,7 @@ import { loadProfile, saveProfile, defaultAvatarUrl, type UserProfile } from './
 import { normalizePhone } from './src/phone';
 import { locationGranted, requestLocationPermission, detectRawLocationGPS, detectRawLocationIP, effectiveUnit } from './src/maps';
 import { messagesViewForNewActivity, walletContacts, repostDraft, type RepostDraft } from './src/deals';
+import { newlyConfirmed } from './src/quickReplies';
 import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
 import { loadPrefs, savePrefs, type UserLocation } from './src/prefs';
 import { systemLanguage, systemCountry } from './src/language';
@@ -367,6 +368,8 @@ function AppInner() {
   const [browseAlertNotify, setBrowseAlertNotify] = useState(false);
   const [browseMaxDistance, setBrowseMaxDistance] = useState(100);
   const [sendLocationOnDeal, setSendLocationOnDeal] = useState(true);
+  const [customMessage, setCustomMessage] = useState('');
+  const [autoSendCustomMessage, setAutoSendCustomMessage] = useState(false);
   const [telemetryOn, setTelemetryOn] = useState(true);
   const [role, setRole] = useState<'passenger' | 'driver' | ''>('');
   // The onIntent handler is a one-time closure; read live browse-alert prefs via a ref.
@@ -530,6 +533,8 @@ function AppInner() {
       setBrowseAlertNotify(p.browseAlertNotify);
       setBrowseMaxDistance(p.browseMaxDistance);
       setSendLocationOnDeal(p.sendLocationOnDeal);
+      setCustomMessage(p.customMessage);
+      setAutoSendCustomMessage(p.autoSendCustomMessage);
       setTelemetryOn(p.telemetryEnabled);
       initTelemetry(p.telemetryEnabled).then(() => trackEvent('app_opened')).catch(() => {});
       setRole(p.role);
@@ -753,6 +758,34 @@ function AppInner() {
     })();
     return () => { cancelled = true; };
   }, [negos]);
+
+  // Auto-send the custom message when a deal is confirmed (Settings → Features).
+  // Every confirmed deal is marked handled exactly once (persisted), even while
+  // the toggle is off or the message empty — so enabling the feature later never
+  // blasts the message into pre-existing chats. The recency guard keeps relay
+  // replays of old confirmed deals (fresh install + key restore) silent too.
+  const autoMsgHandled = useRef<Set<string>>(new Set());
+  const autoMsgLoaded = useRef(false);
+  useEffect(() => {
+    kvGet('freeport.autoMsgSent').then((raw) => {
+      if (raw) { try { autoMsgHandled.current = new Set(JSON.parse(raw) as string[]); } catch {} }
+      autoMsgLoaded.current = true;
+    }).catch(() => { autoMsgLoaded.current = true; });
+  }, []);
+  useEffect(() => {
+    if (!client || !autoMsgLoaded.current) return;
+    const fresh = newlyConfirmed(negos, autoMsgHandled.current);
+    if (fresh.length === 0) return;
+    const msg = customMessage.trim();
+    const nowSec = Date.now() / 1000;
+    for (const n of fresh) {
+      autoMsgHandled.current.add(n.id);
+      if (autoSendCustomMessage && msg && nowSec - n.updatedAt < 600) {
+        client.sendChat(n.id, msg).catch(() => {});
+      }
+    }
+    kvSet('freeport.autoMsgSent', JSON.stringify([...autoMsgHandled.current])).catch(() => {});
+  }, [negos, client, autoSendCustomMessage, customMessage]);
 
   // Subscribe to the coarse market tag(s) every post carries (DEMO_MARKET /
   // SERVICE_MARKET). Discovery must NOT hinge on the location-sharded topic:
@@ -1193,7 +1226,7 @@ function AppInner() {
       </Animated.View>
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
       {tab === 'post' && <PostTab draft={postDraft} onDraftConsumed={() => setPostDraft(null)} client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
       {tab === 'wallet' && (
         <WalletTab
           unit={walletUnit}
@@ -1269,6 +1302,16 @@ function AppInner() {
           onSendLocationOnDealChange={(v) => {
             setSendLocationOnDeal(v);
             savePrefs({ sendLocationOnDeal: v }).catch(() => {});
+          }}
+          customMessage={customMessage}
+          onCustomMessageChange={(v) => {
+            setCustomMessage(v);
+            savePrefs({ customMessage: v }).catch(() => {});
+          }}
+          autoSendCustomMessage={autoSendCustomMessage}
+          onAutoSendCustomMessageChange={(v) => {
+            setAutoSendCustomMessage(v);
+            savePrefs({ autoSendCustomMessage: v }).catch(() => {});
           }}
           telemetryEnabled={telemetryOn}
           onTelemetryChange={(v) => {

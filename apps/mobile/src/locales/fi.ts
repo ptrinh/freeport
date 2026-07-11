@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "Tallenna",
   "Send BTC or USD": "Lähetä BTC tai USD",
   "Repost": "Julkaise uudelleen",
+  "Custom message": "Mukautettu viesti",
+  "One-tap reply in deal chats — e.g. your payment details.": "Yhden napautuksen vastaus kauppakeskusteluissa – esim. maksutietosi.",
+  "Auto-send custom message": "Lähetä mukautettu viesti automaattisesti",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Lähetä se keskusteluun automaattisesti, kun kauppa vahvistetaan.",
+  "I am here": "Olen paikalla",
+  "Please wait": "Odota hetki",
+  "Payment method": "Maksutapa",
+  "Cash": "Käteinen",
+  "Please rate me after the deal": "Arvostele minut kaupan jälkeen",
 };
 export default c;

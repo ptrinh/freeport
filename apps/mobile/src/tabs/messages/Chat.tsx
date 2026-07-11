@@ -98,7 +98,12 @@ const ChatBubble = React.memo(function ChatBubble({
   );
 });
 
-export function ChatThread({ nego, onSend }: { nego: Negotiation; onSend: (text: string) => Promise<void> }) {
+export function ChatThread({ nego, onSend, quickReplies }: {
+  nego: Negotiation;
+  onSend: (text: string) => Promise<void>;
+  /** Grab-style one-tap replies rendered above the input ("I am here ✅", …). */
+  quickReplies?: { label: string; text: string }[];
+}) {
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -182,6 +187,25 @@ export function ChatThread({ nego, onSend }: { nego: Negotiation; onSend: (text:
             <ChatBubble key={m.id ?? `${m.ts}-${m.dir}-${i}`} text={m.text} dir={m.dir} onZoom={setViewerUri} />
           ))}
         </>
+      )}
+      {quickReplies && quickReplies.length > 0 && (
+        <View style={[s.row, { marginTop: 8, gap: 6, flexWrap: 'wrap' }]}>
+          {quickReplies.map((q) => (
+            <Pressable
+              key={q.label}
+              disabled={sending}
+              onPress={async () => {
+                setSending(true);
+                try { await onSend(q.text); }
+                catch (e) { uiAlert(t('Could not send'), e instanceof Error ? e.message : undefined); }
+                finally { setSending(false); }
+              }}
+              style={[s.quickReplyChip, sending && { opacity: 0.6 }]}
+            >
+              <Text style={s.quickReplyChipText} numberOfLines={1}>{q.label}</Text>
+            </Pressable>
+          ))}
+        </View>
       )}
       <View style={[s.row, { marginTop: 8 }]}>
         <TextInput

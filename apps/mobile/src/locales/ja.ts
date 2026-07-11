@@ -752,5 +752,14 @@ const c: Record<string, string> = {
   "Save": "保存",
   "Send BTC or USD": "BTC または USD を送金",
   "Repost": "再投稿",
+  "Custom message": "カスタムメッセージ",
+  "One-tap reply in deal chats — e.g. your payment details.": "取引チャットでワンタップ返信（例：支払い情報）。",
+  "Auto-send custom message": "カスタムメッセージを自動送信",
+  "Send it into the chat automatically whenever a deal is confirmed.": "取引が成立したら自動でチャットに送信します。",
+  "I am here": "着きました",
+  "Please wait": "少々お待ちください",
+  "Payment method": "支払い方法",
+  "Cash": "現金",
+  "Please rate me after the deal": "取引後に評価してください",
 };
 export default c;

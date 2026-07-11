@@ -752,5 +752,14 @@ const c: Record<string, string> = {
   "Save": "Simpan",
   "Send BTC or USD": "Kirim BTC atau USD",
   "Repost": "Posting ulang",
+  "Custom message": "Pesan khusus",
+  "One-tap reply in deal chats — e.g. your payment details.": "Balasan satu ketuk di obrolan transaksi — mis. detail pembayaranmu.",
+  "Auto-send custom message": "Kirim pesan khusus otomatis",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Kirim otomatis ke obrolan setiap kali transaksi dikonfirmasi.",
+  "I am here": "Saya sudah sampai",
+  "Please wait": "Mohon tunggu",
+  "Payment method": "Metode pembayaran",
+  "Cash": "Tunai",
+  "Please rate me after the deal": "Beri saya rating setelah transaksi",
 };
 export default c;

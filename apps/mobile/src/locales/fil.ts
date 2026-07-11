@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "I-save",
   "Send BTC or USD": "Magpadala ng BTC o USD",
   "Repost": "I-repost",
+  "Custom message": "Pasadyang mensahe",
+  "One-tap reply in deal chats — e.g. your payment details.": "One-tap na sagot sa mga chat ng deal — hal. ang iyong mga detalye sa pagbabayad.",
+  "Auto-send custom message": "Awtomatikong ipadala ang pasadyang mensahe",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Awtomatiko itong ipadala sa chat tuwing may nakumpirmang deal.",
+  "I am here": "Nandito na ako",
+  "Please wait": "Sandali lang",
+  "Payment method": "Paraan ng pagbabayad",
+  "Cash": "Cash",
+  "Please rate me after the deal": "Pakiratingan ako pagkatapos ng deal",
 };
 export default c;

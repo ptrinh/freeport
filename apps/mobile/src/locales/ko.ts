@@ -752,5 +752,14 @@ const c: Record<string, string> = {
   "Save": "저장",
   "Send BTC or USD": "BTC 또는 USD 보내기",
   "Repost": "다시 게시",
+  "Custom message": "맞춤 메시지",
+  "One-tap reply in deal chats — e.g. your payment details.": "거래 채팅에서 원탭 답장 — 예: 결제 정보.",
+  "Auto-send custom message": "맞춤 메시지 자동 전송",
+  "Send it into the chat automatically whenever a deal is confirmed.": "거래가 확정되면 자동으로 채팅에 전송합니다.",
+  "I am here": "도착했어요",
+  "Please wait": "잠시만 기다려 주세요",
+  "Payment method": "결제 수단",
+  "Cash": "현금",
+  "Please rate me after the deal": "거래 후 평가 부탁드려요",
 };
 export default c;

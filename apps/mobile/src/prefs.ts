@@ -61,6 +61,12 @@ export interface Prefs {
   /** Auto-share your live location to the other party while a deal is active
    *  (until it completes). On by default. */
   sendLocationOnDeal: boolean;
+  /** One-tap quick reply in deal chats — typically the user's preferred
+   *  payment method + handle. '' = unset (chip hidden, nothing auto-sent). */
+  customMessage: string;
+  /** Auto-send the custom message into the chat when a deal is confirmed.
+   *  Off by default. */
+  autoSendCustomMessage: boolean;
   /** Send anonymous crash reports + usage analytics to the self-hosted
    *  GlitchTip/Aptabase. Scrubbed of all identity/contact/location/content.
    *  On by default; opt out in Settings. */
@@ -88,6 +94,8 @@ const DEFAULTS: Prefs = {
   browseAlertNotify: false,
   browseMaxDistance: 100,
   sendLocationOnDeal: true,
+  customMessage: '',
+  autoSendCustomMessage: false,
   telemetryEnabled: true,
 };
 

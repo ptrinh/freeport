@@ -24,6 +24,7 @@ import { categoryOf, subcategoryOf } from '../categories';
 import { s, palette } from '../ui/theme';
 import { fmtClock, extractPhone, contactWithoutPhone, stateLabel, stateColor } from '../ui/format';
 import { policeNumberFor } from '../emergency';
+import { quickReplies } from '../quickReplies';
 import { uiAlert, runDealAction, confirmAsync, openMaps } from '../ui/alerts';
 import { SystemNotice, SlideToConfirm } from '../ui/fields';
 import { ChatThread, CounterEditor, ReportModal, isTripMsg } from './messages/Chat';
@@ -57,6 +58,7 @@ export function DealsTab({
   onReceiveDeal,
   onRepost,
   sendLocationOnDeal = true,
+  customMessage = '',
   blockedPubkeys,
   onToggleBlock,
 }: {
@@ -88,6 +90,8 @@ export function DealsTab({
   glowCompleted?: boolean;
   /** When off, don't auto-share live location during an active deal. */
   sendLocationOnDeal?: boolean;
+  /** User's custom quick-reply message (Settings) — third chat chip when set. */
+  customMessage?: string;
   /** Peer pubkeys (hex) the user has blocked. */
   blockedPubkeys: Set<string>;
   /** Toggle a peer's blocked state (block ⇄ unblock). */
@@ -752,7 +756,7 @@ export function DealsTab({
                   );
                 })() : null}
 
-                <ChatThread nego={item} onSend={(t) => client?.sendChat(item.id, t) ?? Promise.resolve()} />
+                <ChatThread nego={item} onSend={(t) => client?.sendChat(item.id, t) ?? Promise.resolve()} quickReplies={quickReplies(customMessage)} />
               </>
               );
             })()}

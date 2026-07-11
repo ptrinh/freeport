@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "Mentés",
   "Send BTC or USD": "BTC vagy USD küldése",
   "Repost": "Újraposztolás",
+  "Custom message": "Egyéni üzenet",
+  "One-tap reply in deal chats — e.g. your payment details.": "Egyérintéses válasz az üzleti csevegésekben – pl. a fizetési adataid.",
+  "Auto-send custom message": "Egyéni üzenet automatikus küldése",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Küldd el automatikusan a csevegésbe, amint egy üzlet megerősítést nyer.",
+  "I am here": "Megérkeztem",
+  "Please wait": "Kérlek, várj",
+  "Payment method": "Fizetési mód",
+  "Cash": "Készpénz",
+  "Please rate me after the deal": "Kérlek, értékelj az üzlet után",
 };
 export default c;

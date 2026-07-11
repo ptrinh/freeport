@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "ذخیره",
   "Send BTC or USD": "ارسال BTC یا USD",
   "Repost": "بازنشر",
+  "Custom message": "پیام سفارشی",
+  "One-tap reply in deal chats — e.g. your payment details.": "پاسخ با یک لمس در گفتگوهای معامله؛ مثلاً جزئیات پرداخت شما.",
+  "Auto-send custom message": "ارسال خودکار پیام سفارشی",
+  "Send it into the chat automatically whenever a deal is confirmed.": "هر بار که معامله تأیید شد، آن را به‌طور خودکار در گفتگو ارسال کن.",
+  "I am here": "رسیدم",
+  "Please wait": "لطفاً صبر کنید",
+  "Payment method": "روش پرداخت",
+  "Cash": "نقدی",
+  "Please rate me after the deal": "لطفاً بعد از معامله به من امتیاز دهید",
 };
 export default c;

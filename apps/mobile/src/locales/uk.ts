@@ -718,5 +718,14 @@ const c: Record<string, string> = {
   "Save": "Зберегти",
   "Send BTC or USD": "Надіслати BTC або USD",
   "Repost": "Опублікувати знову",
+  "Custom message": "Власне повідомлення",
+  "One-tap reply in deal chats — e.g. your payment details.": "Відповідь одним дотиком у чатах угод, напр. ваші платіжні дані.",
+  "Auto-send custom message": "Автоматично надсилати власне повідомлення",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Надсилати його в чат автоматично щоразу, коли угоду підтверджено.",
+  "I am here": "Я на місці",
+  "Please wait": "Зачекайте, будь ласка",
+  "Payment method": "Спосіб оплати",
+  "Cash": "Готівка",
+  "Please rate me after the deal": "Оцініть мене після угоди, будь ласка",
 };
 export default c;

@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "Salvează",
   "Send BTC or USD": "Trimite BTC sau USD",
   "Repost": "Repostează",
+  "Custom message": "Mesaj personalizat",
+  "One-tap reply in deal chats — e.g. your payment details.": "Răspuns rapid în chaturile tranzacțiilor, de ex. detaliile tale de plată.",
+  "Auto-send custom message": "Trimite automat mesajul personalizat",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Trimite-l automat în chat de fiecare dată când o tranzacție este confirmată.",
+  "I am here": "Am ajuns",
+  "Please wait": "Așteaptă puțin",
+  "Payment method": "Metodă de plată",
+  "Cash": "Numerar",
+  "Please rate me after the deal": "Te rog să mă evaluezi după tranzacție",
 };
 export default c;

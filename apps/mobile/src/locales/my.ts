@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "သိမ်းရန်",
   "Send BTC or USD": "BTC သို့မဟုတ် USD ပို့ရန်",
   "Repost": "ပြန်တင်ရန်",
+  "Custom message": "စိတ်ကြိုက်စာ",
+  "One-tap reply in deal chats — e.g. your payment details.": "အရောင်းအဝယ်ချက်တင်များတွင် တစ်ချက်နှိပ်ဖြေကြားချက် — ဥပမာ သင့်ငွေပေးချေမှုအချက်အလက်များ။",
+  "Auto-send custom message": "စိတ်ကြိုက်စာကို အလိုအလျောက်ပို့ရန်",
+  "Send it into the chat automatically whenever a deal is confirmed.": "အရောင်းအဝယ်တစ်ခု အတည်ပြုတိုင်း ၎င်းကို ချက်တင်ထဲသို့ အလိုအလျောက်ပို့ပါ။",
+  "I am here": "ရောက်နေပါပြီ",
+  "Please wait": "ခဏစောင့်ပါ",
+  "Payment method": "ငွေပေးချေနည်း",
+  "Cash": "ငွေသား",
+  "Please rate me after the deal": "အရောင်းအဝယ်ပြီးရင် ကျွန်တော့်ကို အဆင့်သတ်မှတ်ပေးပါ။",
 };
 export default c;

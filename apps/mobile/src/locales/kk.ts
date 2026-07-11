@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "Сақтау",
   "Send BTC or USD": "BTC немесе USD жіберу",
   "Repost": "Қайта жариялау",
+  "Custom message": "Жеке хабарлама",
+  "One-tap reply in deal chats — e.g. your payment details.": "Келісім чаттарында бір рет түртіп жауап беру — мысалы, төлем деректеріңіз.",
+  "Auto-send custom message": "Жеке хабарламаны автоматты жіберу",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Келісім расталған сайын оны чатқа автоматты түрде жіберіңіз.",
+  "I am here": "Мен осындамын",
+  "Please wait": "Күте тұрыңыз",
+  "Payment method": "Төлем әдісі",
+  "Cash": "Қолма-қол ақша",
+  "Please rate me after the deal": "Келісімнен кейін мені бағалаңызшы",
 };
 export default c;

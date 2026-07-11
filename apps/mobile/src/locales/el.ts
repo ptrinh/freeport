@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "Αποθήκευση",
   "Send BTC or USD": "Αποστολή BTC ή USD",
   "Repost": "Επαναδημοσίευση",
+  "Custom message": "Προσαρμοσμένο μήνυμα",
+  "One-tap reply in deal chats — e.g. your payment details.": "Απάντηση με ένα πάτημα στις συνομιλίες συναλλαγών, π.χ. τα στοιχεία πληρωμής σας.",
+  "Auto-send custom message": "Αυτόματη αποστολή προσαρμοσμένου μηνύματος",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Αποστέλλεται αυτόματα στη συνομιλία μόλις επιβεβαιωθεί μια συναλλαγή.",
+  "I am here": "Έφτασα",
+  "Please wait": "Περιμένετε λίγο",
+  "Payment method": "Τρόπος πληρωμής",
+  "Cash": "Μετρητά",
+  "Please rate me after the deal": "Παρακαλώ βαθμολογήστε με μετά τη συναλλαγή",
 };
 export default c;

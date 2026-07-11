@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "Salvesta",
   "Send BTC or USD": "Saada BTC või USD",
   "Repost": "Postita uuesti",
+  "Custom message": "Kohandatud sõnum",
+  "One-tap reply in deal chats — e.g. your payment details.": "Ühe puudutusega vastus tehinguvestlustes – nt sinu makseandmed.",
+  "Auto-send custom message": "Saada kohandatud sõnum automaatselt",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Saada see vestlusesse automaatselt, kui tehing on kinnitatud.",
+  "I am here": "Olen kohal",
+  "Please wait": "Palun oota",
+  "Payment method": "Makseviis",
+  "Cash": "Sularaha",
+  "Please rate me after the deal": "Palun hinda mind pärast tehingut",
 };
 export default c;

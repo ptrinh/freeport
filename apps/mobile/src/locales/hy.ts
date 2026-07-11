@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "Պահպանել",
   "Send BTC or USD": "Ուղարկել BTC կամ USD",
   "Repost": "Վերահրապարակել",
+  "Custom message": "Հատուկ հաղորդագրություն",
+  "One-tap reply in deal chats — e.g. your payment details.": "Մեկ հպումով պատասխան գործարքի զրույցներում — օր․ ձեր վճարման տվյալները։",
+  "Auto-send custom message": "Ավտոմատ ուղարկել հատուկ հաղորդագրությունը",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Ավտոմատ ուղարկիր այն զրույց, երբ գործարքը հաստատվի։",
+  "I am here": "Ես այստեղ եմ",
+  "Please wait": "Խնդրում եմ սպասել",
+  "Payment method": "Վճարման եղանակ",
+  "Cash": "Կանխիկ",
+  "Please rate me after the deal": "Խնդրում եմ գնահատիր ինձ գործարքից հետո",
 };
 export default c;

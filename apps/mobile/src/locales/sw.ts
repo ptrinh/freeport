@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "Hifadhi",
   "Send BTC or USD": "Tuma BTC au USD",
   "Repost": "Chapisha tena",
+  "Custom message": "Ujumbe maalum",
+  "One-tap reply in deal chats — e.g. your payment details.": "Jibu kwa mguso mmoja kwenye gumzo la mikataba, k.m. maelezo yako ya malipo.",
+  "Auto-send custom message": "Tuma ujumbe maalum kiotomatiki",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Utume kwenye gumzo kiotomatiki kila mkataba unapothibitishwa.",
+  "I am here": "Nimefika",
+  "Please wait": "Tafadhali subiri",
+  "Payment method": "Njia ya malipo",
+  "Cash": "Pesa taslimu",
+  "Please rate me after the deal": "Tafadhali nikadirie baada ya mkataba",
 };
 export default c;

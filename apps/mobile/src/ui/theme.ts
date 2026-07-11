@@ -154,6 +154,8 @@ function makeStyles(c: Palette) {
     termsTitle: { color: c.dim, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
     chatBox: { marginTop: 10, padding: 10, backgroundColor: c.panel, borderRadius: 10, borderWidth: 1, borderColor: c.border },
     chatTitle: { color: c.dim, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 },
+    quickReplyChip: { paddingVertical: 7, paddingHorizontal: 12, borderRadius: 999, backgroundColor: c.card, borderWidth: 1, borderColor: c.border, maxWidth: '100%' },
+    quickReplyChipText: { color: c.text2, fontSize: 13, fontWeight: '600' },
     chatExpand: { alignSelf: 'center', paddingVertical: 5, paddingHorizontal: 12, marginBottom: 4, borderRadius: 999, backgroundColor: c.card, borderWidth: 1, borderColor: c.border },
     chatExpandText: { color: c.accent, fontSize: 12, fontWeight: '600' },
     trackMsg: { flexDirection: 'row', alignItems: 'center', gap: 6 },

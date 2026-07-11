@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "Запазване",
   "Send BTC or USD": "Изпращане на BTC или USD",
   "Repost": "Публикувай отново",
+  "Custom message": "Персонализирано съобщение",
+  "One-tap reply in deal chats — e.g. your payment details.": "Отговор с едно докосване в чатовете по сделки, напр. вашите данни за плащане.",
+  "Auto-send custom message": "Автоматично изпращане на персонализирано съобщение",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Изпраща се автоматично в чата при потвърждаване на сделка.",
+  "I am here": "Тук съм",
+  "Please wait": "Моля, изчакайте",
+  "Payment method": "Начин на плащане",
+  "Cash": "В брой",
+  "Please rate me after the deal": "Моля, оценете ме след сделката",
 };
 export default c;

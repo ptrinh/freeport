@@ -755,5 +755,14 @@ const c: Record<string, string> = {
   "Save": "Enregistrer",
   "Send BTC or USD": "Envoyer des BTC ou USD",
   "Repost": "Republier",
+  "Custom message": "Message personnalisé",
+  "One-tap reply in deal chats — e.g. your payment details.": "Réponse en un tap dans les discussions de deal — ex. vos coordonnées de paiement.",
+  "Auto-send custom message": "Envoyer le message personnalisé automatiquement",
+  "Send it into the chat automatically whenever a deal is confirmed.": "L'envoyer automatiquement dans la discussion dès qu'un deal est confirmé.",
+  "I am here": "Je suis là",
+  "Please wait": "Un instant",
+  "Payment method": "Moyen de paiement",
+  "Cash": "Espèces",
+  "Please rate me after the deal": "Merci de me noter après le deal",
 };
 export default c;

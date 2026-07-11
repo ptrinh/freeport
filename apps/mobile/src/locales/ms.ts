@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "Simpan",
   "Send BTC or USD": "Hantar BTC atau USD",
   "Repost": "Hantar semula",
+  "Custom message": "Mesej tersuai",
+  "One-tap reply in deal chats — e.g. your payment details.": "Balasan satu ketik dalam sembang perjanjian — cth. butiran pembayaran anda.",
+  "Auto-send custom message": "Hantar mesej tersuai secara automatik",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Hantar ke dalam sembang secara automatik setiap kali perjanjian disahkan.",
+  "I am here": "Saya dah sampai",
+  "Please wait": "Tunggu sekejap",
+  "Payment method": "Kaedah pembayaran",
+  "Cash": "Tunai",
+  "Please rate me after the deal": "Sila nilai saya selepas perjanjian",
 };
 export default c;

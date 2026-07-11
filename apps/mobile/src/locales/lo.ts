@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "ບັນທຶກ",
   "Send BTC or USD": "ສົ່ງ BTC ຫຼື USD",
   "Repost": "ໂພສຄືນ",
+  "Custom message": "ຂໍ້ຄວາມກຳນົດເອງ",
+  "One-tap reply in deal chats — e.g. your payment details.": "ຕອບກັບດ້ວຍການແຕະດຽວໃນແຊັດດີລ — ເຊັ່ນ ລາຍລະອຽດການຊຳລະຂອງທ່ານ.",
+  "Auto-send custom message": "ສົ່ງຂໍ້ຄວາມກຳນົດເອງອັດຕະໂນມັດ",
+  "Send it into the chat automatically whenever a deal is confirmed.": "ສົ່ງມັນເຂົ້າແຊັດໂດຍອັດຕະໂນມັດທຸກຄັ້ງທີ່ດີລຖືກຢືນຢັນ.",
+  "I am here": "ຂ້ອຍມາຮອດແລ້ວ",
+  "Please wait": "ກະລຸນາລໍຖ້າ",
+  "Payment method": "ວິທີການຊຳລະ",
+  "Cash": "ເງິນສົດ",
+  "Please rate me after the deal": "ກະລຸນາໃຫ້ຄະແນນຂ້ອຍຫຼັງຈາກດີລ",
 };
 export default c;

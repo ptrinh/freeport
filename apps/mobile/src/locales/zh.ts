@@ -752,5 +752,14 @@ const c: Record<string, string> = {
   "Save": "保存",
   "Send BTC or USD": "发送 BTC 或 USD",
   "Repost": "重新发布",
+  "Custom message": "自定义消息",
+  "One-tap reply in deal chats — e.g. your payment details.": "在交易聊天中一键回复，例如你的付款信息。",
+  "Auto-send custom message": "自动发送自定义消息",
+  "Send it into the chat automatically whenever a deal is confirmed.": "每当交易确认时，自动发送到聊天中。",
+  "I am here": "我到了",
+  "Please wait": "请稍等",
+  "Payment method": "付款方式",
+  "Cash": "现金",
+  "Please rate me after the deal": "交易后请给我评分",
 };
 export default c;

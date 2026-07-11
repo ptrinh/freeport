@@ -755,5 +755,14 @@ const c: Record<string, string> = {
   "Save": "حفظ",
   "Send BTC or USD": "إرسال BTC أو USD",
   "Repost": "إعادة النشر",
+  "Custom message": "رسالة مخصّصة",
+  "One-tap reply in deal chats — e.g. your payment details.": "رد بنقرة واحدة في محادثات الصفقات، مثل تفاصيل الدفع الخاصة بك.",
+  "Auto-send custom message": "إرسال الرسالة المخصّصة تلقائيًا",
+  "Send it into the chat automatically whenever a deal is confirmed.": "تُرسَل إلى المحادثة تلقائيًا عند تأكيد أي صفقة.",
+  "I am here": "لقد وصلت",
+  "Please wait": "انتظر من فضلك",
+  "Payment method": "طريقة الدفع",
+  "Cash": "نقدًا",
+  "Please rate me after the deal": "من فضلك قيّمني بعد الصفقة",
 };
 export default c;

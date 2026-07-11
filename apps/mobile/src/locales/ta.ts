@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "சேமி",
   "Send BTC or USD": "BTC அல்லது USD அனுப்பு",
   "Repost": "மீண்டும் பதிவிடு",
+  "Custom message": "தனிப்பயன் செய்தி",
+  "One-tap reply in deal chats — e.g. your payment details.": "பரிவர்த்தனை அரட்டைகளில் ஒரே தட்டலில் பதில், எ.கா. உங்கள் கட்டண விவரங்கள்.",
+  "Auto-send custom message": "தனிப்பயன் செய்தியைத் தானாக அனுப்பு",
+  "Send it into the chat automatically whenever a deal is confirmed.": "பரிவர்த்தனை உறுதிசெய்யப்படும்போது அதை அரட்டையில் தானாகவே அனுப்பு.",
+  "I am here": "நான் வந்துவிட்டேன்",
+  "Please wait": "கொஞ்சம் காத்திருங்கள்",
+  "Payment method": "கட்டண முறை",
+  "Cash": "ரொக்கம்",
+  "Please rate me after the deal": "பரிவர்த்தனைக்குப் பிறகு எனக்கு மதிப்பீடு அளியுங்கள்",
 };
 export default c;

@@ -752,5 +752,14 @@ const c: Record<string, string> = {
   "Save": "Lưu",
   "Send BTC or USD": "Gửi BTC hoặc USD",
   "Repost": "Đăng lại",
+  "Custom message": "Tin nhắn tùy chỉnh",
+  "One-tap reply in deal chats — e.g. your payment details.": "Trả lời nhanh một chạm trong chat deal — ví dụ: thông tin thanh toán của bạn.",
+  "Auto-send custom message": "Tự động gửi tin nhắn tùy chỉnh",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Tự động gửi vào chat mỗi khi deal được xác nhận.",
+  "I am here": "Mình đến rồi",
+  "Please wait": "Chờ chút nhé",
+  "Payment method": "Phương thức thanh toán",
+  "Cash": "Tiền mặt",
+  "Please rate me after the deal": "Nhớ đánh giá mình sau deal nhé",
 };
 export default c;

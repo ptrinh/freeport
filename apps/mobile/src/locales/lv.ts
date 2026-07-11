@@ -712,5 +712,14 @@ const c: Record<string, string> = {
   "Save": "Saglabāt",
   "Send BTC or USD": "Sūtīt BTC vai USD",
   "Repost": "Ievietot vēlreiz",
+  "Custom message": "Pielāgots ziņojums",
+  "One-tap reply in deal chats — e.g. your payment details.": "Atbilde ar vienu pieskārienu darījumu tērzēšanā — piemēram, jūsu maksājuma informācija.",
+  "Auto-send custom message": "Automātiski sūtīt pielāgoto ziņojumu",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Automātiski nosūtīt to tērzēšanā ikreiz, kad darījums tiek apstiprināts.",
+  "I am here": "Esmu klāt",
+  "Please wait": "Lūdzu, uzgaidiet",
+  "Payment method": "Maksājuma veids",
+  "Cash": "Skaidra nauda",
+  "Please rate me after the deal": "Lūdzu, novērtējiet mani pēc darījuma",
 };
 export default c;

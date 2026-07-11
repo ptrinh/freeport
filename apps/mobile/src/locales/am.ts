@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "አስቀምጥ",
   "Send BTC or USD": "BTC ወይም USD ላክ",
   "Repost": "እንደገና ለጥፍ",
+  "Custom message": "ብጁ መልእክት",
+  "One-tap reply in deal chats — e.g. your payment details.": "በስምምነት ውይይቶች ውስጥ በአንድ ንክኪ ምላሽ፣ ለምሳሌ የክፍያ ዝርዝሮችዎ።",
+  "Auto-send custom message": "ብጁ መልእክት በራስ-ሰር ላክ",
+  "Send it into the chat automatically whenever a deal is confirmed.": "ስምምነት በተረጋገጠ ቁጥር ወደ ውይይቱ በራስ-ሰር ይላካል።",
+  "I am here": "እዚህ ደርሻለሁ",
+  "Please wait": "እባክዎ ይጠብቁ",
+  "Payment method": "የክፍያ ዘዴ",
+  "Cash": "ጥሬ ገንዘብ",
+  "Please rate me after the deal": "እባክዎ ከስምምነቱ በኋላ ደረጃ ይስጡኝ",
 };
 export default c;

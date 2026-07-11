@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "Saqlash",
   "Send BTC or USD": "BTC yoki USD yuborish",
   "Repost": "Qayta joylash",
+  "Custom message": "Maxsus xabar",
+  "One-tap reply in deal chats — e.g. your payment details.": "Bitim chatlarida bir teginish bilan javob, masalan, to'lov ma'lumotlaringiz.",
+  "Auto-send custom message": "Maxsus xabarni avtomatik yuborish",
+  "Send it into the chat automatically whenever a deal is confirmed.": "Bitim tasdiqlanganda uni chatga avtomatik yuboring.",
+  "I am here": "Yetib keldim",
+  "Please wait": "Biroz kuting",
+  "Payment method": "To'lov usuli",
+  "Cash": "Naqd pul",
+  "Please rate me after the deal": "Bitimdan so'ng meni baholang",
 };
 export default c;

@@ -709,5 +709,14 @@ const c: Record<string, string> = {
   "Save": "შენახვა",
   "Send BTC or USD": "BTC ან USD გაგზავნა",
   "Repost": "ხელახლა გამოქვეყნება",
+  "Custom message": "მორგებული შეტყობინება",
+  "One-tap reply in deal chats — e.g. your payment details.": "ერთი შეხებით პასუხი გარიგების ჩატებში — მაგ. გადახდის დეტალები.",
+  "Auto-send custom message": "მორგებული შეტყობინების ავტომატური გაგზავნა",
+  "Send it into the chat automatically whenever a deal is confirmed.": "გაგზავნეთ ავტომატურად ჩატში, როცა გარიგება დადასტურდება.",
+  "I am here": "აქ ვარ",
+  "Please wait": "მოიცადეთ",
+  "Payment method": "გადახდის მეთოდი",
+  "Cash": "ნაღდი ფული",
+  "Please rate me after the deal": "გთხოვთ, შემაფასოთ გარიგების შემდეგ",
 };
 export default c;

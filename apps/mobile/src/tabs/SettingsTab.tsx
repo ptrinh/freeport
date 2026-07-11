@@ -39,6 +39,7 @@ import { dirIcon } from '../rtl';
 import { isIOSWeb, isStandalonePWA, shortNpub } from '../ui/format';
 import { uiAlert } from '../ui/alerts';
 import { Field, SelectField, ImagePickerField, NumberField, QuickLocationSearch } from '../ui/fields';
+import { defaultCustomMessage } from '../quickReplies';
 import { SelfStats } from './MessagesTab';
 import { DesktopHostPanel } from './settings/DesktopHostPanel';
 import { NotificationsSection } from './settings/NotificationsSection';
@@ -85,6 +86,10 @@ function SettingsTab({
   onRoleChange,
   language,
   onLanguageChange,
+  customMessage,
+  autoSendCustomMessage,
+  onCustomMessageChange,
+  onAutoSendCustomMessageChange,
   fareConfig,
   fareDefaults,
   fareCurrency,
@@ -131,6 +136,10 @@ function SettingsTab({
   onRoleChange: (r: 'passenger' | 'driver') => void;
   language: string;
   onLanguageChange: (l: string) => void;
+  customMessage: string;
+  autoSendCustomMessage: boolean;
+  onCustomMessageChange: (v: string) => void;
+  onAutoSendCustomMessageChange: (v: boolean) => void;
   fareConfig: FareConfig | null;
   fareDefaults: FareConfig;
   fareCurrency: Currency;
@@ -758,6 +767,27 @@ function SettingsTab({
           scroll
         />
       </View>
+
+      {/* Quick-reply custom message: shown as a one-tap chip in deal chats,
+          optionally auto-sent on deal confirmation. The placeholder suggests
+          the country's common instant P2P rail (Zelle/PayNow/…, else cash). */}
+      <Field
+        label={t("Custom message")}
+        value={customMessage}
+        onChange={onCustomMessageChange}
+        placeholder={defaultCustomMessage(location.country)}
+        multiline
+      />
+      <Text style={s.dim}>{t("One-tap reply in deal chats — e.g. your payment details.")}</Text>
+      <Pressable accessibilityRole="switch" accessibilityState={{ checked: autoSendCustomMessage }} style={s.toggleRow} onPress={() => onAutoSendCustomMessageChange(!autoSendCustomMessage)}>
+        <View style={{ flex: 1, marginEnd: 12 }}>
+          <Text style={s.toggleTitle}>{t("Auto-send custom message")}</Text>
+          <Text style={s.dim}>{t("Send it into the chat automatically whenever a deal is confirmed.")}</Text>
+        </View>
+        <View style={[s.switchTrack, autoSendCustomMessage && s.switchTrackOn]}>
+          <View style={[s.switchThumb, autoSendCustomMessage && s.switchThumbOn]} />
+        </View>
+      </Pressable>
 
       {/* Desktop only: host the Freeport web app on the LAN for others.
           Inside Features and NOT gated by pushSupported() (which is false in
