@@ -205,10 +205,14 @@ npx wrangler pages deploy dist --project-name freeport --branch main --commit-di
 # Censorship-resilient mirror: rebuild the single-file offline app from this
 # exact dist and pin it to IPFS (Pinata). Content-addressed, so an unchanged
 # build is a no-op; skipped when PINATA_JWT isn't set. Never fails the deploy.
-echo "▸ Pinning offline single-file app to IPFS…"
+echo "▸ Pinning offline single-file app + source archive to IPFS…"
 node scripts/build-offline.mjs dist offline-freeport.html \
   && node scripts/pin-ipfs.mjs offline-freeport.html \
   || echo "  (IPFS mirror step failed — deploy unaffected)"
+git -C ../.. archive --format=zip -o "$PWD/freeport-source.zip" HEAD \
+  && node scripts/pin-ipfs.mjs freeport-source.zip freeport-source.zip \
+  || echo "  (IPFS source mirror failed — deploy unaffected)"
+rm -f freeport-source.zip
 
 echo "✓ Live at https://freeport.network/ (and https://freeport.trinh.uk/)"
 echo "✓ Privacy policy at https://freeport.network/privacy"

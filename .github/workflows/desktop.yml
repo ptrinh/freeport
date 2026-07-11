@@ -160,6 +160,8 @@ jobs:
           # Mirror to IPFS so the file outlives the git hosting (skips
           # gracefully when the PINATA_JWT secret is absent).
           PINATA_JWT="${{ secrets.PINATA_JWT }}" node apps/mobile/scripts/pin-ipfs.mjs Freeport-offline.html || true
+          git archive --format=zip -o freeport-source.zip HEAD
+          PINATA_JWT="${{ secrets.PINATA_JWT }}" node apps/mobile/scripts/pin-ipfs.mjs freeport-source.zip freeport-source.zip || true
 
       - name: Upload artifacts (dispatch validation builds)
         if: github.event_name == 'workflow_dispatch'
