@@ -69,8 +69,14 @@ export function ReceiveSheet({
     let dead = false;
     // Lightning without a deal-prefill is entirely form-driven now — running
     // the loader there would wipe an invoice the user just created (its
-    // askAmount dependency flips right after createInvoice succeeds).
-    if (tab === 'lightning' && !prefillRequest?.sats) return;
+    // askAmount dependency flips right after createInvoice succeeds). But a
+    // payload left over from ANOTHER tab (Spark/Bitcoin address) must still
+    // be cleared, or switching back to Lightning keeps showing that QR.
+    if (tab === 'lightning' && !prefillRequest?.sats) {
+      setValue((v) => (v.toLowerCase().startsWith('ln') ? v : ''));
+      setLoading(false);
+      return;
+    }
     const load = async () => {
       setLoading(true); setError(''); setValue(''); setCopied(false);
       try {
