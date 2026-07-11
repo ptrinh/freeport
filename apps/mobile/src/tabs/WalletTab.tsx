@@ -62,7 +62,7 @@ function WalletTab({
   const [canScan, setCanScan] = useState(false);
   useEffect(() => { scanSupported().then(setCanScan).catch(() => {}); }, []);
   const [sendPrefill, setSendPrefill] = useState<{ dest: string; hint?: string; amount?: string } | null>(null);
-  const [receivePrefill, setReceivePrefill] = useState<{ sats: number; memo?: string } | null>(null);
+  const [receivePrefill, setReceivePrefill] = useState<{ sats: number; memo?: string; fiatText?: string } | null>(null);
 
   // NWC connect form (setup view / switch flow)
   const [urlDraft, setUrlDraft] = useState('');
@@ -128,7 +128,10 @@ function WalletTab({
       }
       if (dead) return;
       if (prefill.mode === 'receive') {
-        if (sats > 0) { setReceivePrefill({ sats, memo: prefill.memo }); setReceiveOpen(true); }
+        const fiatText = prefill.fiatAmount && prefill.fiatCurrency
+          ? (() => { try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: prefill.fiatCurrency, maximumFractionDigits: 2 }).format(prefill.fiatAmount!); } catch { return `${prefill.fiatAmount} ${prefill.fiatCurrency}`; } })()
+          : undefined;
+        if (sats > 0) { setReceivePrefill({ sats, memo: prefill.memo, fiatText }); setReceiveOpen(true); }
         else setReceiveOpen(true); // no rate — plain receive flow
       } else {
         setSendPrefill({ dest: prefill.dest ?? '', hint: prefill.hint, amount: sats > 0 ? String(sats) : undefined });

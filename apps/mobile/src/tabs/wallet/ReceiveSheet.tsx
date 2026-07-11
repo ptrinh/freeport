@@ -24,8 +24,9 @@ export function ReceiveSheet({
   provider: WalletProvider | null;
   /** Known stablecoins — offered when creating a specific-amount invoice. */
   tokens?: TokenBalanceInfo[];
-  /** Deal Pay-QR: auto-create an invoice for this amount on open. */
-  prefillRequest?: { sats: number; memo?: string } | null;
+  /** Deal Pay-QR: auto-create an invoice for this amount on open.
+   *  fiatText is the agreed price for display ("7.5 SGD"). */
+  prefillRequest?: { sats: number; memo?: string; fiatText?: string } | null;
   onClose: () => void;
 }) {
   const isBreez = provider?.kind === 'breez-spark';
@@ -260,7 +261,9 @@ export function ReceiveSheet({
                 <Image source={{ uri: qrDataUrl(value.toUpperCase().startsWith('LN') ? value.toUpperCase() : value) }} style={{ width: 230, height: 230 }} />
               </View>
               {prefillRequest?.sats && tab === 'lightning' ? (
-                <Text style={{ color: palette.text, fontSize: 22, fontWeight: '800' }}>{prefillRequest.sats.toLocaleString()} sats</Text>
+                <Text style={{ color: palette.text, fontSize: 22, fontWeight: '800' }}>
+                  {prefillRequest.sats.toLocaleString()} sats{prefillRequest.fiatText ? ` ≈ ${prefillRequest.fiatText}` : ''}
+                </Text>
               ) : null}
               <Text selectable style={[s.codeText, { textAlign: 'center' }]} numberOfLines={2}>
                 {value.length > 60 ? value.slice(0, 30) + '…' + value.slice(-26) : value}
