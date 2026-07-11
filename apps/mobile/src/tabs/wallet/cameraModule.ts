@@ -1,4 +1,7 @@
 import { Platform } from 'react-native';
+// Static import: a dynamic import('…') namespace copy can fire lazy getters
+// on the module object (see breezNative.ts / GlitchTip #15).
+import { requireOptionalNativeModule } from 'expo-modules-core';
 
 /**
  * Guarded access to expo-camera. Its JS calls requireNativeModule('ExpoCamera')
@@ -12,8 +15,7 @@ import { Platform } from 'react-native';
  */
 export async function importCamera(): Promise<any | null> {
   try {
-    const core: any = await import('expo-modules-core');
-    if (!core?.requireOptionalNativeModule?.('ExpoCamera')) return null;
+    if (!requireOptionalNativeModule?.('ExpoCamera')) return null;
     return await import('expo-camera');
   } catch {
     return null;
