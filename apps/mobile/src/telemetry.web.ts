@@ -49,6 +49,11 @@ export async function initTelemetry(on: boolean): Promise<void> {
         // when the icon font takes >6s (slow first paint / flaky network);
         // the font still applies when it arrives (GlitchTip issue 11).
         /^\d+ms timeout exceeded$/,
+        // Transient connectivity loss surfacing as an unhandled DOMException
+        // (code 19) from background fetches we don't own — chiefly the Breez
+        // SDK's wasm-internal sync polling when the device drops offline. The
+        // SDK retries on its own; nothing actionable (GlitchTip issue 4).
+        'NetworkError: A network error occurred.',
       ],
       beforeSend: (event) => (enabled ? (scrubEvent(event as any) as any) : null),
       beforeBreadcrumb: (b) => (enabled ? (scrubBreadcrumb(b as any) as any) : null),
