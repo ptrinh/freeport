@@ -707,5 +707,9 @@ const c: Record<string, string> = {
   "Enter an amount": "مبلغ را وارد کنید",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "این آدرس هم بیت‌کوین و هم استیبل‌کوین‌ها (USDT/USDB) را دریافت می‌کند.",
   "Pay QR": "پرداخت QR",
+  "Edit": "ویرایش",
+  "Edit Address": "ویرایش آدرس",
+  "Save": "ذخیره",
+  "Send BTC or USD": "ارسال BTC یا USD",
 };
 export default c;

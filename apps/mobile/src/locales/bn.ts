@@ -704,5 +704,9 @@ const c: Record<string, string> = {
   "Enter an amount": "একটি পরিমাণ লিখুন",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "এই ঠিকানাটি Bitcoin এবং স্টেবলকয়েন (USDT/USDB) উভয়ই গ্রহণ করে।",
   "Pay QR": "QR পেমেন্ট",
+  "Edit": "সম্পাদনা",
+  "Edit Address": "ঠিকানা সম্পাদনা",
+  "Save": "সংরক্ষণ",
+  "Send BTC or USD": "BTC বা USD পাঠান",
 };
 export default c;

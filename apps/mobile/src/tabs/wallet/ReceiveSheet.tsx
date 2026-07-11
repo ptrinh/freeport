@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Image, Modal, Platform, Pressable, ScrollView, Share, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
 import { qrDataUrl } from '../../wallet/qr';
+import { randomUsername, USERNAME_RE } from '../../wallet/username';
 import type { TokenBalanceInfo, WalletProvider } from '../../wallet';
 
 type Tab = 'lightning' | 'spark' | 'bitcoin';
@@ -43,6 +44,8 @@ export function ReceiveSheet({
   const [lnAddr, setLnAddr] = useState<{ address: string; lnurl?: string } | null | undefined>(undefined);
   const [claiming, setClaiming] = useState(false);
   const [username, setUsername] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const autoClaimTried = useRef(false);
   const [amount, setAmount] = useState('');
   const [asset, setAsset] = useState<TokenBalanceInfo | null>(null); // null = BTC
   const [memo, setMemo] = useState('');
@@ -51,7 +54,7 @@ export function ReceiveSheet({
     if (!visible) return;
     setTab('lightning'); setValue(''); setError(''); setCopied(false);
     setAskAmount(provider?.kind !== 'breez-spark'); setAmount(''); setMemo('');
-    setLnAddr(undefined); setUsername(''); setClaiming(false);
+    setLnAddr(undefined); setUsername(''); setClaiming(false); setEditMode(false);
     if (prefillRequest?.sats) {
       // Deal Pay-QR: jump straight to a specific-amount invoice.
       setLnAddr(null);
@@ -118,10 +121,43 @@ export function ReceiveSheet({
     } finally { setLoading(false); }
   };
 
+  // Auto-claim (glow-style): no address yet → register a random username in
+  // the background and land straight on the address view. Falls back to the
+  // manual claim form (with the suggestion prefilled) if registration fails.
+  useEffect(() => {
+    if (!visible || editMode) return;
+    if (lnAddr !== null || !isBreez || !provider?.registerLightningAddress || prefillRequest?.sats) return;
+    if (autoClaimTried.current) return;
+    autoClaimTried.current = true;
+    let dead = false;
+    const register = provider.registerLightningAddress.bind(provider);
+    const checkFree = provider.checkUsername?.bind(provider);
+    (async () => {
+      setClaiming(true);
+      try {
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const u = randomUsername();
+          if (checkFree && !(await checkFree(u))) continue;
+          const info = await register(u);
+          if (!dead) setLnAddr(info);
+          return;
+        }
+        if (!dead) setUsername(randomUsername());
+      } catch {
+        if (!dead) setUsername(randomUsername()); // manual form takes over
+      } finally {
+        if (!dead) setClaiming(false);
+      }
+    })();
+    return () => { dead = true; };
+  }, [visible, lnAddr, isBreez, provider, prefillRequest, editMode]);
+
   const claim = async () => {
     if (!provider?.registerLightningAddress) return;
     const u = username.trim().toLowerCase();
-    if (!/^[a-z0-9][a-z0-9._-]{1,30}$/.test(u)) { setError(t('Pick a username: letters and numbers only')); return; }
+    if (!USERNAME_RE.test(u)) { setError(t('Pick a username: letters and numbers only')); return; }
+    const current = lnAddr?.address?.split('@')[0];
+    if (u === current) { setEditMode(false); return; } // no change
     setClaiming(true); setError('');
     try {
       if (provider.checkUsername && !(await provider.checkUsername(u))) {
@@ -129,6 +165,7 @@ export function ReceiveSheet({
         return;
       }
       setLnAddr(await provider.registerLightningAddress(u));
+      setEditMode(false);
     } catch (e) {
       setError(e instanceof Error && e.message ? e.message : t('Lightning addresses are not available yet'));
     } finally { setClaiming(false); }
@@ -174,7 +211,34 @@ export function ReceiveSheet({
             </View>
           )}
 
-          {tab === 'lightning' && lnAddr === undefined && !prefillRequest ? (
+          {tab === 'lightning' && editMode ? (
+            <View style={{ alignItems: 'center', gap: 14, paddingVertical: 8 }}>
+              <View style={{ width: 64, height: 64, borderRadius: 16, backgroundColor: palette.card, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="flash" size={26} color={palette.accent} />
+              </View>
+              <Text style={{ color: palette.text, fontSize: 18, fontWeight: '800' }}>{t('Edit Address')}</Text>
+              <View style={[s.row, { alignSelf: 'stretch', gap: 8 }]}>
+                <TextInput
+                  style={{ flex: 1, borderWidth: 1, borderColor: palette.border, borderRadius: 12, padding: 12, minHeight: 48, color: palette.text, fontFamily: Platform.OS === 'web' ? 'monospace' : undefined }}
+                  value={username}
+                  onChangeText={(v) => { setUsername(v); setError(''); }}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoFocus
+                />
+                <Text style={[s.dim, { alignSelf: 'center' }]}>@freeport.network</Text>
+              </View>
+              {!!error && <Text style={[s.dim, { color: palette.danger }]}>{error}</Text>}
+              <View style={[s.row, { alignSelf: 'stretch', gap: 8 }]}>
+                <Pressable onPress={() => { setEditMode(false); setError(''); }} style={[s.btnGhost, { flex: 1 }]}>
+                  <Text style={s.btnGhostText}>{t('Cancel')}</Text>
+                </Pressable>
+                <Pressable onPress={claim} disabled={claiming || !username.trim()} style={[s.btnAccept, { flex: 1 }, (claiming || !username.trim()) && { opacity: 0.6 }]}>
+                  {claiming ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t('Save')}</Text>}
+                </Pressable>
+              </View>
+            </View>
+          ) : tab === 'lightning' && (lnAddr === undefined || (claiming && lnAddr === null && !username)) && !prefillRequest ? (
             <View style={{ alignItems: 'center', paddingVertical: 40 }}><ActivityIndicator color={palette.accent} /></View>
           ) : tab === 'lightning' && lnAddr ? (
             <View style={{ alignItems: 'center', gap: 12 }}>
@@ -201,6 +265,12 @@ export function ReceiveSheet({
                   <View style={[s.row, { gap: 6 }]}>
                     <Ionicons name="share-social-outline" size={14} color={palette.text2} />
                     <Text style={s.btnGhostText}>{t('Share')}</Text>
+                  </View>
+                </Pressable>
+                <Pressable onPress={() => { setUsername(lnAddr.address.split('@')[0]); setError(''); setEditMode(true); }} style={[s.btnGhost, { paddingHorizontal: 18 }]}>
+                  <View style={[s.row, { gap: 6 }]}>
+                    <Ionicons name="pencil-outline" size={14} color={palette.text2} />
+                    <Text style={s.btnGhostText}>{t('Edit')}</Text>
                   </View>
                 </Pressable>
               </View>

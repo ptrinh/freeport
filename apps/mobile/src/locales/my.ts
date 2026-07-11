@@ -704,5 +704,9 @@ const c: Record<string, string> = {
   "Enter an amount": "ပမာဏ ထည့်ပါ",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "ဤလိပ်စာသည် Bitcoin နှင့် stablecoin (USDT/USDB) နှစ်မျိုးလုံးကို လက်ခံသည်။",
   "Pay QR": "QR ဖြင့် ငွေပေး",
+  "Edit": "ပြင်ရန်",
+  "Edit Address": "လိပ်စာ ပြင်ရန်",
+  "Save": "သိမ်းရန်",
+  "Send BTC or USD": "BTC သို့မဟုတ် USD ပို့ရန်",
 };
 export default c;

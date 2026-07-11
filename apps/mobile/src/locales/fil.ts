@@ -704,5 +704,9 @@ const c: Record<string, string> = {
   "Enter an amount": "Maglagay ng halaga",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Tumatanggap ang address na ito ng Bitcoin at mga stablecoin (USDT/USDB).",
   "Pay QR": "Bayad QR",
+  "Edit": "I-edit",
+  "Edit Address": "I-edit ang Address",
+  "Save": "I-save",
+  "Send BTC or USD": "Magpadala ng BTC o USD",
 };
 export default c;

@@ -707,5 +707,9 @@ const c: Record<string, string> = {
   "Enter an amount": "தொகையை உள்ளிடவும்",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "இந்த முகவரி Bitcoin மற்றும் stablecoins (USDT/USDB) இரண்டையும் பெறும்.",
   "Pay QR": "QR மூலம் செலுத்து",
+  "Edit": "திருத்து",
+  "Edit Address": "முகவரியைத் திருத்து",
+  "Save": "சேமி",
+  "Send BTC or USD": "BTC அல்லது USD அனுப்பு",
 };
 export default c;

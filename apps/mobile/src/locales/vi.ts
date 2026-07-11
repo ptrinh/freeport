@@ -747,5 +747,9 @@ const c: Record<string, string> = {
   "Enter an amount": "Nhập số tiền",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Địa chỉ này nhận được cả Bitcoin lẫn stablecoin (USDT/USDB).",
   "Pay QR": "QR thanh toán",
+  "Edit": "Sửa",
+  "Edit Address": "Sửa địa chỉ",
+  "Save": "Lưu",
+  "Send BTC or USD": "Gửi BTC hoặc USD",
 };
 export default c;

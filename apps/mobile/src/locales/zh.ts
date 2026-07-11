@@ -747,5 +747,9 @@ const c: Record<string, string> = {
   "Enter an amount": "输入金额",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "该地址同时接收比特币和稳定币（USDT/USDB）。",
   "Pay QR": "收款 QR",
+  "Edit": "编辑",
+  "Edit Address": "编辑地址",
+  "Save": "保存",
+  "Send BTC or USD": "发送 BTC 或 USD",
 };
 export default c;

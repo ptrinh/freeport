@@ -707,5 +707,9 @@ const c: Record<string, string> = {
   "Enter an amount": "Adjon meg egy összeget",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Erre a címre Bitcoint és stablecoinokat (USDT/USDB) is fogadhat.",
   "Pay QR": "QR-fizetés",
+  "Edit": "Szerkesztés",
+  "Edit Address": "Cím szerkesztése",
+  "Save": "Mentés",
+  "Send BTC or USD": "BTC vagy USD küldése",
 };
 export default c;

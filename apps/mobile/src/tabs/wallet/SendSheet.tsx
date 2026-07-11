@@ -129,7 +129,7 @@ export function SendSheet({
         <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: palette.border, marginTop: 8 }} />
         <View style={[s.row, { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 }]}>
           <Ionicons name="arrow-up" size={16} color={palette.accent} style={{ marginEnd: 8 }} />
-          <Text style={{ color: palette.text, fontSize: 18, fontWeight: '800', flex: 1 }}>{t('Send')}</Text>
+          <Text style={{ color: palette.text, fontSize: 18, fontWeight: '800', flex: 1 }}>{t('Send BTC or USD')}</Text>
           <Pressable hitSlop={10} onPress={onClose}><Ionicons name="close" size={20} color={palette.dim} /></Pressable>
         </View>
 
@@ -141,7 +141,7 @@ export function SendSheet({
                 multiline
                 value={input}
                 onChangeText={(v) => { setInput(v); setError(''); }}
-                placeholder={'lnbc… / bc1… / sp1… / user@domain.com'}
+                placeholder={'lnbc… / bc1… / sp1… / user@domain.com / USDT'}
                 placeholderTextColor={palette.placeholder}
                 autoCapitalize="none"
                 autoCorrect={false}

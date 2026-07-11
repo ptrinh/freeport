@@ -704,5 +704,9 @@ const c: Record<string, string> = {
   "Enter an amount": "Weka kiasi",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Anwani hii inapokea Bitcoin na stablecoin (USDT/USDB).",
   "Pay QR": "Lipa kwa QR",
+  "Edit": "Hariri",
+  "Edit Address": "Hariri anwani",
+  "Save": "Hifadhi",
+  "Send BTC or USD": "Tuma BTC au USD",
 };
 export default c;

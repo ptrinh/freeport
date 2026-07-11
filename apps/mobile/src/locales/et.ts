@@ -707,5 +707,9 @@ const c: Record<string, string> = {
   "Enter an amount": "Sisesta summa",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "See aadress võtab vastu nii Bitcoini kui ka stabiilmünte (USDT/USDB).",
   "Pay QR": "QR-makse",
+  "Edit": "Muuda",
+  "Edit Address": "Muuda aadressi",
+  "Save": "Salvesta",
+  "Send BTC or USD": "Saada BTC või USD",
 };
 export default c;

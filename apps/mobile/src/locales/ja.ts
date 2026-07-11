@@ -747,5 +747,9 @@ const c: Record<string, string> = {
   "Enter an amount": "金額を入力",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "このアドレスはBitcoinとステーブルコイン（USDT/USDB）の両方を受け取れます。",
   "Pay QR": "QR決済",
+  "Edit": "編集",
+  "Edit Address": "アドレスを編集",
+  "Save": "保存",
+  "Send BTC or USD": "BTC または USD を送金",
 };
 export default c;

@@ -704,5 +704,9 @@ const c: Record<string, string> = {
   "Enter an amount": "መጠን ያስገቡ",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "ይህ አድራሻ ቢትኮይንንም ሆነ ስቴብልኮይኖችን (USDT/USDB) ይቀበላል።",
   "Pay QR": "በQR ክፈል",
+  "Edit": "አርትዕ",
+  "Edit Address": "አድራሻ አርትዕ",
+  "Save": "አስቀምጥ",
+  "Send BTC or USD": "BTC ወይም USD ላክ",
 };
 export default c;

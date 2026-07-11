@@ -750,5 +750,9 @@ const c: Record<string, string> = {
   "Enter an amount": "Bir tutar girin",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Bu adres hem Bitcoin hem de stablecoin (USDT/USDB) alır.",
   "Pay QR": "QR ile Öde",
+  "Edit": "Düzenle",
+  "Edit Address": "Adresi Düzenle",
+  "Save": "Kaydet",
+  "Send BTC or USD": "BTC veya USD Gönder",
 };
 export default c;

@@ -747,5 +747,9 @@ const c: Record<string, string> = {
   "Enter an amount": "금액을 입력하세요",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "이 주소는 Bitcoin과 스테이블코인(USDT/USDB)을 모두 받을 수 있습니다.",
   "Pay QR": "QR 결제",
+  "Edit": "편집",
+  "Edit Address": "주소 편집",
+  "Save": "저장",
+  "Send BTC or USD": "BTC 또는 USD 보내기",
 };
 export default c;
