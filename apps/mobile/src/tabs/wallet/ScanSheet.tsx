@@ -3,25 +3,17 @@ import { Modal, Platform, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
+import { importCamera } from './cameraModule';
 
 /**
  * QR scanner for the Send flow.
  *  - Web: getUserMedia + BarcodeDetector where available, jsQR (pure JS)
  *    elsewhere — no native deps, works in every modern browser.
- *  - Native: expo-camera via guarded dynamic import; binaries without the
- *    module simply don't show the Scan button (see scanSupported()).
+ *  - Native: expo-camera via importCamera() (probes the native module before
+ *    touching the JS — see cameraModule.ts); binaries without the module
+ *    simply don't show the Scan button.
  */
-export async function scanSupported(): Promise<boolean> {
-  if (Platform.OS === 'web') {
-    try {
-      return !!(navigator as any)?.mediaDevices?.getUserMedia && (window as any).isSecureContext === true;
-    } catch { return false; }
-  }
-  try {
-    const cam: any = await import('expo-camera');
-    return !!cam?.CameraView;
-  } catch { return false; }
-}
+export { scanSupported } from './cameraModule';
 
 function WebScanner({ onCode }: { onCode: (v: string) => void }) {
   const videoRef = useRef<any>(null);
@@ -94,13 +86,14 @@ function NativeScanner({ onCode }: { onCode: (v: string) => void }) {
     let dead = false;
     (async () => {
       try {
-        const cam: any = await import('expo-camera');
+        const cam: any = await importCamera();
+        if (!cam) { if (!dead) setErr(t('Not available for this wallet')); return; } // module not in this binary
         const perm = await cam.Camera.requestCameraPermissionsAsync();
         if (dead) return;
         if (!perm?.granted) { setErr(t('Camera access was denied')); return; }
         setCamera(() => cam.CameraView);
       } catch {
-        if (!dead) setErr(t('Not available for this wallet')); // module not in this binary
+        if (!dead) setErr(t('Not available for this wallet'));
       }
     })();
     return () => { dead = true; };
@@ -166,7 +159,8 @@ export function ScanSheet({
       const res = await picker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 });
       const uri = res?.assets?.[0]?.uri;
       if (!uri) return;
-      const cam: any = await import('expo-camera');
+      const cam: any = await importCamera();
+      if (!cam) { setPickErr(t('No QR code found in that photo')); return; }
       const codes = await cam.Camera.scanFromURLAsync(uri, ['qr']);
       if (codes?.[0]?.data) { onCode(codes[0].data); return; }
       setPickErr(t('No QR code found in that photo'));
