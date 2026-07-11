@@ -1,6 +1,6 @@
 # Freeport: A Peer-to-Peer Marketplace Protocol
 
-**Phil T** — `ptrinh@me.com`
+**Phil T** — `hi@freeport.network`
 
 **Draft v0.2 — June 2026**
 

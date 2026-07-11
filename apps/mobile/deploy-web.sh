@@ -9,7 +9,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")"
-export CLOUDFLARE_ACCOUNT_ID=2edc401e8f3f074f198d7290691817a3   # Ptrinh@me.com
+export CLOUDFLARE_ACCOUNT_ID=2edc401e8f3f074f198d7290691817a3
 
 echo "▸ Exporting web bundle…"
 npx expo export --platform web
