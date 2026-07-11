@@ -6,11 +6,15 @@
  * This worker forwards the LNURL routes upstream instead.
  *
  * Per Breez (Jesse, 2026-07-11): their server resolves the serving domain
- * from the HOST header, and these routes must all be forwarded (more may be
- * added later): /lnurlpay/*, /.well-known/lnurlp/*, /lnurlp/*, /verify/*.
- * freeport.network is whitelisted on their side. We attempt a true Host
- * override (honored for same-account fetches; silently rewritten otherwise)
- * and always include X-Forwarded-Host as the fallback signal.
+ * from the HOST header. Host-based routing on freeport.network is OFFICIALLY
+ * SUPPORTED on their side; forwarded routes: /lnurlpay/*,
+ * /.well-known/lnurlp/*, /lnurlp/*, /verify/*.
+ *
+ * MAINTENANCE: new routes are rare, land in Breez release notes, and
+ * generally fall under /lnurlp/ or /lnurlpay/ (already prefix-forwarded).
+ * When bumping @breeztech/breez-sdk-spark, diff the route list in
+ * https://github.com/breez/spark-sdk/blob/main/crates/breez-sdk/lnurl/src/main.rs
+ * and add anything new here + in wrangler.toml.
  */
 const UPSTREAM = 'https://breez.tips';
 const PREFIXES = ['/lnurlpay/', '/.well-known/lnurlp/', '/lnurlp/', '/verify/'];
