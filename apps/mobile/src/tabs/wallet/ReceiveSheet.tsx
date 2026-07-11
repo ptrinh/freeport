@@ -240,7 +240,7 @@ export function ReceiveSheet({
             </View>
           ) : tab === 'lightning' && (lnAddr === undefined || (claiming && lnAddr === null && !username)) && !prefillRequest ? (
             <View style={{ alignItems: 'center', paddingVertical: 40 }}><ActivityIndicator color={palette.accent} /></View>
-          ) : tab === 'lightning' && lnAddr ? (
+          ) : tab === 'lightning' && lnAddr && !askAmount && !value ? (
             <View style={{ alignItems: 'center', gap: 12 }}>
               <View style={{ backgroundColor: 'white', borderRadius: 14, padding: 8 }}>
                 <Image source={{ uri: qrDataUrl((lnAddr.lnurl || lnAddr.address).toUpperCase()) }} style={{ width: 230, height: 230 }} />
@@ -274,7 +274,10 @@ export function ReceiveSheet({
                   </View>
                 </Pressable>
               </View>
-              <Pressable hitSlop={8} onPress={() => { setLnAddr(null); setAskAmount(true); }}>
+              {/* Keep lnAddr — nulling it would re-arm the auto-claim effect,
+                  which registers a fresh random username over the user's
+                  current address. The form simply takes render priority. */}
+              <Pressable hitSlop={8} onPress={() => { setAskAmount(true); setError(''); }}>
                 <Text style={s.cancelLink}>{t('Create invoice with specific amount')} →</Text>
               </Pressable>
             </View>
