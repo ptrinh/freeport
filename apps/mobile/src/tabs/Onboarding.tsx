@@ -28,7 +28,7 @@ import { pushUnavailableForOnboarding } from '../pushAvailability';
 import { LANGUAGE_CODES, languageLabel } from '../language';
 import { COUNTRY_NAME, COUNTRY_CODES_AZ, statesOf, citiesOf, levelsOf, flagEmoji } from '../locations';
 import { s, palette } from '../ui/theme';
-import { passkeySupported } from '../passkey';
+import { passkeySupported, attemptImmediatePasskeySignIn } from '../passkey';
 import { uiAlert } from '../ui/alerts';
 import { SelectField, RoleGroupHeader, Field, QuickLocationSearch } from '../ui/fields';
 
@@ -43,6 +43,7 @@ export function Onboarding({
   onRestore,
   onPasskeyCreate,
   onPasskeySignIn,
+  onPasskeyAutoSignIn,
   onCloudRestore,
   language,
   onLanguageChange,
@@ -56,6 +57,9 @@ export function Onboarding({
   onPasskeyCreate: () => Promise<void>;
   /** Re-derive an account from an existing (synced) passkey and finish onboarding. */
   onPasskeySignIn: () => Promise<void>;
+  /** Auto sign-in path: the Welcome screen already holds a derived key
+   *  (immediate-mediation prompt) — finish the restore with it. */
+  onPasskeyAutoSignIn: (sk: Uint8Array) => Promise<void>;
   onCloudRestore: () => Promise<boolean>;
   language: string;
   onLanguageChange: (l: string) => void;
@@ -67,6 +71,21 @@ export function Onboarding({
   const [passkeyOk, setPasskeyOk] = useState(false);
   const [passkeyErr, setPasskeyErr] = useState('');
   useEffect(() => { passkeySupported().then(setPasskeyOk).catch(() => {}); }, []);
+  // Auto-prompt: if this browser holds a passkey for freeport.network, the
+  // immediate-mediation picker appears on Welcome; silent for everyone else.
+  const autoTried = useRef(false);
+  useEffect(() => {
+    if (step !== 'choose' || autoTried.current) return;
+    autoTried.current = true;
+    (async () => {
+      const sk = await attemptImmediatePasskeySignIn();
+      if (!sk) return;
+      setBusy('passkeyIn');
+      try { await onPasskeyAutoSignIn(sk); }
+      catch (e) { setPasskeyErr(passkeyErrText(e)); }
+      finally { setBusy(null); }
+    })();
+  }, [step]);
   const passkeyErrText = (e: unknown) => {
     const m = e instanceof Error ? e.message : '';
     if (m === 'passkey-no-prf') return t('This passkey provider does not support key derivation (PRF). Try a platform passkey (Face ID / fingerprint).');

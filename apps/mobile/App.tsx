@@ -1069,6 +1069,14 @@ function AppInner() {
     }
   };
 
+  // Passkey sign-in tail (manual button or the Welcome auto-prompt): store
+  // the derived key, pull settings back from the relay sync, enter the app.
+  const completePasskeySignIn = async (sk: Uint8Array) => {
+    await restoreBackupText(nsecEncode(sk), ''); // same path as a bare-nsec restore
+    try { await restoreSettingsSync(sk); } catch { /* fresh account */ }
+    finishOnboarding();
+  };
+
   // First launch: choose to create a new account or restore from a backup file.
   if (onboarding) {
     return (
@@ -1113,13 +1121,9 @@ function AppInner() {
               await restoreNsec(nsecEncode(sk)); // store; onCreate reuses it
             }}
             onPasskeySignIn={async () => {
-              const sk = await signInWithPasskey();
-              await restoreBackupText(nsecEncode(sk), ''); // same path as a bare-nsec restore
-              // Pull profile + settings back from the encrypted relay sync
-              // (or the public kind:0 as a fallback) before entering the app.
-              try { await restoreSettingsSync(sk); } catch { /* fresh account */ }
-              finishOnboarding();
+              await completePasskeySignIn(await signInWithPasskey());
             }}
+            onPasskeyAutoSignIn={completePasskeySignIn}
             onCloudRestore={async () => {
               const data = await cloudRestore();
               if (!data) return false; // no backup found

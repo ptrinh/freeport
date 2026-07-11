@@ -125,3 +125,31 @@ export async function createPasskeyIdentity(accountLabel: string): Promise<Uint8
 export async function signInWithPasskey(): Promise<Uint8Array> {
   return deriveSk(await prfFromAssertion());
 }
+
+/**
+ * Welcome-screen auto sign-in: WebAuthn "immediate" mediation shows the
+ * account picker right away when this browser has a matching passkey and
+ * rejects silently when it doesn't — so new users never see a prompt.
+ * Returns null whenever there's nothing to sign in with (unsupported
+ * browser, no credential, user dismissed, authenticator without PRF).
+ */
+export async function attemptImmediatePasskeySignIn(): Promise<Uint8Array | null> {
+  if (Platform.OS !== 'web' || !(await passkeySupported())) return null;
+  try {
+    const cred: any = await (navigator as any).credentials.get({
+      publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        rpId: rpId(),
+        userVerification: 'preferred',
+        extensions: { prf: { eval: { first: PRF_SALT } } },
+      },
+      mediation: 'immediate',
+    });
+    const first = cred?.getClientExtensionResults?.()?.prf?.results?.first;
+    return first ? deriveSk(new Uint8Array(first)) : null;
+  } catch {
+    // TypeError (mediation unsupported), NotAllowedError (no credential /
+    // dismissed), SecurityError… — all mean "no auto sign-in", never fatal.
+    return null;
+  }
+}

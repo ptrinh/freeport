@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('react-native', () => ({ Platform: { OS: 'web' } }));
-import { passkeySupported, signInWithPasskey, createPasskeyIdentity, deriveSk } from '../src/passkey';
+import { passkeySupported, signInWithPasskey, createPasskeyIdentity, deriveSk, attemptImmediatePasskeySignIn } from '../src/passkey';
 
 // Frozen vectors: the PRF salt and derivation are consensus-critical — every
 // existing passkey account depends on them. If either changes, sign-in on a
@@ -135,5 +135,36 @@ describe('createPasskeyIdentity', () => {
 describe('deriveSk frozen vector', () => {
   it('never changes for existing accounts', () => {
     expect(hex(deriveSk(PRF7))).toBe(SK_FOR_PRF7);
+  });
+});
+
+
+describe('attemptImmediatePasskeySignIn (Welcome auto-prompt)', () => {
+  it('signs in when the browser holds a passkey (mediation: immediate)', async () => {
+    webEnv();
+    const get = vi.fn(async (req: any) => {
+      expect(req.mediation).toBe('immediate');
+      return credWithPrf(PRF7);
+    });
+    mockCredentials({ get });
+    const sk = await attemptImmediatePasskeySignIn();
+    expect(sk && hex(sk)).toBe(SK_FOR_PRF7);
+  });
+
+  it('null when no credential exists (NotAllowedError) — new users see nothing', async () => {
+    webEnv();
+    mockCredentials({ get: async () => { throw new DOMException('no creds', 'NotAllowedError'); } });
+    expect(await attemptImmediatePasskeySignIn()).toBeNull();
+  });
+
+  it('null on browsers without immediate mediation (TypeError)', async () => {
+    webEnv();
+    mockCredentials({ get: async () => { throw new TypeError('mediation'); } });
+    expect(await attemptImmediatePasskeySignIn()).toBeNull();
+  });
+
+  it('null outside a supported context (file://)', async () => {
+    webEnv({ protocol: 'file:' });
+    expect(await attemptImmediatePasskeySignIn()).toBeNull();
   });
 });
