@@ -42,3 +42,20 @@ export function formatFiat(value: number, currency: string, locale?: string): st
 export function formatPillAmount(amount: number, locale?: string): string {
   return amount.toLocaleString(locale, { maximumFractionDigits: 2 });
 }
+
+
+/**
+ * The unit the header can actually honor: 'local' degrades to 'usd' when no
+ * local rate exists (USD-market users, NWC wallets, transient rate failures),
+ * and to 'sats' when there's no rate at all. 'usd' likewise degrades to
+ * 'sats' without a USD rate.
+ */
+export function effectiveUnit(
+  unit: 'sats' | 'usd' | 'local',
+  usdRate: number | null,
+  localRate: number | null,
+): 'sats' | 'usd' | 'local' {
+  if (unit === 'local') return localRate != null ? 'local' : usdRate != null ? 'usd' : 'sats';
+  if (unit === 'usd') return usdRate != null ? 'usd' : 'sats';
+  return 'sats';
+}

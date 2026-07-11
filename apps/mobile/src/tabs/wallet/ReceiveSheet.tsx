@@ -67,6 +67,10 @@ export function ReceiveSheet({
   useEffect(() => {
     if (!visible || !provider) return;
     let dead = false;
+    // Lightning without a deal-prefill is entirely form-driven now — running
+    // the loader there would wipe an invoice the user just created (its
+    // askAmount dependency flips right after createInvoice succeeds).
+    if (tab === 'lightning' && !prefillRequest?.sats) return;
     const load = async () => {
       setLoading(true); setError(''); setValue(''); setCopied(false);
       try {
@@ -76,9 +80,9 @@ export function ReceiveSheet({
         else if (tab === 'lightning' && prefillRequest?.sats && !askAmount) {
           v = (await provider.receive(prefillRequest.sats, prefillRequest.memo || undefined)).invoice;
         }
-        else if (tab === 'lightning' && provider.kind === 'breez-spark' && !askAmount) {
-          v = (await provider.receive(0, undefined)).invoice; // any-amount invoice
-        }
+        // NOTE: no auto any-amount invoice here — the Lightning tab is
+        // address-first (registered address or the claim form); invoices are
+        // minted only via "Create invoice with specific amount".
         if (!dead) { if (v) setValue(v); else if (tab !== 'lightning') setError(t('Not available for this wallet')); }
       } catch (e) {
         if (!dead) setError(e instanceof Error ? e.message : t('Could not reach the wallet'));
@@ -164,7 +168,9 @@ export function ReceiveSheet({
             </View>
           )}
 
-          {tab === 'lightning' && lnAddr ? (
+          {tab === 'lightning' && lnAddr === undefined && !prefillRequest ? (
+            <View style={{ alignItems: 'center', paddingVertical: 40 }}><ActivityIndicator color={palette.accent} /></View>
+          ) : tab === 'lightning' && lnAddr ? (
             <View style={{ alignItems: 'center', gap: 12 }}>
               <View style={{ backgroundColor: 'white', borderRadius: 14, padding: 8 }}>
                 <Image source={{ uri: qrDataUrl((lnAddr.lnurl || lnAddr.address).toUpperCase()) }} style={{ width: 230, height: 230 }} />

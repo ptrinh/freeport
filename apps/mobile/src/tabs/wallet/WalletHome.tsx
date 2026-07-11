@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
 import type { TokenBalanceInfo, WalletTx } from '../../wallet';
-import { totalFiat, formatFiat, formatPillAmount } from '../../wallet/portfolio';
+import { totalFiat, formatFiat, formatPillAmount, effectiveUnit } from '../../wallet/portfolio';
 
 /**
  * Glow-style wallet home (adapted from breez/glow-web, MIT): centered balance
@@ -51,10 +51,13 @@ export function WalletHome({
 }) {
   // Fiat modes total the whole portfolio (BTC + USD-pegged stablecoins);
   // sats mode stays BTC-only — summing tokens into sats would mislead.
+  // 'local' degrades to USD (then sats) when rates are missing, so a
+  // USD-market user still opens on a fiat number instead of raw sats.
+  const effUnit = effectiveUnit(unit, usdRate, localRate);
   const fiatValue = (() => {
-    if (unit === 'sats') return null;
-    const total = totalFiat(unit, balanceSats, tokens, usdRate, localRate);
-    return total == null ? null : formatFiat(total, unit === 'usd' ? 'USD' : localCurrency);
+    if (effUnit === 'sats') return null;
+    const total = totalFiat(effUnit, balanceSats, tokens, usdRate, localRate);
+    return total == null ? null : formatFiat(total, effUnit === 'usd' ? 'USD' : localCurrency);
   })();
   const fmtTime = (ts: number) => {
     const d = new Date(ts * 1000);
@@ -74,7 +77,7 @@ export function WalletHome({
               <Text style={{ color: palette.dim, fontSize: 12, letterSpacing: 2 }}>{t('BALANCE')}</Text>
               <View style={{ backgroundColor: palette.card, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 2 }}>
                 <Text style={{ color: palette.dim, fontSize: 11, letterSpacing: 2 }}>
-                  {(unit === 'usd' && usdRate != null ? 'USD' : unit === 'local' && localRate != null ? localCurrency : 'SATS') + ' \u21cc'}
+                  {(effUnit === 'usd' ? 'USD' : effUnit === 'local' ? localCurrency : 'SATS') + ' \u21cc'}
                 </Text>
               </View>
               <Pressable hitSlop={8} onPress={onRefresh}>

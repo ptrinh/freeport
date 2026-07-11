@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { totalFiat, formatFiat, formatPillAmount } from '../src/wallet/portfolio';
+import { totalFiat, formatFiat, formatPillAmount, effectiveUnit } from '../src/wallet/portfolio';
 
 const USDT = { id: 'usdt', ticker: 'USDT', name: 'Tether', decimals: 6, amount: 70.5 };
 const USDB = { id: 'usdb', ticker: 'USDB', name: 'USDB', decimals: 6, amount: 20.01 };
@@ -49,5 +49,22 @@ describe('locale-aware separators', () => {
     expect(formatFiat(25, 'USD', 'en-US')).toBe('$25.00');
     const sgd = formatFiat(7.5, 'SGD', 'en-US');
     expect(sgd).toMatch(/7\.50/); // cents preserved for decimal currencies
+  });
+});
+
+
+describe('effectiveUnit (what the header can actually honor)', () => {
+  it("'local' shows local when the rate exists", () => {
+    expect(effectiveUnit('local', 64_000, 2_560_000_000)).toBe('local');
+  });
+  it("'local' degrades to USD for USD-market users / missing local rate", () => {
+    expect(effectiveUnit('local', 64_000, null)).toBe('usd');
+  });
+  it('degrades all the way to sats with no rates at all (NWC)', () => {
+    expect(effectiveUnit('local', null, null)).toBe('sats');
+    expect(effectiveUnit('usd', null, null)).toBe('sats');
+  });
+  it('explicit sats stays sats', () => {
+    expect(effectiveUnit('sats', 64_000, 2_560_000_000)).toBe('sats');
   });
 });
