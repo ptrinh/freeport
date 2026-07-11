@@ -82,18 +82,20 @@ export const COUNTRIES: CountryData[] = [
   //     'Bà Rịa – Vũng Tàu': ['Vũng Tàu', 'Bà Rịa'],
   //   },
   // },
-  {
-    code: 'SG',
-    name: 'Singapore',
-    levels: 1,
-    states: {
-      Central: ['Orchard', 'Newton', 'Bukit Timah', 'Toa Payoh', 'Bishan', 'Marina'],
-      East: ['Bedok', 'Tampines', 'Pasir Ris', 'Changi', 'Katong'],
-      'North-East': ['Hougang', 'Sengkang', 'Punggol', 'Serangoon', 'Ang Mo Kio'],
-      North: ['Woodlands', 'Yishun', 'Sembawang'],
-      West: ['Jurong East', 'Jurong West', 'Clementi', 'Bukit Batok', 'Choa Chu Kang'],
-    },
-  },
+  // Singapore is hidden from the location picker for now (same reasoning as
+  // Vietnam above). Functional per-country data (currency, dial codes) stays.
+  // {
+  //   code: 'SG',
+  //   name: 'Singapore',
+  //   levels: 1,
+  //   states: {
+  //     Central: ['Orchard', 'Newton', 'Bukit Timah', 'Toa Payoh', 'Bishan', 'Marina'],
+  //     East: ['Bedok', 'Tampines', 'Pasir Ris', 'Changi', 'Katong'],
+  //     'North-East': ['Hougang', 'Sengkang', 'Punggol', 'Serangoon', 'Ang Mo Kio'],
+  //     North: ['Woodlands', 'Yishun', 'Sembawang'],
+  //     West: ['Jurong East', 'Jurong West', 'Clementi', 'Bukit Batok', 'Choa Chu Kang'],
+  //   },
+  // },
   {
     code: 'TH',
     name: 'Thailand',
@@ -359,9 +361,13 @@ export const COUNTRY_CODES_AZ: string[] = [
 ];
 
 /** ISO 3166-1 alpha-2 code → country name. */
-export const COUNTRY_NAME: Record<string, string> = Object.fromEntries(
-  COUNTRIES.map((c) => [c.code, c.name]),
-);
+export const COUNTRY_NAME: Record<string, string> = {
+  ...Object.fromEntries(COUNTRIES.map((c) => [c.code, c.name])),
+  // Hidden from the location picker, but posts/deals originating there must
+  // still render a country name for everyone.
+  VN: 'Vietnam',
+  SG: 'Singapore',
+};
 
 export function countryByCode(code: string): CountryData | undefined {
   return COUNTRIES.find((c) => c.code === code);

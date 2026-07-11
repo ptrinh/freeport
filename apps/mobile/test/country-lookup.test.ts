@@ -20,8 +20,12 @@ describe('COUNTRY_NAME (code → name lookup)', () => {
     expect(COUNTRY_NAME['US']).toBe(countryByCode('US')!.name);
   });
 
-  it('has exactly one entry per country (no duplicate codes)', () => {
-    expect(Object.keys(COUNTRY_NAME)).toHaveLength(COUNTRIES.length);
+  it('has exactly one entry per picker country + the hidden markets (VN/SG)', () => {
+    // VN and SG are hidden from the location picker but keep display names so
+    // posts originating there still render a country for everyone.
+    expect(Object.keys(COUNTRY_NAME)).toHaveLength(COUNTRIES.length + 2);
+    expect(COUNTRY_NAME['VN']).toBe('Vietnam');
+    expect(COUNTRIES.some((c) => c.code === 'VN' || c.code === 'SG')).toBe(false);
   });
 });
 
