@@ -17,12 +17,15 @@ export function ReceiveSheet({
   visible,
   provider,
   tokens = [],
+  prefillRequest = null,
   onClose,
 }: {
   visible: boolean;
   provider: WalletProvider | null;
   /** Known stablecoins — offered when creating a specific-amount invoice. */
   tokens?: TokenBalanceInfo[];
+  /** Deal Pay-QR: auto-create an invoice for this amount on open. */
+  prefillRequest?: { sats: number; memo?: string } | null;
   onClose: () => void;
 }) {
   const isBreez = provider?.kind === 'breez-spark';
@@ -48,9 +51,15 @@ export function ReceiveSheet({
     setTab('lightning'); setValue(''); setError(''); setCopied(false);
     setAskAmount(provider?.kind !== 'breez-spark'); setAmount(''); setMemo('');
     setLnAddr(undefined); setUsername(''); setClaiming(false);
-    if (provider?.lightningAddress) provider.lightningAddress().then(setLnAddr).catch(() => setLnAddr(null));
+    if (prefillRequest?.sats) {
+      // Deal Pay-QR: jump straight to a specific-amount invoice.
+      setLnAddr(null);
+      setAskAmount(false);
+      setAmount(String(prefillRequest.sats));
+      setMemo(prefillRequest.memo ?? '');
+    } else if (provider?.lightningAddress) provider.lightningAddress().then(setLnAddr).catch(() => setLnAddr(null));
     else setLnAddr(null);
-  }, [visible, provider]);
+  }, [visible, provider, prefillRequest]);
 
   // Static payloads per tab: Spark address / on-chain address / (breez)
   // an any-amount Lightning invoice.
@@ -63,6 +72,9 @@ export function ReceiveSheet({
         let v: string | null = null;
         if (tab === 'spark') v = await provider.address();
         else if (tab === 'bitcoin') v = await provider.receiveOnchain();
+        else if (tab === 'lightning' && prefillRequest?.sats && !askAmount) {
+          v = (await provider.receive(prefillRequest.sats, prefillRequest.memo || undefined)).invoice;
+        }
         else if (tab === 'lightning' && provider.kind === 'breez-spark' && !askAmount) {
           v = (await provider.receive(0, undefined)).invoice; // any-amount invoice
         }
@@ -73,7 +85,7 @@ export function ReceiveSheet({
     };
     void load();
     return () => { dead = true; };
-  }, [visible, provider, tab, askAmount]);
+  }, [visible, provider, tab, askAmount, prefillRequest]);
 
   const createInvoice = async () => {
     if (!provider) return;
@@ -247,6 +259,9 @@ export function ReceiveSheet({
               <View style={{ backgroundColor: 'white', borderRadius: 14, padding: 8 }}>
                 <Image source={{ uri: qrDataUrl(value.toUpperCase().startsWith('LN') ? value.toUpperCase() : value) }} style={{ width: 230, height: 230 }} />
               </View>
+              {prefillRequest?.sats && tab === 'lightning' ? (
+                <Text style={{ color: palette.text, fontSize: 22, fontWeight: '800' }}>{prefillRequest.sats.toLocaleString()} sats</Text>
+              ) : null}
               <Text selectable style={[s.codeText, { textAlign: 'center' }]} numberOfLines={2}>
                 {value.length > 60 ? value.slice(0, 30) + '…' + value.slice(-26) : value}
               </Text>

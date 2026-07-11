@@ -23,6 +23,9 @@ export function SendSheet({
   hint,
   contacts = [],
   tokens = [],
+  localRate = null,
+  localCurrency = 'USD',
+  initialAmount,
   onClose,
   onPaid,
 }: {
@@ -35,6 +38,11 @@ export function SendSheet({
   contacts?: WalletContact[];
   /** Stablecoin balances — offered as Send assets for Spark destinations. */
   tokens?: TokenBalanceInfo[];
+  /** BTC price in the user's local currency + its ISO code (≈ line). */
+  localRate?: number | null;
+  localCurrency?: string;
+  /** Prefilled sats amount (deal Pay: agreed fiat price already converted). */
+  initialAmount?: string;
   onClose: () => void;
   onPaid: () => void;
 }) {
@@ -53,9 +61,9 @@ export function SendSheet({
 
   useEffect(() => {
     if (visible) {
-      setStep('input'); setInput(initialInput ?? ''); setDest(null); setAsset(null); setAmount(''); setError(''); setBusy(false);
+      setStep('input'); setInput(initialInput ?? ''); setDest(null); setAsset(null); setAmount(initialAmount ?? ''); setError(''); setBusy(false);
     }
-  }, [visible, initialInput]);
+  }, [visible, initialInput, initialAmount]);
 
   const paste = async () => {
     try {
@@ -210,7 +218,16 @@ export function SendSheet({
                 autoFocus
               />
               {asset && <Text style={s.dim}>{t('Available')}: {asset.amount.toLocaleString(undefined, { maximumFractionDigits: 2 })} {asset.ticker}</Text>}
-              {usd != null && !asset && <Text style={s.dim}>≈ ${usd.toLocaleString(undefined, { maximumFractionDigits: 2 })}</Text>}
+              {!asset && (usd != null || (localRate && Number.isFinite(sats))) && (
+                <Text style={s.dim}>
+                  {[
+                    usd != null ? `≈ $${usd.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : '',
+                    localRate && localCurrency !== 'USD' && Number.isFinite(sats)
+                      ? '≈ ' + (() => { try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: localCurrency, maximumFractionDigits: 0 }).format((sats / 1e8) * localRate); } catch { return `${((sats / 1e8) * localRate).toLocaleString(undefined, { maximumFractionDigits: 0 })} ${localCurrency}`; } })()
+                      : '',
+                  ].filter(Boolean).join(' · ')}
+                </Text>
+              )}
               {!!error && <Text style={[s.dim, { color: palette.danger }]}>{error}</Text>}
               <Pressable
                 onPress={() => {

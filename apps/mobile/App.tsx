@@ -43,6 +43,7 @@ import {
 import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, restoreNsec } from './src/identity';
 import { createPasskeyIdentity, signInWithPasskey } from './src/passkey';
 import { restoreSettingsSync } from './src/relaySync';
+import { dealFiat } from './src/wallet/fiatConvert';
 import { nsecEncode } from 'nostr-tools/nip19';
 import { restoreBackupText, buildCloudBundle, restoreFromBundleText } from './src/backup';
 import { cloudAvailable, cloudSave, cloudRestore, cloudClear } from './src/cloudBackup';
@@ -346,7 +347,7 @@ function AppInner() {
   const [servicesEnabled, setServicesEnabled] = useState(false);
   const [experimentalWallet, setExperimentalWallet] = useState(false);
   const [walletNwcUrl, setWalletNwcUrl] = useState('');
-  const [walletPrefill, setWalletPrefill] = useState<{ dest: string; hint?: string } | null>(null);
+  const [walletPrefill, setWalletPrefill] = useState<{ mode?: 'send' | 'receive'; dest?: string; hint?: string; fiatAmount?: number; fiatCurrency?: string; memo?: string } | null>(null);
   const [location, setLocation] = useState<UserLocation>({ country: '', state: '', city: '' });
   // Mirror the latest location so the async launch auto-detect can tell whether
   // the user has manually changed it (e.g. picked a place during onboarding)
@@ -1185,7 +1186,7 @@ function AppInner() {
       </Animated.View>
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
       {tab === 'post' && <PostTab client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onPayDeal={(n) => { setWalletPrefill({ dest: n.theirPayAddress ?? '', hint: n.terms?.payment }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
       {tab === 'wallet' && (
         <WalletTab
           localCurrency={currencyForCountry(location.country)}

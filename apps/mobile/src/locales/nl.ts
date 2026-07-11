@@ -706,5 +706,6 @@ const c: Record<string, string> = {
   "Not enough balance": "Onvoldoende saldo",
   "Enter an amount": "Voer een bedrag in",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Dit adres ontvangt zowel Bitcoin als stablecoins (USDT/USDB).",
+  "Pay QR": "QR betalen",
 };
 export default c;

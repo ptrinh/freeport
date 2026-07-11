@@ -749,5 +749,6 @@ const c: Record<string, string> = {
   "Not enough balance": "الرصيد غير كافٍ",
   "Enter an amount": "أدخل مبلغًا",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "يستقبل هذا العنوان كلاً من البيتكوين والعملات المستقرة (USDT/USDB).",
+  "Pay QR": "ادفع QR",
 };
 export default c;

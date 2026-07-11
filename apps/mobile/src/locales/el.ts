@@ -706,5 +706,6 @@ const c: Record<string, string> = {
   "Not enough balance": "Ανεπαρκές υπόλοιπο",
   "Enter an amount": "Εισαγάγετε ποσό",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Αυτή η διεύθυνση λαμβάνει τόσο Bitcoin όσο και stablecoins (USDT/USDB).",
+  "Pay QR": "Πληρωμή QR",
 };
 export default c;

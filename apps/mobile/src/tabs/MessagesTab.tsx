@@ -54,6 +54,7 @@ export function DealsTab({
   country = '',
   walletEnabled = false,
   onPayDeal,
+  onReceiveDeal,
   sendLocationOnDeal = true,
   blockedPubkeys,
   onToggleBlock,
@@ -70,6 +71,8 @@ export function DealsTab({
   walletEnabled?: boolean;
   /** Open the Wallet tab's Send flow prefilled for this deal. */
   onPayDeal?: (n: Negotiation) => void;
+  /** Seller side: open the Wallet tab's Receive flow (Pay QR) for this deal. */
+  onReceiveDeal?: (n: Negotiation) => void;
   onScroll?: (e: any) => void;
   view: 'active' | 'completed';
   onViewChange: (v: 'active' | 'completed') => void;
@@ -536,12 +539,20 @@ export function DealsTab({
                       )}
                       {st === 'picked_up' && (
                         <>
-                          {/* Settle in-app: only when BOTH sides have the wallet
-                              (ours = walletEnabled, theirs = they attached a
-                              payAddress to their accept) and only the buyer pays. */}
+                          {/* Settle in-app: the buyer pays (their wallet on +
+                              the seller shared a payAddress); the seller can
+                              flash a Pay-QR invoice for the agreed price. */}
                           {role === 'passenger' && walletEnabled && !!item.theirPayAddress && onPayDeal && (
                             <Pressable style={[s.btnAccept, { marginBottom: 8 }]} onPress={() => onPayDeal(item)}>
                               <Text style={s.btnText}>{'⚡ ' + t('Pay')}</Text>
+                            </Pressable>
+                          )}
+                          {role !== 'passenger' && walletEnabled && onReceiveDeal && (
+                            <Pressable style={[s.btnCounter, { marginBottom: 8 }]} onPress={() => onReceiveDeal(item)}>
+                              <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
+                                <Ionicons name="qr-code-outline" size={15} color="white" />
+                                <Text style={s.btnText}>{t('Pay QR')}</Text>
+                              </View>
                             </Pressable>
                           )}
                           <SlideToConfirm label={doneLabel} onConfirm={() => runDealAction(client?.setStage(item.id, 'completed'), t('Could not update the deal'))} />

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { t } from '../i18n';
 import { s, palette } from '../ui/theme';
 import { walletProviderFor, defaultWalletProvider, parseNwcUrl, type TokenBalanceInfo, type WalletProvider, type WalletTx } from '../wallet';
+import { satsForFiat } from '../wallet/fiatConvert';
 import { WalletHome } from './wallet/WalletHome';
 import { SendSheet } from './wallet/SendSheet';
 import { ReceiveSheet } from './wallet/ReceiveSheet';
@@ -31,8 +32,10 @@ function WalletTab({
   localCurrency?: string;
   /** Saved counterparties (from deals that shared a wallet address). */
   contacts?: Array<{ name: string; address: string }>;
-  /** Deal Pay flow: destination (counterparty's address) + agreed-price hint. */
-  prefill?: { dest: string; hint?: string } | null;
+  /** Deal payment flows. mode 'send' (buyer): destination + agreed price →
+   *  amount prefilled in sats. mode 'receive' (seller): Pay-QR invoice for
+   *  the agreed price. fiatAmount/fiatCurrency come parsed from the deal. */
+  prefill?: { mode?: 'send' | 'receive'; dest?: string; hint?: string; fiatAmount?: number; fiatCurrency?: string; memo?: string } | null;
   onPrefillConsumed?: () => void;
   onScroll?: (e: any) => void;
 }) {
@@ -54,7 +57,8 @@ function WalletTab({
   const [scanOpen, setScanOpen] = useState(false);
   const [canScan, setCanScan] = useState(false);
   useEffect(() => { scanSupported().then(setCanScan).catch(() => {}); }, []);
-  const [sendPrefill, setSendPrefill] = useState<{ dest: string; hint?: string } | null>(null);
+  const [sendPrefill, setSendPrefill] = useState<{ dest: string; hint?: string; amount?: string } | null>(null);
+  const [receivePrefill, setReceivePrefill] = useState<{ sats: number; memo?: string } | null>(null);
 
   // NWC connect form (setup view / switch flow)
   const [urlDraft, setUrlDraft] = useState('');
@@ -106,13 +110,30 @@ function WalletTab({
     return () => { cancelled = true; provider.current?.close(); };
   }, [nwcUrl]);
 
-  // Deal Pay flow → open Send prefilled once the tab has a provider.
+  // Deal payment flows → convert the agreed fiat price via the provider's
+  // rate feed, then open the right sheet prefilled. Waits for the provider.
   useEffect(() => {
-    if (!prefill?.dest) return;
-    setSendPrefill(prefill);
-    setSendOpen(true);
-    onPrefillConsumed?.();
-  }, [prefill]);
+    if (!prefill || !connected) return;
+    let dead = false;
+    (async () => {
+      const p = provider.current;
+      let sats = 0;
+      if (p && prefill.fiatAmount && prefill.fiatCurrency) {
+        const rate = await p.fiatRate(prefill.fiatCurrency).catch(() => null);
+        if (rate) sats = satsForFiat(prefill.fiatAmount, rate);
+      }
+      if (dead) return;
+      if (prefill.mode === 'receive') {
+        if (sats > 0) { setReceivePrefill({ sats, memo: prefill.memo }); setReceiveOpen(true); }
+        else setReceiveOpen(true); // no rate — plain receive flow
+      } else {
+        setSendPrefill({ dest: prefill.dest ?? '', hint: prefill.hint, amount: sats > 0 ? String(sats) : undefined });
+        setSendOpen(true);
+      }
+      onPrefillConsumed?.();
+    })();
+    return () => { dead = true; };
+  }, [prefill, connected]);
 
   const connectNwc = async () => {
     setError('');
@@ -197,7 +218,7 @@ function WalletTab({
         walletLabel={provider.current?.kind === 'breez-spark' ? t('Built-in wallet') : t('Connected wallet')}
         onSend={() => { setSendPrefill(null); setSendOpen(true); }}
         onScan={canScan ? () => setScanOpen(true) : undefined}
-        onReceive={() => setReceiveOpen(true)}
+        onReceive={() => { setReceivePrefill(null); setReceiveOpen(true); }}
         onScroll={onScroll}
         footer={
           <View style={{ alignItems: 'center', paddingTop: 18, gap: 10 }}>
@@ -221,9 +242,12 @@ function WalletTab({
         provider={provider.current}
         usdRate={usdRate}
         initialInput={sendPrefill?.dest}
+        initialAmount={sendPrefill?.amount}
         hint={sendPrefill?.hint}
         contacts={contacts}
         tokens={tokens}
+        localRate={localRate}
+        localCurrency={localCurrency}
         onClose={() => setSendOpen(false)}
         onPaid={() => provider.current && refresh(provider.current)}
       />
@@ -231,6 +255,7 @@ function WalletTab({
         visible={receiveOpen}
         provider={provider.current}
         tokens={tokens}
+        prefillRequest={receivePrefill}
         onClose={() => { setReceiveOpen(false); provider.current && refresh(provider.current); }}
       />
       <ScanSheet

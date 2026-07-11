@@ -706,5 +706,6 @@ const c: Record<string, string> = {
   "Not enough balance": "போதிய இருப்பு இல்லை",
   "Enter an amount": "தொகையை உள்ளிடவும்",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "இந்த முகவரி Bitcoin மற்றும் stablecoins (USDT/USDB) இரண்டையும் பெறும்.",
+  "Pay QR": "QR மூலம் செலுத்து",
 };
 export default c;

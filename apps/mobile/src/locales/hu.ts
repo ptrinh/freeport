@@ -706,5 +706,6 @@ const c: Record<string, string> = {
   "Not enough balance": "Nincs elég egyenleg",
   "Enter an amount": "Adjon meg egy összeget",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Erre a címre Bitcoint és stablecoinokat (USDT/USDB) is fogadhat.",
+  "Pay QR": "QR-fizetés",
 };
 export default c;

@@ -703,5 +703,6 @@ const c: Record<string, string> = {
   "Not enough balance": "Salio halitoshi",
   "Enter an amount": "Weka kiasi",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Anwani hii inapokea Bitcoin na stablecoin (USDT/USDB).",
+  "Pay QR": "Lipa kwa QR",
 };
 export default c;

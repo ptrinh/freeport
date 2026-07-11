@@ -703,5 +703,6 @@ const c: Record<string, string> = {
   "Not enough balance": "በቂ ቀሪ ሂሳብ የለም",
   "Enter an amount": "መጠን ያስገቡ",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "ይህ አድራሻ ቢትኮይንንም ሆነ ስቴብልኮይኖችን (USDT/USDB) ይቀበላል።",
+  "Pay QR": "በQR ክፈል",
 };
 export default c;

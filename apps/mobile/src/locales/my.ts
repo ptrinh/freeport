@@ -703,5 +703,6 @@ const c: Record<string, string> = {
   "Not enough balance": "လက်ကျန်ငွေ မလုံလောက်ပါ",
   "Enter an amount": "ပမာဏ ထည့်ပါ",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "ဤလိပ်စာသည် Bitcoin နှင့် stablecoin (USDT/USDB) နှစ်မျိုးလုံးကို လက်ခံသည်။",
+  "Pay QR": "QR ဖြင့် ငွေပေး",
 };
 export default c;

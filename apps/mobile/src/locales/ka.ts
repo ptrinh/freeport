@@ -703,5 +703,6 @@ const c: Record<string, string> = {
   "Not enough balance": "არასაკმარისი ბალანსი",
   "Enter an amount": "შეიყვანეთ თანხა",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "ეს მისამართი იღებს როგორც Bitcoin-ს, ასევე stablecoin-ებს (USDT/USDB).",
+  "Pay QR": "QR გადახდა",
 };
 export default c;

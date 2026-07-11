@@ -746,5 +746,6 @@ const c: Record<string, string> = {
   "Not enough balance": "Không đủ số dư",
   "Enter an amount": "Nhập số tiền",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Địa chỉ này nhận được cả Bitcoin lẫn stablecoin (USDT/USDB).",
+  "Pay QR": "QR thanh toán",
 };
 export default c;

@@ -703,5 +703,6 @@ const c: Record<string, string> = {
   "Not enough balance": "សមតុល្យមិនគ្រប់គ្រាន់",
   "Enter an amount": "បញ្ចូលចំនួនទឹកប្រាក់",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "អាសយដ្ឋាននេះទទួលបានទាំង Bitcoin និង stablecoin (USDT/USDB)។",
+  "Pay QR": "ទូទាត់ QR",
 };
 export default c;

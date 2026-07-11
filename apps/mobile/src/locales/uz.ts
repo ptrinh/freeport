@@ -703,5 +703,6 @@ const c: Record<string, string> = {
   "Not enough balance": "Balans yetarli emas",
   "Enter an amount": "Miqdorni kiriting",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "Bu manzil ham Bitcoin, ham stablecoin (USDT/USDB) qabul qiladi.",
+  "Pay QR": "QR orqali to'lash",
 };
 export default c;

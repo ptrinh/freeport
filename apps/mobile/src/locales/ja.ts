@@ -746,5 +746,6 @@ const c: Record<string, string> = {
   "Not enough balance": "残高が不足しています",
   "Enter an amount": "金額を入力",
   "This address receives both Bitcoin and stablecoins (USDT/USDB).": "このアドレスはBitcoinとステーブルコイン（USDT/USDB）の両方を受け取れます。",
+  "Pay QR": "QR決済",
 };
 export default c;
