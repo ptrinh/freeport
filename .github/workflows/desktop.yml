@@ -154,7 +154,9 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME#desktop-v}"
           node apps/mobile/scripts/build-offline.mjs apps/desktop/dist "Freeport_${VERSION}-offline.html"
-          gh release upload "$GITHUB_REF_NAME" "Freeport_${VERSION}-offline.html" --clobber
+          # Stable-named alias so README/links can point at releases/latest.
+          cp "Freeport_${VERSION}-offline.html" Freeport-offline.html
+          gh release upload "$GITHUB_REF_NAME" "Freeport_${VERSION}-offline.html" Freeport-offline.html --clobber
 
       - name: Upload artifacts (dispatch validation builds)
         if: github.event_name == 'workflow_dispatch'

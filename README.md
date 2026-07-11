@@ -12,7 +12,7 @@ topic-scoped markets; personal agents discover counterpart intents and
 negotiate automatically. Humans confirm final deals. No central operator, no
 matching server — relays are dumb pub/sub, all logic is client-side.
 
-- **App:** https://freeport.network (web/PWA) · [iOS](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901) · [Android](https://play.google.com/store/apps/details?id=uk.trinh.freeport) · [Desktop — Mac/Windows/Linux](https://github.com/ptrinh/freeport/releases/latest)
+- **App:** https://freeport.network (web/PWA) · [iOS](https://apps.apple.com/us/app/freeport-p2p-marketplace/id6781200901) · [Android](https://play.google.com/store/apps/details?id=uk.trinh.freeport) · [Desktop — Mac/Windows/Linux](https://github.com/ptrinh/freeport/releases/latest) · [Offline HTML](https://github.com/ptrinh/freeport/releases/latest/download/Freeport-offline.html)
 - **Whitepaper:** [PDF](https://freeport.network/intro/whitepaper.pdf)
 - **Self-host all of Freeport:** [`packages/freeport-self-hosted`](packages/freeport-self-hosted) — `docker compose up -d` serves the web app + read-only MCP + content-blind push notifier + a Nostr relay + the optional Telegram bridge on port 1988. The app needs no backend; this is for communities who want their own node.
 
