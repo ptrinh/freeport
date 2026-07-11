@@ -157,6 +157,9 @@ jobs:
           # Stable-named alias so README/links can point at releases/latest.
           cp "Freeport_${VERSION}-offline.html" Freeport-offline.html
           gh release upload "$GITHUB_REF_NAME" "Freeport_${VERSION}-offline.html" Freeport-offline.html --clobber
+          # Mirror to IPFS so the file outlives the git hosting (skips
+          # gracefully when the PINATA_JWT secret is absent).
+          PINATA_JWT="${{ secrets.PINATA_JWT }}" node apps/mobile/scripts/pin-ipfs.mjs Freeport-offline.html || true
 
       - name: Upload artifacts (dispatch validation builds)
         if: github.event_name == 'workflow_dispatch'

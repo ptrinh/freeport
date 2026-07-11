@@ -202,5 +202,13 @@ cp store/llms.txt dist/llms.txt
 echo "▸ Deploying to Cloudflare Pages…"
 npx wrangler pages deploy dist --project-name freeport --branch main --commit-dirty=true
 
+# Censorship-resilient mirror: rebuild the single-file offline app from this
+# exact dist and pin it to IPFS (Pinata). Content-addressed, so an unchanged
+# build is a no-op; skipped when PINATA_JWT isn't set. Never fails the deploy.
+echo "▸ Pinning offline single-file app to IPFS…"
+node scripts/build-offline.mjs dist offline-freeport.html \
+  && node scripts/pin-ipfs.mjs offline-freeport.html \
+  || echo "  (IPFS mirror step failed — deploy unaffected)"
+
 echo "✓ Live at https://freeport.network/ (and https://freeport.trinh.uk/)"
 echo "✓ Privacy policy at https://freeport.network/privacy"
