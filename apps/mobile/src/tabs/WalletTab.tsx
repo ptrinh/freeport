@@ -218,7 +218,9 @@ function WalletTab({
         localCurrency={localCurrency}
         unit={unit}
         onToggleUnit={() => onUnitChange?.(
-          unit === 'sats' ? 'usd' : unit === 'usd' && localRate != null && localCurrency !== 'USD' ? 'local' : 'sats')}
+          // The header is fiat-only per spec: cycle local ↔ USD. Sats live in
+          // the pills (and only ever headline as a no-rates degradation).
+          unit === 'local' ? 'usd' : 'local')}
         txs={txs}
         refreshing={refreshing}
         onRefresh={() => provider.current && refresh(provider.current)}

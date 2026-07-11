@@ -518,7 +518,7 @@ function AppInner() {
       setServicesEnabled(p.servicesEnabled);
       setExperimentalWallet(p.experimentalWallet);
       setWalletNwcUrl(p.walletNwcUrl);
-      setWalletUnit(p.walletUnit);
+      setWalletUnit(p.walletUnit === 'sats' ? 'local' : p.walletUnit); // header is fiat-only now
       setLocation(p.location);
       setUseNip07(p.useNip07);
       setThemeState(p.theme); // palette applied by the effective-theme resolver above
