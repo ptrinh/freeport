@@ -5,4 +5,7 @@ account_id = "2edc401e8f3f074f198d7290691817a3"
 
 routes = [
   { pattern = "freeport.network/.well-known/lnurlp/*", zone_name = "freeport.network" },
+  { pattern = "freeport.network/lnurlpay/*", zone_name = "freeport.network" },
+  { pattern = "freeport.network/lnurlp/*", zone_name = "freeport.network" },
+  { pattern = "freeport.network/verify/*", zone_name = "freeport.network" },
 ]

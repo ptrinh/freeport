@@ -1,31 +1,40 @@
 /**
- * LNURL-pay proxy — keeps lightning addresses on the apex domain.
+ * LNURL proxy — keeps lightning addresses on the apex domain.
  *
- * user@freeport.network resolves via GET /.well-known/lnurlp/<user>, but the
- * apex serves the web app from Cloudflare Pages and can't CNAME to Breez's
- * hosted LNURL server (breez.tips). This worker forwards those requests
- * upstream instead. The original host rides along as X-Forwarded-Host since
- * a cross-zone fetch can't preserve the Host header.
+ * user@freeport.network needs Breez's hosted LNURL server, but the apex
+ * serves the web app from Cloudflare Pages and can't CNAME to breez.tips.
+ * This worker forwards the LNURL routes upstream instead.
+ *
+ * Per Breez (Jesse, 2026-07-11): their server resolves the serving domain
+ * from the HOST header, and these routes must all be forwarded (more may be
+ * added later): /lnurlpay/*, /.well-known/lnurlp/*, /lnurlp/*, /verify/*.
+ * freeport.network is whitelisted on their side. We attempt a true Host
+ * override (honored for same-account fetches; silently rewritten otherwise)
+ * and always include X-Forwarded-Host as the fallback signal.
  */
+const UPSTREAM = 'https://breez.tips';
+const PREFIXES = ['/lnurlpay/', '/.well-known/lnurlp/', '/lnurlp/', '/verify/'];
+
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    if (!url.pathname.startsWith('/.well-known/lnurlp/')) {
+    if (!PREFIXES.some((p) => url.pathname.startsWith(p))) {
       return new Response('not found', { status: 404 });
     }
-    const upstream = new URL('https://breez.tips' + url.pathname + url.search);
+    const upstream = new URL(UPSTREAM + url.pathname + url.search);
+    const headers = new Headers(request.headers);
+    headers.set('Host', url.hostname);              // domain resolution upstream
+    headers.set('X-Forwarded-Host', url.hostname);  // fallback signal
+    headers.delete('cf-connecting-ip');
     const resp = await fetch(upstream, {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        'x-forwarded-host': url.hostname,
-        'user-agent': 'freeport-lnurlp-proxy',
-      },
+      method: request.method,
+      headers,
+      body: ['GET', 'HEAD'].includes(request.method) ? undefined : request.body,
+      redirect: 'manual',
     });
-    const headers = new Headers();
-    headers.set('content-type', resp.headers.get('content-type') ?? 'application/json');
-    headers.set('access-control-allow-origin', '*');
-    headers.set('cache-control', 'no-store');
-    return new Response(resp.body, { status: resp.status, headers });
+    const out = new Headers(resp.headers);
+    out.set('access-control-allow-origin', '*');
+    out.set('cache-control', 'no-store');
+    return new Response(resp.body, { status: resp.status, headers: out });
   },
 };
