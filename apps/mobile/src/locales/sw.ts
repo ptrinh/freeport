@@ -718,5 +718,7 @@ const c: Record<string, string> = {
   "Payment method": "Njia ya malipo",
   "Cash": "Pesa taslimu",
   "Please rate me after the deal": "Tafadhali nikadirie baada ya mkataba",
+  "Donation": "Mchango",
+  "Copy BTC address": "Nakili anwani ya BTC",
 };
 export default c;

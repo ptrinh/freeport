@@ -761,5 +761,7 @@ const c: Record<string, string> = {
   "Payment method": "วิธีการชำระเงิน",
   "Cash": "เงินสด",
   "Please rate me after the deal": "โปรดให้คะแนนฉันหลังจบดีล",
+  "Donation": "บริจาค",
+  "Copy BTC address": "คัดลอกที่อยู่ BTC",
 };
 export default c;

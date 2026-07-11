@@ -721,5 +721,7 @@ const c: Record<string, string> = {
   "Payment method": "Fizetési mód",
   "Cash": "Készpénz",
   "Please rate me after the deal": "Kérlek, értékelj az üzlet után",
+  "Donation": "Adomány",
+  "Copy BTC address": "BTC-cím másolása",
 };
 export default c;

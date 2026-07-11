@@ -718,5 +718,7 @@ const c: Record<string, string> = {
   "Payment method": "ວິທີການຊຳລະ",
   "Cash": "ເງິນສົດ",
   "Please rate me after the deal": "ກະລຸນາໃຫ້ຄະແນນຂ້ອຍຫຼັງຈາກດີລ",
+  "Donation": "ການບໍລິຈາກ",
+  "Copy BTC address": "ສຳເນົາທີ່ຢູ່ BTC",
 };
 export default c;

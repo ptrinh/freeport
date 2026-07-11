@@ -1,10 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { ActivityIndicator, Linking, Platform, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, Share, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { versionLabel, checkForUpdate, applyUpdate, getTrack, setTrack, trackSupported, type UpdateTrack } from '../../updates';
 import { confirmAsync } from '../../ui/alerts';
 import { s, palette } from '../../ui/theme';
+
+const DONATION_BTC = 'bc1ps44wjx3wpu4s0xj746gz2lu45nspsm9059d3ym8xz0nrhu4psyasdgwwhx';
 
 function AboutSection({
   onReplayTour,
@@ -12,6 +14,7 @@ function AboutSection({
   onReplayTour: () => void;
 }) {
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [donationCopied, setDonationCopied] = useState(false);
   // On a mobile-browser web session (not the installed PWA / native app),
   // suggest the native app — shown as a passive notice in About.
   const nativeOS = useMemo<'ios' | 'android' | null>(() => {
@@ -109,11 +112,21 @@ function AboutSection({
             <Ionicons name="help-circle-outline" size={16} color="white" />
             <Text style={s.btnText}>{t('Replay guided tour')}</Text>
           </Pressable>
-          <Text style={[s.dim, { marginTop: 10 }]}>© Phil T</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 4 }}>
-            <Text style={s.dim}>{t('Feedback')}: </Text>
-            <Pressable hitSlop={6} onPress={() => Linking.openURL('mailto:hi@freeport.network')}>
-              <Text style={s.link}>hi@freeport.network</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 10, gap: 6 }}>
+            <Text style={s.dim}>{t('Donation')}: </Text>
+            <Pressable
+              hitSlop={6}
+              onPress={async () => {
+                try {
+                  // expo-clipboard isn't in the binary — Share is the native copy path.
+                  if (Platform.OS === 'web' && (navigator as any)?.clipboard) {
+                    await (navigator as any).clipboard.writeText(DONATION_BTC);
+                    setDonationCopied(true);
+                  } else await Share.share({ message: DONATION_BTC });
+                } catch { /* ignore */ }
+              }}
+            >
+              <Text style={s.link}>{donationCopied ? t('Copied') : t('Copy BTC address')}</Text>
             </Pressable>
           </View>
         </>

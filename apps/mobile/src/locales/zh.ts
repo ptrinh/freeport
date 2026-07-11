@@ -761,5 +761,7 @@ const c: Record<string, string> = {
   "Payment method": "付款方式",
   "Cash": "现金",
   "Please rate me after the deal": "交易后请给我评分",
+  "Donation": "捐赠",
+  "Copy BTC address": "复制 BTC 地址",
 };
 export default c;

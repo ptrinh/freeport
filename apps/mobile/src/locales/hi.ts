@@ -761,5 +761,7 @@ const c: Record<string, string> = {
   "Payment method": "भुगतान का तरीका",
   "Cash": "नकद",
   "Please rate me after the deal": "डील के बाद मुझे रेटिंग दें",
+  "Donation": "दान",
+  "Copy BTC address": "BTC पता कॉपी करें",
 };
 export default c;

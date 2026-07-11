@@ -721,5 +721,7 @@ const c: Record<string, string> = {
   "Payment method": "אמצעי תשלום",
   "Cash": "מזומן",
   "Please rate me after the deal": "נא לדרג אותי בסיום העסקה",
+  "Donation": "תרומה",
+  "Copy BTC address": "העתק כתובת BTC",
 };
 export default c;

@@ -721,5 +721,7 @@ const c: Record<string, string> = {
   "Payment method": "Τρόπος πληρωμής",
   "Cash": "Μετρητά",
   "Please rate me after the deal": "Παρακαλώ βαθμολογήστε με μετά τη συναλλαγή",
+  "Donation": "Δωρεά",
+  "Copy BTC address": "Αντιγραφή διεύθυνσης BTC",
 };
 export default c;

@@ -718,5 +718,7 @@ const c: Record<string, string> = {
   "Payment method": "የክፍያ ዘዴ",
   "Cash": "ጥሬ ገንዘብ",
   "Please rate me after the deal": "እባክዎ ከስምምነቱ በኋላ ደረጃ ይስጡኝ",
+  "Donation": "ልገሳ",
+  "Copy BTC address": "የBTC አድራሻ ቅዳ",
 };
 export default c;

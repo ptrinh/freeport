@@ -718,5 +718,7 @@ const c: Record<string, string> = {
   "Payment method": "ගෙවීම් ක්‍රමය",
   "Cash": "මුදල්",
   "Please rate me after the deal": "ගනුදෙනුවෙන් පසු මට ශ්‍රේණිගත කරන්න",
+  "Donation": "පරිත්‍යාගය",
+  "Copy BTC address": "BTC ලිපිනය පිටපත් කරන්න",
 };
 export default c;

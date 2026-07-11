@@ -721,5 +721,7 @@ const c: Record<string, string> = {
   "Payment method": "Maksājuma veids",
   "Cash": "Skaidra nauda",
   "Please rate me after the deal": "Lūdzu, novērtējiet mani pēc darījuma",
+  "Donation": "Ziedojums",
+  "Copy BTC address": "Kopēt BTC adresi",
 };
 export default c;
