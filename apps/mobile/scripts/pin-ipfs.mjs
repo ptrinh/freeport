@@ -27,9 +27,13 @@ const auth = { Authorization: `Bearer ${jwt}` };
 
 async function pinFile() {
   const form = new FormData();
-  form.append('file', new Blob([fs.readFileSync(file)], { type: 'text/html' }), path.basename(file));
+  // Wrap in a directory so the CID resolves to /<pinName> — gateways then
+  // pick the content type from the file extension. A bare-file pin has no
+  // name at all, and our UTF-16LE BOM (FF FE) matches the MP3 frame-sync
+  // bits, so content sniffers served the app as audio/mpeg.
+  form.append('file', new Blob([fs.readFileSync(file)]), pinName);
   form.append('pinataMetadata', JSON.stringify({ name: pinName }));
-  form.append('pinataOptions', JSON.stringify({ cidVersion: 1 }));
+  form.append('pinataOptions', JSON.stringify({ cidVersion: 1, wrapWithDirectory: true }));
   const res = await fetch(`${API}/pinning/pinFileToIPFS`, { method: 'POST', headers: auth, body: form });
   if (!res.ok) throw new Error(`pinFileToIPFS ${res.status}: ${(await res.text()).slice(0, 300)}`);
   return res.json();
@@ -58,6 +62,6 @@ const cid = out.IpfsHash;
 const size = (fs.statSync(file).size / 1e6).toFixed(1);
 console.log(`▸ Pinned ${path.basename(file)} (${size} MB) to IPFS${out.isDuplicate ? ' (unchanged — same CID)' : ''}`);
 console.log(`  CID:     ${cid}`);
-console.log(`  Gateway: https://ipfs.io/ipfs/${cid}`);
-console.log(`           https://gateway.pinata.cloud/ipfs/${cid}`);
+console.log(`  Gateway: https://ipfs.io/ipfs/${cid}/${pinName}`);
+console.log(`           https://gateway.pinata.cloud/ipfs/${cid}/${pinName}`);
 await pruneOld(cid);
