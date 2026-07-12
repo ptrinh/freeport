@@ -73,6 +73,28 @@ freeport listen --market <topic>         watch a market
 freeport run --config <agent.json>       full agent loop [--post intent.json] [--yes]
 ```
 
+### Release builds (mobile)
+
+Each EAS build emits ONE artifact, so a release produces three:
+
+```sh
+# iOS → App Store Connect (auto-submits; then press "Submit for Review" in ASC)
+eas build --platform ios     --profile production     --clear-cache --auto-submit
+
+# Android → Play Store bundle (.aab)
+eas build --platform android --profile production     --clear-cache
+
+# Android → universal APK (single all-ABI .apk for sideloading / GitHub release)
+eas build --platform android --profile production-apk --clear-cache
+```
+
+`--clear-cache` forces a fresh prebuild so newly-added native modules
+(expo-camera, Breez) are actually linked — a stale native cache once shipped a
+binary with Breez but no camera. `production-apk` extends `production` (same
+`production` OTA channel + autoIncrement), overriding only `buildType: apk`.
+Bump `versionCode`/`buildNumber` in `app.json` when Play/ASC reject a reused
+one (autoIncrement is unreliable with `appVersionSource: local`).
+
 ### Desktop app CLI (headless host)
 
 The desktop app ([GitHub Releases](https://github.com/ptrinh/freeport/releases))
