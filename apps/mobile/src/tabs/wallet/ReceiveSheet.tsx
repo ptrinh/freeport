@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Image, Modal, Platform, Pressable, ScrollView, Share, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Image, Modal, Platform, Pressable, ScrollView, Share, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
@@ -188,6 +188,11 @@ export function ReceiveSheet({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      {/* Lift the bottom sheet above the keyboard. app.json sets Android's
+          softwareKeyboardLayoutMode to "pan" (window does NOT auto-resize), so
+          the keyboard would cover the inputs on BOTH platforms without this.
+          RN's recommended pairing: padding on iOS, height on Android. */}
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, justifyContent: 'flex-end' }}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' }} onPress={onClose} />
       <View style={{ backgroundColor: palette.bg, borderTopLeftRadius: 18, borderTopRightRadius: 18, paddingBottom: 26, width: '100%', maxWidth: 560, alignSelf: 'center' }}>
         <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: palette.border, marginTop: 8 }} />
@@ -383,6 +388,7 @@ export function ReceiveSheet({
           )}
         </ScrollView>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

@@ -1,21 +1,38 @@
 import { Platform } from 'react-native';
-// Static import: a dynamic import('…') namespace copy can fire lazy getters
-// on the module object (see breezNative.ts / GlitchTip #15).
-import { requireOptionalNativeModule } from 'expo-modules-core';
+// Static import (namespace): a dynamic import('…') namespace copy can fire
+// lazy getters on the module object (see breezNative.ts / GlitchTip #15).
+import * as ExpoCore from 'expo-modules-core';
+
+/**
+ * Is an Expo native module present in THIS binary? Mirrors exactly what
+ * expo-camera does internally — `requireNativeModule('ExpoCamera')` — but
+ * without throwing. Two layers of defence:
+ *  1. `requireOptionalNativeModule` (the documented, null-returning API).
+ *  2. If that export is somehow missing from the bundled expo-modules-core,
+ *     fall back to the JSI registry `globalThis.expo.modules[name]` directly
+ *     — otherwise an `undefined?.()` call would mis-read as "absent" and hide
+ *     the Scan button on binaries that DO ship the camera.
+ */
+function hasExpoNativeModule(name: string): boolean {
+  try {
+    const req = (ExpoCore as any).requireOptionalNativeModule;
+    if (typeof req === 'function') return !!req(name);
+    return !!(globalThis as any).expo?.modules?.[name];
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Guarded access to expo-camera. Its JS calls requireNativeModule('ExpoCamera')
  * at module-init, which THROWS on binaries built before the module was added
- * (runtime <= 1.4.1). Crucially, Metro runs module factories inside
- * guardedLoadModule, which reports init errors straight to the GLOBAL error
- * handler (ErrorUtils.reportFatalError) — a try/catch around import() never
- * sees them (GlitchTip issue 12). So probe the native side first via
- * expo-modules-core (present in every binary): requireOptionalNativeModule
- * returns null instead of throwing.
+ * (runtime <= 1.4.1). Metro runs module factories inside guardedLoadModule and
+ * reports init errors to the GLOBAL error handler, so a try/catch around
+ * import() never sees them (GlitchTip #12). Probe the native side first.
  */
 export async function importCamera(): Promise<any | null> {
+  if (!hasExpoNativeModule('ExpoCamera')) return null;
   try {
-    if (!requireOptionalNativeModule?.('ExpoCamera')) return null;
     return await import('expo-camera');
   } catch {
     return null;

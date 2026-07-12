@@ -21,6 +21,10 @@ import { loadKey } from '../identity';
 import { deriveWalletMnemonic } from './seed';
 import { mapSparkPayments } from './breezMap';
 import { importBreezNative } from './breezNative';
+import {
+  bitcoinAddressMethod, bolt11ReceiveMethod, bolt11SendOptions, inputPaymentRequest,
+  paymentFailed, sparkAddressMethod, sparkInvoiceMethod, variantDetails, variantOf,
+} from './breezShapes';
 import { toBaseUnits, fromBaseUnits } from './tokens';
 import type { ParsedDest, TokenBalanceInfo, WalletBalance, WalletCapabilities, WalletInvoice, WalletProvider, WalletTx } from './types';
 
@@ -75,7 +79,9 @@ async function loadWasmBytes(): Promise<ArrayBuffer> {
   return bytes;
 }
 
-async function loadSdk(mnemonic: string): Promise<any> {
+/** Returns the connected SDK plus, on native, the module namespace `M` that
+ *  holds the generated uniffi enum classes (null on web — see breezShapes). */
+async function loadSdk(mnemonic: string): Promise<{ sdk: any; M: any | null }> {
   if (Platform.OS === 'web') {
     const mod: any = await import('@breeztech/breez-sdk-spark/web');
     // The package's default init() would re-do this via import.meta.url;
@@ -91,11 +97,12 @@ async function loadSdk(mnemonic: string): Promise<any> {
     const config = mod.defaultConfig('mainnet');
     config.apiKey = API_KEY;
     config.lnurlDomain = 'freeport.network';
-    return await mod.connect({
+    const sdk = await mod.connect({
       config,
       seed: { type: 'mnemonic', mnemonic, passphrase: undefined },
       storageDir: 'freeport-wallet',
     });
+    return { sdk, M: null };
   }
   // Native: guarded — importing the package on a binary without the
   // TurboModule hard-crashes the app (see breezNative.ts).
@@ -108,13 +115,14 @@ async function loadSdk(mnemonic: string): Promise<any> {
   config.apiKey = API_KEY;
     config.lnurlDomain = 'freeport.network';
   const seed = new mod.Seed.Mnemonic({ mnemonic, passphrase: undefined });
-  return await mod.connect({ config, seed, storageDir: dir });
+  return { sdk: await mod.connect({ config, seed, storageDir: dir }), M: mod };
 }
 
 export class BreezSparkProvider implements WalletProvider {
   readonly kind = 'breez-spark' as const;
 
-  constructor(private sdk: any) {}
+  /** `M` = native uniffi enum namespace, null on web (see breezShapes.ts). */
+  constructor(private sdk: any, private M: any | null = null) {}
 
   capabilities(): WalletCapabilities {
     return { lightning: true, stablecoin: true, transactions: true };
@@ -131,19 +139,14 @@ export class BreezSparkProvider implements WalletProvider {
 
   async receive(sats: number, description?: string): Promise<WalletInvoice> {
     const r = await this.sdk.receivePayment({
-      paymentMethod: {
-        type: 'bolt11Invoice',
-        description: description ?? '',
-        amountSats: Math.max(0, Math.round(sats)),
-        expirySecs: 3600,
-      },
+      paymentMethod: bolt11ReceiveMethod(this.M, sats, description ?? ''),
     });
     if (!r?.paymentRequest) throw new Error('wallet returned no invoice');
     return { invoice: r.paymentRequest, sats };
   }
 
   async address(): Promise<string | null> {
-    const r = await this.sdk.receivePayment({ paymentMethod: { type: 'sparkAddress' } });
+    const r = await this.sdk.receivePayment({ paymentMethod: sparkAddressMethod(this.M) });
     return r?.paymentRequest || null;
   }
 
@@ -153,14 +156,14 @@ export class BreezSparkProvider implements WalletProvider {
     if (!isBolt11 && (!sats || sats <= 0)) throw new Error('amount-required');
     // The SDK's parser handles bolt11 / lightning address / Spark address.
     const prepared = await this.sdk.prepareSendPayment({
-      paymentRequest: { type: 'input', input },
+      paymentRequest: inputPaymentRequest(this.M, input),
       ...(isBolt11 ? {} : { amount: BigInt(Math.round(sats!)) }),
     });
     const r = await this.sdk.sendPayment({
       prepareResponse: prepared,
-      ...(isBolt11 ? { options: { type: 'bolt11Invoice', preferSpark: false, completionTimeoutSecs: 30 } } : {}),
+      ...(isBolt11 ? { options: bolt11SendOptions(this.M) } : {}),
     });
-    if (r?.payment?.status === 'failed') throw new Error('payment failed');
+    if (paymentFailed(r?.payment?.status)) throw new Error('payment failed');
     return {};
   }
 
@@ -196,12 +199,7 @@ export class BreezSparkProvider implements WalletProvider {
 
   async receiveToken(token: TokenBalanceInfo, amount: number | string, description?: string): Promise<WalletInvoice> {
     const r = await this.sdk.receivePayment({
-      paymentMethod: {
-        type: 'sparkInvoice',
-        tokenIdentifier: token.id,
-        amount: toBaseUnits(amount, token.decimals).toString(),
-        ...(description ? { description } : {}),
-      },
+      paymentMethod: sparkInvoiceMethod(this.M, token.id, toBaseUnits(amount, token.decimals), description),
     });
     if (!r?.paymentRequest) throw new Error('wallet returned no invoice');
     return { invoice: r.paymentRequest, sats: 0 };
@@ -209,12 +207,12 @@ export class BreezSparkProvider implements WalletProvider {
 
   async payToken(destination: string, token: TokenBalanceInfo, amount: number | string): Promise<{ preimage?: string }> {
     const prepared = await this.sdk.prepareSendPayment({
-      paymentRequest: { type: 'input', input: destination.trim() },
+      paymentRequest: inputPaymentRequest(this.M, destination.trim()),
       amount: toBaseUnits(amount, token.decimals),
       tokenIdentifier: token.id,
     });
     const r = await this.sdk.sendPayment({ prepareResponse: prepared });
-    if (r?.payment?.status === 'failed') throw new Error('payment failed');
+    if (paymentFailed(r?.payment?.status)) throw new Error('payment failed');
     return {};
   }
 
@@ -222,15 +220,18 @@ export class BreezSparkProvider implements WalletProvider {
     const raw = input.trim();
     try {
       const r = await this.sdk.parse(raw);
-      switch (r?.type) {
-        case 'bolt11Invoice':
-          return { kind: 'bolt11', raw, sats: r.amountMsat != null ? Math.floor(Number(r.amountMsat) / 1000) : null, description: r.description || undefined };
-        case 'lightningAddress': return { kind: 'lightningAddress', raw };
-        case 'lnurlPay': return { kind: 'lnurlPay', raw };
-        case 'bitcoinAddress': return { kind: 'bitcoinAddress', raw };
+      // variantOf/variantDetails bridge WASM ({type, …fields}) and native
+      // uniffi (tag + inner[0]) result shapes.
+      const d = variantDetails(r);
+      switch (variantOf(r)) {
+        case 'bolt11invoice':
+          return { kind: 'bolt11', raw, sats: d?.amountMsat != null ? Math.floor(Number(d.amountMsat) / 1000) : null, description: d?.description || undefined };
+        case 'lightningaddress': return { kind: 'lightningAddress', raw };
+        case 'lnurlpay': return { kind: 'lnurlPay', raw };
+        case 'bitcoinaddress': return { kind: 'bitcoinAddress', raw };
         case 'bip21': return { kind: 'bitcoinAddress', raw };
-        case 'sparkAddress':
-        case 'sparkInvoice': return { kind: 'sparkAddress', raw };
+        case 'sparkaddress':
+        case 'sparkinvoice': return { kind: 'sparkAddress', raw };
         default: return { kind: 'unknown', raw };
       }
     } catch {
@@ -253,7 +254,7 @@ export class BreezSparkProvider implements WalletProvider {
   }
 
   async receiveOnchain(): Promise<string | null> {
-    const r = await this.sdk.receivePayment({ paymentMethod: { type: 'bitcoinAddress' } });
+    const r = await this.sdk.receivePayment({ paymentMethod: bitcoinAddressMethod(this.M) });
     return r?.paymentRequest || null;
   }
 
@@ -289,6 +290,6 @@ export async function connectBreez(): Promise<WalletProvider | null> {
   const sk = await loadKey();
   if (!sk) return null;
   const mnemonic = deriveWalletMnemonic(sk);
-  const sdk = await loadSdk(mnemonic);
-  return new BreezSparkProvider(sdk);
+  const { sdk, M } = await loadSdk(mnemonic);
+  return new BreezSparkProvider(sdk, M);
 }
