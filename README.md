@@ -16,6 +16,20 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 - **Whitepaper:** [PDF](https://freeport.network/intro/whitepaper.pdf)
 - **Self-host all of Freeport:** [`packages/freeport-self-hosted`](packages/freeport-self-hosted) — `docker compose up -d` serves the web app + read-only MCP + content-blind push notifier + a Nostr relay + the optional Telegram bridge on port 1988. The app needs no backend; this is for communities who want their own node.
 
+## Why Freeport exists
+
+- **It's a research project.** How far can pure P2P infrastructure go? Buyers,
+  sellers, riders, drivers meet over Nostr, settle in Lightning or cash.
+  Nothing in between needs permission to exist.
+- **It's a thesis.** A P2P marketplace with a reputation system works. When
+  people own their reputation, the market self-regulates.
+- **It's a check and balance.** A zero-fee exit that answers to no one puts a
+  ceiling on how greedy the big platforms can get.
+- **It's fun.** An open protocol, Claude Code as a pair programmer, no
+  investor deck.
+- **Nobody profits — including me.** No operator, no cut. A protocol, not a
+  platform. Run it or fork it.
+
 ## Layout
 
 | Path | What |
