@@ -24,7 +24,7 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 | `packages/protocol` | Spec as code: event build/parse, negotiation state machine, matching, geohash |
 | `packages/agent` | CLI personal agent (`freeport run`): subscribe, auto-match, negotiate, human confirm |
 | `packages/freeport-self-hosted` | Self-hosted Freeport in a box (default port 1988): the web app + read-only MCP server + Web Push / Expo notifier + NIP-01 relay + the **Telegram bridge** (feed, listen mode, pings, guest mode) |
-| `apps/mobile` | Expo/React Native + PWA client (post intent, negotiate, confirm deals, key backup, 55 locales incl. RTL). UI is split into `apps/mobile/src/tabs/*` (one file per tab) + `apps/mobile/src/ui/*` (theme, shared fields, formatters, alerts); see [`apps/mobile/CONTRIBUTING.md`](apps/mobile/CONTRIBUTING.md) |
+| `apps/mobile` | Expo/React Native + PWA client (post intent, negotiate, confirm deals, built-in Lightning/stablecoin wallet, key backup, 55 locales incl. RTL). UI is split into `apps/mobile/src/tabs/*` (one file per tab) + `apps/mobile/src/ui/*` (theme, shared fields, formatters, alerts); see [`apps/mobile/CONTRIBUTING.md`](apps/mobile/CONTRIBUTING.md) |
 | `relay/` | Self-hosted strfry relay (docker-compose, Proxmox-LXC-sized, Uptime-Kuma health) |
 | `demo/` | Two-agent rideshare demo configs + script |
 
@@ -37,8 +37,9 @@ matching server — relays are dumb pub/sub, all logic is client-side.
   vertical-agnostic; verticals are payload schemas (`rideshare/1`) plus a
   client-side matcher.
 - **Intents public, negotiations encrypted** (NIP-04 now, NIP-17 next).
-- **Settlement out of scope for v1**: deals end with contact exchange; a
-  reserved `payment` field lands Lightning later without breaking changes.
+- **Settlement is self-custodial only**: the built-in wallet (below) never
+  holds funds and there is no escrow — deals still end with contact exchange,
+  payment is a convenience layered on the reserved `payment` field.
 
 ## Quick start
 
@@ -121,6 +122,16 @@ others**.
   self-update on macOS/Windows — plus a **single-file offline copy**
   (`Freeport_x.y.z-offline.html`): the whole app, fonts and all 56 languages in
   one HTML file that runs from `file://` with no install and no server.
+- **Wallet (experimental)**: built-in **self-custodial Bitcoin Lightning +
+  stablecoin (USDT/USDB) wallet** via [Breez SDK](https://breez.technology)
+  (Spark), lazy-loaded and enabled in Settings → Features. Wallet keys derive
+  from your Nostr key — one backup covers identity and funds. Lightning
+  address (`you@freeport.network`), bolt11, on-chain, QR scan, contacts, and
+  balances shown in your local currency. Deal integration: once a deal is
+  confirmed the buyer gets a **Pay** button and the seller a **Pay QR** with
+  the agreed amount auto-converted from fiat to sats. Prefer your own wallet?
+  Connect it over **NWC (NIP-47)** instead. Spark is a young trust-minimized
+  L2 — treat it as a spending wallet (`apps/mobile/src/wallet/`).
 - **Reputation**: implemented — karma ratings (PoW-backed, `apps/mobile/src/karma.ts`),
   deal receipts, proven-deal counts, per-viewer web-of-trust weighting, and a
   `nostr_search_reputation` MCP tool. What remains open is *sybil resistance*:
@@ -136,8 +147,8 @@ others**.
 
 ## Non-goals (v1)
 
-Payments/escrow, dispute resolution, vetting, anti-sybil — all deliberately
-deferred.
+Escrow/custody (payments are self-custodial wallet-to-wallet only), dispute
+resolution, vetting, anti-sybil — all deliberately deferred.
 
 ## License & forking
 
