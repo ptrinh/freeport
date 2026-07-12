@@ -68,6 +68,45 @@ production` for OTA JS updates, `bash deploy-web.sh` for the web PWA (set
 None are required to exist for the market to function — they add push
 notifications, a Telegram bridge, and agent tooling on top of the public relays.
 
+## Wallet & Lightning addresses (optional)
+
+The built-in wallet (Breez SDK / Spark) works out of the box for bolt11,
+on-chain and Spark payments once you set your own **`EXPO_PUBLIC_BREEZ_API_KEY`**
+(the embedded key is the upstream deployment's — get your own from Breez).
+Those rails need nothing domain-specific.
+
+**Lightning addresses (`user@yourdomain`) are the one exception** — they resolve
+over LUD-16 (`https://<domain>/.well-known/lnurlp/<user>`), served by Breez's
+hosted LNURL backend. There are two ways to wire your domain to it:
+
+### Option B — `pay.yourdomain` via CNAME (recommended)
+
+One DNS record, no proxy of yours in the payment path, and any new LNURL routes
+Breez adds work automatically. **No Breez whitelist step** — a subdomain CNAME'd
+to their backend is served generically.
+
+1. DNS: `CNAME  pay.yourdomain  →  breez.tips` (confirm the exact target with
+   Breez). The subdomain must NOT be proxied/orange-clouded if your DNS is on
+   Cloudflare — set it to **DNS-only** so TLS terminates at Breez.
+2. App: set `config.lnurlDomain = 'pay.yourdomain'` in
+   `apps/mobile/src/wallet/breez.ts` (both the web and native branches).
+3. Nothing else — no worker, no routes to maintain.
+
+Trade-off: addresses are the longer `user@pay.yourdomain`.
+
+### Option A — apex `user@yourdomain` via a proxy worker
+
+Shorter address, but the apex already serves the web app (Cloudflare Pages) and
+can't CNAME to Breez, so you proxy the LNURL routes and Breez must **whitelist
+your apex** (Host-based routing, arranged with them directly).
+
+1. Ask Breez to enable Host-based routing for `yourdomain`.
+2. Deploy `infra/lnurlp-proxy/` (worker.js is already domain-agnostic — it
+   forwards `/.well-known/lnurlp/*`, `/lnurlpay/*`, `/lnurlp/*`, `/verify/*` to
+   `breez.tips` with your Host header). In `wrangler.toml` set your `account_id`
+   and the four `routes`/`zone_name` to `yourdomain`, then `wrangler deploy`.
+3. App: `config.lnurlDomain = 'yourdomain'`.
+
 ## Names to search for
 
 A fork should leave no trace of the upstream deployment. Grep for these and
