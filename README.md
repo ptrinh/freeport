@@ -29,12 +29,9 @@ matching server — relays are dumb pub/sub, all logic is client-side.
   investor deck.
 - **Nobody profits — including me.** No operator, no cut. A protocol, not a
   platform. Run it or fork it.
-- **No one will protect you here — that's the point, and the price.** When a
-  deal goes bad — a scam, a dispute, a rider stranded — there is no support
-  line, no refund button, no arbiter above the two of you. Reputation,
-  receipts and your own judgment are the whole safety net. Every middleman
-  you remove takes their protection with them; Freeport just makes that
-  trade honestly.
+- **No one will protect you here — that's the point, and the price.** No
+  support line, no refunds, no arbiter. Reputation and your own judgment are
+  the whole safety net.
 
 ## Layout
 
