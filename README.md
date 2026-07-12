@@ -167,6 +167,12 @@ others**.
 Escrow/custody (payments are self-custodial wallet-to-wallet only), dispute
 resolution, vetting, anti-sybil — all deliberately deferred.
 
+## Donate
+
+No fees, no revenue — if Freeport is useful to you, donations cover relays
+and app-store bills. BTC:
+`bc1ps44wjx3wpu4s0xj746gz2lu45nspsm9059d3ym8xz0nrhu4psyasdgwwhx`
+
 ## License & forking
 
 MIT ([LICENSE](LICENSE)). Freeport exists to be forked: any community can
