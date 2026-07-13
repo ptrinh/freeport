@@ -823,5 +823,14 @@ const c: Record<string, string> = {
   "Voice call": "语音通话",
   "Video call": "视频通话",
   "Missed call": "未接来电",
+  "Reply": "回复",
+  "Send payment": "发送付款",
+  "Disappearing messages": "阅后即焚消息",
+  "New messages disappear after 24 hours": "新消息将在 24 小时后消失",
+  "New messages disappear after 7 days": "新消息将在 7 天后消失",
+  "Share screen": "共享屏幕",
+  "Stop sharing screen": "停止共享屏幕",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "给 {name} 打赏 sats — 在此帖子公开表示感谢。",
 };
 export default c;

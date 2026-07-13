@@ -783,5 +783,14 @@ const c: Record<string, string> = {
   "Voice call": "שיחת קול",
   "Video call": "שיחת וידאו",
   "Missed call": "שיחה שלא נענתה",
+  "Reply": "השב",
+  "Send payment": "שלח תשלום",
+  "Disappearing messages": "הודעות נעלמות",
+  "New messages disappear after 24 hours": "הודעות חדשות נעלמות אחרי 24 שעות",
+  "New messages disappear after 7 days": "הודעות חדשות נעלמות אחרי 7 ימים",
+  "Share screen": "שתף מסך",
+  "Stop sharing screen": "הפסק שיתוף מסך",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "תן סאטס ל-{name} — תודה פומבית בפוסט הזה.",
 };
 export default c;

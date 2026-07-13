@@ -783,5 +783,14 @@ const c: Record<string, string> = {
   "Voice call": "குரல் அழைப்பு",
   "Video call": "வீடியோ அழைப்பு",
   "Missed call": "தவறவிட்ட அழைப்பு",
+  "Reply": "பதிலளி",
+  "Send payment": "பணம் அனுப்பு",
+  "Disappearing messages": "மறையும் செய்திகள்",
+  "New messages disappear after 24 hours": "புதிய செய்திகள் 24 மணிநேரத்தில் மறையும்",
+  "New messages disappear after 7 days": "புதிய செய்திகள் 7 நாட்களில் மறையும்",
+  "Share screen": "திரையைப் பகிர்",
+  "Stop sharing screen": "திரைப் பகிர்வை நிறுத்து",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "{name} க்கு sats டிப் அனுப்பு — இந்தப் பதிவில் பொது நன்றி.",
 };
 export default c;

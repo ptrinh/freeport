@@ -786,5 +786,14 @@ const c: Record<string, string> = {
   "Voice call": "Hlasový hovor",
   "Video call": "Video hovor",
   "Missed call": "Zmeškaný hovor",
+  "Reply": "Odpovědět",
+  "Send payment": "Odeslat platbu",
+  "Disappearing messages": "Mizející zprávy",
+  "New messages disappear after 24 hours": "Nové zprávy zmizí po 24 hodinách",
+  "New messages disappear after 7 days": "Nové zprávy zmizí po 7 dnech",
+  "Share screen": "Sdílet obrazovku",
+  "Stop sharing screen": "Ukončit sdílení obrazovky",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Pošlete spropitné v sats uživateli {name} — veřejné poděkování k tomuto příspěvku.",
 };
 export default c;

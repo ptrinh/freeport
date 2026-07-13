@@ -780,5 +780,14 @@ const c: Record<string, string> = {
   "Voice call": "ໂທດ້ວຍສຽງ",
   "Video call": "ໂທວິດີໂອ",
   "Missed call": "ສາຍທີ່ບໍ່ໄດ້ຮັບ",
+  "Reply": "ຕອບກັບ",
+  "Send payment": "ສົ່ງການຈ່າຍເງິນ",
+  "Disappearing messages": "ຂໍ້ຄວາມທີ່ຫາຍໄປ",
+  "New messages disappear after 24 hours": "ຂໍ້ຄວາມໃໝ່ຈະຫາຍໄປຫຼັງຈາກ 24 ຊົ່ວໂມງ",
+  "New messages disappear after 7 days": "ຂໍ້ຄວາມໃໝ່ຈະຫາຍໄປຫຼັງຈາກ 7 ມື້",
+  "Share screen": "ແບ່ງປັນໜ້າຈໍ",
+  "Stop sharing screen": "ຢຸດການແບ່ງປັນໜ້າຈໍ",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "ສົ່ງ sats ໃຫ້ {name} — ຄຳຂອບໃຈສາທາລະນະໃນໂພສນີ້.",
 };
 export default c;

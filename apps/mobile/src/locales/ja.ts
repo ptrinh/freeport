@@ -823,5 +823,14 @@ const c: Record<string, string> = {
   "Voice call": "音声通話",
   "Video call": "ビデオ通話",
   "Missed call": "不在着信",
+  "Reply": "返信",
+  "Send payment": "支払いを送る",
+  "Disappearing messages": "消えるメッセージ",
+  "New messages disappear after 24 hours": "新しいメッセージは24時間後に消えます",
+  "New messages disappear after 7 days": "新しいメッセージは7日後に消えます",
+  "Share screen": "画面を共有",
+  "Stop sharing screen": "画面共有を停止",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "{name}さんにsatsを送る — この投稿への公開のお礼です。",
 };
 export default c;

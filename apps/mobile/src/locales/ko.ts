@@ -823,5 +823,14 @@ const c: Record<string, string> = {
   "Voice call": "음성 통화",
   "Video call": "영상 통화",
   "Missed call": "부재중 전화",
+  "Reply": "답장",
+  "Send payment": "결제 보내기",
+  "Disappearing messages": "사라지는 메시지",
+  "New messages disappear after 24 hours": "새 메시지는 24시간 후에 사라집니다",
+  "New messages disappear after 7 days": "새 메시지는 7일 후에 사라집니다",
+  "Share screen": "화면 공유",
+  "Stop sharing screen": "화면 공유 중지",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "{name}님에게 sats 보내기 — 이 게시물에 대한 공개 감사 인사입니다.",
 };
 export default c;

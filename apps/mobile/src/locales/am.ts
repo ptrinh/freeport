@@ -780,5 +780,14 @@ const c: Record<string, string> = {
   "Voice call": "የድምጽ ጥሪ",
   "Video call": "የቪዲዮ ጥሪ",
   "Missed call": "ያመለጠ ጥሪ",
+  "Reply": "መልስ",
+  "Send payment": "ክፍያ ላክ",
+  "Disappearing messages": "የሚጠፉ መልዕክቶች",
+  "New messages disappear after 24 hours": "አዲስ መልዕክቶች ከ24 ሰዓት በኋላ ይጠፋሉ",
+  "New messages disappear after 7 days": "አዲስ መልዕክቶች ከ7 ቀናት በኋላ ይጠፋሉ",
+  "Share screen": "ስክሪን አጋራ",
+  "Stop sharing screen": "ስክሪን ማጋራት አቁም",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "ለ{name} sats ስጦታ ስጥ — በዚህ ልጥፍ ላይ ይፋዊ ምስጋና።",
 };
 export default c;

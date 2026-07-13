@@ -784,5 +784,14 @@ const c: Record<string, string> = {
   "Voice call": "Balso skambutis",
   "Video call": "Vaizdo skambutis",
   "Missed call": "Praleistas skambutis",
+  "Reply": "Atsakyti",
+  "Send payment": "Siųsti mokėjimą",
+  "Disappearing messages": "Išnykstančios žinutės",
+  "New messages disappear after 24 hours": "Naujos žinutės išnyksta po 24 valandų",
+  "New messages disappear after 7 days": "Naujos žinutės išnyksta po 7 dienų",
+  "Share screen": "Bendrinti ekraną",
+  "Stop sharing screen": "Nustoti bendrinti ekraną",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Siųskite sats vartotojui {name} — viešas ačiū už šį įrašą.",
 };
 export default c;

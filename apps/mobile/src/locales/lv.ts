@@ -783,5 +783,14 @@ const c: Record<string, string> = {
   "Voice call": "Balss zvans",
   "Video call": "Video zvans",
   "Missed call": "Neatbildēts zvans",
+  "Reply": "Atbildēt",
+  "Send payment": "Sūtīt maksājumu",
+  "Disappearing messages": "Pazūdošie ziņojumi",
+  "New messages disappear after 24 hours": "Jaunie ziņojumi pazūd pēc 24 stundām",
+  "New messages disappear after 7 days": "Jaunie ziņojumi pazūd pēc 7 dienām",
+  "Share screen": "Kopīgot ekrānu",
+  "Stop sharing screen": "Pārtraukt ekrāna kopīgošanu",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Sūtiet sats lietotājam {name} — publisks paldies par šo ierakstu.",
 };
 export default c;

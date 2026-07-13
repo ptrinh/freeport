@@ -27,6 +27,9 @@ export interface UserProfile {
   phoneDisplay: PhoneDisplay;
   /** Optional external link (e.g. provider's website/social). Published as NIP-24 `website`. */
   externalLink: string;
+  /** Lightning address (lud16) — auto-filled from the wallet when it's on, so
+   *  others can zap this user's posts (NIP-57). Published as `lud16`. */
+  lud16?: string;
   /** Driver's vehicle model (e.g. "Toyota Vios — white"). Published publicly. */
   vehicleModel: string;
   /** Driver's full licence-plate number — kept on device; full value shared via DM at deal time. */
@@ -121,6 +124,7 @@ export async function publishProfile(
   if (profile.about) content.about = profile.about;
   if (profile.gallery?.length) content.gallery = profile.gallery;
   if (profile.externalLink) content.website = profile.externalLink.trim();
+  if (profile.lud16) content.lud16 = profile.lud16.trim();
   // Masking happens HERE, before publish — relays never see the full number
   // unless the user explicitly opted into 'full'.
   if (profile.phone) {

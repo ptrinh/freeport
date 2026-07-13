@@ -783,5 +783,14 @@ const c: Record<string, string> = {
   "Voice call": "Telefonatë me zë",
   "Video call": "Telefonatë video",
   "Missed call": "Telefonatë e humbur",
+  "Reply": "Përgjigju",
+  "Send payment": "Dërgo pagesën",
+  "Disappearing messages": "Mesazhe që zhduken",
+  "New messages disappear after 24 hours": "Mesazhet e reja zhduken pas 24 orësh",
+  "New messages disappear after 7 days": "Mesazhet e reja zhduken pas 7 ditësh",
+  "Share screen": "Ndaj ekranin",
+  "Stop sharing screen": "Ndalo ndarjen e ekranit",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Dërgo sats te {name} — një falënderim publik në këtë postim.",
 };
 export default c;

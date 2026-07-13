@@ -117,7 +117,7 @@ export class MobileClient {
   readonly negotiations = new Map<string, Negotiation>();
   private published = new Map<string, Intent>();
   /** Cache of fetched kind:0 profiles keyed by pubkey. */
-  readonly profiles = new Map<string, { name?: string; picture?: string; about?: string; phone?: string; vehicleModel?: string; plate?: string }>();
+  readonly profiles = new Map<string, { name?: string; picture?: string; about?: string; phone?: string; vehicleModel?: string; plate?: string; lud16?: string }>();
   /** Cache of fetched reputations keyed by pubkey. */
   readonly reputations = new Map<string, Reputation>();
   /** Recently seen market intents (others'), for client-side price suggestions. */
@@ -501,7 +501,7 @@ export class MobileClient {
             try {
               const meta = JSON.parse(ev.content);
               this.profileTs.set(ev.pubkey, ev.created_at);
-              this.profiles.set(ev.pubkey, { name: meta.name, picture: meta.picture, about: meta.about, phone: meta.phone, vehicleModel: meta.vehicle_model, plate: meta.plate });
+              this.profiles.set(ev.pubkey, { name: meta.name, picture: meta.picture, about: meta.about, phone: meta.phone, vehicleModel: meta.vehicle_model, plate: meta.plate, lud16: meta.lud16 });
               this.onProfileFetched?.(ev.pubkey);
             } catch {}
           },

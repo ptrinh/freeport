@@ -783,5 +783,14 @@ const c: Record<string, string> = {
   "Voice call": "Röstsamtal",
   "Video call": "Videosamtal",
   "Missed call": "Missat samtal",
+  "Reply": "Svara",
+  "Send payment": "Skicka betalning",
+  "Disappearing messages": "Försvinnande meddelanden",
+  "New messages disappear after 24 hours": "Nya meddelanden försvinner efter 24 timmar",
+  "New messages disappear after 7 days": "Nya meddelanden försvinner efter 7 dagar",
+  "Share screen": "Dela skärm",
+  "Stop sharing screen": "Sluta dela skärm",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Skicka sats till {name} — ett offentligt tack på det här inlägget.",
 };
 export default c;

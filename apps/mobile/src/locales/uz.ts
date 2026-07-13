@@ -780,5 +780,14 @@ const c: Record<string, string> = {
   "Voice call": "Ovozli qo'ng'iroq",
   "Video call": "Video qo'ng'iroq",
   "Missed call": "O'tkazib yuborilgan qo'ng'iroq",
+  "Reply": "Javob berish",
+  "Send payment": "To'lov yuborish",
+  "Disappearing messages": "Yo'qoladigan xabarlar",
+  "New messages disappear after 24 hours": "Yangi xabarlar 24 soatdan keyin yo'qoladi",
+  "New messages disappear after 7 days": "Yangi xabarlar 7 kundan keyin yo'qoladi",
+  "Share screen": "Ekranni ulashish",
+  "Stop sharing screen": "Ekran ulashishni to'xtatish",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "{name} ga sats in'om qiling — bu postda ommaviy tashakkur.",
 };
 export default c;

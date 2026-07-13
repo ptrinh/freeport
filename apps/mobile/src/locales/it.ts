@@ -783,5 +783,14 @@ const c: Record<string, string> = {
   "Voice call": "Chiamata vocale",
   "Video call": "Videochiamata",
   "Missed call": "Chiamata persa",
+  "Reply": "Rispondi",
+  "Send payment": "Invia pagamento",
+  "Disappearing messages": "Messaggi effimeri",
+  "New messages disappear after 24 hours": "I nuovi messaggi scompaiono dopo 24 ore",
+  "New messages disappear after 7 days": "I nuovi messaggi scompaiono dopo 7 giorni",
+  "Share screen": "Condividi schermo",
+  "Stop sharing screen": "Interrompi condivisione schermo",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Manda sats a {name} — un ringraziamento pubblico su questo post.",
 };
 export default c;

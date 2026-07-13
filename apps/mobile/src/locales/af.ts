@@ -783,5 +783,14 @@ const c: Record<string, string> = {
   "Voice call": "Stemoproep",
   "Video call": "Video-oproep",
   "Missed call": "Gemiste oproep",
+  "Reply": "Antwoord",
+  "Send payment": "Stuur betaling",
+  "Disappearing messages": "Verdwynende boodskappe",
+  "New messages disappear after 24 hours": "Nuwe boodskappe verdwyn na 24 uur",
+  "New messages disappear after 7 days": "Nuwe boodskappe verdwyn na 7 dae",
+  "Share screen": "Deel skerm",
+  "Stop sharing screen": "Stop skermdeling",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Gee sats-fooitjie vir {name} — 'n openbare dankie op hierdie plasing.",
 };
 export default c;

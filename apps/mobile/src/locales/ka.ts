@@ -780,5 +780,14 @@ const c: Record<string, string> = {
   "Voice call": "ხმოვანი ზარი",
   "Video call": "ვიდეო ზარი",
   "Missed call": "გამოტოვებული ზარი",
+  "Reply": "პასუხი",
+  "Send payment": "გადახდის გაგზავნა",
+  "Disappearing messages": "ქრებადი შეტყობინებები",
+  "New messages disappear after 24 hours": "ახალი შეტყობინებები ქრება 24 საათის შემდეგ",
+  "New messages disappear after 7 days": "ახალი შეტყობინებები ქრება 7 დღის შემდეგ",
+  "Share screen": "ეკრანის გაზიარება",
+  "Stop sharing screen": "ეკრანის გაზიარების შეწყვეტა",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "გაუგზავნეთ sats {name}-ს — საჯარო მადლობა ამ პოსტზე.",
 };
 export default c;

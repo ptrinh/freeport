@@ -780,5 +780,14 @@ const c: Record<string, string> = {
   "Voice call": "Voice call",
   "Video call": "Video call",
   "Missed call": "Hindi nasagot na tawag",
+  "Reply": "Tumugon",
+  "Send payment": "Magpadala ng bayad",
+  "Disappearing messages": "Nawawalang mga mensahe",
+  "New messages disappear after 24 hours": "Nawawala ang mga bagong mensahe pagkatapos ng 24 oras",
+  "New messages disappear after 7 days": "Nawawala ang mga bagong mensahe pagkatapos ng 7 araw",
+  "Share screen": "Ibahagi ang screen",
+  "Stop sharing screen": "Itigil ang pagbabahagi ng screen",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Magbigay ng sats kay {name} — pampublikong pasasalamat sa post na ito.",
 };
 export default c;

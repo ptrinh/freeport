@@ -780,5 +780,14 @@ const c: Record<string, string> = {
   "Voice call": "Ձայնային զանգ",
   "Video call": "Տեսազանգ",
   "Missed call": "Բաց թողնված զանգ",
+  "Reply": "Պատասխանել",
+  "Send payment": "Ուղարկել վճարում",
+  "Disappearing messages": "Անհետացող հաղորդագրություններ",
+  "New messages disappear after 24 hours": "Նոր հաղորդագրությունները անհետանում են 24 ժամ հետո",
+  "New messages disappear after 7 days": "Նոր հաղորդագրությունները անհետանում են 7 օր հետո",
+  "Share screen": "Կիսվել էկրանով",
+  "Stop sharing screen": "Դադարեցնել էկրանի ցուցադրումը",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Ուղարկեք sats {name}-ին — հրապարակային շնորհակալություն այս գրառման տակ։",
 };
 export default c;

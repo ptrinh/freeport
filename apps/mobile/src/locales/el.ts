@@ -783,5 +783,14 @@ const c: Record<string, string> = {
   "Voice call": "Φωνητική κλήση",
   "Video call": "Βιντεοκλήση",
   "Missed call": "Αναπάντητη κλήση",
+  "Reply": "Απάντηση",
+  "Send payment": "Αποστολή πληρωμής",
+  "Disappearing messages": "Μηνύματα που εξαφανίζονται",
+  "New messages disappear after 24 hours": "Τα νέα μηνύματα εξαφανίζονται μετά από 24 ώρες",
+  "New messages disappear after 7 days": "Τα νέα μηνύματα εξαφανίζονται μετά από 7 ημέρες",
+  "Share screen": "Κοινή χρήση οθόνης",
+  "Stop sharing screen": "Διακοπή κοινής χρήσης οθόνης",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Δώσε φιλοδώρημα sats στον/στην {name} — ένα δημόσιο ευχαριστώ σε αυτή τη δημοσίευση.",
 };
 export default c;

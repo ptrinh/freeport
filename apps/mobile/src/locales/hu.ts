@@ -783,5 +783,14 @@ const c: Record<string, string> = {
   "Voice call": "Hanghívás",
   "Video call": "Videohívás",
   "Missed call": "Nem fogadott hívás",
+  "Reply": "Válasz",
+  "Send payment": "Fizetés küldése",
+  "Disappearing messages": "Eltűnő üzenetek",
+  "New messages disappear after 24 hours": "Az új üzenetek 24 óra után eltűnnek",
+  "New messages disappear after 7 days": "Az új üzenetek 7 nap után eltűnnek",
+  "Share screen": "Képernyő megosztása",
+  "Stop sharing screen": "Képernyőmegosztás leállítása",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Adj satsot {name} részére — nyilvános köszönet ehhez a bejegyzéshez.",
 };
 export default c;

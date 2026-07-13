@@ -783,5 +783,14 @@ const c: Record<string, string> = {
   "Voice call": "Гласовен повик",
   "Video call": "Видео повик",
   "Missed call": "Пропуштен повик",
+  "Reply": "Одговори",
+  "Send payment": "Испрати плаќање",
+  "Disappearing messages": "Исчезнувачки пораки",
+  "New messages disappear after 24 hours": "Новите пораки исчезнуваат по 24 часа",
+  "New messages disappear after 7 days": "Новите пораки исчезнуваат по 7 дена",
+  "Share screen": "Сподели екран",
+  "Stop sharing screen": "Запри споделување екран",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Испрати sats до {name} — јавна благодарност на оваа објава.",
 };
 export default c;

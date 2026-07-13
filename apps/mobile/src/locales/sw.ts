@@ -780,5 +780,14 @@ const c: Record<string, string> = {
   "Voice call": "Simu ya sauti",
   "Video call": "Simu ya video",
   "Missed call": "Simu uliyokosa",
+  "Reply": "Jibu",
+  "Send payment": "Tuma malipo",
+  "Disappearing messages": "Ujumbe unaotoweka",
+  "New messages disappear after 24 hours": "Ujumbe mpya hutoweka baada ya saa 24",
+  "New messages disappear after 7 days": "Ujumbe mpya hutoweka baada ya siku 7",
+  "Share screen": "Shiriki skrini",
+  "Stop sharing screen": "Acha kushiriki skrini",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Tuma sats kwa {name} — shukrani za hadharani kwenye chapisho hili.",
 };
 export default c;

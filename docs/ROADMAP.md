@@ -473,23 +473,29 @@ app store". **Effort:** medium-high, security-dominated.
 
 ## Conditional payments — HODL invoices (trust-minimized escrow)
 
-The honest answer to "no one will protect you here": escrow-like safety with no
-custodian. The buyer pays a **hold invoice** whose funds are locked, not
-settled, until the buyer releases on delivery — otherwise it expires and
-refunds automatically. No operator ever holds the money; the Lightning protocol
-enforces it. Highest-value trust primitive for a marketplace where deals can go
-bad. **Caveat:** depends on hold-invoice support in the Breez SDK / Spark L2 —
-verify before committing; may need a fallback rail. Pairs naturally with deal
+**Status (2026-07): BLOCKED upstream.** Verified: the Breez Spark SDK (both the
+WASM and react-native builds, 0.18/0.19) exposes no hold-invoice API — there is
+nothing to build on today. Re-check on each SDK bump; if Breez/Spark never ship
+it, the fallback rail would be a second wallet backend that does (e.g. an LND
+REST endpoint the user brings), which is a much bigger lift.
+
+The idea stands: escrow-like safety with no custodian. The buyer pays a **hold
+invoice** whose funds are locked, not settled, until the buyer releases on
+delivery — otherwise it expires and refunds automatically. No operator ever
+holds the money; the Lightning protocol enforces it. Pairs naturally with deal
 receipts and the `payment` flow that already exists.
 
 ## Zaps / tipping (NIP-57)
 
-Tip sats to a good post, a helpful reply, or a trusted seller — the Nostr-native
-social-payment primitive, layered on the wallet + karma that already exist.
-Low effort, high virality: a zap button on posts / profiles / chat, a running
-zap total as a soft reputation signal alongside karma. Uses the lightning
-address for the zap request; publish zap receipts (kind 9735) so totals are
-verifiable.
+**Status (2026-07): v1 SHIPPED.** Verified breez.tips supports NIP-57
+server-side (`allowsNostr` + `nostrPubkey` in the lnurlp response — the
+receiver's LNURL server signs and publishes the kind-9735 receipts). Shipped:
+`lud16` auto-published in kind:0 while the Wallet tab is open, ⚡ Zap chip on
+Browse cards (only for zappable authors), amount sheet (21/210/2.1k/21k sats),
+signed kind-9734 request → invoice → wallet Send flow, and batched 9735
+totals shown on the chip. Degrades to a plain lnurl-pay tip when the
+receiver's server lacks zap support. Remaining: zap from profiles/chat, zap
+totals as a reputation input.
 
 ## AI concierge
 

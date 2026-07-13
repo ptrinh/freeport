@@ -780,5 +780,14 @@ const c: Record<string, string> = {
   "Voice call": "အသံခေါ်ဆိုမှု",
   "Video call": "ဗီဒီယိုခေါ်ဆိုမှု",
   "Missed call": "လွတ်သွားသောခေါ်ဆိုမှု",
+  "Reply": "ပြန်စာ",
+  "Send payment": "ငွေပေးချေမှု ပို့ရန်",
+  "Disappearing messages": "ပျောက်ကွယ်သွားသော မက်ဆေ့ချ်များ",
+  "New messages disappear after 24 hours": "မက်ဆေ့ချ်အသစ်များ ၂၄ နာရီအကြာတွင် ပျောက်ကွယ်သွားမည်",
+  "New messages disappear after 7 days": "မက်ဆေ့ချ်အသစ်များ ၇ ရက်အကြာတွင် ပျောက်ကွယ်သွားမည်",
+  "Share screen": "မျက်နှာပြင် မျှဝေရန်",
+  "Stop sharing screen": "မျက်နှာပြင် မျှဝေမှု ရပ်ရန်",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "{name} ကို sats ပေးရန် — ဤပို့စ်ပေါ်တွင် အများမြင် ကျေးဇူးတင်စကား။",
 };
 export default c;

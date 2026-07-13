@@ -789,5 +789,14 @@ const c: Record<string, string> = {
   "Voice call": "Голосовий дзвінок",
   "Video call": "Відеодзвінок",
   "Missed call": "Пропущений дзвінок",
+  "Reply": "Відповісти",
+  "Send payment": "Надіслати платіж",
+  "Disappearing messages": "Зникаючі повідомлення",
+  "New messages disappear after 24 hours": "Нові повідомлення зникають через 24 години",
+  "New messages disappear after 7 days": "Нові повідомлення зникають через 7 днів",
+  "Share screen": "Демонструвати екран",
+  "Stop sharing screen": "Зупинити демонстрацію екрана",
+  "Zap": "Zap",
+  "Tip sats to {name} — a public thank-you on this post.": "Надішліть sats для {name} — публічна подяка під цим дописом.",
 };
 export default c;

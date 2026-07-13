@@ -28,6 +28,7 @@ import { dirIcon } from '../rtl';
 import { maskPhone, isDisplayablePhone } from '../profile';
 import { getPow } from 'nostr-tools/nip13';
 import { s, palette } from '../ui/theme';
+import { fetchZapTotals } from '../zaps';
 import { defaultIntentTime, timeToWindow, parsePayment, fmtWindow, extractPhone, myPostTitle, primaryGeohash, fmtPayment } from '../ui/format';
 import { uiAlert, openMaps } from '../ui/alerts';
 import { Row, DurationField, TimeField, PaymentField, Field, type IoniconName } from '../ui/fields';
@@ -44,6 +45,8 @@ export function MarketTab({
   defaultSubcategory,
   maxDistance,
   onScroll,
+  walletEnabled = false,
+  onZap,
 }: {
   intents: Intent[];
   client: MobileClient | null;
@@ -56,6 +59,9 @@ export function MarketTab({
   defaultSubcategory: string;
   maxDistance: number;
   onScroll?: (e: any) => void;
+  /** Zaps (NIP-57): tip the poster — shown when their profile carries lud16. */
+  walletEnabled?: boolean;
+  onZap?: (intent: Intent) => void;
 }) {
   const country = location.country;
   // Resolve the unit HERE from the raw preference + this tab's own location —
@@ -78,6 +84,8 @@ export function MarketTab({
   const [drillCategory, setDrillCategory] = useState<string | null>(initCat);
   const PAGE_SIZE = 50;
   const [limit, setLimit] = useState(PAGE_SIZE);
+  // Zap totals for the visible page — ONE batched 9735 query per page change.
+  const [zapTotals, setZapTotals] = useState<Map<string, number>>(new Map());
   const [cardViewerUri, setCardViewerUri] = useState<string | null>(null); // full-screen post image
   // Re-evaluate the feed every 30s so a post drops off as soon as it passes its
   // expiry / requested time — without waiting for an unrelated re-render.
@@ -212,6 +220,16 @@ export function MarketTab({
   }, [intents, servicesEnabled, filterCat, filterSub, kw, sortPrefs, ref, client, nowTick, doneListingKeys, maxDistance, distanceUnit, distKm]);
 
   const paged = refSettling ? [] : shown.list.slice(0, limit);
+
+  // Zap totals for the current page (only when the chip can render at all).
+  const pagedIdsKey = paged.map((i) => i.id).join(',');
+  useEffect(() => {
+    if (!walletEnabled || !onZap || !client || !paged.length) return;
+    return fetchZapTotals(client.pool, client.relays, paged.map((i) => i.id), (totals) => {
+      if (totals.size) setZapTotals((prev) => new Map([...prev, ...totals]));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagedIdsKey, walletEnabled, client]);
   const hasMore = shown.list.length > paged.length;
   const activeSortKeys = sortPrefs.filter((k) => k !== 'none');
   // When the icon+label row wraps to 2 lines, collapse to icon-only to stay
@@ -506,9 +524,18 @@ export function MarketTab({
                 )}
               </>
             )}
-            <Text style={s.meta}>
-              {item.pubkey.slice(0, 10)}… · expires {new Date(item.content.expires_at * 1000).toLocaleTimeString()}
-            </Text>
+            <View style={[s.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
+              <Text style={[s.meta, { flex: 1 }]}>
+                {item.pubkey.slice(0, 10)}… · expires {new Date(item.content.expires_at * 1000).toLocaleTimeString()}
+              </Text>
+              {walletEnabled && onZap && !mine(item) && client?.profiles.get(item.pubkey)?.lud16 ? (
+                <Pressable style={s.mapLink} onPress={() => onZap(item)} hitSlop={6} accessibilityRole="button" accessibilityLabel={t('Zap')}>
+                  <Text style={s.mapLinkText}>
+                    {'⚡ ' + ((zapTotals.get(item.id) ?? 0) > 0 ? `${zapTotals.get(item.id)!.toLocaleString()}` : t('Zap'))}
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
 
             {/* Respond — open a negotiation with this poster. */}
             {(() => {

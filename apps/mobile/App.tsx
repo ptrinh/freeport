@@ -98,6 +98,7 @@ import { CallOverlay } from './src/calls/CallOverlay';
 import { callsSupported } from './src/calls/webrtc';
 import { defaultAvatarUrl as peerAvatarUrl } from './src/profile';
 import { unreadCount as convUnread, type Conversation } from './src/conversations';
+import { ZapSheet } from './src/ui/ZapSheet';
 import { uiAlert } from './src/ui/alerts';
 import { SettingsTab } from './src/tabs/SettingsTab';
 import { Onboarding } from './src/tabs/Onboarding';
@@ -378,6 +379,8 @@ function AppInner() {
   const [walletUnit, setWalletUnit] = useState<'sats' | 'usd' | 'local'>('local');
   const [postDraft, setPostDraft] = useState<RepostDraft | null>(null);
   const [walletPrefill, setWalletPrefill] = useState<{ mode?: 'send' | 'receive'; dest?: string; hint?: string; fiatAmount?: number; fiatCurrency?: string; memo?: string } | null>(null);
+  /** Post being zapped (NIP-57) — opens the amount sheet. */
+  const [zapTarget, setZapTarget] = useState<Intent | null>(null);
   const [location, setLocation] = useState<UserLocation>({ country: '', state: '', city: '' });
   // Mirror the latest location so the async launch auto-detect can tell whether
   // the user has manually changed it (e.g. picked a place during onboarding)
@@ -1099,6 +1102,29 @@ function AppInner() {
   // The confirm back-flow / poke healer (auto-reply with our contact) — see hook.
   useContactHandshake(client, negos, profile, buildContactFor, resumeTick);
 
+  // Zappability: publish our lightning address as kind:0 `lud16` so others'
+  // clients can zap our posts (NIP-57). Resolved only while the Wallet tab is
+  // open — the wallet boots there anyway; never at app start.
+  useEffect(() => {
+    if (tab !== 'wallet' || !experimentalWallet || !client) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const provider = await activeWalletProvider(walletNwcUrl);
+        const la = await provider?.lightningAddress?.();
+        // NWC fallback: its address() IS a lud16; Breez's is a Spark address.
+        const fallback = !la ? await provider?.address?.() : null;
+        const addr = la?.address ?? (fallback?.includes('@') ? fallback : null);
+        if (cancelled || !addr || profile.lud16 === addr) return;
+        const p = { ...profile, lud16: addr };
+        setProfile(p);
+        await saveProfile(p);
+        client.publishProfile(p).catch(() => {});
+      } catch { /* wallet not ready — retry next visit */ }
+    })();
+    return () => { cancelled = true; };
+  }, [tab, experimentalWallet, walletNwcUrl, client]);
+
   // A pure passenger only posts ride requests and waits for drivers — Browse
   // (where you pick listings) is noise. Show it for drivers, or once the
   // Service/Product vertical is on. Switch away if the active tab vanishes.
@@ -1342,7 +1368,7 @@ function AppInner() {
           </Pressable>
         ) : null}
       </Animated.View>
-      {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
+      {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} walletEnabled={experimentalWallet} onZap={(i) => setZapTarget(i)} />}
       {tab === 'post' && <PostTab draft={postDraft} onDraftConsumed={() => setPostDraft(null)} client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
       {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} onStartCall={chatCallsEnabled && callsSupported() ? (peer, video) => callManagerRef.current?.startCall(peer, video) : undefined} onPayFriend={(peer, payAddress) => { setWalletPrefill({ mode: 'send', dest: payAddress }); setTab('wallet'); }} />}
       {tab === 'wallet' && (
@@ -1564,6 +1590,21 @@ function AppInner() {
           />
         );
       })()}
+      {zapTarget && (
+        <ZapSheet
+          client={client}
+          signer={signerRef.current}
+          lud16={client?.profiles.get(zapTarget.pubkey)?.lud16 ?? ''}
+          toPubkey={zapTarget.pubkey}
+          eventId={zapTarget.id}
+          onInvoice={(pr) => {
+            setZapTarget(null);
+            setWalletPrefill({ mode: 'send', dest: pr, memo: 'Zap' });
+            setTab('wallet');
+          }}
+          onClose={() => setZapTarget(null)}
+        />
+      )}
       {resolvedInvite && (
         <InviteResolvedSheet
           client={client}
