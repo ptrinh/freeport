@@ -307,8 +307,11 @@ holding these two toggles:
   addressable "read up to <ts>" marker). Off = you send no acks and,
   reciprocally, don't see others' ticks.
 - **Enable calls** — turn on 1:1 audio/video calls (see the calls section). Off
-  = no call button, and incoming call invites are declined automatically. When
-  on, a nested sub-toggle appears:
+  = no call button, and incoming call invites are declined automatically.
+  Show a note under the toggle: **"Your IP address may be exposed to the person
+  you call."** (WebRTC reveals your IP to the peer on a direct connection;
+  turning on TURN fallback below relays instead so the peer can't see it.)
+  When on, a nested sub-toggle appears:
   - **Enable TURN fallback for calls** — when a direct peer-to-peer connection
     fails (~15–20% of calls behind strict NAT), relay the call through TURN
     (Cloudflare) so it still connects — and, as a side effect, the two peers no
