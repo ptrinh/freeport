@@ -305,8 +305,17 @@ holding these two toggles:
   - **2 green ticks** = read (recipient opened the conversation).
   Delivered/read require the recipient to send back a tiny ack DM (or an
   addressable "read up to <ts>" marker). Off = you send no acks and,
-  reciprocally, don't see others' ticks. Both toggles default OFF (privacy-first,
-  consistent with the rest of Freeport).
+  reciprocally, don't see others' ticks.
+- **Enable calls** — turn on 1:1 audio/video calls (see the calls section). Off
+  = no call button, and incoming call invites are declined automatically. When
+  on, a nested sub-toggle appears:
+  - **Enable TURN fallback for calls** — when a direct peer-to-peer connection
+    fails (~15–20% of calls behind strict NAT), relay the call through TURN
+    (Cloudflare) so it still connects — and, as a side effect, the two peers no
+    longer see each other's raw IP (Cloudflare does; media stays e2e). Off =
+    direct-only: better IP privacy vs. the relay, but those calls just fail.
+
+All toggles default OFF (privacy-first, consistent with the rest of Freeport).
 
 **Chat feature set (Telegram/WhatsApp parity, filtered to what fits P2P).**
 Ordered by value-for-effort; `[v1]` ship with the first cut, `[later]` follow-ups.
