@@ -287,6 +287,22 @@ gates DMs from unknown pubkeys; per-conversation block + archive; invite codes
 expire. No content is ever public — only the ephemeral, randomly-keyed invite
 event exists on relays, and only until it expires or is revoked.
 
+**Chat settings (Settings → Features, shown only when Chat is on).** Two extra
+toggles appear once Chat is enabled:
+- **Show last seen** — publish your last-online time so contacts see it on the
+  chat. Off = you don't broadcast it (and, reciprocally, you don't see theirs).
+  Mechanism: a presence marker refreshed on app foreground (an addressable
+  `d`-tagged event, or piggybacked on the read-marker below), readable only by
+  accepted contacts.
+- **Chat receipts** — WhatsApp-style delivery/read ticks:
+  - **1 grey tick** = sent (event accepted by a relay),
+  - **2 ticks** = delivered (recipient's client received + decrypted it),
+  - **2 green ticks** = read (recipient opened the conversation).
+  Delivered/read require the recipient to send back a tiny ack DM (or an
+  addressable "read up to <ts>" marker). Off = you send no acks and,
+  reciprocally, don't see others' ticks. Both toggles default OFF (privacy-first,
+  consistent with the rest of Freeport).
+
 **Effort:** medium. Transport + `ChatThread` reuse is small; the Conversation
-model/store, the invite publish+resolve flow, the deeplink handling, and the
-FAB + accept/reject UX are the bulk.
+model/store, the invite publish+resolve flow, the deeplink handling, the
+FAB + accept/reject UX, and the last-seen/receipts acks are the bulk.
