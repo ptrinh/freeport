@@ -445,10 +445,28 @@ exfiltrate the nsec or drain the wallet:
   (MetaMask/Alby-style), with per-app permissions and a spend cap.
 - Ties directly to the on-device / passkey key handling — get that right first.
 
-**Caveats.** App Store/Play are hostile to "run downloaded third-party code /
-mini-app store" (Apple 4.7 allows it only within limits) — so this is
-**web/PWA-first**; a native version is constrained/later. Decentralized launch
-(URL / Nostr directory) fits the ethos; a curated store does not.
+**Platform decision (from the design review — the original "web/PWA-first"
+was self-contradictory).** The injection trick only works NATIVELY:
+`react-native-webview`'s `injectedJavaScript` can plant `window.nostr`/
+`window.webln` into any origin, whereas on web a mini-app is a cross-origin
+iframe you cannot inject into — "any NIP-07 app just works" is false on web
+(it would need mini-apps to adopt a postMessage SDK, killing the pitch). So:
+**native-first** (WebView shell, launched by URL/QR only — no store UI, which
+is the defensible reading of Apple 4.7's HTML5 mini-app allowances), with a
+degraded postMessage-SDK mode on web later. `react-native-webview` is
+pre-linked since 1.6.0.
+
+**Permission model (concrete, not adjectives):**
+- `signEvent`: **kind allowlist** per app. A mini-app that signs kind 4 can
+  impersonate you in deal negotiations; one that signs 32101/32102 posts
+  listings as you. Default: only app-scoped kinds silently; every other kind
+  = per-event approval dialog.
+- `nip04/nip44 decrypt`: **default deny** — blanket grant would expose the
+  entire DM history (deals + friend chats). At most per-peer grants.
+- WebLN `sendPayment`: spend cap enforced in the SHELL's wallet bridge
+  (per-app + per-day, persisted in prefs) — never trust anything WebView-side.
+- The signer never crosses the bridge; only signed results do. The bridge
+  deserves its own adversarial test suite (like the invite-hijack tests).
 
 **Framing:** "Freeport as an identity + wallet provider for web apps", not "an
 app store". **Effort:** medium-high, security-dominated.
@@ -538,9 +556,36 @@ media track on the SAME WebRTC connection (no new infra, same e2e).
   or sensitive info beyond what you intend.
 
 **Scope.** 1:1 only — mesh WebRTC doesn't scale past ~4 and group calls need an
-SFU (an operator media server). Native needs `react-native-webrtc` (a heavy
-native module → a fresh binary build + mic/cam permissions, which the app
-already requests). Web/PWA can ship first.
+SFU (an operator media server). Native needs `react-native-webrtc` (pre-linked
+since the 1.6.0 binary — ship-ahead policy above; mic/cam permissions already
+in the manifest). Web/PWA can ship first.
+
+**Implementation constraints (from the design review — bake these in):**
+1. **Non-trickle ICE only.** Trickling emits tens of candidates as separate
+   messages; over NIP-04 DMs that's dozens of encrypted events per call setup —
+   relay rate limits + out-of-order delivery. Gather until
+   `icegatheringstate === 'complete'` (bounded by a ~3s timeout), then send ONE
+   `call.offer` / ONE `call.answer` with candidates inlined in the SDP. Setup
+   is a few seconds slower; over relay transport that's the correct trade.
+2. **Stale-offer replay guard.** `watchDMs` backfills up to 7 days of DMs on
+   every launch — an old `call.offer` must never ring on reload. Two layers:
+   the live gate (`createdAt >= watchStartTs - 5`, same as chat) AND a
+   freshness TTL inside the envelope (ring only when `now - offer.ts ≤ 60s`).
+3. **Ringing without a push server (v1 semantics).** Kind-4 DMs arrive only
+   while the app is open; the content-blind push can't open a ringing screen.
+   v1: in-app ringing only, ring timeout ~45s → `call.hangup(missed)` → a
+   "Missed call" line in the chat thread. CallKit / ConnectionService native
+   call UI is a separate, later project.
+4. **Module gating.** 1.5.x binaries lack the WebRTC module — probe
+   (`NativeModules`/TurboModuleRegistry, the cameraModule.ts pattern from
+   crashes #12–15) before any import and hide call buttons when absent. Calls
+   are also gated on an ACTIVE friend-chat conversation (the accept/reject
+   handshake doubles as the call spam gate) and auto-declined when the
+   "Enable calls" toggle is off.
+5. **Desktop (Tauri) is out of scope for v1** — getUserMedia inside
+   WKWebView/webkit2gtk needs entitlements/flags and is unverified.
+6. **Verify Cloudflare Realtime TURN pricing/free allowance** before turning
+   the TURN fallback on by default anywhere; STUN-only is the safe default.
 
 **Effort:** medium-high — WebRTC integration + native module, call UI
 (incoming/outgoing/in-call), signaling over DMs (small, reuses chat), and the

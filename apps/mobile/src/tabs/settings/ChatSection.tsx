@@ -14,11 +14,22 @@ function ChatSection({
   onShowLastSeenChange,
   receipts,
   onReceiptsChange,
+  callsEnabled,
+  onCallsEnabledChange,
+  callsTurn,
+  onCallsTurnChange,
+  callsSupported = true,
 }: {
   showLastSeen: boolean;
   onShowLastSeenChange: (v: boolean) => void;
   receipts: boolean;
   onReceiptsChange: (v: boolean) => void;
+  callsEnabled: boolean;
+  onCallsEnabledChange: (v: boolean) => void;
+  callsTurn: boolean;
+  onCallsTurnChange: (v: boolean) => void;
+  /** False on binaries without the WebRTC module (pre-1.6.0) — row disabled. */
+  callsSupported?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const Toggle = ({ icon, title, desc, value, onChange }: {
@@ -67,6 +78,41 @@ function ChatSection({
             value={receipts}
             onChange={onReceiptsChange}
           />
+          {callsSupported ? (
+            <>
+              <Toggle
+                icon="call-outline"
+                title={t('Enable calls')}
+                desc={t('Audio & video calls with chat friends, peer-to-peer. Off: incoming calls are declined automatically.')}
+                value={callsEnabled}
+                onChange={onCallsEnabledChange}
+              />
+              {callsEnabled && (
+                <>
+                  <Text style={[s.dim, { marginStart: 30 }]}>
+                    {'⚠️ ' + t('Your IP address may be exposed to the person you call.')}
+                  </Text>
+                  <View style={{ marginStart: 20 }}>
+                    <Toggle
+                      icon="swap-horizontal-outline"
+                      title={t('TURN fallback for calls')}
+                      desc={t("When a direct connection fails, relay the call through Cloudflare so it still connects — the other person then can't see your IP. Off: those calls just fail.")}
+                      value={callsTurn}
+                      onChange={onCallsTurnChange}
+                    />
+                  </View>
+                </>
+              )}
+            </>
+          ) : (
+            <View style={[s.toggleRow, { opacity: 0.45 }]}>
+              <Ionicons name="call-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
+              <View style={{ flex: 1, marginEnd: 12 }}>
+                <Text style={s.toggleTitle}>{t('Enable calls')}</Text>
+                <Text style={s.dim}>{t('Calls need a newer app version')}</Text>
+              </View>
+            </View>
+          )}
         </>
       )}
     </>

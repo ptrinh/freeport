@@ -6,3 +6,4 @@ export * from './negotiation.js';
 export * from './matching.js';
 export * from './moderation.js';
 export * from './chat.js';
+export * from './call.js';

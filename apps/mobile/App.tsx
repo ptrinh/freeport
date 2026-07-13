@@ -92,7 +92,11 @@ import { WalletTab } from './src/tabs/WalletTab';
 import { activeWalletProvider } from './src/wallet';
 import { PostTab } from './src/tabs/PostTab';
 import { DealsTab, isImageMsg, isAudioMsg, isTripMsg } from './src/tabs/MessagesTab';
-import { InviteResolvedSheet } from './src/tabs/messages/FriendChat';
+import { InviteResolvedSheet, chatDisplayName } from './src/tabs/messages/FriendChat';
+import { CallManager, type CallState } from './src/calls/manager';
+import { CallOverlay } from './src/calls/CallOverlay';
+import { callsSupported } from './src/calls/webrtc';
+import { defaultAvatarUrl as peerAvatarUrl } from './src/profile';
 import { unreadCount as convUnread, type Conversation } from './src/conversations';
 import { uiAlert } from './src/ui/alerts';
 import { SettingsTab } from './src/tabs/SettingsTab';
@@ -355,6 +359,15 @@ function AppInner() {
   const [experimentalChat, setExperimentalChat] = useState(false);
   const [chatShowLastSeen, setChatShowLastSeen] = useState(false);
   const [chatReceipts, setChatReceipts] = useState(false);
+  const [chatCallsEnabled, setChatCallsEnabled] = useState(false);
+  const [chatCallsTurn, setChatCallsTurn] = useState(false);
+  // Calls: one manager per client; prefs read through a ref so the manager's
+  // event-time reads never see a stale closure.
+  const callPrefsRef = useRef({ callsEnabled: false, turnEnabled: false });
+  useEffect(() => { callPrefsRef.current = { callsEnabled: chatCallsEnabled, turnEnabled: chatCallsTurn }; }, [chatCallsEnabled, chatCallsTurn]);
+  const [callState, setCallState] = useState<CallState>({ phase: 'idle' });
+  const [callStreams, setCallStreams] = useState<{ local: any; remote: any }>({ local: null, remote: null });
+  const callManagerRef = useRef<CallManager | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   // An opened #invite=<code> link, waiting for the client to resolve it.
   const [pendingInviteCode, setPendingInviteCode] = useState<string | null>(() =>
@@ -538,6 +551,8 @@ function AppInner() {
       setExperimentalChat(p.experimentalChat);
       setChatShowLastSeen(p.chatShowLastSeen);
       setChatReceipts(p.chatReceipts);
+      setChatCallsEnabled(p.chatCallsEnabled);
+      setChatCallsTurn(p.chatCallsTurn);
       setWalletNwcUrl(p.walletNwcUrl);
       setWalletUnit(p.walletUnit === 'sats' ? 'local' : p.walletUnit); // header is fiat-only now
       setLocation(p.location);
@@ -1020,6 +1035,36 @@ function AppInner() {
     client?.setChatPrefs({ receipts: chatReceipts, lastSeen: chatShowLastSeen });
   }, [client, chatReceipts, chatShowLastSeen]);
 
+  // Call manager — created per client; torn down (hang up) on client swap.
+  useEffect(() => {
+    if (!client) return;
+    const mgr = new CallManager({
+      send: (peer, env) => client.sendCallSignal(peer, env),
+      prefs: () => callPrefsRef.current,
+      turnEndpoint: () => 'https://turn.freeport.network',
+      onState: setCallState,
+      onStreams: (local, remote) => setCallStreams({ local, remote }),
+      onMissed: (peer, direction) => {
+        client.chatLocalNotice(peer, direction === 'incoming' ? 'in' : 'out',
+          direction === 'incoming' ? '📞 ' + t('Missed call') : '📞 ' + t('No answer'));
+        if (direction === 'incoming' && AppState.currentState !== 'active' && !pushOnRef.current) {
+          notify('Freeport', t('Missed call'), { tab: 'messages' });
+        }
+      },
+    });
+    callManagerRef.current = mgr;
+    client.onCallSignal = (from, env) => {
+      // Ring only while alerts are live (mirrors chat's resume-mute window).
+      if (env.type === 'call.offer' && AppState.currentState === 'active' && Date.now() >= alertsMutedUntil.current) eventAlert();
+      mgr.handleSignal(from, env);
+    };
+    return () => {
+      mgr.hangup();
+      callManagerRef.current = null;
+      setCallState({ phase: 'idle' });
+    };
+  }, [client]);
+
   // Opened invite links (web #hash now; native deep links via Linking).
   useEffect(() => {
     if (Platform.OS === 'web') {
@@ -1299,7 +1344,7 @@ function AppInner() {
       </Animated.View>
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
       {tab === 'post' && <PostTab draft={postDraft} onDraftConsumed={() => setPostDraft(null)} client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} />}
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} onStartCall={chatCallsEnabled && callsSupported() ? (peer, video) => callManagerRef.current?.startCall(peer, video) : undefined} />}
       {tab === 'wallet' && (
         <WalletTab
           unit={walletUnit}
@@ -1343,6 +1388,16 @@ function AppInner() {
           onChatReceiptsChange={(v) => {
             setChatReceipts(v);
             savePrefs({ chatReceipts: v }).catch(() => {});
+          }}
+          chatCallsEnabled={chatCallsEnabled}
+          onChatCallsEnabledChange={(v) => {
+            setChatCallsEnabled(v);
+            savePrefs({ chatCallsEnabled: v }).catch(() => {});
+          }}
+          chatCallsTurn={chatCallsTurn}
+          onChatCallsTurnChange={(v) => {
+            setChatCallsTurn(v);
+            savePrefs({ chatCallsTurn: v }).catch(() => {});
           }}
           requiredLocOk={locOk}
           requiredNotifOk={notifSatisfied}
@@ -1486,6 +1541,28 @@ function AppInner() {
           onScroll={onContentScroll}
         />
       )}
+      {callState.phase !== 'idle' && (() => {
+        const peer = callState.peer ?? '';
+        const conv = conversations.find((c) => c.peer === peer);
+        const name = conv ? chatDisplayName(conv, client) : (client?.profiles.get(peer)?.name || peer.slice(0, 12));
+        const avatar = client?.profiles.get(peer)?.picture || (peer ? peerAvatarUrl(npubFromHex(peer)) : undefined);
+        const mgr = callManagerRef.current;
+        return (
+          <CallOverlay
+            state={callState}
+            localStream={callStreams.local}
+            remoteStream={callStreams.remote}
+            peerName={name}
+            peerAvatar={avatar}
+            onAccept={() => mgr?.acceptCall()}
+            onDecline={() => mgr?.declineCall()}
+            onHangup={() => mgr?.hangup()}
+            onToggleMute={() => mgr?.toggleMute()}
+            onToggleCamera={() => mgr?.toggleCamera()}
+            onDismiss={() => mgr?.dismissEnded()}
+          />
+        );
+      })()}
       {resolvedInvite && (
         <InviteResolvedSheet
           client={client}

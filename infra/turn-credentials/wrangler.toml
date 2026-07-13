@@ -1,0 +1,11 @@
+name = "freeport-turn-credentials"
+main = "worker.js"
+compatibility_date = "2026-07-01"
+account_id = "2edc401e8f3f074f198d7290691817a3"
+
+routes = [
+  { pattern = "turn.freeport.network/*", zone_name = "freeport.network" },
+]
+
+# Secrets (wrangler secret put …): TURN_KEY_ID, TURN_API_TOKEN
+# Create the TURN key in the Cloudflare dashboard: Realtime → TURN.

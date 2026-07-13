@@ -108,7 +108,8 @@ function ExperimentalSection({
               <View style={[s.switchThumb, chatEnabled && s.switchThumbOn]} />
             </View>
           </Pressable>
-          <ComingSoonRow icon="call-outline" title={t('Calls')} desc={t('Peer-to-peer audio & video calls in chat — coming soon.')} />
+          {/* Calls shipped — the toggle lives under Settings → Chat (with the
+              TURN fallback + IP note), per the roadmap spec. */}
           <ComingSoonRow icon="apps-outline" title={t('Mini-apps')} desc={t('Web apps that use your Freeport identity & wallet — coming soon.')} />
           <ComingSoonRow icon="flash-outline" title={t('Zaps')} desc={t('Tip sats to helpful posts and trusted sellers — coming soon.')} />
         </>

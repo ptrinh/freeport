@@ -66,6 +66,7 @@ export function DealsTab({
   chatEnabled = false,
   conversations = [],
   chatReceiptsOn = false,
+  onStartCall,
 }: {
   client: MobileClient | null;
   negos: Negotiation[];
@@ -106,6 +107,8 @@ export function DealsTab({
   conversations?: Conversation[];
   /** Chat receipts toggle — reciprocal: off = we send no acks and show no ticks. */
   chatReceiptsOn?: boolean;
+  /** Start a call from a chat header (present when calls are on + supported). */
+  onStartCall?: (peer: string, video: boolean) => void;
 }) {
   // Friend chat: which conversation is open (peer pubkey) + the invite popup.
   const [openChatPeer, setOpenChatPeer] = useState<string | null>(null);
@@ -282,6 +285,7 @@ export function DealsTab({
         blocked={blockedPubkeys.has(openConv.peer)}
         onToggleBlock={onToggleBlock}
         onClose={() => setOpenChatPeer(null)}
+        onStartCall={onStartCall}
       />
     )}
     {reportNego && (

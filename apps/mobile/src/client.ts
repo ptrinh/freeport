@@ -34,6 +34,10 @@ import {
   makeChatAck,
   mintInviteCode,
   verifyInviteCode,
+  parseCallEnvelope,
+  callOfferFresh,
+  CALL_OFFER,
+  type CallEnvelope,
   type ChatEnvelope,
   applyInbound,
   applyOutbound,
@@ -171,6 +175,14 @@ export class MobileClient {
   private ackTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private ackMax = new Map<string, number>();
   private chatPersistTimer: ReturnType<typeof setTimeout> | null = null;
+  /**
+   * Live call signaling from a peer (see calls/manager.ts). Only fires for:
+   * LIVE events (never the startup backfill — an old offer must not ring),
+   * peers with an ACTIVE friend-chat conversation (handshake = spam gate),
+   * and offers still within their freshness TTL. Answer/hangup replays are
+   * additionally deduped per event id by the manager's call-id check.
+   */
+  onCallSignal?: (from: string, env: CallEnvelope) => void;
 
   constructor(
     private signer: Signer,
@@ -713,7 +725,12 @@ export class MobileClient {
             // here (never via pendingMsgs) so a chat DM can't queue forever
             // waiting on an intent that doesn't exist.
             const chat = parseChatEnvelope(plain);
-            if (chat) this.processChatDM(chat, ev.pubkey, ev.created_at, ev.id);
+            if (chat) {
+              this.processChatDM(chat, ev.pubkey, ev.created_at, ev.id);
+              return;
+            }
+            const call = parseCallEnvelope(plain);
+            if (call) this.processCallDM(call, ev.pubkey, ev.created_at);
           } catch {
             /* not a Freeport DM */
           }
@@ -1051,6 +1068,25 @@ export class MobileClient {
     await this.sendDM(peer, JSON.stringify(env));
   }
 
+  /**
+   * Route an inbound call envelope. Calls are ephemeral: nothing here
+   * persists, and the guards are strict because a stale ring is worse than a
+   * missed one — the DM backfill replays the whole recent window on every
+   * launch/resume.
+   */
+  private processCallDM(env: CallEnvelope, from: string, createdAt: number): void {
+    if (this.blocked.has(from)) return;
+    if (this.conversations.get(from)?.state !== 'active') return; // handshake first — the call spam gate
+    if (createdAt < this.watchStartTs - 5) return;                // backfill replay — never ring old offers
+    if (env.type === CALL_OFFER && !callOfferFresh(env)) return;  // relay-delayed offer past its TTL
+    this.onCallSignal?.(from, env);
+  }
+
+  /** Send one call-signaling envelope (offer/answer/hangup) to a peer. */
+  async sendCallSignal(peer: string, env: CallEnvelope): Promise<void> {
+    await this.sendDM(peer, JSON.stringify(env));
+  }
+
   /** Send a chat request to a resolved invite's pubkey (opener side). */
   async chatInvite(peer: string, myName?: string): Promise<void> {
     const env = makeChatInvite(myName);
@@ -1092,6 +1128,22 @@ export class MobileClient {
     this.commitConversation(updated);
     this.onConversationUpdate?.(updated);
     await this.sendChatEnvelope(peer, env);
+  }
+
+  /**
+   * Append a LOCAL-ONLY line to a conversation (e.g. "Missed call") — never
+   * sent to the peer; it just documents a call event in the thread.
+   */
+  chatLocalNotice(peer: string, dir: 'in' | 'out', text: string): void {
+    const conv = this.conversations.get(peer);
+    if (!conv) return;
+    const updated: Conversation = {
+      ...conv,
+      updatedAt: Math.floor(Date.now() / 1000),
+      messages: [...conv.messages, { dir, text, ts: Math.floor(Date.now() / 1000) }],
+    };
+    this.commitConversation(updated);
+    this.onConversationUpdate?.(updated);
   }
 
   /** Archive/unarchive a conversation (local only — the peer isn't told). */

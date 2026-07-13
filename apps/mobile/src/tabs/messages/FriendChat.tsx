@@ -140,7 +140,7 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
 
 // ─── Conversation screen ─────────────────────────────────────────────────────
 
-export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlock, onClose }: {
+export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlock, onClose, onStartCall }: {
   client: MobileClient | null;
   conv: Conversation;
   /** Receipts toggle (Settings → Chat) — reciprocal: off = no ticks shown either. */
@@ -148,6 +148,8 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
   blocked: boolean;
   onToggleBlock: (pubkey: string) => void;
   onClose: () => void;
+  /** Present when calls are enabled + supported and the conversation is active. */
+  onStartCall?: (peer: string, video: boolean) => void;
 }) {
   // Opening the thread reads it — advances the local mark and (receipts on)
   // tells the peer. Re-run as new messages arrive while the thread is open.
@@ -170,6 +172,16 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
               <Text style={[s.dim, { fontSize: 11 }]}>{t('Last seen {time}', { time: fmtRowTime(lastSeen) })}</Text>
             ) : null}
           </View>
+          {onStartCall && conv.state === 'active' && !blocked ? (
+            <>
+              <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Voice call')} onPress={() => onStartCall(conv.peer, false)}>
+                <Ionicons name="call-outline" size={20} color={palette.text2} />
+              </Pressable>
+              <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Video call')} onPress={() => onStartCall(conv.peer, true)}>
+                <Ionicons name="videocam-outline" size={20} color={palette.text2} />
+              </Pressable>
+            </>
+          ) : null}
           <Pressable
             hitSlop={8}
             accessibilityRole="button" accessibilityLabel={conv.archived ? t('Unarchive chat') : t('Archive chat')}

@@ -47,6 +47,7 @@ import { FareEstimator } from './settings/FareEstimator';
 import { AboutSection } from './settings/AboutSection';
 import { ExperimentalSection } from './settings/ExperimentalSection';
 import { ChatSection } from './settings/ChatSection';
+import { callsSupported } from '../calls/webrtc';
 
 function SettingsTab({
   npub,
@@ -63,6 +64,10 @@ function SettingsTab({
   onChatShowLastSeenChange,
   chatReceipts,
   onChatReceiptsChange,
+  chatCallsEnabled,
+  onChatCallsEnabledChange,
+  chatCallsTurn,
+  onChatCallsTurnChange,
   requiredLocOk,
   requiredNotifOk,
   onDismissNotif,
@@ -119,6 +124,10 @@ function SettingsTab({
   onChatShowLastSeenChange: (v: boolean) => void;
   chatReceipts: boolean;
   onChatReceiptsChange: (v: boolean) => void;
+  chatCallsEnabled: boolean;
+  onChatCallsEnabledChange: (v: boolean) => void;
+  chatCallsTurn: boolean;
+  onChatCallsTurnChange: (v: boolean) => void;
   requiredLocOk: boolean;
   requiredNotifOk: boolean;
   onDismissNotif: () => void;
@@ -917,6 +926,11 @@ function SettingsTab({
           onShowLastSeenChange={onChatShowLastSeenChange}
           receipts={chatReceipts}
           onReceiptsChange={onChatReceiptsChange}
+          callsEnabled={chatCallsEnabled}
+          onCallsEnabledChange={onChatCallsEnabledChange}
+          callsTurn={chatCallsTurn}
+          onCallsTurnChange={onChatCallsTurnChange}
+          callsSupported={callsSupported()}
         />
       )}
 

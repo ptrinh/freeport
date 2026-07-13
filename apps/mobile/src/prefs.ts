@@ -77,6 +77,12 @@ export interface Prefs {
   chatShowLastSeen: boolean;
   /** Chat: delivery/read receipts (reciprocal ticks). Off by default. */
   chatReceipts: boolean;
+  /** Chat: 1:1 audio/video calls (WebRTC). Off = no call buttons AND incoming
+   *  call invites are declined automatically. */
+  chatCallsEnabled: boolean;
+  /** Chat: relay calls through TURN when a direct connection fails. Off =
+   *  direct-only (better IP privacy vs the relay; those calls just fail). */
+  chatCallsTurn: boolean;
 }
 
 const DEFAULTS: Prefs = {
@@ -106,6 +112,8 @@ const DEFAULTS: Prefs = {
   experimentalChat: false,
   chatShowLastSeen: false,
   chatReceipts: false,
+  chatCallsEnabled: false,
+  chatCallsTurn: false,
 };
 
 /** Public-instance hostnames we've renamed. Installs that saved one of these
