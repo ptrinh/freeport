@@ -108,7 +108,9 @@ describe('DM backfill window (dmLastSeen)', () => {
     const first = makeClient();
     await first.client.loadNegotiations();
     first.client.watchDMs();
-    expect(first.reqs.at(-1).since).toBeLessThanOrEqual(now - 7 * 24 * 3600 + 5);
+    // watchDMs subscribes with a filter ARRAY (kind-4 DMs + kind-1059 wraps).
+    const dmFilter = (r: any) => (Array.isArray(r) ? r.find((f: any) => f.kinds?.includes(4)) : r);
+    expect(dmFilter(first.reqs.at(-1)).since).toBeLessThanOrEqual(now - 7 * 24 * 3600 + 5);
 
     // A DM arrives 1h ago → lastSeen persists (via the debounced write).
     first.deliver({ kind: 4, pubkey: A, created_at: now - 3600, content: 'x', id: 'ev1', tags: [] });
@@ -119,7 +121,7 @@ describe('DM backfill window (dmLastSeen)', () => {
     const second = makeClient();
     await second.client.loadNegotiations();
     second.client.watchDMs();
-    const since = second.reqs.at(-1).since;
+    const since = dmFilter(second.reqs.at(-1)).since;
     expect(since).toBeGreaterThan(now - 2 * 24 * 3600); // way inside 7d
     expect(since).toBeLessThanOrEqual(now - 3600 - 24 * 3600 + 5); // behind lastSeen by the margin
   });
