@@ -36,11 +36,15 @@ function ExperimentalSection({
   onWalletEnabledChange,
   servicesEnabled,
   onServicesEnabledChange,
+  chatEnabled,
+  onChatEnabledChange,
 }: {
   walletEnabled: boolean;
   onWalletEnabledChange: (v: boolean) => void;
   servicesEnabled: boolean;
   onServicesEnabledChange: (v: boolean) => void;
+  chatEnabled: boolean;
+  onChatEnabledChange: (v: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -89,7 +93,21 @@ function ExperimentalSection({
               <View style={[s.switchThumb, walletEnabled && s.switchThumbOn]} />
             </View>
           </Pressable>
-          <ComingSoonRow icon="chatbubbles-outline" title={t('Chat')} desc={t('Encrypted 1:1 chat with friends — coming soon.')} />
+          <Pressable
+            accessibilityRole="switch"
+            accessibilityState={{ checked: chatEnabled }}
+            style={s.toggleRow}
+            onPress={() => onChatEnabledChange(!chatEnabled)}
+          >
+            <Ionicons name="chatbubbles-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
+            <View style={{ flex: 1, marginEnd: 12 }}>
+              <Text style={s.toggleTitle}>{t('Chat')}</Text>
+              <Text style={s.dim}>{t('Encrypted 1:1 chat with friends, beyond deals. Invite-based — only people you share your link with can reach you.')}</Text>
+            </View>
+            <View style={[s.switchTrack, chatEnabled && s.switchTrackOn]}>
+              <View style={[s.switchThumb, chatEnabled && s.switchThumbOn]} />
+            </View>
+          </Pressable>
           <ComingSoonRow icon="call-outline" title={t('Calls')} desc={t('Peer-to-peer audio & video calls in chat — coming soon.')} />
           <ComingSoonRow icon="apps-outline" title={t('Mini-apps')} desc={t('Web apps that use your Freeport identity & wallet — coming soon.')} />
           <ComingSoonRow icon="flash-outline" title={t('Zaps')} desc={t('Tip sats to helpful posts and trusted sellers — coming soon.')} />

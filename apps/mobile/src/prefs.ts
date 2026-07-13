@@ -71,6 +71,12 @@ export interface Prefs {
    *  GlitchTip/Aptabase. Scrubbed of all identity/contact/location/content.
    *  On by default; opt out in Settings. */
   telemetryEnabled: boolean;
+  /** Experimental: friend chat (invite-based 1:1 chat, deal-independent). */
+  experimentalChat: boolean;
+  /** Chat: share your last-seen with accepted contacts (reciprocal). Off by default. */
+  chatShowLastSeen: boolean;
+  /** Chat: delivery/read receipts (reciprocal ticks). Off by default. */
+  chatReceipts: boolean;
 }
 
 const DEFAULTS: Prefs = {
@@ -97,6 +103,9 @@ const DEFAULTS: Prefs = {
   customMessage: '',
   autoSendCustomMessage: false,
   telemetryEnabled: true,
+  experimentalChat: false,
+  chatShowLastSeen: false,
+  chatReceipts: false,
 };
 
 /** Public-instance hostnames we've renamed. Installs that saved one of these

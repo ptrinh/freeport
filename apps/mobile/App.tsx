@@ -37,6 +37,8 @@ import {
   MSG_COUNTER,
   MSG_ACCEPT,
   MSG_CHAT,
+  CHAT_INVITE,
+  parseInviteLink,
   type Intent,
   type Negotiation,
 } from '@freeport/protocol';
@@ -90,6 +92,9 @@ import { WalletTab } from './src/tabs/WalletTab';
 import { activeWalletProvider } from './src/wallet';
 import { PostTab } from './src/tabs/PostTab';
 import { DealsTab, isImageMsg, isAudioMsg, isTripMsg } from './src/tabs/MessagesTab';
+import { InviteResolvedSheet } from './src/tabs/messages/FriendChat';
+import { unreadCount as convUnread, type Conversation } from './src/conversations';
+import { uiAlert } from './src/ui/alerts';
 import { SettingsTab } from './src/tabs/SettingsTab';
 import { Onboarding } from './src/tabs/Onboarding';
 
@@ -347,6 +352,15 @@ function AppInner() {
   const [profile, setProfile] = useState<UserProfile>({ name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' });
   const [servicesEnabled, setServicesEnabled] = useState(false);
   const [experimentalWallet, setExperimentalWallet] = useState(false);
+  const [experimentalChat, setExperimentalChat] = useState(false);
+  const [chatShowLastSeen, setChatShowLastSeen] = useState(false);
+  const [chatReceipts, setChatReceipts] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  // An opened #invite=<code> link, waiting for the client to resolve it.
+  const [pendingInviteCode, setPendingInviteCode] = useState<string | null>(() =>
+    Platform.OS === 'web' && typeof window !== 'undefined' ? parseInviteLink(window.location.hash) : null,
+  );
+  const [resolvedInvite, setResolvedInvite] = useState<{ pubkey: string; name?: string } | null>(null);
   const [walletNwcUrl, setWalletNwcUrl] = useState('');
   const [walletUnit, setWalletUnit] = useState<'sats' | 'usd' | 'local'>('local');
   const [postDraft, setPostDraft] = useState<RepostDraft | null>(null);
@@ -521,6 +535,9 @@ function AppInner() {
       const p = await loadPrefs();
       setServicesEnabled(p.servicesEnabled);
       setExperimentalWallet(p.experimentalWallet);
+      setExperimentalChat(p.experimentalChat);
+      setChatShowLastSeen(p.chatShowLastSeen);
+      setChatReceipts(p.chatReceipts);
       setWalletNwcUrl(p.walletNwcUrl);
       setWalletUnit(p.walletUnit === 'sats' ? 'local' : p.walletUnit); // header is fiat-only now
       setLocation(p.location);
@@ -682,6 +699,21 @@ function AppInner() {
           return [i, ...prev.filter((p) => p.d !== i.d)];
         });
       c.onNegotiationUpdate = () => setNegos([...c.negotiations.values()]);
+      c.onConversationUpdate = () => setConversations([...c.conversations.values()]);
+      // Friend chat alerts: ding in the foreground, notify when backgrounded
+      // (mirrors onIncomingMessage; the push server doesn't know about chat
+      // DMs' content either way — envelopes are indistinguishable kind-4s).
+      c.onIncomingChat = (conv, env) => {
+        if (AppState.currentState === 'active') {
+          if (Date.now() >= alertsMutedUntil.current) eventAlert();
+          return;
+        }
+        if (pushOnRef.current) return;
+        const body = env.type === CHAT_INVITE
+          ? t('New chat invite')
+          : (env.text || '').trim().slice(0, 120) || t('New message');
+        notify('Freeport', body, { tab: 'messages' });
+      };
       c.onOutboxChange = (n) => setOutboxPending(n);
       // Local notification for a new inbound DM. Only when backgrounded — the
       // in-app Messages badge already covers the foreground. Content-blind body.
@@ -908,9 +940,14 @@ function AppInner() {
     ? 0
     : negos.filter((n) => n.state === 'confirmed' && n.updatedAt > chatSeenTs).length;
 
+  // Friend chat: unread messages + pending incoming invites join the badge.
+  const chatBadge = !experimentalChat || tab === 'messages'
+    ? 0
+    : conversations.reduce((n, c) => (blocked.has(c.peer) ? n : n + convUnread(c) + (c.state === 'pending_in' ? 1 : 0)), 0);
+
   const pendingCount = negos.filter(
     (n) => n.state === 'open' && n.termsBy === 'them' || n.state === 'accepted_by_them',
-  ).length + expiredNotices.length + unreadChats + unreadDeals;
+  ).length + expiredNotices.length + unreadChats + unreadDeals + chatBadge;
 
   // Listings whose deal (for us) is finished — completed or cancelled/expired —
   // so Browse can hide them: a closed deal shouldn't keep showing as takeable.
@@ -978,6 +1015,42 @@ function AppInner() {
       ? async () => (await activeWalletProvider(walletNwcUrl))?.address() ?? null
       : undefined;
   }, [client, experimentalWallet, walletNwcUrl]);
+  // Receipts/last-seen toggles feed the client (it sends/omits acks accordingly).
+  useEffect(() => {
+    client?.setChatPrefs({ receipts: chatReceipts, lastSeen: chatShowLastSeen });
+  }, [client, chatReceipts, chatShowLastSeen]);
+
+  // Opened invite links (web #hash now; native deep links via Linking).
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      if (typeof window === 'undefined') return;
+      const onHash = () => { const code = parseInviteLink(window.location.hash); if (code) setPendingInviteCode(code); };
+      window.addEventListener('hashchange', onHash);
+      return () => window.removeEventListener('hashchange', onHash);
+    }
+    Linking.getInitialURL().then((u) => { const code = u && parseInviteLink(u); if (code) setPendingInviteCode(code); }).catch(() => {});
+    const sub = Linking.addEventListener('url', (e) => { const code = parseInviteLink(e.url); if (code) setPendingInviteCode(code); });
+    return () => sub.remove();
+  }, []);
+
+  // Resolve the code → inviter pubkey (relays do the lookup; the hash
+  // commitment inside resolveChatInvite discards forged/hijacked codes).
+  useEffect(() => {
+    if (!client || !pendingInviteCode) return;
+    let cancelled = false;
+    client.resolveChatInvite(pendingInviteCode).then((r) => {
+      if (cancelled) return;
+      setPendingInviteCode(null);
+      // Consume the fragment so a reload doesn't re-open the sheet.
+      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location.hash.includes('invite=')) {
+        try { window.history.replaceState(null, '', window.location.pathname + window.location.search); } catch { /* best-effort */ }
+      }
+      if (r) setResolvedInvite(r);
+      else uiAlert(t('Invite not found'), t('This invite link has expired or was revoked.'));
+    });
+    return () => { cancelled = true; };
+  }, [client, pendingInviteCode]);
+
   // The confirm back-flow / poke healer (auto-reply with our contact) — see hook.
   useContactHandshake(client, negos, profile, buildContactFor, resumeTick);
 
@@ -1226,7 +1299,7 @@ function AppInner() {
       </Animated.View>
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} />}
       {tab === 'post' && <PostTab draft={postDraft} onDraftConsumed={() => setPostDraft(null)} client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} />}
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} />}
       {tab === 'wallet' && (
         <WalletTab
           unit={walletUnit}
@@ -1256,6 +1329,21 @@ function AppInner() {
             setExperimentalWallet(v);
             savePrefs({ experimentalWallet: v }).catch(() => {});
           }}
+          experimentalChat={experimentalChat}
+          onExperimentalChatChange={(v) => {
+            setExperimentalChat(v);
+            savePrefs({ experimentalChat: v }).catch(() => {});
+          }}
+          chatShowLastSeen={chatShowLastSeen}
+          onChatShowLastSeenChange={(v) => {
+            setChatShowLastSeen(v);
+            savePrefs({ chatShowLastSeen: v }).catch(() => {});
+          }}
+          chatReceipts={chatReceipts}
+          onChatReceiptsChange={(v) => {
+            setChatReceipts(v);
+            savePrefs({ chatReceipts: v }).catch(() => {});
+          }}
           requiredLocOk={locOk}
           requiredNotifOk={notifSatisfied}
           onDismissNotif={dismissNotif}
@@ -1268,6 +1356,7 @@ function AppInner() {
           onRestore={() => {
             resetIntents();
             setNegos([]);
+            setConversations([]);
             setClient(null);
             setInitVersion((v) => v + 1);
           }}
@@ -1363,7 +1452,7 @@ function AppInner() {
             setRole('');
             setProfile(empty);
             setNpub('');
-            resetIntents(); setNegos([]); setMyIntents([]);
+            resetIntents(); setNegos([]); setMyIntents([]); setConversations([]);
             setClient(null);
             signerRef.current = null;
             setTab('post');
@@ -1389,12 +1478,30 @@ function AppInner() {
             if (useNip07) setUseNip07(false);
             const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
             setRole(''); setProfile(empty); setNpub('');
-            resetIntents(); setNegos([]); setMyIntents([]);
+            resetIntents(); setNegos([]); setMyIntents([]); setConversations([]);
             setExpiredLog([]); setExpiredSeen(new Set());
             setClient(null); signerRef.current = null;
             setTab('post'); setOnboarding(true);
           }}
           onScroll={onContentScroll}
+        />
+      )}
+      {resolvedInvite && (
+        <InviteResolvedSheet
+          client={client}
+          invite={resolvedInvite}
+          myName={profile.name || undefined}
+          onDone={(sent) => {
+            setResolvedInvite(null);
+            if (!sent) return;
+            // Sending an invite implies the user wants the feature.
+            if (!experimentalChat) {
+              setExperimentalChat(true);
+              savePrefs({ experimentalChat: true }).catch(() => {});
+            }
+            setMessagesView('active');
+            setTab('messages');
+          }}
         />
       )}
       <View style={[s.tabbar, { paddingBottom: insets.bottom }]}>

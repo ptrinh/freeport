@@ -247,6 +247,17 @@ bulk is the dual-rail migration and testing across old↔new client pairs
 
 ## Peer-to-peer chat (friend chat) — experimental
 
+**Status (2026-07): v1 core SHIPPED** — experimental toggle, hash-commitment
+invite codes (publish/resolve/rotate over relays), `chat.*` envelope family
+parsed ahead of the negotiation path, conversation store with replay guards,
+FAB + invite QR/link popup, `#invite=` link handling (web hash + native deep
+link), accept/reject handshake, WhatsApp-style rows, archive + block,
+delivery/read receipts + last-seen-via-acks with reciprocal Settings → Chat
+toggles. Still open from the spec below: transport is NIP-04 behind the
+send/watch seam (NIP-17 swap pending), and the `[v1]`-extras/`[later]` feature
+list (in-chat payments, reply, reactions, disappearing, verify safety number,
+note-to-self, polish).
+
 Direct 1:1 chat between users, independent of any deal — reusing the encrypted
 DM transport and chat UI the marketplace already has. Gated behind an
 **Experimental → Chat** switch (a new `experimentalChat` pref, same pattern as

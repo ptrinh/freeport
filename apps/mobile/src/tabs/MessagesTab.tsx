@@ -30,6 +30,8 @@ import { SystemNotice, SlideToConfirm } from '../ui/fields';
 import { ChatThread, CounterEditor, ReportModal, isTripMsg } from './messages/Chat';
 import { KarmaRater, KarmaReceived } from './messages/Karma';
 import { LiveTripShare } from './messages/LiveTripShare';
+import { ChatFab, FriendChatModal, FriendChatSection, InviteSheet } from './messages/FriendChat';
+import { type Conversation } from '../conversations';
 
 // Re-exported so App.tsx keeps importing these from './src/tabs/MessagesTab'.
 export { isImageMsg, isAudioMsg, isTripMsg } from './messages/Chat';
@@ -61,6 +63,9 @@ export function DealsTab({
   customMessage = '',
   blockedPubkeys,
   onToggleBlock,
+  chatEnabled = false,
+  conversations = [],
+  chatReceiptsOn = false,
 }: {
   client: MobileClient | null;
   negos: Negotiation[];
@@ -96,7 +101,16 @@ export function DealsTab({
   blockedPubkeys: Set<string>;
   /** Toggle a peer's blocked state (block ⇄ unblock). */
   onToggleBlock: (pubkey: string) => void;
+  /** Experimental friend chat (Settings → Experimental → Chat). */
+  chatEnabled?: boolean;
+  conversations?: Conversation[];
+  /** Chat receipts toggle — reciprocal: off = we send no acks and show no ticks. */
+  chatReceiptsOn?: boolean;
 }) {
+  // Friend chat: which conversation is open (peer pubkey) + the invite popup.
+  const [openChatPeer, setOpenChatPeer] = useState<string | null>(null);
+  const [showInvite, setShowInvite] = useState(false);
+  const openConv = openChatPeer ? conversations.find((c) => c.peer === openChatPeer) ?? null : null;
   const [counteringId, setCounteringId] = useState<string | null>(null);
   // Our full contact (name · phone [· 🚗 vehicle • plate if we're the driver]),
   // sent on counter-offers too so the peer can phone us mid-negotiation.
@@ -170,6 +184,15 @@ export function DealsTab({
 
   const header = (
     <View>
+      {/* Friend chats (experimental) — pending requests + WhatsApp-style rows. */}
+      {chatEnabled && view === 'active' && (
+        <FriendChatSection
+          client={client}
+          conversations={conversations}
+          blockedPubkeys={blockedPubkeys}
+          onOpen={(peer) => setOpenChatPeer(peer)}
+        />
+      )}
       <View style={[s.segRow, { marginHorizontal: 12, marginTop: 8 }]}>
         {(['active', 'completed'] as const).map((v) => {
           const seg = (
@@ -246,7 +269,21 @@ export function DealsTab({
   const reportNego = reportingId ? negos.find((n) => n.id === reportingId) : null;
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
+    {/* Friend chat overlays (experimental) */}
+    {showInvite && (
+      <InviteSheet client={client} myName={profile.name || undefined} onClose={() => setShowInvite(false)} />
+    )}
+    {openConv && (
+      <FriendChatModal
+        client={client}
+        conv={openConv}
+        receiptsOn={chatReceiptsOn}
+        blocked={blockedPubkeys.has(openConv.peer)}
+        onToggleBlock={onToggleBlock}
+        onClose={() => setOpenChatPeer(null)}
+      />
+    )}
     {reportNego && (
       <ReportModal
         onClose={() => setReportingId(null)}
@@ -874,6 +911,7 @@ export function DealsTab({
         );
       }}
     />
-    </>
+    {chatEnabled && <ChatFab onPress={() => setShowInvite(true)} />}
+    </View>
   );
 }

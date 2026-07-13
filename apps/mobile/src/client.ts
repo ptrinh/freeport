@@ -15,13 +15,26 @@ import { fetchReputation, type Reputation } from './reputation';
 import { buildTrustMap } from './wot';
 import { kvGet, kvSet, kvDelete } from './kv';
 import type { Signer } from './signer';
+import { applyChatInbound, applyChatOutbound, newConversation, type Conversation } from './conversations';
 import {
   DEFAULT_RELAYS,
   KIND_INTENT_OFFER,
   KIND_INTENT_REQUEST,
+  KIND_CHAT_INVITE,
+  CHAT_INVITE,
+  CHAT_MSG,
   buildIntentTemplate,
   parseIntentEvent,
   parseNegotiationMessage,
+  parseChatEnvelope,
+  makeChatInvite,
+  makeChatAccept,
+  makeChatReject,
+  makeChatMsg,
+  makeChatAck,
+  mintInviteCode,
+  verifyInviteCode,
+  type ChatEnvelope,
   applyInbound,
   applyOutbound,
   dedupeNegotiationMessages,
@@ -77,6 +90,14 @@ const DM_BACKFILL_MARGIN_SECONDS = 24 * 3600;
 const DM_BACKFILL_MAX_SECONDS = 7 * 24 * 3600;
 /** Outbox entries older than this are dropped on load — the deal has moved on. */
 const OUTBOX_MAX_AGE_SECONDS = 7 * 24 * 3600;
+/** Persisted friend-chat conversations (experimental Chat feature). */
+const CHAT_STORE_KEY = 'freeport.conversations';
+/** The user's current invite {code, nonce} — one active invite at a time. */
+const CHAT_INVITE_KEY = 'freeport.chatInvite';
+/** Relay-side lifetime of a published invite (NIP-40). Regenerating is cheap. */
+const CHAT_INVITE_TTL_SECONDS = 7 * 24 * 3600;
+/** Coalesce delivered-acks per peer so a message burst sends ONE receipt. */
+const CHAT_ACK_DELAY_MS = 300;
 
 export class MobileClient {
   // enableReconnect: SimplePool transparently re-opens a dropped relay socket
@@ -138,6 +159,18 @@ export class MobileClient {
   onOutboxChange?: (pending: number) => void;
   /** Unix seconds when watchDMs started — used to skip notifying for backfilled history. */
   private watchStartTs = 0;
+
+  // ─── Friend chat (experimental) ────────────────────────────────────────────
+  /** Conversations keyed by peer pubkey (hex). See src/conversations.ts. */
+  readonly conversations = new Map<string, Conversation>();
+  onConversationUpdate?: (conv: Conversation) => void;
+  /** Fires for a genuinely NEW inbound chat envelope (invite or message). */
+  onIncomingChat?: (conv: Conversation, env: ChatEnvelope) => void;
+  /** Receipts/last-seen toggles (Settings → Chat); both reciprocal + off by default. */
+  private chatPrefs = { receipts: false, lastSeen: false };
+  private ackTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private ackMax = new Map<string, number>();
+  private chatPersistTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private signer: Signer,
@@ -301,6 +334,8 @@ export class MobileClient {
     try { await kvDelete(PUBLISHED_STORE_KEY); } catch { /* best-effort */ }
     try { await kvDelete(OUTBOX_STORE_KEY); } catch { /* best-effort */ }
     try { await kvDelete(DM_LAST_SEEN_KEY); } catch { /* best-effort */ }
+    try { await kvDelete(CHAT_STORE_KEY); } catch { /* best-effort */ }
+    try { await kvDelete(CHAT_INVITE_KEY); } catch { /* best-effort */ }
   }
 
   async loadNegotiations(): Promise<void> {
@@ -310,6 +345,7 @@ export class MobileClient {
     } catch { /* first launch */ }
     await this.loadOutbox(); // undelivered DMs from the previous session retry first
     await this.loadPublished(); // restore own posts first so inbound accepts can match
+    await this.loadConversations(); // friend chats (experimental Chat feature)
     try {
       const raw = await kvGet(NEGO_STORE_KEY);
       if (!raw) return;
@@ -669,8 +705,15 @@ export class MobileClient {
           try {
             const plain = await this.signer.nip04Decrypt(ev.pubkey, ev.content);
             const msg = parseNegotiationMessage(plain);
-            if (!msg) return;
-            this.processDM(msg, ev.pubkey, ev.created_at, false, ev.id);
+            if (msg) {
+              this.processDM(msg, ev.pubkey, ev.created_at, false, ev.id);
+              return;
+            }
+            // Not a negotiation envelope — try the friend-chat family. Parsed
+            // here (never via pendingMsgs) so a chat DM can't queue forever
+            // waiting on an intent that doesn't exist.
+            const chat = parseChatEnvelope(plain);
+            if (chat) this.processChatDM(chat, ev.pubkey, ev.created_at, ev.id);
           } catch {
             /* not a Freeport DM */
           }
@@ -944,6 +987,230 @@ export class MobileClient {
   agreeCancel(negoId: string) { return this.sendCancelStep(negoId, makeCancelAgree); }
   /** Decline the cancellation request → deal reverts to confirmed. */
   keepDeal(negoId: string) { return this.sendCancelStep(negoId, makeCancelDecline); }
+
+  // ─── Friend chat (experimental) ────────────────────────────────────────────
+
+  setChatPrefs(prefs: { receipts: boolean; lastSeen: boolean }): void {
+    this.chatPrefs = prefs;
+  }
+
+  private commitConversation(conv: Conversation): void {
+    this.conversations.set(conv.peer, conv);
+    if (this.chatPersistTimer) return;
+    this.chatPersistTimer = setTimeout(() => {
+      this.chatPersistTimer = null;
+      kvSet(CHAT_STORE_KEY, JSON.stringify([...this.conversations.values()])).catch(() => {});
+    }, 250);
+  }
+
+  async loadConversations(): Promise<void> {
+    try {
+      const raw = await kvGet(CHAT_STORE_KEY);
+      if (!raw) return;
+      for (const conv of JSON.parse(raw) as Conversation[]) {
+        if (!conv?.peer) continue;
+        this.conversations.set(conv.peer, conv);
+        this.fetchProfile(conv.peer); // avatar + display name for the row
+        this.onConversationUpdate?.(conv);
+      }
+    } catch { /* corrupt/absent → start empty */ }
+  }
+
+  /** Apply one decrypted inbound chat envelope (see conversations.ts). */
+  private processChatDM(env: ChatEnvelope, from: string, createdAt: number, eventId?: string): void {
+    if (this.blocked.has(from)) return;
+    const updated = applyChatInbound(this.conversations.get(from), env, from, eventId);
+    if (!updated) return;
+    this.commitConversation(updated);
+    this.fetchProfile(from); // avatar + kind:0 name for the chat row
+    this.onConversationUpdate?.(updated);
+    // Live-only side effects — never for the startup backfill replay.
+    if (createdAt < this.watchStartTs - 5) return;
+    if (env.type === CHAT_INVITE || env.type === CHAT_MSG) this.onIncomingChat?.(updated, env);
+    if (env.type === CHAT_MSG && updated.state === 'active') this.queueDeliveredAck(from, env.ts);
+  }
+
+  /** Coalesced delivered-receipt: one ack covers a burst of inbound messages. */
+  private queueDeliveredAck(peer: string, ts: number): void {
+    if (!this.chatPrefs.receipts) return;
+    this.ackMax.set(peer, Math.max(this.ackMax.get(peer) ?? 0, ts));
+    if (this.ackTimers.has(peer)) return;
+    this.ackTimers.set(peer, setTimeout(() => {
+      this.ackTimers.delete(peer);
+      const upTo = this.ackMax.get(peer) ?? 0;
+      this.ackMax.delete(peer);
+      this.sendChatEnvelope(peer, makeChatAck('delivered', upTo, this.lastSeenNow())).catch(() => {});
+    }, CHAT_ACK_DELAY_MS));
+  }
+
+  private lastSeenNow(): number | undefined {
+    return this.chatPrefs.lastSeen ? Math.floor(Date.now() / 1000) : undefined;
+  }
+
+  private async sendChatEnvelope(peer: string, env: ChatEnvelope): Promise<void> {
+    await this.sendDM(peer, JSON.stringify(env));
+  }
+
+  /** Send a chat request to a resolved invite's pubkey (opener side). */
+  async chatInvite(peer: string, myName?: string): Promise<void> {
+    const env = makeChatInvite(myName);
+    const conv = applyChatOutbound(
+      this.conversations.get(peer) ?? newConversation(peer, 'pending_out'),
+      env,
+    );
+    this.commitConversation(conv);
+    this.onConversationUpdate?.(conv);
+    await this.sendChatEnvelope(peer, env);
+  }
+
+  /** Accept a pending incoming chat request. */
+  async chatAccept(peer: string, myName?: string): Promise<void> {
+    const conv = this.conversations.get(peer);
+    if (!conv || conv.state !== 'pending_in') return;
+    const updated = applyChatOutbound(conv, makeChatAccept(myName));
+    this.commitConversation(updated);
+    this.onConversationUpdate?.(updated);
+    await this.sendChatEnvelope(peer, makeChatAccept(myName));
+  }
+
+  /** Reject a pending incoming chat request — the conversation is dropped. */
+  async chatReject(peer: string): Promise<void> {
+    const conv = this.conversations.get(peer);
+    if (!conv || conv.state !== 'pending_in') return;
+    this.conversations.delete(peer);
+    kvSet(CHAT_STORE_KEY, JSON.stringify([...this.conversations.values()])).catch(() => {});
+    this.onConversationUpdate?.({ ...conv, state: 'rejected' });
+    await this.sendChatEnvelope(peer, makeChatReject());
+  }
+
+  /** Send a friend-chat message (active conversation). */
+  async chatSend(peer: string, text: string): Promise<void> {
+    const conv = this.conversations.get(peer);
+    if (!conv || conv.state !== 'active' || !text.trim()) return;
+    const env = makeChatMsg(text.trim());
+    const updated = applyChatOutbound(conv, env);
+    this.commitConversation(updated);
+    this.onConversationUpdate?.(updated);
+    await this.sendChatEnvelope(peer, env);
+  }
+
+  /** Archive/unarchive a conversation (local only — the peer isn't told). */
+  chatSetArchived(peer: string, archived: boolean): void {
+    const conv = this.conversations.get(peer);
+    if (!conv) return;
+    const updated = { ...conv, archived };
+    this.commitConversation(updated);
+    this.onConversationUpdate?.(updated);
+  }
+
+  /**
+   * The user opened this conversation: advance the local read mark and, when
+   * receipts are on, tell the peer (read ack, optionally with our last-seen).
+   */
+  markChatRead(peer: string): void {
+    const conv = this.conversations.get(peer);
+    if (!conv) return;
+    const newestIn = conv.messages.reduce((m, x) => (x.dir === 'in' && x.ts > m ? x.ts : m), 0);
+    if ((conv.myReadTs ?? 0) >= newestIn && newestIn !== 0) return; // already read up to here
+    const updated = { ...conv, myReadTs: Math.max(newestIn, Math.floor(Date.now() / 1000)) };
+    this.commitConversation(updated);
+    this.onConversationUpdate?.(updated);
+    if (this.chatPrefs.receipts && newestIn > 0 && conv.state === 'active') {
+      this.sendChatEnvelope(peer, makeChatAck('read', newestIn, this.lastSeenNow())).catch(() => {});
+    }
+  }
+
+  /**
+   * Get-or-create the user's shareable invite. Publishing is idempotent per
+   * code (addressable d-tag) and refreshes the relay-side TTL, so calling it
+   * every time the invite popup opens keeps the code alive.
+   */
+  async publishChatInvite(name?: string): Promise<{ code: string }> {
+    let stored: { code: string; nonce: string } | null = null;
+    try {
+      const raw = await kvGet(CHAT_INVITE_KEY);
+      if (raw) stored = JSON.parse(raw);
+    } catch { /* mint fresh */ }
+    let invite = stored;
+    if (!invite?.code || !verifyInviteCode(invite.code, this.pubkey, invite.nonce)) {
+      invite = mintInviteCode(this.pubkey);
+      await kvSet(CHAT_INVITE_KEY, JSON.stringify(invite));
+    }
+    await this.publishInviteEvent(invite.code, JSON.stringify({ v: 1, nonce: invite.nonce, ...(name ? { name } : {}) }), CHAT_INVITE_TTL_SECONDS);
+    return { code: invite.code };
+  }
+
+  /** Invalidate the current invite (tombstone its d-tag) and mint a fresh one. */
+  async rotateChatInvite(name?: string): Promise<{ code: string }> {
+    try {
+      const raw = await kvGet(CHAT_INVITE_KEY);
+      const old = raw ? (JSON.parse(raw) as { code: string }) : null;
+      // Same revocation mechanism as intent withdraw: republish the same d with
+      // empty content and a short future expiration (born-expired is dropped).
+      if (old?.code) await this.publishInviteEvent(old.code, '', WITHDRAW_TTL_SECONDS);
+    } catch { /* revoking a lost invite is best-effort */ }
+    const fresh = mintInviteCode(this.pubkey);
+    await kvSet(CHAT_INVITE_KEY, JSON.stringify(fresh));
+    await this.publishInviteEvent(fresh.code, JSON.stringify({ v: 1, nonce: fresh.nonce, ...(name ? { name } : {}) }), CHAT_INVITE_TTL_SECONDS);
+    return { code: fresh.code };
+  }
+
+  private async publishInviteEvent(code: string, content: string, ttlSeconds: number): Promise<void> {
+    const now = Math.floor(Date.now() / 1000);
+    const ev = await this.signer.signEvent({
+      kind: KIND_CHAT_INVITE,
+      created_at: now,
+      tags: [['d', code], ['expiration', String(now + ttlSeconds)]],
+      content,
+    });
+    await Promise.any(this.pool.publish(this.relays, ev));
+  }
+
+  /**
+   * Resolve an invite code → the inviter. Queries relays by d-tag, then
+   * verifies each candidate's hash commitment (author + nonce must produce the
+   * code) so a republished/hijacked code is discarded. Newest valid event wins.
+   */
+  resolveChatInvite(code: string, timeoutMs = 4000): Promise<{ pubkey: string; name?: string } | null> {
+    return new Promise((resolve) => {
+      // Newest event per AUTHOR — a rotation tombstone (empty content) must
+      // supersede that author's older valid invite even when a relay serves
+      // both versions of the addressable event.
+      const latest = new Map<string, Event>();
+      const finish = () => {
+        clearTimeout(timer);
+        try { sub.close(); } catch { /* already closed */ }
+        let best: { pubkey: string; name?: string; createdAt: number } | null = null;
+        const now = Math.floor(Date.now() / 1000);
+        for (const ev of latest.values()) {
+          if (!ev.content) continue; // tombstoned (rotated) invite
+          const exp = Number(ev.tags.find((t) => t[0] === 'expiration')?.[1]);
+          if (Number.isFinite(exp) && exp <= now) continue;
+          try {
+            const body = JSON.parse(ev.content) as { nonce?: string; name?: string };
+            if (!body?.nonce || !verifyInviteCode(code, ev.pubkey, body.nonce)) continue; // forgery or junk
+            if (!best || ev.created_at > best.createdAt) best = { pubkey: ev.pubkey, name: body.name, createdAt: ev.created_at };
+          } catch { /* junk content */ }
+        }
+        resolve(best ? { pubkey: best.pubkey, name: best.name } : null);
+      };
+      const timer = setTimeout(finish, timeoutMs);
+      const sub = this.pool.subscribeMany(
+        this.relays,
+        { kinds: [KIND_CHAT_INVITE], '#d': [code] },
+        {
+          onevent: (ev: Event) => {
+            const cur = latest.get(ev.pubkey);
+            if (cur && cur.created_at > ev.created_at) return;
+            // Same-second rotate: keep the tombstone over the old invite.
+            if (cur && cur.created_at === ev.created_at && !cur.content) return;
+            latest.set(ev.pubkey, ev);
+          },
+          oneose: finish,
+        },
+      );
+    });
+  }
 
   /**
    * Encrypt, sign and send a negotiation DM. Never rejects on relay failure:

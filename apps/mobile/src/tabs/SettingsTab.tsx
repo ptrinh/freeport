@@ -46,6 +46,7 @@ import { NotificationsSection } from './settings/NotificationsSection';
 import { FareEstimator } from './settings/FareEstimator';
 import { AboutSection } from './settings/AboutSection';
 import { ExperimentalSection } from './settings/ExperimentalSection';
+import { ChatSection } from './settings/ChatSection';
 
 function SettingsTab({
   npub,
@@ -56,6 +57,12 @@ function SettingsTab({
   onReplayTour,
   experimentalWallet,
   onExperimentalWalletChange,
+  experimentalChat,
+  onExperimentalChatChange,
+  chatShowLastSeen,
+  onChatShowLastSeenChange,
+  chatReceipts,
+  onChatReceiptsChange,
   requiredLocOk,
   requiredNotifOk,
   onDismissNotif,
@@ -106,6 +113,12 @@ function SettingsTab({
   onReplayTour: () => void;
   experimentalWallet: boolean;
   onExperimentalWalletChange: (v: boolean) => void;
+  experimentalChat: boolean;
+  onExperimentalChatChange: (v: boolean) => void;
+  chatShowLastSeen: boolean;
+  onChatShowLastSeenChange: (v: boolean) => void;
+  chatReceipts: boolean;
+  onChatReceiptsChange: (v: boolean) => void;
   requiredLocOk: boolean;
   requiredNotifOk: boolean;
   onDismissNotif: () => void;
@@ -893,7 +906,19 @@ function SettingsTab({
         onWalletEnabledChange={onExperimentalWalletChange}
         servicesEnabled={servicesEnabled}
         onServicesEnabledChange={onServicesEnabledChange}
+        chatEnabled={experimentalChat}
+        onChatEnabledChange={onExperimentalChatChange}
       />
+
+      {/* Chat settings — its own section, only while the experiment is on. */}
+      {experimentalChat && (
+        <ChatSection
+          showLastSeen={chatShowLastSeen}
+          onShowLastSeenChange={onChatShowLastSeenChange}
+          receipts={chatReceipts}
+          onReceiptsChange={onChatReceiptsChange}
+        />
+      )}
 
       <AboutSection onReplayTour={onReplayTour} />
 

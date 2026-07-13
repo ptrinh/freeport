@@ -33,6 +33,36 @@ export const KIND_KARMA = 32103;
  * a deal alone. Karma events are only counted against a proven receipt pair.
  */
 export const KIND_DEAL_RECEIPT = 32104;
+/**
+ * Friend-chat invite — addressable by (pubkey, kind, d-tag) where d is a short
+ * invite code. The code is a HASH COMMITMENT to the inviter's pubkey
+ * (base32(sha256(pubkey ‖ nonce))[:10]), NOT a random string: d-tags are only
+ * unique per (kind, pubkey, d), so anyone could republish the same code under
+ * their own key. Resolvers recompute the hash from each candidate's author +
+ * nonce and discard events whose author doesn't match — a hijacked code is
+ * unresolvable by construction. Revoked by republishing the same d empty
+ * (the intent-withdraw mechanism). See docs/ROADMAP.md (friend chat).
+ */
+export const KIND_CHAT_INVITE = 32105;
+
+/**
+ * Friend-chat envelope types — JSON inside encrypted DMs, like the negotiation
+ * envelopes but keyed purely on the peer pubkey (no intent). Parsed BEFORE the
+ * negotiation path; clients that predate chat drop them silently.
+ */
+export const CHAT_INVITE = 'chat.invite';
+export const CHAT_ACCEPT = 'chat.accept';
+export const CHAT_REJECT = 'chat.reject';
+export const CHAT_MSG = 'chat.msg';
+/** Delivery/read receipt; also carries last-seen (only to accepted contacts). */
+export const CHAT_ACK = 'chat.ack';
+
+export type ChatMsgType =
+  | typeof CHAT_INVITE
+  | typeof CHAT_ACCEPT
+  | typeof CHAT_REJECT
+  | typeof CHAT_MSG
+  | typeof CHAT_ACK;
 
 export const MSG_COUNTER = 'negotiate.counter';
 export const MSG_ACCEPT = 'negotiate.accept';

@@ -72,10 +72,13 @@ const ChatBubble = React.memo(function ChatBubble({
   text,
   dir,
   onZoom,
+  tick,
 }: {
   text: string;
   dir: 'in' | 'out';
   onZoom: (uri: string) => void;
+  /** WhatsApp-style receipt on outbound bubbles (friend chat, receipts on). */
+  tick?: 'sent' | 'delivered' | 'read' | null;
 }) {
   return (
     <View style={[s.chatBubble, dir === 'out' ? s.chatOut : s.chatIn]}>
@@ -94,15 +97,35 @@ const ChatBubble = React.memo(function ChatBubble({
             <Text style={[s.trackMsgText, dir === 'out' && s.chatTextOut]}>{t('Track live location')}</Text>
           </Pressable>
         : <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn]}>{text}</Text>}
+      {dir === 'out' && tick ? (
+        <View style={{ alignSelf: 'flex-end', marginTop: 2 }}>
+          <Ionicons
+            name={tick === 'sent' ? 'checkmark' : 'checkmark-done'}
+            size={13}
+            color={tick === 'read' ? '#4ade80' : 'rgba(245,247,250,0.75)'}
+          />
+        </View>
+      ) : null}
     </View>
   );
 });
 
-export function ChatThread({ nego, onSend, quickReplies }: {
-  nego: Negotiation;
+/**
+ * The transport-agnostic chat surface: message list (collapsed preview),
+ * quick replies, text/photo/voice input, image viewer. Used by both the deal
+ * chat (ChatThread, bound to a Negotiation) and the friend chat (bound to a
+ * Conversation) — keep it free of either model.
+ */
+export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title }: {
+  messages: { dir: 'in' | 'out'; text: string; ts: number; id?: string }[];
   onSend: (text: string) => Promise<void>;
   /** Grab-style one-tap replies rendered above the input ("I am here ✅", …). */
   quickReplies?: { label: string; text: string }[];
+  emptyHint?: string;
+  /** Receipt tick for an outbound message ts (friend chat with receipts on). */
+  tickFor?: (ts: number) => 'sent' | 'delivered' | 'read';
+  /** Optional heading inside the box (the deal chat shows "Chat"). */
+  title?: string;
 }) {
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
@@ -110,7 +133,7 @@ export function ChatThread({ nego, onSend, quickReplies }: {
   const [recording, setRecording] = useState(false);
   const [viewerUri, setViewerUri] = useState<string | null>(null);
   const [showAllMsgs, setShowAllMsgs] = useState(false);
-  const msgs = nego.messages ?? [];
+  const msgs = messages;
   // Keep the thread compact: show only the most recent few, with a tap to reveal
   // the rest. Otherwise a long conversation pushes the input box far down the card.
   const CHAT_PREVIEW = 5;
@@ -167,9 +190,9 @@ export function ChatThread({ nego, onSend, quickReplies }: {
 
   return (
     <View style={s.chatBox}>
-      <Text style={s.chatTitle}>{t("Chat")}</Text>
+      {title ? <Text style={s.chatTitle}>{title}</Text> : null}
       {msgs.length === 0 ? (
-        <Text style={s.dim}>{t("Send a message to coordinate the pickup.")}</Text>
+        <Text style={s.dim}>{emptyHint ?? t("Send a message to coordinate the pickup.")}</Text>
       ) : (
         <>
           {collapsedMsgs && (
@@ -184,7 +207,7 @@ export function ChatThread({ nego, onSend, quickReplies }: {
             // duplicated the last bubble — and the constant tear-down/rebuild
             // thrashed layout while scrolling. ts is epoch *seconds* so two quick
             // messages can share one; disambiguate with dir + index.
-            <ChatBubble key={m.id ?? `${m.ts}-${m.dir}-${i}`} text={m.text} dir={m.dir} onZoom={setViewerUri} />
+            <ChatBubble key={m.id ?? `${m.ts}-${m.dir}-${i}`} text={m.text} dir={m.dir} onZoom={setViewerUri} tick={m.dir === 'out' ? tickFor?.(m.ts) : null} />
           ))}
         </>
       )}
@@ -247,6 +270,15 @@ export function ChatThread({ nego, onSend, quickReplies }: {
       </Modal>
     </View>
   );
+}
+
+/** Free-text chat for a confirmed deal — the Negotiation-bound wrapper. */
+export function ChatThread({ nego, onSend, quickReplies }: {
+  nego: Negotiation;
+  onSend: (text: string) => Promise<void>;
+  quickReplies?: { label: string; text: string }[];
+}) {
+  return <ChatCore title={t('Chat')} messages={nego.messages ?? []} onSend={onSend} quickReplies={quickReplies} />;
 }
 
 export function CounterEditor({
