@@ -39,6 +39,12 @@ import {
   makeChatTtl,
   mintInviteCode,
   verifyInviteCode,
+  KIND_PRODUCT,
+  buildProductTemplate,
+  buildProductRemovalTemplate,
+  parseProductEvent,
+  type BuildProductInput,
+  type Product,
   parseCallEnvelope,
   callOfferFresh,
   CALL_OFFER,
@@ -125,6 +131,11 @@ export class MobileClient {
   readonly reputations = new Map<string, Reputation>();
   /** Recently seen market intents (others'), for client-side price suggestions. */
   readonly marketIntents = new Map<string, Intent>();
+  /** Storefront products keyed by `${pubkey}|${d}` (latest addressable wins). */
+  readonly products = new Map<string, Product>();
+  onProduct?: (product: Product) => void;
+  /** A product of OURS was removed (tombstone echoed back / local remove). */
+  onProductRemoved?: (pubkey: string, d: string) => void;
   /** Per-viewer web-of-trust weights, built once at startup. */
   private trustPromise: Promise<Map<string, number>> | null = null;
   /** Nego IDs whose receipt we already published. */
@@ -694,6 +705,64 @@ export class MobileClient {
       this.sendDM(updated.peer, JSON.stringify(msg)).catch(() => { /* best-effort */ });
       this.onNegotiationUpdate?.(updated);
     }
+  }
+
+  /**
+   * Watch storefront products (NIP-15 kind 30018) on our market tags.
+   * Addressable: a newer event per (pubkey, d) replaces the older one; a
+   * TOMBSTONE (empty content) removes the product from the map.
+   */
+  watchShops(market: string | string[]): () => void {
+    const markets = Array.isArray(market) ? market : [market];
+    const sub = this.pool.subscribeMany(
+      this.relays,
+      { kinds: [KIND_PRODUCT], '#t': markets },
+      {
+        onevent: (ev: Event) => {
+          const d = ev.tags.find((t) => t[0] === 'd')?.[1];
+          if (!d) return;
+          const key = ev.pubkey + '|' + d;
+          const cur = this.products.get(key);
+          if (cur && cur.createdAt >= ev.created_at) return; // stale replay
+          const product = parseProductEvent(ev);
+          if (!product) {
+            // Tombstone (or junk) NEWER than what we show — drop the listing.
+            if (cur) {
+              this.products.delete(key);
+              this.onProductRemoved?.(ev.pubkey, d);
+            }
+            return;
+          }
+          if (!screenIntentContent('service/1', product.content.name, { notes: product.content.description }).allowed) return;
+          this.products.set(key, product);
+          this.fetchProfile(product.pubkey);
+          this.onProduct?.(product);
+        },
+      },
+    );
+    return () => sub.close();
+  }
+
+  /** Publish (or edit — same d) one of OUR products. */
+  async publishProduct(input: BuildProductInput): Promise<Product> {
+    const verdict = screenIntent(undefined, input.name, undefined, input.description);
+    if (!verdict.allowed) throw new Error(verdict.reason ?? 'This listing is not allowed.');
+    const tmpl = buildProductTemplate(input);
+    const ev = await this.signer.signEvent({ kind: tmpl.kind, created_at: tmpl.created_at, tags: tmpl.tags, content: tmpl.content });
+    const product = parseProductEvent(ev)!;
+    this.products.set(product.pubkey + '|' + product.d, product);
+    await Promise.any(this.pool.publish(this.relays, ev));
+    this.onProduct?.(product);
+    return product;
+  }
+
+  /** Remove one of OUR products (tombstone its d-tag). */
+  async removeProduct(d: string, market: string): Promise<void> {
+    const tmpl = buildProductRemovalTemplate(d, market);
+    const ev = await this.signer.signEvent({ kind: tmpl.kind, created_at: tmpl.created_at, tags: tmpl.tags, content: tmpl.content });
+    this.products.delete(this.pubkey + '|' + d);
+    await Promise.any(this.pool.publish(this.relays, ev));
+    this.onProductRemoved?.(this.pubkey, d);
   }
 
   /** Replace the set of blocked peer pubkeys (hex). Inbound DMs from them are dropped. */

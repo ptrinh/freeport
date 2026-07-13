@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { type Intent, type ProposedTerms } from '@freeport/protocol';
+import { type Intent, type Product, type ProposedTerms } from '@freeport/protocol';
 import { AreaMap } from '../Map';
 import { t, tn } from '../i18n';
 import { MobileClient } from '../client';
@@ -29,6 +29,7 @@ import { maskPhone, isDisplayablePhone } from '../profile';
 import { getPow } from 'nostr-tools/nip13';
 import { s, palette } from '../ui/theme';
 import { fetchZapTotals } from '../zaps';
+import { ShopsView } from './ShopsView';
 import { defaultIntentTime, timeToWindow, parsePayment, fmtWindow, extractPhone, myPostTitle, primaryGeohash, fmtPayment } from '../ui/format';
 import { uiAlert, openMaps } from '../ui/alerts';
 import { Row, DurationField, TimeField, PaymentField, Field, type IoniconName } from '../ui/fields';
@@ -47,6 +48,10 @@ export function MarketTab({
   onScroll,
   walletEnabled = false,
   onZap,
+  products = [],
+  onChatSeller,
+  shopMarket = '',
+  shopCurrency = 'USD',
 }: {
   intents: Intent[];
   client: MobileClient | null;
@@ -62,6 +67,11 @@ export function MarketTab({
   /** Zaps (NIP-57): tip the poster — shown when their profile carries lud16. */
   walletEnabled?: boolean;
   onZap?: (intent: Intent) => void;
+  /** Storefronts (NIP-15) — shown as a Shops segment when services are on. */
+  products?: Product[];
+  onChatSeller?: (pubkey: string) => void;
+  shopMarket?: string;
+  shopCurrency?: string;
 }) {
   const country = location.country;
   // Resolve the unit HERE from the raw preference + this tab's own location —
@@ -69,6 +79,9 @@ export function MarketTab({
   // show miles while Settings says km (user report).
   const distanceUnit = effectiveUnit(distanceUnitPref, country);
   const [mapOpenId, setMapOpenId] = useState<string | null>(null);
+  // Posts ⇄ Shops segment (storefronts ride the services vertical).
+  const shopsEnabled = servicesEnabled && !!onChatSeller;
+  const [browseView, setBrowseView] = useState<'posts' | 'shops'>('posts');
   const [respondingId, setRespondingId] = useState<string | null>(null);
   const [respondedIds, setRespondedIds] = useState<Set<string>>(new Set());
   const [keyword, setKeyword] = useState('');
@@ -241,6 +254,29 @@ export function MarketTab({
 
   return (
     <View style={{ flex: 1 }}>
+      {/* Storefronts: Posts ⇄ Shops segment (services vertical only). */}
+      {shopsEnabled && (
+        <View style={[s.segRow, { marginHorizontal: 12, marginTop: 8 }]}>
+          {(['posts', 'shops'] as const).map((v) => (
+            <Pressable key={v} onPress={() => setBrowseView(v)} style={[s.seg, browseView === v && s.segActive, { flex: 1 }]}>
+              <Ionicons name={v === 'posts' ? 'megaphone-outline' : 'storefront-outline'} size={15} color={browseView === v ? palette.chipBlueText : palette.dim} style={{ marginEnd: 6 }} />
+              <Text style={[s.segText, browseView === v && s.segTextActive]}>{v === 'posts' ? t('Posts') : t('Shops')}</Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
+      {shopsEnabled && browseView === 'shops' ? (
+        <ShopsView
+          client={client}
+          products={products}
+          myPubkey={client?.pubkey ?? ''}
+          market={shopMarket}
+          defaultCurrency={shopCurrency}
+          onChatSeller={onChatSeller!}
+          onScroll={onScroll}
+        />
+      ) : (
+      <>
       <View style={s.searchBar}>
         <View style={s.searchInputWrap}>
           <Ionicons name="search" size={16} color={palette.dim} />
@@ -590,6 +626,8 @@ export function MarketTab({
         </Pressable>
       </View>
     </Modal>
+    </>
+    )}
     </View>
   );
 }

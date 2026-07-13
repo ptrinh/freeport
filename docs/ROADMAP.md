@@ -519,6 +519,16 @@ be explicit opt-in (it sees your request text).
 
 ## Persistent storefronts (NIP-15)
 
+**Status (2026-07): v1 SHIPPED.** Products are NIP-15 kind-30018 addressable
+events carrying our market `t` tag (interops with other Nostr Market clients;
+edits republish the same d, removal tombstones it — the intent-withdraw
+pattern). Browse gains a Posts ⇄ Shops segment (services vertical): shops
+grouped by seller with a "Chat with seller" conversational checkout (friend-
+chat request — negotiation, in-chat ⚡ payment and reputation reuse the
+existing rails), plus a "My shop" editor (add/edit/remove, photo upload,
+moderation-screened). Remaining: NIP-15 stalls (kind 30017), quantities/
+sold-out, shop search/categories, per-shop zap totals.
+
 Today providers post one-off intents. A standing **shop** — a seller's catalog
 as addressable events (NIP-15 Nostr Market: stalls + products) — lets them list
 durable offerings that stay browsable, not just a single request that expires.

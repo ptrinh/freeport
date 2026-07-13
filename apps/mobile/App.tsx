@@ -40,6 +40,7 @@ import {
   CHAT_INVITE,
   parseInviteLink,
   type Intent,
+  type Product,
   type Negotiation,
 } from '@freeport/protocol';
 import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, restoreNsec } from './src/identity';
@@ -381,6 +382,8 @@ function AppInner() {
   const [walletPrefill, setWalletPrefill] = useState<{ mode?: 'send' | 'receive'; dest?: string; hint?: string; fiatAmount?: number; fiatCurrency?: string; memo?: string } | null>(null);
   /** Post being zapped (NIP-57) — opens the amount sheet. */
   const [zapTarget, setZapTarget] = useState<Intent | null>(null);
+  /** Storefront products (NIP-15), keyed upstream by (pubkey, d). */
+  const [products, setProducts] = useState<Product[]>([]);
   const [location, setLocation] = useState<UserLocation>({ country: '', state: '', city: '' });
   // Mirror the latest location so the async launch auto-detect can tell whether
   // the user has manually changed it (e.g. picked a place during onboarding)
@@ -718,6 +721,8 @@ function AppInner() {
         });
       c.onNegotiationUpdate = () => setNegos([...c.negotiations.values()]);
       c.onConversationUpdate = () => setConversations([...c.conversations.values()]);
+      c.onProduct = () => setProducts([...c.products.values()]);
+      c.onProductRemoved = () => setProducts([...c.products.values()]);
       // Friend chat alerts: ding in the foreground, notify when backgrounded
       // (mirrors onIncomingMessage; the push server doesn't know about chat
       // DMs' content either way — envelopes are indistinguishable kind-4s).
@@ -850,7 +855,9 @@ function AppInner() {
     resetIntents();
     const markets = servicesEnabled ? [DEMO_MARKET, SERVICE_MARKET] : [DEMO_MARKET];
     const unsub = client.watchMarket(markets);
-    return unsub;
+    // Storefronts ride the services vertical — same market tag.
+    const unsubShops = servicesEnabled ? client.watchShops(SERVICE_MARKET) : null;
+    return () => { unsub(); unsubShops?.(); };
   }, [client, servicesEnabled, resumeTick]);
 
   // Watch incoming DMs (offers/messages). Re-subscribed on resume so a fresh
@@ -1368,7 +1375,14 @@ function AppInner() {
           </Pressable>
         ) : null}
       </Animated.View>
-      {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} walletEnabled={experimentalWallet} onZap={(i) => setZapTarget(i)} />}
+      {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} walletEnabled={experimentalWallet} onZap={(i) => setZapTarget(i)} products={products} shopMarket={SERVICE_MARKET} shopCurrency={defaultCurrency} onChatSeller={(pubkey) => {
+        // Conversational checkout: a chat request to the seller. Implies the
+        // Chat experiment (same consent model as opening an invite link).
+        if (!experimentalChat) { setExperimentalChat(true); savePrefs({ experimentalChat: true }).catch(() => {}); }
+        client?.chatInvite(pubkey, profile.name || undefined).catch(() => {});
+        setMessagesView('active');
+        setTab('messages');
+      }} />}
       {tab === 'post' && <PostTab draft={postDraft} onDraftConsumed={() => setPostDraft(null)} client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
       {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} onStartCall={chatCallsEnabled && callsSupported() ? (peer, video) => callManagerRef.current?.startCall(peer, video) : undefined} onPayFriend={(peer, payAddress) => { setWalletPrefill({ mode: 'send', dest: payAddress }); setTab('wallet'); }} />}
       {tab === 'wallet' && (
@@ -1438,6 +1452,7 @@ function AppInner() {
             resetIntents();
             setNegos([]);
             setConversations([]);
+            setProducts([]);
             setClient(null);
             setInitVersion((v) => v + 1);
           }}
