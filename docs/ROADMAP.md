@@ -306,6 +306,36 @@ toggles appear once Chat is enabled:
   reciprocally, don't see others' ticks. Both toggles default OFF (privacy-first,
   consistent with the rest of Freeport).
 
-**Effort:** medium. Transport + `ChatThread` reuse is small; the Conversation
-model/store, the invite publish+resolve flow, the deeplink handling, the
-FAB + accept/reject UX, and the last-seen/receipts acks are the bulk.
+**Chat feature set (Telegram/WhatsApp parity, filtered to what fits P2P).**
+Ordered by value-for-effort; `[v1]` ship with the first cut, `[later]` follow-ups.
+
+1. **In-chat payments** `[v1]` — the standout combo: you already know the peer's
+   pubkey and (via Contacts / their invite) a pay address, and the wallet
+   exists. A **Send** action in the chat opens the wallet Send flow prefilled
+   for this peer (sats / USDT). Nothing Telegram/WhatsApp do self-custodially.
+2. **Reply / quote** `[v1]` — a reply-to reference in the message payload,
+   rendered as a quoted snippet above the bubble.
+3. **Reactions (emoji)** `[v1]` — NIP-25-style reactions, but encrypted like the
+   DMs (an ack-style message carrying the target id + emoji).
+4. **Disappearing messages (TTL)** `[v1]` — per-conversation timer; messages
+   auto-delete locally after the timer. Client-side expiry is exact on your
+   device; the peer's deletion is a request (best-effort, like any e2e app).
+   Strong fit for the privacy ethos.
+5. **Verify safety number** `[later]` — a Signal-style screen to compare pubkey
+   fingerprints (or scan each other's) and mark a contact verified. Leans into
+   "own your identity"; small.
+6. **Note-to-self (Saved messages)** `[later]` — a conversation with your own
+   pubkey for quick notes; nearly free once the Conversation model exists.
+7. **Polish** `[later]` — per-chat mute, in-history search (over decrypted
+   messages, local), pin a message, forward a message, and share a friend's
+   invite. All small, independent additions.
+
+Deliberately deferred / out of scope: **group chat** (encrypted groups over
+Nostr are an unsolved-ish problem — MLS/NIP-104 is still maturing; big lift),
+**edit/unsend** (Nostr NIP-09 deletion is best-effort — peers may have cached),
+and sticker/GIF stores + large media CDNs (hosting cost, not core).
+
+**Effort:** medium for the v1 cut. Transport + `ChatThread` reuse is small; the
+Conversation model/store, the invite publish+resolve flow, the deeplink
+handling, the FAB + accept/reject UX, the last-seen/receipts acks, and the
+`[v1]` features (in-chat pay, reply, reactions, disappearing) are the bulk.
