@@ -33,6 +33,15 @@ export interface CallState {
   startedAt?: number;
   muted?: boolean;
   cameraOff?: boolean;
+  /** Web: currently sending the screen instead of the camera. */
+  sharingScreen?: boolean;
+}
+
+/** Screen share rides replaceTrack on the EXISTING video sender — no
+ *  renegotiation round over the DM channel. Web-only (getDisplayMedia);
+ *  native needs ReplayKit/MediaProjection (see roadmap). */
+export function screenShareSupported(): boolean {
+  return typeof (globalThis as any).navigator?.mediaDevices?.getDisplayMedia === 'function';
 }
 
 const IDLE: CallState = { phase: 'idle' };
@@ -84,6 +93,8 @@ export class CallManager {
   private remoteStream: any = null;
   private pendingOfferSdp: string | null = null;
   private ringTimer: ReturnType<typeof setTimeout> | null = null;
+  private screenTrack: any = null;
+  private cameraTrack: any = null;
 
   constructor(private deps: CallManagerDeps) {}
 
@@ -280,6 +291,37 @@ export class CallManager {
     this.setState({ ...this.state, cameraOff });
   }
 
+  /**
+   * Toggle screen sharing (web, during a VIDEO call): swap the outgoing video
+   * track via sender.replaceTrack — same m-line, so no renegotiation and no
+   * extra signaling round over the relays. Ending the browser share (its own
+   * "stop sharing" chrome) reverts to the camera automatically.
+   */
+  async toggleScreenShare(): Promise<void> {
+    if (this.state.phase !== 'active' || !this.state.video || !this.pc) return;
+    if (!screenShareSupported()) return;
+    const sender = this.pc.getSenders?.().find((sn: any) => sn.track?.kind === 'video');
+    if (!sender) return;
+    if (this.state.sharingScreen) {
+      try { this.screenTrack?.stop(); } catch { /* already stopped */ }
+      this.screenTrack = null;
+      if (this.cameraTrack) await sender.replaceTrack(this.cameraTrack);
+      this.setState({ ...this.state, sharingScreen: false });
+      return;
+    }
+    try {
+      const display = await (globalThis as any).navigator.mediaDevices.getDisplayMedia({ video: true });
+      const track = display.getVideoTracks()[0];
+      if (!track) return;
+      this.cameraTrack = sender.track;
+      this.screenTrack = track;
+      await sender.replaceTrack(track);
+      // Browser "Stop sharing" chrome ends the track — revert to camera.
+      track.onended = () => { this.toggleScreenShare().catch(() => {}); };
+      this.setState({ ...this.state, sharingScreen: true });
+    } catch { /* user dismissed the picker */ }
+  }
+
   /** Clear an 'ended' banner back to idle (UI dismiss). */
   dismissEnded(): void {
     if (this.state.phase === 'ended') this.setState(IDLE);
@@ -287,6 +329,9 @@ export class CallManager {
 
   private teardown(): void {
     this.pendingOfferSdp = null;
+    try { this.screenTrack?.stop(); } catch { /* platform quirks */ }
+    this.screenTrack = null;
+    this.cameraTrack = null;
     try { for (const tr of this.localStream?.getTracks?.() ?? []) tr.stop(); } catch { /* platform quirks */ }
     try { this.pc?.close(); } catch { /* already closed */ }
     this.pc = null;

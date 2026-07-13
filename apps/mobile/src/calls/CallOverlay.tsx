@@ -8,7 +8,7 @@ import { Image, Modal, Platform, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../i18n';
 import { loadRTC, type RTC } from './webrtc';
-import type { CallState } from './manager';
+import { screenShareSupported, type CallState } from './manager';
 
 /** Cross-platform stream renderer: RTCView natively, a DOM <video> on web.
  *  On web this is ALSO the audio sink — rendered (hidden) for voice calls. */
@@ -42,7 +42,7 @@ function RoundBtn({ icon, bg, label, onPress }: { icon: any; bg: string; label: 
   );
 }
 
-export function CallOverlay({ state, localStream, remoteStream, peerName, peerAvatar, onAccept, onDecline, onHangup, onToggleMute, onToggleCamera, onDismiss }: {
+export function CallOverlay({ state, localStream, remoteStream, peerName, peerAvatar, onAccept, onDecline, onHangup, onToggleMute, onToggleCamera, onToggleScreenShare, onDismiss }: {
   state: CallState;
   localStream: any;
   remoteStream: any;
@@ -53,6 +53,7 @@ export function CallOverlay({ state, localStream, remoteStream, peerName, peerAv
   onHangup: () => void;
   onToggleMute: () => void;
   onToggleCamera: () => void;
+  onToggleScreenShare?: () => void;
   onDismiss: () => void;
 }) {
   const [rtc, setRtc] = useState<RTC | null>(null);
@@ -132,6 +133,9 @@ export function CallOverlay({ state, localStream, remoteStream, peerName, peerAv
               <RoundBtn icon={state.muted ? 'mic-off' : 'mic'} bg={state.muted ? '#b45309' : '#334155'} label={state.muted ? t('Unmute') : t('Mute')} onPress={onToggleMute} />
               {state.video ? (
                 <RoundBtn icon={state.cameraOff ? 'videocam-off' : 'videocam'} bg={state.cameraOff ? '#b45309' : '#334155'} label={t('Toggle camera')} onPress={onToggleCamera} />
+              ) : null}
+              {state.video && state.phase === 'active' && onToggleScreenShare && screenShareSupported() ? (
+                <RoundBtn icon={state.sharingScreen ? 'stop-circle' : 'share-outline'} bg={state.sharingScreen ? '#b45309' : '#334155'} label={state.sharingScreen ? t('Stop sharing screen') : t('Share screen')} onPress={onToggleScreenShare} />
               ) : null}
               <RoundBtn icon="call" bg="#dc2626" label={t('Hang up')} onPress={onHangup} />
             </>

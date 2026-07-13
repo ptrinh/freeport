@@ -1,7 +1,7 @@
 /** Friend-chat conversation state machine (pure reducer — no client/relay). */
 import { describe, it, expect } from 'vitest';
-import { makeChatAccept, makeChatAck, makeChatInvite, makeChatMsg, makeChatReject } from '@freeport/protocol';
-import { applyChatInbound, applyChatOutbound, newConversation, tickFor, unreadCount, type Conversation } from '../src/conversations';
+import { makeChatAccept, makeChatAck, makeChatInvite, makeChatMsg, makeChatReact, makeChatReject, makeChatTtl } from '@freeport/protocol';
+import { applyChatInbound, applyChatOutbound, newConversation, sweepExpired, tickFor, unreadCount, type Conversation } from '../src/conversations';
 
 const PEER = 'f'.repeat(64);
 
@@ -101,5 +101,54 @@ describe('receipts (acks)', () => {
   it('acks are ignored outside an active conversation', () => {
     const pending = applyChatInbound(undefined, makeChatInvite(), PEER, 'a5')!;
     expect(applyChatInbound(pending, makeChatAck('read', 10), PEER, 'a6')).toBeNull();
+  });
+});
+
+
+describe('chat extras (reply / reactions / TTL / pay)', () => {
+  const active = (): Conversation => ({ ...newConversation(PEER, 'active'), messages: [] });
+
+  it('invite/accept carry the lightning address', () => {
+    const conv = applyChatInbound(undefined, makeChatInvite('Alice', 'alice@freeport.network'), PEER, 'p1')!;
+    expect(conv.theirPay).toBe('alice@freeport.network');
+    const out = applyChatOutbound(newConversation(PEER, 'pending_out'), makeChatInvite());
+    const accepted = applyChatInbound(out, makeChatAccept('Bob', 'bob@freeport.network'), PEER, 'p2')!;
+    expect(accepted.theirPay).toBe('bob@freeport.network');
+  });
+
+  it('replies carry the target id + quote snapshot both ways', () => {
+    let conv = applyChatInbound(active(), makeChatMsg('original'), PEER, 'orig')!;
+    conv = applyChatOutbound(conv, makeChatMsg('replying', { replyTo: 'orig', quote: 'original' }), 'my-ev')!;
+    const out = conv.messages[1];
+    expect(out.replyTo).toBe('orig');
+    expect(out.quote).toBe('original');
+    expect(out.id).toBe('my-ev'); // outbound id = sent event id (shared identifier)
+    const echoed = applyChatInbound(conv, { ...makeChatMsg('their reply', { replyTo: 'my-ev', quote: 'replying' }) }, PEER, 'r2')!;
+    expect(echoed.messages[2].replyTo).toBe('my-ev');
+  });
+
+  it('reactions: one per side, latest wins, empty removes; unknown target dropped', () => {
+    let conv = applyChatInbound(active(), makeChatMsg('hi'), PEER, 'm1')!;
+    conv = applyChatInbound(conv, makeChatReact('m1', '👍'), PEER, 'r1')!;
+    expect(conv.messages[0].reactions).toEqual([{ emoji: '👍', dir: 'in' }]);
+    conv = applyChatInbound(conv, makeChatReact('m1', '❤️'), PEER, 'r2')!;
+    expect(conv.messages[0].reactions).toEqual([{ emoji: '❤️', dir: 'in' }]);
+    conv = applyChatOutbound(conv, makeChatReact('m1', '😂'));
+    expect(conv.messages[0].reactions).toHaveLength(2);
+    conv = applyChatInbound(conv, makeChatReact('m1', ''), PEER, 'r3')!;
+    expect(conv.messages[0].reactions).toEqual([{ emoji: '😂', dir: 'out' }]);
+    expect(applyChatInbound(conv, makeChatReact('nope', '👍'), PEER, 'r4')).toBeNull();
+  });
+
+  it('TTL syncs both ways; sender expires_in is authoritative; sweep drops', () => {
+    let conv = applyChatOutbound(active(), makeChatTtl(3600));
+    expect(conv.disappearTtl).toBe(3600);
+    conv = applyChatInbound(conv, makeChatTtl(0), PEER, 't1')!;
+    expect(conv.disappearTtl).toBeUndefined();
+    const now = Math.floor(Date.now() / 1000);
+    conv = applyChatInbound(conv, { ...makeChatMsg('gone soon'), expires_in: 10 }, PEER, 'e1')!;
+    expect(conv.messages[0].expiresAt).toBe(conv.messages[0].ts + 10);
+    expect(sweepExpired(conv, now + 5)).toBe(conv);              // not yet — same ref
+    expect(sweepExpired(conv, now + 11).messages).toHaveLength(0); // gone
   });
 });

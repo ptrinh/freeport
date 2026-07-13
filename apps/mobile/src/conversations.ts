@@ -11,7 +11,7 @@
  *   rejected    — they rejected our invite (kept as a tombstone so a relay
  *                 replay of the old invite doesn't resurrect the request)
  */
-import { CHAT_ACCEPT, CHAT_ACK, CHAT_INVITE, CHAT_MSG, CHAT_REJECT, type ChatEnvelope, type ChatMessage } from '@freeport/protocol';
+import { CHAT_ACCEPT, CHAT_ACK, CHAT_INVITE, CHAT_MSG, CHAT_REACT, CHAT_REJECT, CHAT_TTL, type ChatEnvelope, type ChatMessage } from '@freeport/protocol';
 
 export type ConversationState = 'pending_out' | 'pending_in' | 'active' | 'rejected';
 
@@ -32,6 +32,10 @@ export interface Conversation {
   theirReadTs?: number;
   /** Their last-seen, from acks — only present when they share it. */
   theirLastSeen?: number;
+  /** Their lightning address (from invite/accept) — enables in-chat payments. */
+  theirPay?: string;
+  /** Disappearing-messages timer (seconds), synced both ways. undefined/0 = off. */
+  disappearTtl?: number;
   /** Replay guard, same as Negotiation.seenEventIds (bounded). */
   seenEventIds?: string[];
 }
@@ -44,8 +48,10 @@ export function newConversation(peer: string, state: ConversationState, name?: s
   return { peer, state, ...(name ? { name } : {}), messages: [], updatedAt: nowSec() };
 }
 
-/** Fold our own outbound envelope into the conversation. */
-export function applyChatOutbound(conv: Conversation, env: ChatEnvelope): Conversation {
+/** Fold our own outbound envelope into the conversation. `eventId` is the
+ *  sent DM's id — stored on outbound messages so BOTH sides share one
+ *  identifier per message (reply/reaction targets). */
+export function applyChatOutbound(conv: Conversation, env: ChatEnvelope, eventId?: string): Conversation {
   const next: Conversation = { ...conv, updatedAt: nowSec() };
   switch (env.type) {
     case CHAT_INVITE:
@@ -55,13 +61,40 @@ export function applyChatOutbound(conv: Conversation, env: ChatEnvelope): Conver
       next.state = 'active';
       return next;
     case CHAT_MSG:
-      next.messages = [...conv.messages, { dir: 'out' as const, text: env.text ?? '', ts: env.ts }].slice(-MESSAGES_MAX);
+      next.messages = [...conv.messages, {
+        dir: 'out' as const, text: env.text ?? '', ts: env.ts, id: eventId,
+        ...(env.reply_to ? { replyTo: env.reply_to, quote: env.quote } : {}),
+        ...(env.expires_in ? { expiresAt: env.ts + env.expires_in } : {}),
+      }].slice(-MESSAGES_MAX);
       // Sending into an archived chat un-archives it.
       next.archived = false;
+      return next;
+    case CHAT_REACT:
+      next.messages = applyReaction(conv.messages, env.target!, env.emoji ?? '', 'out');
+      return next;
+    case CHAT_TTL:
+      next.disappearTtl = env.seconds || undefined;
       return next;
     default:
       return conv; // reject handled by dropping; acks don't change our view
   }
+}
+
+/** One reaction per side per message; '' removes that side's reaction.
+ *  Returns the SAME array when the target isn't found (caller drops the event). */
+function applyReaction(messages: ChatMessage[], target: string, emoji: string, dir: 'in' | 'out'): ChatMessage[] {
+  if (!messages.some((m) => m.id === target)) return messages;
+  return messages.map((m) => {
+    if (m.id !== target) return m;
+    const others = (m.reactions ?? []).filter((r) => r.dir !== dir);
+    return { ...m, reactions: emoji ? [...others, { emoji, dir }] : others };
+  });
+}
+
+/** Drop messages past their disappearing deadline. Same ref when unchanged. */
+export function sweepExpired(conv: Conversation, now = nowSec()): Conversation {
+  if (!conv.messages.some((m) => m.expiresAt && m.expiresAt <= now)) return conv;
+  return { ...conv, messages: conv.messages.filter((m) => !m.expiresAt || m.expiresAt > now) };
 }
 
 /**
@@ -92,14 +125,14 @@ function applyChatInboundUnchecked(
   if (env.type === CHAT_INVITE) {
     // A fresh request — or, if we'd already invited THEM, mutual interest:
     // both sides tapped each other's invite, no accept round needed.
-    if (!conv) return { ...newConversation(peer, 'pending_in', env.name), updatedAt: ts };
-    if (conv.state === 'pending_out') return { ...conv, state: 'active', name: conv.name ?? env.name, updatedAt: ts };
-    if (conv.state === 'rejected') return { ...conv, state: 'pending_in', name: env.name ?? conv.name, updatedAt: ts };
+    if (!conv) return { ...newConversation(peer, 'pending_in', env.name), theirPay: env.pay, updatedAt: ts };
+    if (conv.state === 'pending_out') return { ...conv, state: 'active', name: conv.name ?? env.name, theirPay: env.pay ?? conv.theirPay, updatedAt: ts };
+    if (conv.state === 'rejected') return { ...conv, state: 'pending_in', name: env.name ?? conv.name, theirPay: env.pay ?? conv.theirPay, updatedAt: ts };
     return null; // active or already pending_in — replayed invite, no-op
   }
   if (env.type === CHAT_ACCEPT) {
     if (!conv || conv.state !== 'pending_out') return null;
-    return { ...conv, state: 'active', name: conv.name ?? env.name, updatedAt: ts };
+    return { ...conv, state: 'active', name: conv.name ?? env.name, theirPay: env.pay ?? conv.theirPay, updatedAt: ts };
   }
   if (env.type === CHAT_REJECT) {
     if (!conv || conv.state !== 'pending_out') return null;
@@ -117,8 +150,23 @@ function applyChatInboundUnchecked(
       state: 'active',
       updatedAt: ts,
       archived: false, // new activity resurfaces an archived chat
-      messages: [...msgs, { dir: 'in' as const, text: env.text ?? '', ts: env.ts, id: eventId }].slice(-MESSAGES_MAX),
+      messages: [...msgs, {
+        dir: 'in' as const, text: env.text ?? '', ts: env.ts, id: eventId,
+        ...(env.reply_to ? { replyTo: env.reply_to, quote: env.quote } : {}),
+        // The SENDER's expires_in is authoritative — never our own timer.
+        ...(env.expires_in ? { expiresAt: env.ts + env.expires_in } : {}),
+      }].slice(-MESSAGES_MAX),
     };
+  }
+  if (env.type === CHAT_REACT) {
+    if (!conv || conv.state !== 'active') return null;
+    const messages = applyReaction(conv.messages, env.target!, env.emoji ?? '', 'in');
+    if (messages === conv.messages) return null; // unknown target (expired?) — drop
+    return { ...conv, messages };
+  }
+  if (env.type === CHAT_TTL) {
+    if (!conv || conv.state !== 'active') return null;
+    return { ...conv, disappearTtl: env.seconds || undefined, updatedAt: ts };
   }
   if (env.type === CHAT_ACK) {
     if (!conv || conv.state !== 'active') return null;

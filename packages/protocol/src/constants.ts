@@ -56,13 +56,19 @@ export const CHAT_REJECT = 'chat.reject';
 export const CHAT_MSG = 'chat.msg';
 /** Delivery/read receipt; also carries last-seen (only to accepted contacts). */
 export const CHAT_ACK = 'chat.ack';
+/** Emoji reaction on a message (encrypted, unlike public NIP-25). */
+export const CHAT_REACT = 'chat.react';
+/** Per-conversation disappearing-messages timer, synced to both sides. */
+export const CHAT_TTL = 'chat.ttl';
 
 export type ChatMsgType =
   | typeof CHAT_INVITE
   | typeof CHAT_ACCEPT
   | typeof CHAT_REJECT
   | typeof CHAT_MSG
-  | typeof CHAT_ACK;
+  | typeof CHAT_ACK
+  | typeof CHAT_REACT
+  | typeof CHAT_TTL;
 
 export const MSG_COUNTER = 'negotiate.counter';
 export const MSG_ACCEPT = 'negotiate.accept';

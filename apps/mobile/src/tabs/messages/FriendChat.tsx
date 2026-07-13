@@ -140,7 +140,10 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
 
 // ─── Conversation screen ─────────────────────────────────────────────────────
 
-export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlock, onClose, onStartCall }: {
+/** Disappearing-timer cycle: off → 24h → 7d → off. */
+const TTL_STEPS = [0, 24 * 3600, 7 * 24 * 3600];
+
+export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlock, onClose, onStartCall, walletEnabled = false, onPayFriend }: {
   client: MobileClient | null;
   conv: Conversation;
   /** Receipts toggle (Settings → Chat) — reciprocal: off = no ticks shown either. */
@@ -150,6 +153,9 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
   onClose: () => void;
   /** Present when calls are enabled + supported and the conversation is active. */
   onStartCall?: (peer: string, video: boolean) => void;
+  /** In-chat payments: ⚡ opens the wallet Send flow prefilled for this friend. */
+  walletEnabled?: boolean;
+  onPayFriend?: (peer: string, payAddress: string) => void;
 }) {
   // Opening the thread reads it — advances the local mark and (receipts on)
   // tells the peer. Re-run as new messages arrive while the thread is open.
@@ -172,6 +178,24 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
               <Text style={[s.dim, { fontSize: 11 }]}>{t('Last seen {time}', { time: fmtRowTime(lastSeen) })}</Text>
             ) : null}
           </View>
+          {walletEnabled && onPayFriend && conv.theirPay && conv.state === 'active' && !blocked ? (
+            <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Send payment')} onPress={() => onPayFriend(conv.peer, conv.theirPay!)}>
+              <Ionicons name="flash-outline" size={20} color={palette.text2} />
+            </Pressable>
+          ) : null}
+          {conv.state === 'active' ? (
+            <Pressable
+              hitSlop={8}
+              accessibilityRole="button" accessibilityLabel={t('Disappearing messages')}
+              onPress={() => {
+                const cur = TTL_STEPS.indexOf(conv.disappearTtl ?? 0);
+                const next = TTL_STEPS[(cur + 1) % TTL_STEPS.length];
+                client?.chatSetTtl(conv.peer, next).catch(() => {});
+              }}
+            >
+              <Ionicons name={conv.disappearTtl ? 'timer' : 'timer-outline'} size={20} color={conv.disappearTtl ? palette.accent : palette.text2} />
+            </Pressable>
+          ) : null}
           {onStartCall && conv.state === 'active' && !blocked ? (
             <>
               <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Voice call')} onPress={() => onStartCall(conv.peer, false)}>
@@ -208,11 +232,19 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
           {blocked && (
             <Text style={[s.dim, { marginBottom: 8 }]}>{t('You blocked this person — they cannot message you.')}</Text>
           )}
+          {conv.disappearTtl ? (
+            <Text style={[s.dim, { marginBottom: 8, textAlign: 'center' }]}>
+              {'⏱ ' + (conv.disappearTtl >= 7 * 24 * 3600
+                ? t('New messages disappear after 7 days')
+                : t('New messages disappear after 24 hours'))}
+            </Text>
+          ) : null}
           <ChatCore
             messages={conv.messages}
-            onSend={(txt) => client?.chatSend(conv.peer, txt) ?? Promise.resolve()}
+            onSend={(txt, opts) => client?.chatSend(conv.peer, txt, opts) ?? Promise.resolve()}
             emptyHint={t('Say hello 👋')}
             tickFor={receiptsOn ? (ts) => tickFor(conv, ts) : undefined}
+            onReact={(id, emoji) => client?.chatReact(conv.peer, id, emoji).catch(() => {})}
           />
         </ScrollView>
       </View>

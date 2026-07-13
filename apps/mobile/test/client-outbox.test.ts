@@ -54,8 +54,9 @@ describe('MobileClient DM outbox', () => {
     const counts: number[] = [];
     client.onOutboxChange = (n) => counts.push(n);
 
-    // Offline send: must not throw, must queue + persist.
-    await expect((client as any).sendDM(PEER, '{"hello":1}')).resolves.toBe(false);
+    // Offline send: must not throw, must queue + persist. (sendDM resolves to
+    // the event id either way — queued-ness is observable via outboxPending.)
+    await expect((client as any).sendDM(PEER, '{"hello":1}')).resolves.toMatch(/^ev-/);
     expect(client.outboxPending()).toBe(1);
     expect(counts.at(-1)).toBe(1);
     expect(published).toHaveLength(0);

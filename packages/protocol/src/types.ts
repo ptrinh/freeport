@@ -98,11 +98,18 @@ export interface ChatMessage {
   text: string;
   ts: EpochSeconds;
   /**
-   * Source DM event id (inbound) — used to dedupe relay echoes and the reload
-   * backfill so the same message is never appended twice. Optional for back-
-   * compat with messages stored before this field existed.
+   * Source DM event id — inbound: the received event's id; outbound (friend
+   * chat): the sent event's id, so BOTH sides share one identifier per
+   * message (reply/reaction targets). Optional for back-compat.
    */
   id?: string;
+  /** Friend chat: id of the message this replies to + a short quoted snapshot. */
+  replyTo?: string;
+  quote?: string;
+  /** Friend chat: disappearing-messages deadline (epoch seconds). */
+  expiresAt?: EpochSeconds;
+  /** Friend chat: emoji reactions (one per side — the latest wins). */
+  reactions?: { emoji: string; dir: 'in' | 'out' }[];
 }
 
 export interface ProposedTerms {

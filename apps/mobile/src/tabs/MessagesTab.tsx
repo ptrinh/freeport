@@ -67,6 +67,7 @@ export function DealsTab({
   conversations = [],
   chatReceiptsOn = false,
   onStartCall,
+  onPayFriend,
 }: {
   client: MobileClient | null;
   negos: Negotiation[];
@@ -109,6 +110,8 @@ export function DealsTab({
   chatReceiptsOn?: boolean;
   /** Start a call from a chat header (present when calls are on + supported). */
   onStartCall?: (peer: string, video: boolean) => void;
+  /** In-chat payments (friend chat): open the wallet Send flow for a friend. */
+  onPayFriend?: (peer: string, payAddress: string) => void;
 }) {
   // Friend chat: which conversation is open (peer pubkey) + the invite popup.
   const [openChatPeer, setOpenChatPeer] = useState<string | null>(null);
@@ -286,6 +289,8 @@ export function DealsTab({
         onToggleBlock={onToggleBlock}
         onClose={() => setOpenChatPeer(null)}
         onStartCall={onStartCall}
+        walletEnabled={walletEnabled}
+        onPayFriend={onPayFriend}
       />
     )}
     {reportNego && (

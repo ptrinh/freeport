@@ -73,15 +73,30 @@ const ChatBubble = React.memo(function ChatBubble({
   dir,
   onZoom,
   tick,
+  quote,
+  reactions,
+  onLongPress,
 }: {
   text: string;
   dir: 'in' | 'out';
   onZoom: (uri: string) => void;
   /** WhatsApp-style receipt on outbound bubbles (friend chat, receipts on). */
   tick?: 'sent' | 'delivered' | 'read' | null;
+  /** Quoted snapshot of the message this replies to (friend chat). */
+  quote?: string;
+  /** Emoji reactions, one per side (friend chat). */
+  reactions?: { emoji: string; dir: 'in' | 'out' }[];
+  /** Friend chat: opens the react/reply action row. */
+  onLongPress?: () => void;
 }) {
   return (
+    <Pressable onLongPress={onLongPress} delayLongPress={350} disabled={!onLongPress}>
     <View style={[s.chatBubble, dir === 'out' ? s.chatOut : s.chatIn]}>
+      {quote ? (
+        <View style={{ borderStartWidth: 3, borderStartColor: dir === 'out' ? 'rgba(245,247,250,0.6)' : palette.accent, paddingStart: 8, marginBottom: 4, opacity: 0.85 }}>
+          <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn, { fontSize: 12 }]} numberOfLines={2}>{quote}</Text>
+        </View>
+      ) : null}
       {isAudioMsg(text)
         ? <VoiceMessage url={text} dir={dir} />
         : isImageMsg(text)
@@ -107,8 +122,19 @@ const ChatBubble = React.memo(function ChatBubble({
         </View>
       ) : null}
     </View>
+    {reactions && reactions.length > 0 ? (
+      <View style={{ flexDirection: 'row', gap: 4, alignSelf: dir === 'out' ? 'flex-end' : 'flex-start', marginTop: -6, marginBottom: 4, marginHorizontal: 6 }}>
+        {reactions.map((r) => (
+          <Text key={r.dir} style={{ fontSize: 13, backgroundColor: palette.card, borderRadius: 10, borderWidth: 1, borderColor: palette.border, paddingHorizontal: 5, paddingVertical: 1, overflow: 'hidden' }}>{r.emoji}</Text>
+        ))}
+      </View>
+    ) : null}
+    </Pressable>
   );
 });
+
+/** Reaction palette shown on long-press (friend chat). */
+const REACT_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
 /**
  * The transport-agnostic chat surface: message list (collapsed preview),
@@ -116,9 +142,9 @@ const ChatBubble = React.memo(function ChatBubble({
  * chat (ChatThread, bound to a Negotiation) and the friend chat (bound to a
  * Conversation) — keep it free of either model.
  */
-export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title }: {
-  messages: { dir: 'in' | 'out'; text: string; ts: number; id?: string }[];
-  onSend: (text: string) => Promise<void>;
+export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title, onReact }: {
+  messages: { dir: 'in' | 'out'; text: string; ts: number; id?: string; quote?: string; reactions?: { emoji: string; dir: 'in' | 'out' }[] }[];
+  onSend: (text: string, opts?: { replyTo?: string; quote?: string }) => Promise<void>;
   /** Grab-style one-tap replies rendered above the input ("I am here ✅", …). */
   quickReplies?: { label: string; text: string }[];
   emptyHint?: string;
@@ -126,8 +152,13 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
   tickFor?: (ts: number) => 'sent' | 'delivered' | 'read';
   /** Optional heading inside the box (the deal chat shows "Chat"). */
   title?: string;
+  /** Friend chat: enables long-press react + reply (targets need message ids). */
+  onReact?: (targetId: string, emoji: string) => void;
 }) {
   const [text, setText] = useState('');
+  // Long-press action row target + the message being replied to.
+  const [actionsFor, setActionsFor] = useState<string | null>(null);
+  const [replyingTo, setReplyingTo] = useState<{ id: string; quote: string } | null>(null);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -168,8 +199,9 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
     if (!msg) return;
     setSending(true);
     try {
-      await onSend(msg);
+      await onSend(msg, replyingTo ? { replyTo: replyingTo.id, quote: replyingTo.quote } : undefined);
       setText('');
+      setReplyingTo(null);
     } catch (e) {
       uiAlert(t('Could not send'), e instanceof Error ? e.message : undefined);
     } finally { setSending(false); }
@@ -207,7 +239,29 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
             // duplicated the last bubble — and the constant tear-down/rebuild
             // thrashed layout while scrolling. ts is epoch *seconds* so two quick
             // messages can share one; disambiguate with dir + index.
-            <ChatBubble key={m.id ?? `${m.ts}-${m.dir}-${i}`} text={m.text} dir={m.dir} onZoom={setViewerUri} tick={m.dir === 'out' ? tickFor?.(m.ts) : null} />
+            <React.Fragment key={m.id ?? `${m.ts}-${m.dir}-${i}`}>
+              <ChatBubble
+                text={m.text} dir={m.dir} onZoom={setViewerUri}
+                tick={m.dir === 'out' ? tickFor?.(m.ts) : null}
+                quote={m.quote} reactions={m.reactions}
+                onLongPress={onReact && m.id ? () => setActionsFor(actionsFor === m.id ? null : m.id!) : undefined}
+              />
+              {actionsFor === m.id && onReact && m.id ? (
+                <View style={[s.row, { gap: 6, alignSelf: m.dir === 'out' ? 'flex-end' : 'flex-start', marginBottom: 6, flexWrap: 'wrap' }]}>
+                  {REACT_EMOJIS.map((e) => (
+                    <Pressable key={e} onPress={() => { onReact(m.id!, e); setActionsFor(null); }} hitSlop={4}
+                      style={{ backgroundColor: palette.card, borderRadius: 14, borderWidth: 1, borderColor: palette.border, paddingHorizontal: 6, paddingVertical: 3 }}>
+                      <Text style={{ fontSize: 16 }}>{e}</Text>
+                    </Pressable>
+                  ))}
+                  <Pressable onPress={() => { setReplyingTo({ id: m.id!, quote: m.text.slice(0, 80) }); setActionsFor(null); }} hitSlop={4}
+                    style={{ backgroundColor: palette.card, borderRadius: 14, borderWidth: 1, borderColor: palette.border, paddingHorizontal: 8, paddingVertical: 3, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <Ionicons name="arrow-undo-outline" size={13} color={palette.text2} />
+                    <Text style={{ color: palette.text2, fontSize: 12 }}>{t('Reply')}</Text>
+                  </Pressable>
+                </View>
+              ) : null}
+            </React.Fragment>
           ))}
         </>
       )}
@@ -230,6 +284,15 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
           ))}
         </View>
       )}
+      {replyingTo ? (
+        <View style={[s.row, { marginTop: 8, backgroundColor: palette.card, borderRadius: 8, borderWidth: 1, borderColor: palette.border, padding: 6, gap: 6 }]}>
+          <Ionicons name="arrow-undo" size={14} color={palette.accent} />
+          <Text style={[s.dim, { flex: 1 }]} numberOfLines={1}>{replyingTo.quote}</Text>
+          <Pressable onPress={() => setReplyingTo(null)} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Cancel')}>
+            <Ionicons name="close-circle" size={16} color={palette.dim} />
+          </Pressable>
+        </View>
+      ) : null}
       <View style={[s.row, { marginTop: 8 }]}>
         <TextInput
           style={[s.input, { flex: 1 }]}

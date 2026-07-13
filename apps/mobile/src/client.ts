@@ -15,7 +15,7 @@ import { fetchReputation, type Reputation } from './reputation';
 import { buildTrustMap } from './wot';
 import { kvGet, kvSet, kvDelete } from './kv';
 import type { Signer } from './signer';
-import { applyChatInbound, applyChatOutbound, newConversation, type Conversation } from './conversations';
+import { applyChatInbound, applyChatOutbound, newConversation, sweepExpired, type Conversation } from './conversations';
 import {
   DEFAULT_RELAYS,
   KIND_INTENT_OFFER,
@@ -32,6 +32,8 @@ import {
   makeChatReject,
   makeChatMsg,
   makeChatAck,
+  makeChatReact,
+  makeChatTtl,
   mintInviteCode,
   verifyInviteCode,
   parseCallEnvelope,
@@ -698,6 +700,8 @@ export class MobileClient {
 
   watchDMs(): () => void {
     this.watchStartTs = Math.floor(Date.now() / 1000);
+    // Disappearing messages expire on a timer, not only on events.
+    const sweepTimer = setInterval(() => this.sweepExpiredMessages(), 60_000);
     // Backfill from just behind the newest DM we've already processed (with a
     // reorder margin) instead of always 7 days — for a daily user that's ~7×
     // fewer NIP-04 decrypts and replays per launch/resume. The event-id replay
@@ -737,7 +741,7 @@ export class MobileClient {
         },
       },
     );
-    return () => sub.close();
+    return () => { clearInterval(sweepTimer); sub.close(); };
   }
 
   /**
@@ -1030,6 +1034,7 @@ export class MobileClient {
         this.fetchProfile(conv.peer); // avatar + display name for the row
         this.onConversationUpdate?.(conv);
       }
+      this.sweepExpiredMessages(); // disappearing messages expire across restarts too
     } catch { /* corrupt/absent → start empty */ }
   }
 
@@ -1064,8 +1069,8 @@ export class MobileClient {
     return this.chatPrefs.lastSeen ? Math.floor(Date.now() / 1000) : undefined;
   }
 
-  private async sendChatEnvelope(peer: string, env: ChatEnvelope): Promise<void> {
-    await this.sendDM(peer, JSON.stringify(env));
+  private async sendChatEnvelope(peer: string, env: ChatEnvelope): Promise<string> {
+    return this.sendDM(peer, JSON.stringify(env));
   }
 
   /**
@@ -1089,7 +1094,7 @@ export class MobileClient {
 
   /** Send a chat request to a resolved invite's pubkey (opener side). */
   async chatInvite(peer: string, myName?: string): Promise<void> {
-    const env = makeChatInvite(myName);
+    const env = makeChatInvite(myName, await this.resolvePayAddress());
     const conv = applyChatOutbound(
       this.conversations.get(peer) ?? newConversation(peer, 'pending_out'),
       env,
@@ -1103,10 +1108,11 @@ export class MobileClient {
   async chatAccept(peer: string, myName?: string): Promise<void> {
     const conv = this.conversations.get(peer);
     if (!conv || conv.state !== 'pending_in') return;
-    const updated = applyChatOutbound(conv, makeChatAccept(myName));
+    const env = makeChatAccept(myName, await this.resolvePayAddress());
+    const updated = applyChatOutbound(conv, env);
     this.commitConversation(updated);
     this.onConversationUpdate?.(updated);
-    await this.sendChatEnvelope(peer, makeChatAccept(myName));
+    await this.sendChatEnvelope(peer, env);
   }
 
   /** Reject a pending incoming chat request — the conversation is dropped. */
@@ -1119,15 +1125,51 @@ export class MobileClient {
     await this.sendChatEnvelope(peer, makeChatReject());
   }
 
-  /** Send a friend-chat message (active conversation). */
-  async chatSend(peer: string, text: string): Promise<void> {
+  /** Send a friend-chat message (active conversation). Send-then-commit so
+   *  the stored message carries the DM event id (reply/reaction target). */
+  async chatSend(peer: string, text: string, opts?: { replyTo?: string; quote?: string }): Promise<void> {
     const conv = this.conversations.get(peer);
     if (!conv || conv.state !== 'active' || !text.trim()) return;
-    const env = makeChatMsg(text.trim());
+    const env = makeChatMsg(text.trim(), { ...opts, expiresIn: conv.disappearTtl });
+    const id = await this.sendChatEnvelope(peer, env);
+    const cur = this.conversations.get(peer) ?? conv; // may have advanced while sending
+    const updated = applyChatOutbound(cur, env, id);
+    this.commitConversation(updated);
+    this.onConversationUpdate?.(updated);
+  }
+
+  /** React to a message (one emoji per side; '' removes yours). */
+  async chatReact(peer: string, targetId: string, emoji: string): Promise<void> {
+    const conv = this.conversations.get(peer);
+    if (!conv || conv.state !== 'active') return;
+    const env = makeChatReact(targetId, emoji);
     const updated = applyChatOutbound(conv, env);
     this.commitConversation(updated);
     this.onConversationUpdate?.(updated);
     await this.sendChatEnvelope(peer, env);
+  }
+
+  /** Set the disappearing-messages timer (0 = off) — synced to the peer. */
+  async chatSetTtl(peer: string, seconds: number): Promise<void> {
+    const conv = this.conversations.get(peer);
+    if (!conv || conv.state !== 'active') return;
+    const env = makeChatTtl(seconds);
+    const updated = applyChatOutbound(conv, env);
+    this.commitConversation(updated);
+    this.onConversationUpdate?.(updated);
+    await this.sendChatEnvelope(peer, env);
+  }
+
+  /** Drop messages past their disappearing deadline (exact locally). */
+  sweepExpiredMessages(): void {
+    const now = Math.floor(Date.now() / 1000);
+    for (const conv of this.conversations.values()) {
+      const swept = sweepExpired(conv, now);
+      if (swept !== conv) {
+        this.commitConversation(swept);
+        this.onConversationUpdate?.(swept);
+      }
+    }
   }
 
   /**
@@ -1270,7 +1312,7 @@ export class MobileClient {
    * reconnect, so an optimistically-committed local state can't silently
    * diverge from the counterparty. Encryption/signing errors still throw.
    */
-  private async sendDM(to: string, plaintext: string): Promise<boolean> {
+  private async sendDM(to: string, plaintext: string): Promise<string> {
     const ciphertext = await this.signer.nip04Encrypt(to, plaintext);
     const ev = await this.signer.signEvent({
       kind: 4,
@@ -1278,6 +1320,7 @@ export class MobileClient {
       tags: [['p', to]],
       content: ciphertext,
     });
-    return this.publishDM(ev);
+    await this.publishDM(ev);
+    return ev.id;
   }
 }
