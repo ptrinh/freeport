@@ -110,6 +110,21 @@ relay data. Roughly ordered by value-for-effort:
   position against the expected route client-side and nudges the rider
   ("off route — everything OK?") with one-tap SOS.
 
+### Fair-price discovery — "going rate" widget — small, pure client-side
+- Intents (and confirmed deals, via receipts) are already public signed events,
+  so a client can compute local market stats with no server and no protocol
+  change: median/range of accepted prices for a similar corridor + time window.
+- Surface it in two places: while **composing** an intent ("similar rides
+  settled at $10–13 this week") and while **countering** ("this ask is ~20%
+  above the going rate"). Directly improves negotiation quality for newcomers
+  who have no feel for local prices.
+- Mechanics: reuse the browse subscription's event stream; bucket by market +
+  geohash-prefix pair (from→to) + day-part; take price from confirmed-deal
+  receipts where present, falling back to posted asks. All local, nothing new
+  is published.
+- Honest caveat: quality scales with liquidity — hide the widget below a
+  minimum sample size rather than show a misleading number.
+
 ### Hourly charter / rental — small
 - Intent type with per-hour pricing terms (car + driver for N hours). Template
   + UI only; negotiation flow unchanged.
@@ -160,6 +175,47 @@ is convenience, not lock-in.
 **Effort:** medium — the export/protocol pieces are documented; the real work
 is the Worker manifest endpoint, signing setup, and a careful two-rail
 migration. Zero app-code changes beyond app.json config.
+
+## NIP-17/NIP-44 gift-wrapped DMs — metadata privacy upgrade
+
+NIP-04 encrypts message *content*, but relays still see **who talks to whom and
+when** — every negotiation leaks its social graph as public metadata (sender
+pubkey, recipient `p` tag, timestamp). For a marketplace, that's a map of who
+is dealing with whom. NIP-17 fixes it:
+
+- **NIP-44** replaces NIP-04's encryption (modern construction:
+  secp256k1 ECDH → ChaCha20 + HMAC-SHA256, versioned, padded).
+- **NIP-17 gift wrap**: the real message (kind 14, unsigned "rumor") is
+  **sealed** (kind 13, signed by the sender, encrypted to the recipient) and
+  then **wrapped** (kind 1059) with a **throwaway key** and a **randomized
+  timestamp**. On the wire, a relay sees only: random-pubkey → recipient,
+  at a fuzzed time. Sender identity, message kind, and timing are hidden;
+  deniability comes free (the inner rumor is unsigned).
+
+**Scope.** This upgrades every DM path at once: negotiation envelopes, chat
+(friend chat rides on the same transport), call signaling, and the chat-invite
+handshake. Nothing about the public intent events changes — those are public
+by design.
+
+**Migration (the real work).** Old clients speak NIP-04 only, so cut over
+gradually:
+1. Ship **receive** support first (subscribe to kind 1059 for our pubkey,
+   unwrap → route into the same negotiation/conversation stores). OTA-able.
+2. Then **send** NIP-17 when the peer advertises support — via a capability
+   flag in the negotiation envelope or a kind-10050 (DM relay list) probe —
+   falling back to NIP-04 otherwise.
+3. After the fallback window (track adoption via the flag), default to
+   NIP-17-only and keep NIP-04 receive for stragglers.
+
+**Caveats.** Wrapped events are bigger (double encryption + padding); some
+relays rate-limit kind 1059 or drop unsigned-inner constructions — verify the
+default relay set handles them. Subscription model changes too: you can no
+longer filter inbound DMs by sender (that's the point), so dedupe/routing keys
+off the unwrapped rumor instead.
+
+**Effort:** medium — nostr-tools already ships nip44 + gift-wrap helpers; the
+bulk is the dual-rail migration and testing across old↔new client pairs
+(extend the fake-relay multi-client tests in `apps/mobile/test/`).
 
 ## Peer-to-peer chat (friend chat) — experimental
 
