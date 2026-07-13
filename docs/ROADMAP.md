@@ -341,3 +341,74 @@ and sticker/GIF stores + large media CDNs (hosting cost, not core).
 Conversation model/store, the invite publish+resolve flow, the deeplink
 handling, the FAB + accept/reject UX, the last-seen/receipts acks, and the
 `[v1]` features (in-chat pay, reply, reactions, disappearing) are the bulk.
+
+## Mini-apps — a decentralized super-app shell (NIP-07 + WebLN)
+
+Turn Freeport into a host that injects its **portable identity** and
+**self-custodial wallet** into third-party web apps — the WeChat/Zalo
+mini-program idea, done the Nostr way (no curated store, no operator).
+
+**How.** A WebView shell exposes the two standard bridges so any web app "just
+works" against a Freeport user:
+- **NIP-07** (`window.nostr`: `getPublicKey`, `signEvent`, `nip04`/`nip44`) —
+  "sign in with your Freeport key". Portable, self-sovereign identity — better
+  than WeChat's siloed account.
+- **WebLN** (`window.webln`: `makeInvoice`, `sendPayment`) — the WeChat-Pay
+  analog, but self-custodial via the built-in wallet.
+Distribution is **decentralized**: apps are launched by URL / QR or listed in a
+Nostr-published directory (addressable events) — not a central app store.
+
+**Security is the hard part (non-negotiable).** A malicious mini-app must never
+exfiltrate the nsec or drain the wallet:
+- The raw key is never exposed; signing happens in the shell.
+- Every `signEvent` / `sendPayment` is gated behind an explicit approval dialog
+  (MetaMask/Alby-style), with per-app permissions and a spend cap.
+- Ties directly to the on-device / passkey key handling — get that right first.
+
+**Caveats.** App Store/Play are hostile to "run downloaded third-party code /
+mini-app store" (Apple 4.7 allows it only within limits) — so this is
+**web/PWA-first**; a native version is constrained/later. Decentralized launch
+(URL / Nostr directory) fits the ethos; a curated store does not.
+
+**Framing:** "Freeport as an identity + wallet provider for web apps", not "an
+app store". **Effort:** medium-high, security-dominated.
+
+## Conditional payments — HODL invoices (trust-minimized escrow)
+
+The honest answer to "no one will protect you here": escrow-like safety with no
+custodian. The buyer pays a **hold invoice** whose funds are locked, not
+settled, until the buyer releases on delivery — otherwise it expires and
+refunds automatically. No operator ever holds the money; the Lightning protocol
+enforces it. Highest-value trust primitive for a marketplace where deals can go
+bad. **Caveat:** depends on hold-invoice support in the Breez SDK / Spark L2 —
+verify before committing; may need a fallback rail. Pairs naturally with deal
+receipts and the `payment` flow that already exists.
+
+## Zaps / tipping (NIP-57)
+
+Tip sats to a good post, a helpful reply, or a trusted seller — the Nostr-native
+social-payment primitive, layered on the wallet + karma that already exist.
+Low effort, high virality: a zap button on posts / profiles / chat, a running
+zap total as a soft reputation signal alongside karma. Uses the lightning
+address for the zap request; publish zap receipts (kind 9735) so totals are
+verifiable.
+
+## AI concierge
+
+Freeport already ships personal agents (`packages/agent`). Surface one in the
+app as a natural-language concierge: "find me a ride to the airport at 5pm under
+$12" → it drafts the intent, posts it, watches for counter-offers, and surfaces
+the best matches for the human to confirm — the existing negotiate loop, driven
+by language instead of forms. On-brand for a project built with Claude Code.
+On-device or bring-your-own-model to keep it operator-free; a hosted model must
+be explicit opt-in (it sees your request text).
+
+## Persistent storefronts (NIP-15)
+
+Today providers post one-off intents. A standing **shop** — a seller's catalog
+as addressable events (NIP-15 Nostr Market: stalls + products) — lets them list
+durable offerings that stay browsable, not just a single request that expires.
+Turns Freeport from a ride/task board into a general P2P marketplace, reusing
+the same signed-events + reputation + wallet stack. Buyers browse a shop, start
+a negotiation/chat, pay with the wallet. Mostly additive: a new event
+kind/template + a shop view + a "my shop" editor.
