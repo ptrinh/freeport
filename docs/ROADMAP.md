@@ -270,8 +270,11 @@ out-of-band is an invite.
 - A circular **floating action button** (`+` icon) pinned bottom-right, sitting
   **above** the bottom tab bar (never overlapping it). Only shown when Chat is
   on. Tapping opens the invite popup (QR + shareable link + copy).
-- Friend chats appear as rows — `[Name] · [Last message] · [Time]` — in the
-  Messages list (a section distinct from deal threads).
+- Friend chats appear as rows, WhatsApp-style: a round **profile picture on
+  the left**, then `[Name]` / `[Last message]` / `[Time]` — in the Messages
+  list (a section distinct from deal threads). The avatar is the peer's kind:0
+  `picture` (profiles are already fetched via `onProfileFetched`), falling back
+  to the same dicebear-by-npub avatar the app uses elsewhere.
 - Tapping a row opens the **same chat UI as the deal chat** (`ChatThread`),
   with a top action to **Archive** the conversation and a **Block** action.
 
