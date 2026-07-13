@@ -101,11 +101,14 @@ relay data. Roughly ordered by value-for-effort:
   reads and render a heat layer on the map. No server, no new data exposure
   (intents are already public). A "pro" feature for drivers that stays P2P.
 
-### Safety kit — medium
-- SOS button: quick-dial local emergency number + auto-share the live trip to
-  pre-chosen trusted contacts (live-trip sharing already exists).
-- Route-deviation alert: compare live position against the expected route
-  client-side; nudge the rider ("off route — everything OK?") with one-tap SOS.
+### Safety kit — partly shipped
+- **Done**: an Emergency Call button (quick-dial the local police number for the
+  pickup area) shows for the passenger/customer while a deal is In Transit; live
+  live-location sharing during an active deal also ships.
+- **Remaining**: auto-share the live trip to pre-chosen *trusted contacts* (not
+  just the counterparty), and a route-deviation alert that compares live
+  position against the expected route client-side and nudges the rider
+  ("off route — everything OK?") with one-tap SOS.
 
 ### Hourly charter / rental — small
 - Intent type with per-hour pricing terms (car + driver for N hours). Template
@@ -117,9 +120,9 @@ relay data. Roughly ordered by value-for-effort:
   opt-in per chat (it leaks message content to a third party — surface that).
 
 ### Non-goals (need a central operator)
-CUSTODIAL wallets/escrow (self-custodial payments are planned — see below),
-surge pricing (Freeport is free negotiation), loyalty programs, trip
-insurance, centralized driver vetting.
+CUSTODIAL wallets/escrow (the self-custodial wallet has shipped — Breez Spark +
+NWC, `src/wallet/`; custody/escrow stays off-limits), surge pricing (Freeport is
+free negotiation), loyalty programs, trip insurance, centralized driver vetting.
 
 ## Self-hosted OTA updates on Cloudflare (drop the EAS Update dependency)
 
@@ -157,68 +160,6 @@ is convenience, not lock-in.
 **Effort:** medium — the export/protocol pieces are documented; the real work
 is the Worker manifest endpoint, signing setup, and a careful two-rail
 migration. Zero app-code changes beyond app.json config.
-
-Settlement without becoming a money transmitter: the app NEVER holds funds.
-The protocol's reserved `payment` field (v1) makes this additive.
-
-**Architecture: a PLUGGABLE wallet layer** (`src/wallet/`), not a hard Breez
-dependency. One `WalletProvider` interface — `capabilities()` (assets,
-receive/send methods), `balance()`, `receive()` (bolt11 / Spark address),
-`pay(invoiceOrAddress)`, events — with two implementations:
-
-1. **`breez-spark` (default)**: the embedded self-custodial wallet below —
-   zero-setup UX for users who have no wallet (the majority).
-2. **`nwc` (NIP-47 Nostr Wallet Connect)**: bring-your-own wallet (Alby Hub,
-   coinos, Primal, self-hosted nodes…). Pairs naturally with the existing
-   nostr-tools stack; the user pastes/scans an NWC connection string in
-   Settings. Capability-gated: NWC is Lightning-BTC-only, so stablecoin
-   balance/denomination UI hides itself when this provider is active.
-
-Settings: "Wallet → Built-in (default) / Connect your own (NWC)". The deal
-"Pay" flow talks only to the interface, so providers are interchangeable and
-a future provider (e.g. another L2) is additive.
-
-**Default provider: Breez SDK — Nodeless (Spark implementation).**
-- One wallet, two assets: Lightning BTC + native stablecoins (USDT/USDB on
-  Spark); balance can be HELD in USD — the right default for ride/service
-  pricing (no BTC volatility between deal and settle).
-- Spark↔Spark transfers are instant and zero-fee — ideal when both deal
-  parties use the Freeport wallet; Lightning interop covers everyone else.
-- Self-custodial and nodeless (no channel management); wallet key derived
-  from the user's existing Nostr key — the current account backup already
-  backs up the wallet (one seed story).
-- Verified v0.18.0 (2026-07): official WASM builds exist → all four surfaces
-  work (iOS/Android/web/desktop). Web lazy-loads the 4.5 MB gz core only when
-  the wallet is opened. Size impact per platform ≈ +5–8 MB download
-  (iOS arm64 slice / Android per-ABI); exclude from the offline single-file
-  build.
-
-**Trust caveat (document honestly in-app):** Spark is a young (2025)
-statechain-based L2 — trust-MINIMIZED, not trustless (operators must delete
-old keys). Acceptable for spending-wallet amounts; nudge users to keep
-balances small ("this is a spending wallet").
-
-**Status (2026-07):** implemented behind Settings → Experimental → Wallet.
-Both providers live in `src/wallet/` (NWC + breez-spark, seed derived from
-the Nostr key via SHA-256 domain tag `freeport-wallet-v1`). Breez lazy-loads:
-web splits the glue into an async chunk and fetches the wasm (copied to
-`public/` on postinstall) only when the tab opens; native guards the dynamic
-import so pre-Breez binaries fall back to "coming in a future app update".
-Requires `EXPO_PUBLIC_BREEZ_API_KEY` at build time; without it only NWC shows.
-
-**Rollout:**
-1. PoC first: EAS build one target, measure real IPA/AAB delta, send/receive
-   USDT between two devices, verify WASM on web + Tauri.
-2. Ship behind a feature flag in ONE pilot market; soft balance-cap nudge.
-3. Also ship the trivial fallback everywhere: payment address (lud16 / Spark
-   address) in the profile + "Pay" deep link on confirmed deals — covers
-   users of external wallets and any surface where the SDK lags.
-4. GATE: written legal sign-off (self-custody software exemptions, e.g. SG
-   PSA) BEFORE any public rollout. No escrow, ever — that flips the model to
-   custodial.
-
-Deliberately skipped: custodial options (Cashu mints, exchange APIs) —
-they conflict with the no-operator model.
 
 ## Peer-to-peer chat (friend chat) — experimental
 
