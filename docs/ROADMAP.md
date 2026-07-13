@@ -458,6 +458,17 @@ vector. Offer a **force-relay-through-TURN** option: the two peers no longer see
 each other's raw IP (Cloudflare does, but media stays e2e). Warn before the
 first call.
 
+**Screen sharing.** During a call, share your screen — it's just another
+media track on the SAME WebRTC connection (no new infra, same e2e).
+- Web/PWA: `navigator.mediaDevices.getDisplayMedia()` → replace/add the video
+  track. Easy.
+- Native: heavier — iOS needs a **ReplayKit Broadcast Upload Extension** (a
+  separate build target); Android uses the **MediaProjection** API.
+  `react-native-webrtc` supports both but each needs native config. Ship it
+  web-first, native later.
+- Warn before starting: a shared screen can leak notifications, other chats,
+  or sensitive info beyond what you intend.
+
 **Scope.** 1:1 only — mesh WebRTC doesn't scale past ~4 and group calls need an
 SFU (an operator media server). Native needs `react-native-webrtc` (a heavy
 native module → a fresh binary build + mic/cam permissions, which the app
