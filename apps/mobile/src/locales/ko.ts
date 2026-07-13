@@ -763,5 +763,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "거래 후 평가 부탁드려요",
   "Donation": "기부",
   "Copy BTC address": "BTC 주소 복사",
+  "Calls": "통화",
+  "Mini-apps": "미니앱",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "친구와의 암호화된 1:1 채팅 — 곧 제공됩니다.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "채팅에서 P2P 음성·영상 통화 — 곧 제공됩니다.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Freeport 신원과 지갑을 사용하는 웹 앱 — 곧 제공됩니다.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "유용한 게시물과 신뢰할 수 있는 판매자에게 sats 팁 보내기 — 곧 제공됩니다.",
 };
 export default c;

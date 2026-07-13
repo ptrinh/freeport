@@ -720,5 +720,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "ກະລຸນາໃຫ້ຄະແນນຂ້ອຍຫຼັງຈາກດີລ",
   "Donation": "ການບໍລິຈາກ",
   "Copy BTC address": "ສຳເນົາທີ່ຢູ່ BTC",
+  "Calls": "ການໂທ",
+  "Mini-apps": "ມິນິແອັບ",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "ແຊັດ 1:1 ທີ່ເຂົ້າລະຫັດກັບໝູ່ເພື່ອນ — ໃກ້ຈະເປີດໃຫ້ໃຊ້.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "ການໂທສຽງ ແລະ ວິດີໂອແບບ P2P ໃນແຊັດ — ໃກ້ຈະເປີດໃຫ້ໃຊ້.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "ເວັບແອັບທີ່ໃຊ້ຕົວຕົນ ແລະ ກະເປົາເງິນ Freeport ຂອງທ່ານ — ໃກ້ຈະເປີດໃຫ້ໃຊ້.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "ສົ່ງ sats ເປັນທິບໃຫ້ໂພສທີ່ເປັນປະໂຫຍດ ແລະ ຜູ້ຂາຍທີ່ໜ້າເຊື່ອຖື — ໃກ້ຈະເປີດໃຫ້ໃຊ້.",
 };
 export default c;

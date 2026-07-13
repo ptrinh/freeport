@@ -723,5 +723,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "Kérlek, értékelj az üzlet után",
   "Donation": "Adomány",
   "Copy BTC address": "BTC-cím másolása",
+  "Calls": "Hívások",
+  "Mini-apps": "Mini-appok",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "Titkosított 1:1 csevegés barátokkal — hamarosan.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "Peer-to-peer hang- és videohívások a csevegésben — hamarosan.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Webalkalmazások, amelyek a Freeport-identitásodat és -tárcádat használják — hamarosan.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "Adj sats borravalót a hasznos bejegyzéseknek és a megbízható eladóknak — hamarosan.",
 };
 export default c;

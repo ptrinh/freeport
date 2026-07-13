@@ -723,5 +723,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "Gradeer my asseblief ná die transaksie",
   "Donation": "Skenking",
   "Copy BTC address": "Kopieer BTC-adres",
+  "Calls": "Oproepe",
+  "Mini-apps": "Mini-apps",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "Geënkripteerde 1:1-klets met vriende — binnekort beskikbaar.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "Eweknie-oudio- en -video-oproepe in klets — binnekort beskikbaar.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Webtoepassings wat jou Freeport-identiteit en -beursie gebruik — binnekort beskikbaar.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "Gee sats as fooitjie vir nuttige plasings en betroubare verkopers — binnekort beskikbaar.",
 };
 export default c;

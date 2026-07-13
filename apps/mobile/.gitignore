@@ -4,3 +4,4 @@ public/
 
 # local build env (Breez API key)
 .env.local
+dist-fresh/

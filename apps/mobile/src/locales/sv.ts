@@ -723,5 +723,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "Betygsätt mig gärna efter affären",
   "Donation": "Donation",
   "Copy BTC address": "Kopiera BTC-adress",
+  "Calls": "Samtal",
+  "Mini-apps": "Miniappar",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "Krypterad 1:1-chatt med vänner – kommer snart.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "Peer-to-peer-ljud- och videosamtal i chatten – kommer snart.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Webbappar som använder din Freeport-identitet och plånbok – kommer snart.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "Ge sats i dricks till hjälpsamma inlägg och pålitliga säljare – kommer snart.",
 };
 export default c;

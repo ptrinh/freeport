@@ -763,5 +763,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "Beri saya rating setelah transaksi",
   "Donation": "Donasi",
   "Copy BTC address": "Salin alamat BTC",
+  "Calls": "Panggilan",
+  "Mini-apps": "Aplikasi mini",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "Chat 1:1 terenkripsi dengan teman — segera hadir.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "Panggilan suara & video peer-to-peer di chat — segera hadir.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Aplikasi web yang menggunakan identitas & dompet Freeport Anda — segera hadir.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "Beri tip sats ke postingan bermanfaat dan penjual tepercaya — segera hadir.",
 };
 export default c;

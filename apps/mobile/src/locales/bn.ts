@@ -720,5 +720,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "ডিলের পরে দয়া করে আমাকে রেটিং দিন",
   "Donation": "অনুদান",
   "Copy BTC address": "BTC ঠিকানা কপি করুন",
+  "Calls": "কল",
+  "Mini-apps": "মিনি-অ্যাপ",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "বন্ধুদের সাথে এনক্রিপ্টেড ১:১ চ্যাট — শীঘ্রই আসছে।",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "চ্যাটে পিয়ার-টু-পিয়ার অডিও ও ভিডিও কল — শীঘ্রই আসছে।",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "আপনার Freeport পরিচয় ও ওয়ালেট ব্যবহার করে এমন ওয়েব অ্যাপ — শীঘ্রই আসছে।",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "সহায়ক পোস্ট ও বিশ্বস্ত বিক্রেতাদের sats টিপ দিন — শীঘ্রই আসছে।",
 };
 export default c;

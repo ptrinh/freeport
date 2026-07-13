@@ -720,5 +720,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "Tafadhali nikadirie baada ya mkataba",
   "Donation": "Mchango",
   "Copy BTC address": "Nakili anwani ya BTC",
+  "Calls": "Simu",
+  "Mini-apps": "Programu ndogo",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "Gumzo la 1:1 lililosimbwa na marafiki — inakuja hivi karibuni.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "Simu za sauti na video za moja kwa moja kati ya watumiaji kwenye gumzo — inakuja hivi karibuni.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Programu za wavuti zinazotumia utambulisho na pochi yako ya Freeport — inakuja hivi karibuni.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "Tuma sats kama zawadi kwa machapisho yenye msaada na wauzaji wanaoaminika — inakuja hivi karibuni.",
 };
 export default c;

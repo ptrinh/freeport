@@ -720,5 +720,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "Pakiratingan ako pagkatapos ng deal",
   "Donation": "Donasyon",
   "Copy BTC address": "Kopyahin ang BTC address",
+  "Calls": "Mga tawag",
+  "Mini-apps": "Mga mini-app",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "Naka-encrypt na 1:1 chat kasama ang mga kaibigan — malapit na.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "Peer-to-peer na audio at video call sa chat — malapit na.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Mga web app na gumagamit ng iyong Freeport identity at wallet — malapit na.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "Mag-tip ng sats sa mga kapaki-pakinabang na post at pinagkakatiwalaang seller — malapit na.",
 };
 export default c;

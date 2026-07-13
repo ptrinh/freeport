@@ -2,6 +2,34 @@
 
 Items intentionally postponed, with enough context to pick them up later.
 
+## Ship-ahead policy: native modules + coming-soon switches
+
+Binary releases are slow (store review) but OTA JS updates are instant — so
+every binary ships **ahead of the roadmap**: native modules for planned
+features are linked now, and the features arrive later as pure-JS OTA pushes.
+`runtimeVersion.policy = appVersion` keeps this safe: bump the app version
+whenever a native module is added, and OTA updates for the new runtime never
+reach old binaries that lack the module.
+
+**Pre-linked as of 1.6.0** (feature JS not yet shipped):
+- `react-native-webrtc` (+ config plugin) — for audio/video calls + screen
+  share. Mic/camera permissions were already in the manifest (voice messages,
+  QR scan).
+- `react-native-webview` — for the mini-apps shell (and any embedded web flow).
+
+**Deliberately NOT pre-linked:**
+- Live Activity widget (iOS) — a Swift widget extension is a separate build
+  target whose UI can't be OTA'd anyway; add it when the feature is built.
+- ReplayKit broadcast extension (iOS screen share) — same reason; web/PWA
+  screen share needs nothing.
+
+**Coming-soon switches.** Settings → Experimental shows a row for each major
+upcoming feature (Chat, Calls, Mini-apps, Zaps) **before it exists**: visible
+but disabled, marked "Coming soon". Users see what's next; when a feature
+ships via OTA, the row becomes a live toggle (the pref pattern is already
+established — the Wallet toggle landed ahead of the wallet). Keep this list in
+sync with the sections below.
+
 ## Lock-screen live progress (Live Activity) — deferred until native build
 
 **Goal:** show deal/trip progress on the phone lock screen + Dynamic Island
@@ -231,19 +259,48 @@ username→pubkey directory and never links the payment handle to the Nostr
 identity (see the privacy note under the wallet section). The only thing shared
 out-of-band is an invite.
 
+**Sequencing with NIP-17 (see the gift-wrap section above).** NIP-04 leaks the
+friend graph to relays (who ⇄ whom, when) — worse for social chat than for deal
+DMs. Chat has no install base yet, so it should launch **NIP-17-native** (or at
+minimum behind the same transport abstraction the NIP-17 migration introduces)
+rather than shipping on NIP-04 and migrating later. If chat lands first, build
+it on a `sendPrivate/watchPrivate` seam so swapping the wire format is a
+transport change, not a chat change.
+
+**Message envelope (new types, parsed before the negotiation path).**
+`watchDMs` currently decrypts and runs `parseNegotiationMessage`, which accepts
+only negotiation types (they require `nego` + `intent_id`) and silently drops
+everything else. Friend chat adds its own envelope family, versioned like the
+negotiation one: `chat.invite`, `chat.accept`, `chat.reject`, `chat.msg`,
+`chat.ack` (delivery/read receipts, doubling as the presence carrier — below).
+Parse these in a branch BEFORE the negotiation path so they never fall into the
+`pendingMsgs` queue waiting for an intent that doesn't exist. Old clients drop
+unknown types on the floor — that's the (graceful) compat story.
+
 **Invite = relay-resolved short code (Option 2, no hosted server).**
-- Generating: the app mints a random 8–10 char code and publishes a small
-  **addressable event** with `d = <code>`, signed (author = the inviter's
-  pubkey), carrying a display name. Short TTL; revocable by republishing the
-  same `d` empty (same mechanism as intent withdraw). Reuses the addressable
-  d-tag machinery already in `client.ts`.
+- **The code is a hash commitment to the inviter's pubkey** — NOT a random
+  string. d-tags are only unique per *(kind, pubkey, d)*, so with a random code
+  anyone watching relays could race-publish the same `d` under their own pubkey
+  and hijack the invite (the victim would chat with — and could in-chat-pay —
+  the attacker). Instead: mint a random nonce, set
+  `code = base32(sha256(inviter_pubkey ‖ nonce))[:10]`, and publish the
+  addressable event with `d = <code>` carrying the nonce + a display name,
+  signed by the inviter. The resolver recomputes the hash from each candidate
+  event's author + nonce and **discards any event whose author doesn't match
+  the code** — forgeries are unresolvable by construction. Link stays short,
+  no directory needed. Reserve the event kind in `packages/protocol/src/constants.ts`
+  and spec it in `docs/protocol.md` alongside the intent kinds.
+- Short TTL; revocable by republishing the same `d` empty (same mechanism as
+  intent withdraw). Reuses the addressable d-tag machinery already in `client.ts`.
 - Sharing: QR code + a fragment link `https://freeport.network/#invite=<code>`.
   The `#fragment` is client-side only (never sent to a server), same as the
   live-trip `#t=` links the app already parses.
-- Resolving: opening the link → app queries relays `{ '#d': [code], kinds: […] }`
-  → gets the inviter's pubkey. Relays do the lookup; no shortener service.
-- Entropy note: 8–10 chars keeps casual enumeration/collision low; a guessed
-  code only leaks "you may receive a chat invite", never funds or keys.
+- Resolving: opening the link → app queries relays `{ '#d': [code], kinds: [<invite kind>] }`
+  → verifies the commitment (above) → gets the inviter's pubkey. Relays do the
+  lookup; no shortener service.
+- Entropy note: 10 base32 chars (~50 bits) keeps casual enumeration/collision
+  low; a guessed code only leaks "you may receive a chat invite", never funds
+  or keys.
 - **Rotating**: the invite popup has a **Generate new invite link** button —
   it tombstones the current code (republish its `d` empty, so the old
   QR/link stops resolving) and mints+publishes a fresh one. Use it if a link
@@ -291,11 +348,14 @@ event exists on relays, and only until it expires or is revoked.
 on/off switch stays under Features; once Chat is enabled a separate **Chat**
 section appears in Settings (its own collapsible, like Browse/Features)
 holding these two toggles:
-- **Show last seen** — publish your last-online time so contacts see it on the
-  chat. Off = you don't broadcast it (and, reciprocally, you don't see theirs).
-  Mechanism: a presence marker refreshed on app foreground (an addressable
-  `d`-tagged event, or piggybacked on the read-marker below), readable only by
-  accepted contacts.
+- **Show last seen** — share your last-online time so contacts see it on the
+  chat. Off = you don't share it (and, reciprocally, you don't see theirs).
+  Mechanism: **piggybacked on the encrypted `chat.ack` receipts** (a `last_seen`
+  timestamp on each ack). A public addressable presence event can't be
+  "readable only by contacts" — there's no group-encryption primitive here —
+  so the choice is leak-to-everyone or O(N) per-contact DMs; the ack channel
+  already flows exactly to accepted contacts and costs nothing extra. Trade-off
+  (accepted): last-seen only refreshes per active conversation, not globally.
 - **Chat receipts** — WhatsApp-style delivery/read ticks:
   - **1 grey tick** = sent (event accepted by a relay),
   - **2 ticks** = delivered (recipient's client received + decrypted it),

@@ -720,5 +720,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "እባክዎ ከስምምነቱ በኋላ ደረጃ ይስጡኝ",
   "Donation": "ልገሳ",
   "Copy BTC address": "የBTC አድራሻ ቅዳ",
+  "Calls": "ጥሪዎች",
+  "Mini-apps": "ሚኒ መተግበሪያዎች",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "ከጓደኞች ጋር የተመሰጠረ 1:1 ውይይት — በቅርቡ ይመጣል።",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "በውይይት ውስጥ የአቻ-ለአቻ የድምፅ እና የቪዲዮ ጥሪዎች — በቅርቡ ይመጣል።",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "የFreeport ማንነትዎን እና ቦርሳዎን የሚጠቀሙ የድር መተግበሪያዎች — በቅርቡ ይመጣል።",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "ለጠቃሚ ልጥፎች እና ለታመኑ ሻጮች sats ይሸልሙ — በቅርቡ ይመጣል።",
 };
 export default c;

@@ -763,5 +763,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "โปรดให้คะแนนฉันหลังจบดีล",
   "Donation": "บริจาค",
   "Copy BTC address": "คัดลอกที่อยู่ BTC",
+  "Calls": "การโทร",
+  "Mini-apps": "มินิแอป",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "แชท 1:1 เข้ารหัสกับเพื่อน — เร็ว ๆ นี้",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "โทรด้วยเสียงและวิดีโอแบบ peer-to-peer ในแชท — เร็ว ๆ นี้",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "เว็บแอปที่ใช้ตัวตนและกระเป๋าเงิน Freeport ของคุณ — เร็ว ๆ นี้",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "ทิป sats ให้โพสต์ที่มีประโยชน์และผู้ขายที่เชื่อถือได้ — เร็ว ๆ นี้",
 };
 export default c;

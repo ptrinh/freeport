@@ -763,5 +763,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "取引後に評価してください",
   "Donation": "寄付",
   "Copy BTC address": "BTCアドレスをコピー",
+  "Calls": "通話",
+  "Mini-apps": "ミニアプリ",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "友だちとの暗号化された1対1チャット。近日公開。",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "チャット内でのピアツーピア音声・ビデオ通話。近日公開。",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Freeportのアイデンティティとウォレットを使うWebアプリ。近日公開。",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "役立つ投稿や信頼できる出品者にsatsでチップを送る。近日公開。",
 };
 export default c;

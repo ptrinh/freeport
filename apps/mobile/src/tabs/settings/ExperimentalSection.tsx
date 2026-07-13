@@ -10,7 +10,27 @@ import { s, palette } from '../../ui/theme';
  *  - Wallet: the self-custodial BTC/stablecoin wallet (Breez SDK Spark /
  *    NWC — see docs/ROADMAP.md). The toggle lands ahead of the feature so
  *    the pref exists across surfaces before the wallet UI ships.
+ *
+ * Coming-soon rows (ship-ahead policy, docs/ROADMAP.md): roadmap features are
+ * shown here disabled before they exist, so users see what's next. When a
+ * feature ships via OTA its row becomes a live toggle like Wallet's.
  */
+
+/** A visible-but-disabled row for a feature that hasn't shipped yet. */
+function ComingSoonRow({ icon, title, desc }: { icon: React.ComponentProps<typeof Ionicons>['name']; title: string; desc: string }) {
+  return (
+    <View accessibilityRole="switch" accessibilityState={{ checked: false, disabled: true }} style={[s.toggleRow, { opacity: 0.45 }]}>
+      <Ionicons name={icon} size={20} color={palette.text2} style={{ marginEnd: 10 }} />
+      <View style={{ flex: 1, marginEnd: 12 }}>
+        <Text style={s.toggleTitle}>{title}</Text>
+        <Text style={s.dim}>{desc}</Text>
+      </View>
+      <View style={s.switchTrack}>
+        <View style={s.switchThumb} />
+      </View>
+    </View>
+  );
+}
 function ExperimentalSection({
   walletEnabled,
   onWalletEnabledChange,
@@ -69,6 +89,10 @@ function ExperimentalSection({
               <View style={[s.switchThumb, walletEnabled && s.switchThumbOn]} />
             </View>
           </Pressable>
+          <ComingSoonRow icon="chatbubbles-outline" title={t('Chat')} desc={t('Encrypted 1:1 chat with friends — coming soon.')} />
+          <ComingSoonRow icon="call-outline" title={t('Calls')} desc={t('Peer-to-peer audio & video calls in chat — coming soon.')} />
+          <ComingSoonRow icon="apps-outline" title={t('Mini-apps')} desc={t('Web apps that use your Freeport identity & wallet — coming soon.')} />
+          <ComingSoonRow icon="flash-outline" title={t('Zaps')} desc={t('Tip sats to helpful posts and trusted sellers — coming soon.')} />
         </>
       )}
     </>

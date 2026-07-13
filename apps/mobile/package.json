@@ -17,6 +17,7 @@
     "@aptabase/web": "^0.5.0",
     "@breeztech/breez-sdk-spark": "^0.19.0",
     "@breeztech/breez-sdk-spark-react-native": "^0.18.0",
+    "@config-plugins/react-native-webrtc": "^13.0.0",
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.3",
     "@freeport/protocol": "file:../../packages/protocol",
@@ -64,6 +65,8 @@
     "react-native-passkeys": "^0.4.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-web": "^0.21.0",
+    "react-native-webrtc": "^124.0.7",
+    "react-native-webview": "13.15.0",
     "typescript": "~5.9.2"
   },
   "devDependencies": {

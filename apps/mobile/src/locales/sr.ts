@@ -723,5 +723,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "Молим оцените ме након договора",
   "Donation": "Донација",
   "Copy BTC address": "Копирај BTC адресу",
+  "Calls": "Позиви",
+  "Mini-apps": "Мини-апликације",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "Шифровано 1:1 ћаскање са пријатељима — ускоро.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "Peer-to-peer аудио и видео позиви у ћаскању — ускоро.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Веб апликације које користе ваш Freeport идентитет и новчаник — ускоро.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "Пошаљите sats као напојницу за корисне објаве и поуздане продавце — ускоро.",
 };
 export default c;

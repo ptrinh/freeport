@@ -723,5 +723,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "Παρακαλώ βαθμολογήστε με μετά τη συναλλαγή",
   "Donation": "Δωρεά",
   "Copy BTC address": "Αντιγραφή διεύθυνσης BTC",
+  "Calls": "Κλήσεις",
+  "Mini-apps": "Μίνι εφαρμογές",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "Κρυπτογραφημένη συνομιλία 1:1 με φίλους — έρχεται σύντομα.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "Κλήσεις ήχου και βίντεο peer-to-peer μέσα στη συνομιλία — έρχεται σύντομα.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Εφαρμογές web που χρησιμοποιούν την ταυτότητα και το πορτοφόλι σας στο Freeport — έρχεται σύντομα.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "Δώστε φιλοδώρημα σε sats σε χρήσιμες αναρτήσεις και αξιόπιστους πωλητές — έρχεται σύντομα.",
 };
 export default c;

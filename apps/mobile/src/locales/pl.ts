@@ -725,5 +725,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "Oceń mnie po transakcji",
   "Donation": "Darowizna",
   "Copy BTC address": "Kopiuj adres BTC",
+  "Calls": "Połączenia",
+  "Mini-apps": "Miniaplikacje",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "Szyfrowany czat 1:1 ze znajomymi — już wkrótce.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "Połączenia audio i wideo peer-to-peer w czacie — już wkrótce.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Aplikacje internetowe korzystające z Twojej tożsamości i portfela Freeport — już wkrótce.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "Dawaj napiwki w sats za pomocne posty i zaufanym sprzedawcom — już wkrótce.",
 };
 export default c;

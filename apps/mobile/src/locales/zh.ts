@@ -763,5 +763,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "交易后请给我评分",
   "Donation": "捐赠",
   "Copy BTC address": "复制 BTC 地址",
+  "Calls": "通话",
+  "Mini-apps": "小程序",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "与好友进行加密的 1:1 聊天 — 即将推出。",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "聊天中的点对点音视频通话 — 即将推出。",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "使用你的 Freeport 身份与钱包的网页应用 — 即将推出。",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "给有用的帖子和可信的卖家打赏 sats — 即将推出。",
 };
 export default c;

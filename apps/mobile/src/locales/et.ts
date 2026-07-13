@@ -723,5 +723,12 @@ const c: Record<string, string> = {
   "Please rate me after the deal": "Palun hinda mind pärast tehingut",
   "Donation": "Annetus",
   "Copy BTC address": "Kopeeri BTC-aadress",
+  "Calls": "Kõned",
+  "Mini-apps": "Minirakendused",
+  "Zaps": "Zaps",
+  "Encrypted 1:1 chat with friends — coming soon.": "Krüpteeritud üks-ühele vestlus sõpradega — tulekul.",
+  "Peer-to-peer audio & video calls in chat — coming soon.": "Kasutajatevahelised heli- ja videokõned vestluses — tulekul.",
+  "Web apps that use your Freeport identity & wallet — coming soon.": "Veebirakendused, mis kasutavad sinu Freeporti identiteeti ja rahakotti — tulekul.",
+  "Tip sats to helpful posts and trusted sellers — coming soon.": "Jäta sats'ides jootraha kasulikele postitustele ja usaldusväärsetele müüjatele — tulekul.",
 };
 export default c;

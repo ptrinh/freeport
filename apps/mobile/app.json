@@ -3,7 +3,7 @@
     "name": "Freeport",
     "slug": "freeport",
     "owner": "ptrinh",
-    "version": "1.5.2",
+    "version": "1.6.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
@@ -42,7 +42,7 @@
           "apiKey": "AIzaSyB70aRYEMJlBtl3LgvnBpGe6dkKuJhwJY4"
         }
       },
-      "versionCode": 21
+      "versionCode": 23
     },
     "web": {
       "bundler": "metro",
@@ -68,6 +68,13 @@
         "expo-av",
         {
           "microphonePermission": "Freeport uses the microphone so you can record and send voice messages."
+        }
+      ],
+      [
+        "@config-plugins/react-native-webrtc",
+        {
+          "cameraPermission": "Freeport needs camera access for video calls and to take photos for listings and messages.",
+          "microphonePermission": "Freeport uses the microphone for calls and voice messages."
         }
       ],
       "expo-font",
