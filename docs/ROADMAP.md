@@ -206,6 +206,16 @@ migration. Zero app-code changes beyond app.json config.
 
 ## NIP-17/NIP-44 gift-wrapped DMs — metadata privacy upgrade
 
+**Status (2026-07): SHIPPED for chat + calls.** The NIP-04 handshake
+(invite/accept — must reach every client) exchanges an `n17` capability flag;
+once both sides flag it, all post-handshake traffic (chat.msg/react/ttl/ack +
+call.*) rides kind-1059 gift wraps: sender identity, timing, and the fact
+that the two pubkeys talk at all are hidden from relays. The rumor id is the
+shared message identifier (replies/reactions/dedupe). NIP-07 extension users
+lack raw-key access → they stay NIP-04 and never flag the capability.
+Remaining: migrate the NEGOTIATION envelopes (big NIP-04 install base — needs
+the dual-rail plan below).
+
 NIP-04 encrypts message *content*, but relays still see **who talks to whom and
 when** — every negotiation leaks its social graph as public metadata (sender
 pubkey, recipient `p` tag, timestamp). For a marketplace, that's a map of who

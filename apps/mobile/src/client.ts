@@ -5,6 +5,7 @@
  */
 import { SimplePool } from 'nostr-tools/pool';
 import { type Event } from 'nostr-tools/pure';
+import { createRumor, createSeal, createWrap, unwrapEvent } from 'nostr-tools/nip59';
 import { getPow } from 'nostr-tools/nip13';
 import { minePowAsync } from './pow';
 import { screenIntent, screenIntentContent } from './moderation';
@@ -22,6 +23,8 @@ import {
   KIND_INTENT_REQUEST,
   KIND_CHAT_INVITE,
   CHAT_INVITE,
+  CHAT_ACCEPT,
+  CHAT_REJECT,
   CHAT_MSG,
   buildIntentTemplate,
   parseIntentEvent,
@@ -708,11 +711,20 @@ export class MobileClient {
     // guard makes any overlap harmless.
     const floor = Math.floor(Date.now() / 1000) - DM_BACKFILL_MAX_SECONDS;
     const since = Math.max(floor, this.dmLastSeenTs - DM_BACKFILL_MARGIN_SECONDS);
+    // NIP-17: wrap timestamps are randomized up to ~2 days into the past
+    // (metadata privacy), so the 1059 filter reaches 2 days further back than
+    // the kind-4 one; rumor ids in seenEventIds make the overlap harmless.
+    const filters: any[] = [{ kinds: [4], '#p': [this.pubkey], since }];
+    if (this.nip17Supported()) filters.push({ kinds: [1059], '#p': [this.pubkey], since: since - 2 * 24 * 3600 });
     const sub = this.pool.subscribeMany(
       this.relays,
-      { kinds: [4], '#p': [this.pubkey], since },
+      filters as any,
       {
         onevent: async (ev: Event) => {
+          if (ev.kind === 1059) {
+            this.processWrap(ev);
+            return;
+          }
           if (ev.created_at > this.dmLastSeenTs && ev.created_at <= this.watchStartTs + 300) {
             this.dmLastSeenTs = ev.created_at;
             void this.persistNegotiations(); // debounced; also writes dmLastSeen
@@ -720,21 +732,7 @@ export class MobileClient {
           if (this.blocked.has(ev.pubkey)) return; // blocked peer — drop without decrypting
           try {
             const plain = await this.signer.nip04Decrypt(ev.pubkey, ev.content);
-            const msg = parseNegotiationMessage(plain);
-            if (msg) {
-              this.processDM(msg, ev.pubkey, ev.created_at, false, ev.id);
-              return;
-            }
-            // Not a negotiation envelope — try the friend-chat family. Parsed
-            // here (never via pendingMsgs) so a chat DM can't queue forever
-            // waiting on an intent that doesn't exist.
-            const chat = parseChatEnvelope(plain);
-            if (chat) {
-              this.processChatDM(chat, ev.pubkey, ev.created_at, ev.id);
-              return;
-            }
-            const call = parseCallEnvelope(plain);
-            if (call) this.processCallDM(call, ev.pubkey, ev.created_at);
+            this.routePlaintext(plain, ev.pubkey, ev.created_at, ev.id);
           } catch {
             /* not a Freeport DM */
           }
@@ -742,6 +740,44 @@ export class MobileClient {
       },
     );
     return () => { clearInterval(sweepTimer); sub.close(); };
+  }
+
+  /** Route one decrypted plaintext through the three envelope families. */
+  private routePlaintext(plain: string, from: string, createdAt: number, eventId?: string): void {
+    const msg = parseNegotiationMessage(plain);
+    if (msg) {
+      this.processDM(msg, from, createdAt, false, eventId);
+      return;
+    }
+    // Not a negotiation envelope — try the friend-chat family. Parsed here
+    // (never via pendingMsgs) so a chat DM can't queue forever waiting on an
+    // intent that doesn't exist.
+    const chat = parseChatEnvelope(plain);
+    if (chat) {
+      this.processChatDM(chat, from, createdAt, eventId);
+      return;
+    }
+    const call = parseCallEnvelope(plain);
+    if (call) this.processCallDM(call, from, createdAt);
+  }
+
+  /**
+   * Unwrap a kind-1059 gift wrap → the inner rumor is the real message:
+   * sender = rumor.pubkey (the wrap's is ephemeral), time = rumor.created_at
+   * (the wrap's is randomized), id = rumor.id (shared with the sender's
+   * outbound record). The blocked check must run AFTER unwrap — the wrap's
+   * author is a throwaway key by design.
+   */
+  private processWrap(ev: Event): void {
+    try {
+      const rumor = unwrapEvent(ev, this.signer.secretKey!);
+      if (!rumor?.pubkey || typeof rumor.content !== 'string') return;
+      if (rumor.pubkey === this.pubkey) return; // our own outbound copy
+      if (this.blocked.has(rumor.pubkey)) return;
+      this.routePlaintext(rumor.content, rumor.pubkey, rumor.created_at, rumor.id);
+    } catch {
+      /* not addressed to us / junk wrap */
+    }
   }
 
   /**
@@ -1069,8 +1105,40 @@ export class MobileClient {
     return this.chatPrefs.lastSeen ? Math.floor(Date.now() / 1000) : undefined;
   }
 
+  /** We can gift-wrap iff we hold the raw key (local signer; not NIP-07). */
+  private nip17Supported(): boolean {
+    return !!this.signer.secretKey;
+  }
+
+  /**
+   * NIP-17 send: kind-14 rumor (our JSON envelope as content) → seal → wrap.
+   * Returns the RUMOR id — the wrap id differs per recipient and its
+   * timestamp is randomized, so the rumor id is the shared message identifier
+   * both sides use for replies/reactions/dedupe.
+   */
+  private async sendWrapped(peer: string, plaintext: string): Promise<string> {
+    const sk = this.signer.secretKey!;
+    const rumor = createRumor(
+      { kind: 14, created_at: Math.floor(Date.now() / 1000), tags: [['p', peer]], content: plaintext },
+      sk,
+    );
+    const wrap = createWrap(createSeal(rumor, sk, peer), peer);
+    await this.publishDM(wrap as Event);
+    return rumor.id;
+  }
+
+  /**
+   * Post-handshake chat traffic upgrades to gift wrap when BOTH sides can
+   * (the handshake itself always rides NIP-04 so it reaches every client —
+   * capability is exchanged via the invite/accept `n17` flag).
+   */
   private async sendChatEnvelope(peer: string, env: ChatEnvelope): Promise<string> {
-    return this.sendDM(peer, JSON.stringify(env));
+    const handshake = env.type === CHAT_INVITE || env.type === CHAT_ACCEPT || env.type === CHAT_REJECT;
+    const plaintext = JSON.stringify(env);
+    if (!handshake && this.nip17Supported() && this.conversations.get(peer)?.nip17) {
+      return this.sendWrapped(peer, plaintext);
+    }
+    return this.sendDM(peer, plaintext);
   }
 
   /**
@@ -1087,14 +1155,20 @@ export class MobileClient {
     this.onCallSignal?.(from, env);
   }
 
-  /** Send one call-signaling envelope (offer/answer/hangup) to a peer. */
+  /** Send one call-signaling envelope (offer/answer/hangup) to a peer —
+   *  gift-wrapped when the conversation upgraded to NIP-17. */
   async sendCallSignal(peer: string, env: CallEnvelope): Promise<void> {
-    await this.sendDM(peer, JSON.stringify(env));
+    const plaintext = JSON.stringify(env);
+    if (this.nip17Supported() && this.conversations.get(peer)?.nip17) {
+      await this.sendWrapped(peer, plaintext);
+      return;
+    }
+    await this.sendDM(peer, plaintext);
   }
 
   /** Send a chat request to a resolved invite's pubkey (opener side). */
   async chatInvite(peer: string, myName?: string): Promise<void> {
-    const env = makeChatInvite(myName, await this.resolvePayAddress());
+    const env = makeChatInvite(myName, await this.resolvePayAddress(), this.nip17Supported());
     const conv = applyChatOutbound(
       this.conversations.get(peer) ?? newConversation(peer, 'pending_out'),
       env,
@@ -1108,7 +1182,7 @@ export class MobileClient {
   async chatAccept(peer: string, myName?: string): Promise<void> {
     const conv = this.conversations.get(peer);
     if (!conv || conv.state !== 'pending_in') return;
-    const env = makeChatAccept(myName, await this.resolvePayAddress());
+    const env = makeChatAccept(myName, await this.resolvePayAddress(), this.nip17Supported());
     const updated = applyChatOutbound(conv, env);
     this.commitConversation(updated);
     this.onConversationUpdate?.(updated);

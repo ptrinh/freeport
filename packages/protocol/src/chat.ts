@@ -93,6 +93,10 @@ export interface ChatEnvelope {
   last_seen?: number;
   /** chat.invite / chat.accept: sender's lightning address (in-chat payments). */
   pay?: string;
+  /** chat.invite / chat.accept: sender can speak NIP-17 gift wrap — when both
+   *  sides flag it, post-handshake traffic (msg/react/ttl/ack + call.*)
+   *  upgrades to kind-1059 wraps and relays stop seeing the social graph. */
+  n17?: boolean;
   /** chat.msg: id of the message being replied to (its DM event id). */
   reply_to?: string;
   /** chat.msg: short snapshot of the quoted text (render without lookup). */
@@ -111,10 +115,10 @@ export interface ChatEnvelope {
 
 const nowSec = () => Math.floor(Date.now() / 1000);
 
-export const makeChatInvite = (name?: string, pay?: string): ChatEnvelope =>
-  ({ v: SCHEMA_VERSION, type: CHAT_INVITE, ...(name ? { name } : {}), ...(pay ? { pay } : {}), ts: nowSec() });
-export const makeChatAccept = (name?: string, pay?: string): ChatEnvelope =>
-  ({ v: SCHEMA_VERSION, type: CHAT_ACCEPT, ...(name ? { name } : {}), ...(pay ? { pay } : {}), ts: nowSec() });
+export const makeChatInvite = (name?: string, pay?: string, n17?: boolean): ChatEnvelope =>
+  ({ v: SCHEMA_VERSION, type: CHAT_INVITE, ...(name ? { name } : {}), ...(pay ? { pay } : {}), ...(n17 ? { n17 } : {}), ts: nowSec() });
+export const makeChatAccept = (name?: string, pay?: string, n17?: boolean): ChatEnvelope =>
+  ({ v: SCHEMA_VERSION, type: CHAT_ACCEPT, ...(name ? { name } : {}), ...(pay ? { pay } : {}), ...(n17 ? { n17 } : {}), ts: nowSec() });
 export const makeChatReject = (): ChatEnvelope =>
   ({ v: SCHEMA_VERSION, type: CHAT_REJECT, ts: nowSec() });
 export const makeChatMsg = (text: string, opts?: { replyTo?: string; quote?: string; expiresIn?: number }): ChatEnvelope =>

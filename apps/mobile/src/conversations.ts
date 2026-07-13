@@ -34,6 +34,9 @@ export interface Conversation {
   theirLastSeen?: number;
   /** Their lightning address (from invite/accept) — enables in-chat payments. */
   theirPay?: string;
+  /** Peer speaks NIP-17 (from invite/accept) — post-handshake traffic upgrades
+   *  to gift wrap when WE can too (transport choice ANDs our own support). */
+  nip17?: boolean;
   /** Disappearing-messages timer (seconds), synced both ways. undefined/0 = off. */
   disappearTtl?: number;
   /** Replay guard, same as Negotiation.seenEventIds (bounded). */
@@ -125,14 +128,14 @@ function applyChatInboundUnchecked(
   if (env.type === CHAT_INVITE) {
     // A fresh request — or, if we'd already invited THEM, mutual interest:
     // both sides tapped each other's invite, no accept round needed.
-    if (!conv) return { ...newConversation(peer, 'pending_in', env.name), theirPay: env.pay, updatedAt: ts };
-    if (conv.state === 'pending_out') return { ...conv, state: 'active', name: conv.name ?? env.name, theirPay: env.pay ?? conv.theirPay, updatedAt: ts };
-    if (conv.state === 'rejected') return { ...conv, state: 'pending_in', name: env.name ?? conv.name, theirPay: env.pay ?? conv.theirPay, updatedAt: ts };
+    if (!conv) return { ...newConversation(peer, 'pending_in', env.name), theirPay: env.pay, nip17: !!env.n17, updatedAt: ts };
+    if (conv.state === 'pending_out') return { ...conv, state: 'active', name: conv.name ?? env.name, theirPay: env.pay ?? conv.theirPay, nip17: !!env.n17, updatedAt: ts };
+    if (conv.state === 'rejected') return { ...conv, state: 'pending_in', name: env.name ?? conv.name, theirPay: env.pay ?? conv.theirPay, nip17: !!env.n17, updatedAt: ts };
     return null; // active or already pending_in — replayed invite, no-op
   }
   if (env.type === CHAT_ACCEPT) {
     if (!conv || conv.state !== 'pending_out') return null;
-    return { ...conv, state: 'active', name: conv.name ?? env.name, theirPay: env.pay ?? conv.theirPay, updatedAt: ts };
+    return { ...conv, state: 'active', name: conv.name ?? env.name, theirPay: env.pay ?? conv.theirPay, nip17: !!env.n17, updatedAt: ts };
   }
   if (env.type === CHAT_REJECT) {
     if (!conv || conv.state !== 'pending_out') return null;
