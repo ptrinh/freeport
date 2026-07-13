@@ -247,6 +247,10 @@ out-of-band is an invite.
   → gets the inviter's pubkey. Relays do the lookup; no shortener service.
 - Entropy note: 8–10 chars keeps casual enumeration/collision low; a guessed
   code only leaks "you may receive a chat invite", never funds or keys.
+- **Rotating**: the invite popup has a **Generate new invite link** button —
+  it tombstones the current code (republish its `d` empty, so the old
+  QR/link stops resolving) and mints+publishes a fresh one. Use it if a link
+  leaked or got shared too widely. One active invite code per user at a time.
 
 **Opening the link.**
 - Web: the web app reads `location.hash`, resolves the code, shows the invite.
