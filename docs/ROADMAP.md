@@ -290,8 +290,10 @@ gates DMs from unknown pubkeys; per-conversation block + archive; invite codes
 expire. No content is ever public — only the ephemeral, randomly-keyed invite
 event exists on relays, and only until it expires or is revoked.
 
-**Chat settings (Settings → Features, shown only when Chat is on).** Two extra
-toggles appear once Chat is enabled:
+**Chat settings — a dedicated Settings → Chat section.** The experimental
+on/off switch stays under Features; once Chat is enabled a separate **Chat**
+section appears in Settings (its own collapsible, like Browse/Features)
+holding these two toggles:
 - **Show last seen** — publish your last-online time so contacts see it on the
   chat. Off = you don't broadcast it (and, reciprocally, you don't see theirs).
   Mechanism: a presence marker refreshed on app foreground (an addressable
