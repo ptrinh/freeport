@@ -412,3 +412,45 @@ Turns Freeport from a ride/task board into a general P2P marketplace, reusing
 the same signed-events + reputation + wallet stack. Buyers browse a shop, start
 a negotiation/chat, pay with the wallet. Mostly additive: a new event
 kind/template + a shop view + a "my shop" editor.
+
+## Audio/video calls (WebRTC + Nostr-DM signaling)
+
+1:1 voice/video in chat — reusing the encrypted DM channel for the one piece
+that normally needs a server.
+
+**How.**
+- **Media**: WebRTC (`react-native-webrtc` on native, built-in on web/PWA),
+  **e2e encrypted by default** (DTLS-SRTP) directly between the two peers.
+- **Signaling** (SDP offer/answer + ICE exchange): sent as a few encrypted
+  NIP-04 DM events — **no signaling server**, reuses the chat transport. Media
+  never touches a relay.
+
+**NAT traversal — the only server-ish piece.** WebRTC needs STUN + sometimes
+TURN:
+- **STUN** (public IP discovery): free public servers, stateless — no burden.
+- **TURN** (relays media when a direct connection fails, ~15–20% of calls):
+  relays real bandwidth → needs infra. Recommended setup:
+  **STUN-first for the ~80% direct case + Cloudflare Realtime TURN as fallback.**
+  Cloudflare runs the TURN; a small Worker (same pattern as `lnurlp-proxy`)
+  mints **ephemeral** TURN credentials from a server-side API token (never
+  shipped to the client) and returns `iceServers` to the app. Billed on relayed
+  egress with a generous free allowance (verify current pricing); since TURN
+  only handles the fallback slice, real cost is small. Alternatives for
+  forks/self-host: their own Cloudflare token, self-hosted `coturn`, or
+  Metered's free tier. Or degrade gracefully (no TURN → call fails when direct
+  fails).
+
+**Privacy caveat (surface to the user).** WebRTC leaks your IP to the peer (or
+to TURN). For a pubkey-pseudonymous marketplace that's a deanonymization
+vector. Offer a **force-relay-through-TURN** option: the two peers no longer see
+each other's raw IP (Cloudflare does, but media stays e2e). Warn before the
+first call.
+
+**Scope.** 1:1 only — mesh WebRTC doesn't scale past ~4 and group calls need an
+SFU (an operator media server). Native needs `react-native-webrtc` (a heavy
+native module → a fresh binary build + mic/cam permissions, which the app
+already requests). Web/PWA can ship first.
+
+**Effort:** medium-high — WebRTC integration + native module, call UI
+(incoming/outgoing/in-call), signaling over DMs (small, reuses chat), and the
+TURN-credential Worker.
