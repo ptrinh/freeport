@@ -219,3 +219,70 @@ Requires `EXPO_PUBLIC_BREEZ_API_KEY` at build time; without it only NWC shows.
 
 Deliberately skipped: custodial options (Cashu mints, exchange APIs) —
 they conflict with the no-operator model.
+
+## Peer-to-peer chat (friend chat) — experimental
+
+Direct 1:1 chat between users, independent of any deal — reusing the encrypted
+DM transport and chat UI the marketplace already has. Gated behind an
+**Experimental → Chat** switch (a new `experimentalChat` pref, same pattern as
+`experimentalWallet`); everything below only exists when it's on.
+
+**Identity & transport (no new dependency).** Chat is pubkey-to-pubkey over the
+existing NIP-04 encrypted DMs (`client.sendChat`/`watchDMs`, keyed on pubkey).
+It deliberately does NOT use the lightning address / NIP-05 — so it adds no
+username→pubkey directory and never links the payment handle to the Nostr
+identity (see the privacy note under the wallet section). The only thing shared
+out-of-band is an invite.
+
+**Invite = relay-resolved short code (Option 2, no hosted server).**
+- Generating: the app mints a random 8–10 char code and publishes a small
+  **addressable event** with `d = <code>`, signed (author = the inviter's
+  pubkey), carrying a display name. Short TTL; revocable by republishing the
+  same `d` empty (same mechanism as intent withdraw). Reuses the addressable
+  d-tag machinery already in `client.ts`.
+- Sharing: QR code + a fragment link `https://freeport.network/#invite=<code>`.
+  The `#fragment` is client-side only (never sent to a server), same as the
+  live-trip `#t=` links the app already parses.
+- Resolving: opening the link → app queries relays `{ '#d': [code], kinds: […] }`
+  → gets the inviter's pubkey. Relays do the lookup; no shortener service.
+- Entropy note: 8–10 chars keeps casual enumeration/collision low; a guessed
+  code only leaks "you may receive a chat invite", never funds or keys.
+
+**Opening the link.**
+- Web: the web app reads `location.hash`, resolves the code, shows the invite.
+- Mobile browser with the app installed: offer **"Open with Freeport app"** via
+  a universal link / deeplink carrying the code, so the native app handles it.
+- Fallback: the web app handles it in-page.
+
+**Handshake (accept/reject).**
+1. The opener sees the resolved invite and taps **Send Chat Invite** → sends a
+   chat-invite DM to the inviter's pubkey.
+2. The inviter receives an incoming request and can **Accept / Reject**.
+3. On Accept the conversation goes active and both sides can chat; on Reject it
+   is dropped. Until accepted, it's a pending request (spam gate for unknown
+   pubkeys).
+
+**Messages tab UI.**
+- A circular **floating action button** (`+` icon) pinned bottom-right, sitting
+  **above** the bottom tab bar (never overlapping it). Only shown when Chat is
+  on. Tapping opens the invite popup (QR + shareable link + copy).
+- Friend chats appear as rows — `[Name] · [Last message] · [Time]` — in the
+  Messages list (a section distinct from deal threads).
+- Tapping a row opens the **same chat UI as the deal chat** (`ChatThread`),
+  with a top action to **Archive** the conversation and a **Block** action.
+
+**Refactor required.** `ChatThread` is currently bound to a `Negotiation`
+(`nego.messages`). Extract a generic **Conversation** model keyed by peer pubkey
+(pending | active | archived | blocked, message list, last-message/time) and a
+small conversations store; point both the deal chat and friend chat at it.
+`watchDMs` already delivers inbound DMs by pubkey, so routing a DM to a
+conversation (vs a negotiation) is the main wiring.
+
+**Safety.** Invites are opt-in (you choose who gets the code); accept/reject
+gates DMs from unknown pubkeys; per-conversation block + archive; invite codes
+expire. No content is ever public — only the ephemeral, randomly-keyed invite
+event exists on relays, and only until it expires or is revoked.
+
+**Effort:** medium. Transport + `ChatThread` reuse is small; the Conversation
+model/store, the invite publish+resolve flow, the deeplink handling, and the
+FAB + accept/reject UX are the bulk.
