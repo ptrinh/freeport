@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>eSIM Demo Shop — Freeport Mini-app</title>
+<!-- Freeport web-shell SDK: exposes window.nostr/webln/freeport when this page
+     runs inside the Freeport WEB shell (iframe). Inside the native shell the
+     shim is injected and this script exits immediately. -->
+<script src="https://freeport.network/sdk.js"></script>
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -104,6 +108,8 @@
   var pubkey = '';
   var $ = function (id) { return document.getElementById(id); };
 
+  // Native shell injects the bridge; the web shell's SDK installs it only
+  // when this page is actually embedded. A plain browser tab has neither.
   var inShell = !!(window.nostr && window.freeport);
   if (!inShell) {
     $('bridge-note').hidden = false;

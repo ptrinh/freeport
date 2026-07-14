@@ -7,7 +7,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { generateSecretKey, getPublicKey, verifyEvent } from 'nostr-tools/pure';
 import * as nip44 from 'nostr-tools/nip44';
-import { MiniAppFirewall } from '../src/miniapps/firewall';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { MiniAppFirewall, BRIDGE_METHODS } from '../src/miniapps/firewall';
 import { MiniAppBridge, sanitizeTemplate, encodeResponseJs, type BridgeDeps, type ApprovalRequest } from '../src/miniapps/bridge';
 import { MINIAPP_SHIM } from '../src/miniapps/shim';
 import { LocalSigner } from '../src/signer';
@@ -325,6 +327,24 @@ describe('response encoding (injection back into the page)', () => {
     // the encoded payload must round-trip exactly
     const m = js.match(/JSON\.parse\((".*")\)/s)!;
     expect(JSON.parse(JSON.parse(m[1]))).toEqual(JSON.parse(hostile));
+  });
+});
+
+describe('web SDK asset (packages/miniapp-sdk/freeport-sdk.js)', () => {
+  const SDK = readFileSync(join(__dirname, '../../../packages/miniapp-sdk/freeport-sdk.js'), 'utf8');
+
+  it('is static, embeds-only, and yields to the native shim and real extensions', () => {
+    expect(SDK).not.toMatch(/\$\{/);                        // no interpolation
+    expect(SDK).toContain('window !== window.top');         // only when embedded
+    expect(SDK).toContain('__fpMiniApp');                    // native shim wins
+    expect(SDK).not.toMatch(/nsec|secretKey|privateKey/);    // nothing secret-shaped
+  });
+
+  it('speaks the exact bridge RPC surface — same methods as the native shim', () => {
+    for (const m of BRIDGE_METHODS) {
+      expect(SDK, `SDK missing ${m}`).toContain(`'${m}'`);
+      expect(MINIAPP_SHIM, `shim missing ${m}`).toContain(`'${m}'`);
+    }
   });
 });
 

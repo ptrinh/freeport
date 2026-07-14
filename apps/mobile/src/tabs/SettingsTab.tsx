@@ -287,7 +287,7 @@ function SettingsTab({
   const [miniAppFw, setMiniAppFw] = useState<MiniAppFirewall | null>(null);
   const [openMiniApp, setOpenMiniApp] = useState<MiniAppRecord | null>(null);
   useEffect(() => {
-    if (experimentalMiniApps && Platform.OS !== 'web' && !miniAppFw) {
+    if (experimentalMiniApps && !miniAppFw) {
       void loadFirewall().then(setMiniAppFw).catch(() => {});
     }
   }, [experimentalMiniApps, miniAppFw]);
@@ -954,8 +954,9 @@ function SettingsTab({
         onMiniAppsEnabledChange={onExperimentalMiniAppsChange}
       />
 
-      {/* Mini-apps registry — native-only shell for NIP-07/WebLN web apps. */}
-      {experimentalMiniApps && Platform.OS !== 'web' && miniAppFw ? (
+      {/* Mini-apps registry — WebView shell on native, sandboxed iframe +
+          postMessage SDK on web. */}
+      {experimentalMiniApps && miniAppFw ? (
         <MiniAppsSection firewall={miniAppFw} onOpenApp={setOpenMiniApp} />
       ) : null}
       {openMiniApp && miniAppFw && signerRef.current ? (

@@ -245,8 +245,14 @@ app-claimed; sign templates field-whitelisted) and `MiniAppShell.tsx` is the
 hardened WebView (static shim, main-frame-only, incognito per app, navigation
 locked to the registered origin, popups off, responses escape-encoded).
 Add by URL or QR under Settings → Mini-apps; punycode lookalike origins are
-refused outright. Remaining below: web postMessage mode, a Nostr-published
-directory/blocklist, per-app spend-cap UI.
+refused outright. **Web mode also shipped**: a sandboxed cross-origin iframe +
+`MessageChannel` handshake (port handed over with targetOrigin pinned to the
+registered origin — browser-authenticated, stronger than native's navigation
+tracking) with a one-line postMessage SDK (`packages/miniapp-sdk`, served at
+freeport.network/sdk.js) that is deliberately outside the TCB; approval
+dialogs render in the parent DOM with delayed-arm Allow buttons. Same
+firewall, same tests. Demo: examples/demo-app → freeport.network/demo-app.
+Remaining: a Nostr-published directory/blocklist, per-app spend-cap UI.
 
 Turn Freeport into a host that injects its **portable identity** and
 **self-custodial wallet** into third-party web apps — the WeChat/Zalo
