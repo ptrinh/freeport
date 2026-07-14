@@ -322,7 +322,13 @@ export class MiniAppFirewall {
     this.mustApp(origin).perms.spendCapDaySats = sats;
   }
 
-  /** Record a completed payment (approved OR auto-allowed) against the caps. */
+  /**
+   * Reserve/record a payment against the caps. Call this SYNCHRONOUSLY at the
+   * decision point (before any `await wallet.pay…`), not after the payment
+   * settles — otherwise N concurrent auto-allowed payments each read spend=0
+   * and all pass the cap/cooldown (TOCTOU). On payment failure, undo with
+   * `refundSpend`.
+   */
   recordSpend(origin: string, sats: number, now: number): void {
     const s = rolled(this.spend.get(origin), now);
     s.sats += sats;
@@ -331,6 +337,18 @@ export class MiniAppFirewall {
     this.globalSpend = rolled(this.globalSpend, now);
     this.globalSpend.sats += sats;
     this.globalSpend.lastPayAt = now;
+  }
+
+  /** Undo a reservation whose payment failed. Rolls back the day's sats total
+   *  (clamped at 0); leaves lastPayAt so a failed attempt still counts toward
+   *  the cooldown (a hostile app can't retry-spam through failures). */
+  refundSpend(origin: string, sats: number, now: number): void {
+    if (sats <= 0) return;
+    const s = rolled(this.spend.get(origin), now);
+    s.sats = Math.max(0, s.sats - sats);
+    this.spend.set(origin, s);
+    this.globalSpend = rolled(this.globalSpend, now);
+    this.globalSpend.sats = Math.max(0, this.globalSpend.sats - sats);
   }
 
   spentToday(origin: string, now: number): number {

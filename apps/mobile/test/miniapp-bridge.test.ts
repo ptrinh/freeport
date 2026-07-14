@@ -190,6 +190,36 @@ describe('payments', () => {
     expect(persist).toHaveBeenCalled();
   });
 
+  it('concurrent auto-allowed payments cannot race past the daily cap (TOCTOU)', async () => {
+    // A per-app cap makes payments under it auto-allow with no dialog. Two
+    // 600-sat payments fired together: without a synchronous reservation both
+    // read spent=0 and slip under the 1000 cap. approve rejects, so the one
+    // that (correctly) has to ask never pays.
+    const { bridge, firewall, wallet, approve } = makeBridge({ approveResult: { ok: false } });
+    firewall.setSpendCap(APP, 1000);
+    wallet.parseAmount.mockReturnValue(600);
+    let block: () => void = () => {};
+    wallet.payInvoice.mockImplementation(async () => { await new Promise<void>((r) => { block = r; }); return { preimage: 'f'.repeat(64) }; });
+    const p = Promise.all([
+      call(bridge, 'webln.sendPayment', { invoice: 'lnbc_a' }, 'a'),
+      call(bridge, 'webln.sendPayment', { invoice: 'lnbc_b' }, 'b'),
+    ]);
+    await Promise.resolve(); block(); // let the first (reserved) payment settle
+    const [a, b] = await p;
+    expect(wallet.payInvoice).toHaveBeenCalledTimes(1);   // only one auto-allowed
+    expect(approve).toHaveBeenCalledTimes(1);              // the other had to ask
+    expect(firewall.spentToday(APP, T0)).toBe(600);        // cap not doubled
+    expect([a, b].filter((r) => r.ok).length).toBe(1);
+  });
+
+  it('a failed reserved payment refunds its cap headroom', async () => {
+    const { bridge, firewall, wallet } = makeBridge({ approveResult: { ok: true } });
+    wallet.parseAmount.mockReturnValue(400);
+    wallet.payInvoice.mockRejectedValue(new Error('boom'));
+    await call(bridge, 'webln.sendPayment', { invoice: 'lnbc_x' });
+    expect(firewall.spentToday(APP, T0)).toBe(0); // reservation rolled back
+  });
+
   it('user rejection means the wallet is never touched', async () => {
     const { bridge, wallet } = makeBridge({ approveResult: { ok: false } });
     await call(bridge, 'webln.sendPayment', { invoice: 'lnbc_x' });

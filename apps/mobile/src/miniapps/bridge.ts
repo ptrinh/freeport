@@ -187,7 +187,16 @@ export class MiniAppBridge {
       if (res.remember) this.applyGrant(msg.method as BridgeMethod, template?.kind, p.peer);
     }
 
-    return this.execute(id, msg.method as BridgeMethod, p, template, invoice);
+    // RESERVE the spend synchronously, here, before execute()'s first await —
+    // this is the same run as evaluate() (no yield between), so concurrent
+    // payments can't each see spend=0 and all slip under the cap (TOCTOU).
+    // execute() refunds if the payment throws.
+    let reserved = 0;
+    if (msg.method === 'webln.sendPayment') reserved = this.deps.wallet?.parseAmount(invoice) ?? 0;
+    else if (msg.method === 'freeport.paySpark') reserved = typeof p.sats === 'number' ? p.sats : 0;
+    if (reserved > 0) { this.deps.firewall.recordSpend(this.origin, reserved, this.now()); this.deps.persist(); }
+
+    return this.execute(id, msg.method as BridgeMethod, p, template, invoice, reserved);
   }
 
   /** Convert an "always allow" into a standing grant — but only the shapes the
@@ -204,7 +213,7 @@ export class MiniAppBridge {
     this.deps.persist();
   }
 
-  private async execute(id: string, method: BridgeMethod, p: Record<string, unknown>, template: EventTemplate | null, invoice: string): Promise<RpcResponse> {
+  private async execute(id: string, method: BridgeMethod, p: Record<string, unknown>, template: EventTemplate | null, invoice: string, reserved = 0): Promise<RpcResponse> {
     const { signer, wallet, context } = this.deps;
     try {
       switch (method) {
@@ -247,24 +256,18 @@ export class MiniAppBridge {
           return { id, ok: true, result: { paymentRequest: pr } };
         }
         case 'webln.sendPayment': {
-          if (!wallet) return { id, ok: false, error: 'no wallet' };
+          if (!wallet) { this.refund(reserved); return { id, ok: false, error: 'no wallet' }; }
+          // Spend was reserved before this await (TOCTOU-safe); refund on failure.
           const { preimage } = await wallet.payInvoice(invoice);
-          const paid = wallet.parseAmount(invoice) ?? 0;
-          this.deps.firewall.recordSpend(this.origin, paid, this.now());
-          this.deps.persist();
           return { id, ok: true, result: { preimage } };
         }
         case 'freeport.paySpark': {
-          if (!wallet) return { id, ok: false, error: 'no wallet' };
+          if (!wallet) { this.refund(reserved); return { id, ok: false, error: 'no wallet' }; }
           const opts = {
             sats: typeof p.sats === 'number' ? p.sats : undefined,
             token: p.token as { ticker: string; amount: number } | undefined,
           };
           const { preimage } = await wallet.paySpark(p.address as string, opts);
-          if (opts.sats) {
-            this.deps.firewall.recordSpend(this.origin, opts.sats, this.now());
-            this.deps.persist();
-          }
           return { id, ok: true, result: { preimage: preimage ?? '' } };
         }
       }
@@ -274,6 +277,8 @@ export class MiniAppBridge {
       // saves the user guessing why it failed.
       const isPay = method.startsWith('webln.') || method === 'freeport.paySpark';
       if (isPay) {
+        // The reservation didn't happen — give the cap headroom back.
+        this.refund(reserved);
         const msg = String((e as Error)?.message || '').toLowerCase();
         if (/insufficient|not enough|balance too low/.test(msg)) return { id, ok: false, error: 'insufficient balance' };
         if (/no .*balance|no exchange rate|no rate/.test(msg)) return { id, ok: false, error: msg.includes('rate') ? 'no exchange rate' : 'insufficient balance' };
@@ -281,6 +286,11 @@ export class MiniAppBridge {
       }
       return { id, ok: false, error: 'operation failed' };
     }
+  }
+
+  /** Give back a spend reservation whose payment never completed. */
+  private refund(reserved: number): void {
+    if (reserved > 0) { this.deps.firewall.refundSpend(this.origin, reserved, this.now()); this.deps.persist(); }
   }
 
   private nip44Key(peer: string): Uint8Array {
