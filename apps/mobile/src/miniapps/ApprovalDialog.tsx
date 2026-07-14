@@ -42,7 +42,8 @@ export function ApprovalDialog({ req, onDone }: { req: ApprovalRequest; onDone: 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={() => onDone({ ok: false })}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 24 }}>
-        <View style={[s.card, { marginHorizontal: 0 }]}>
+        {/* Cap the sheet on wide screens (desktop web) — full-bleed otherwise. */}
+        <View style={[s.card, { marginHorizontal: 0, width: '100%', maxWidth: 440, alignSelf: 'center' }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <Ionicons name={sensitive ? 'warning' : 'shield-checkmark-outline'} size={20} color={sensitive ? '#f59e0b' : palette.text2} />
             <Text style={[s.toggleTitle, { flex: 1 }]} numberOfLines={1}>{req.appName}</Text>

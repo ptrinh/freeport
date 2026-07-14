@@ -286,7 +286,8 @@ export function AppsTab({
       {/* Add-app sheet: URL/QR step, then required icon+title confirm step. */}
       <Modal visible={addStep != null} transparent animationType="fade" onRequestClose={closeAddSheet}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 24 }}>
-          <View style={[s.card, { marginHorizontal: 0 }]}>
+          {/* Cap the sheet on wide screens (desktop web) — full-bleed otherwise. */}
+          <View style={[s.card, { marginHorizontal: 0, width: '100%', maxWidth: 440, alignSelf: 'center' }]}>
             <Text style={s.toggleTitle}>{t('Add App')}</Text>
             {addStep === 'url' ? (
               <>
