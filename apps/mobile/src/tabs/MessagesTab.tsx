@@ -69,6 +69,7 @@ export function DealsTab({
   onStartCall,
   onPayFriend,
   chatTranslateTo,
+  onAcceptChatInvite,
 }: {
   client: MobileClient | null;
   negos: Negotiation[];
@@ -115,6 +116,8 @@ export function DealsTab({
   onPayFriend?: (peer: string, payAddress: string) => void;
   /** On-device auto-translate target for inbound chat messages. */
   chatTranslateTo?: string;
+  /** Accepting an invite (also enables the Chat experiment when off). */
+  onAcceptChatInvite?: (peer: string) => void;
 }) {
   // Friend chat: which conversation is open (peer pubkey) + the invite popup.
   const [openChatPeer, setOpenChatPeer] = useState<string | null>(null);
@@ -193,13 +196,17 @@ export function DealsTab({
 
   const header = (
     <View>
-      {/* Friend chats (experimental) — pending requests + WhatsApp-style rows. */}
-      {chatEnabled && view === 'active' && (
+      {/* Friend chats (experimental) — pending requests + WhatsApp-style rows.
+          Rendered even when the experiment is OFF so an incoming request is
+          always answerable (it then shows ONLY pending requests). */}
+      {view === 'active' && (
         <FriendChatSection
           client={client}
           conversations={conversations}
           blockedPubkeys={blockedPubkeys}
           onOpen={(peer) => setOpenChatPeer(peer)}
+          onAcceptInvite={onAcceptChatInvite}
+          chatEnabled={chatEnabled}
         />
       )}
       <View style={[s.segRow, { marginHorizontal: 12, marginTop: 8 }]}>

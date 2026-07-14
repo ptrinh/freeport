@@ -56,11 +56,17 @@ function Avatar({ uri, size = 44 }: { uri: string; size?: number }) {
 
 // ─── Conversation list ───────────────────────────────────────────────────────
 
-export function FriendChatSection({ client, conversations, blockedPubkeys, onOpen }: {
+export function FriendChatSection({ client, conversations, blockedPubkeys, onOpen, onAcceptInvite, chatEnabled = true }: {
   client: MobileClient | null;
   conversations: Conversation[];
   blockedPubkeys: Set<string>;
   onOpen: (peer: string) => void;
+  /** Accepting an invite while the Chat experiment is off also enables it
+   *  (same consent model as opening an invite link). */
+  onAcceptInvite?: (peer: string) => void;
+  /** When the experiment is off, only PENDING requests render — the rest of
+   *  the chat UI stays behind the toggle. */
+  chatEnabled?: boolean;
 }) {
   const [showArchived, setShowArchived] = useState(false);
   // Blocked peers: hide their PENDING invites (spam), but keep an already-
@@ -69,8 +75,11 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
     (c.state === 'active' || c.state === 'pending_out' || (c.state === 'pending_in' && !blockedPubkeys.has(c.peer))));
   if (visible.length === 0) return null;
   const pending = visible.filter((c) => c.state === 'pending_in').sort((a, b) => b.updatedAt - a.updatedAt);
-  const live = visible.filter((c) => c.state !== 'pending_in' && !c.archived).sort((a, b) => b.updatedAt - a.updatedAt);
-  const archived = visible.filter((c) => c.state !== 'pending_in' && c.archived).sort((a, b) => b.updatedAt - a.updatedAt);
+  // Experiment off: incoming requests must still be visible/answerable —
+  // otherwise an invite arrives into a hidden UI (user report).
+  const live = chatEnabled ? visible.filter((c) => c.state !== 'pending_in' && !c.archived).sort((a, b) => b.updatedAt - a.updatedAt) : [];
+  const archived = chatEnabled ? visible.filter((c) => c.state !== 'pending_in' && c.archived).sort((a, b) => b.updatedAt - a.updatedAt) : [];
+  if (!chatEnabled && pending.length === 0) return null;
 
   return (
     <View style={{ marginHorizontal: 12, marginTop: 8 }}>
@@ -84,7 +93,7 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
           </View>
           <Pressable
             style={[s.btnAccept, { paddingHorizontal: 14 }]}
-            onPress={() => client?.chatAccept(c.peer).catch(() => {})}
+            onPress={() => (onAcceptInvite ? onAcceptInvite(c.peer) : client?.chatAccept(c.peer).catch(() => {}))}
             accessibilityRole="button" accessibilityLabel={t('Accept')}
           >
             <Text style={s.btnText}>{t('Accept')}</Text>

@@ -977,9 +977,11 @@ function AppInner() {
     : negos.filter((n) => n.state === 'confirmed' && n.updatedAt > chatSeenTs).length;
 
   // Friend chat: unread messages + pending incoming invites join the badge.
-  const chatBadge = !experimentalChat || tab === 'messages'
+  // Pending invites count even while the experiment is OFF — the request row
+  // renders regardless, so the badge must lead the user to it.
+  const chatBadge = tab === 'messages'
     ? 0
-    : conversations.reduce((n, c) => (blocked.has(c.peer) ? n : n + convUnread(c) + (c.state === 'pending_in' ? 1 : 0)), 0);
+    : conversations.reduce((n, c) => (blocked.has(c.peer) ? n : n + (experimentalChat ? convUnread(c) : 0) + (c.state === 'pending_in' ? 1 : 0)), 0);
 
   const pendingCount = negos.filter(
     (n) => n.state === 'open' && n.termsBy === 'them' || n.state === 'accepted_by_them',
@@ -1395,7 +1397,12 @@ function AppInner() {
         setTab('messages');
       }} />}
       {tab === 'post' && <PostTab draft={postDraft} onDraftConsumed={() => setPostDraft(null)} client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} onStartCall={chatCallsEnabled && callsSupported() ? (peer, video) => callManagerRef.current?.startCall(peer, video) : undefined} onPayFriend={(peer, payAddress) => { setWalletPrefill({ mode: 'send', dest: payAddress }); setTab('wallet'); }} chatTranslateTo={chatTranslate && translateToggleVisible(experimentalLlm) ? (language || systemLanguage()) : undefined} />}
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} onStartCall={chatCallsEnabled && callsSupported() ? (peer, video) => callManagerRef.current?.startCall(peer, video) : undefined} onPayFriend={(peer, payAddress) => { setWalletPrefill({ mode: 'send', dest: payAddress }); setTab('wallet'); }} onAcceptChatInvite={(peer) => {
+        // Same consent model as opening an invite link: answering YES to a
+        // chat request implies wanting the feature.
+        if (!experimentalChat) { setExperimentalChat(true); savePrefs({ experimentalChat: true }).catch(() => {}); }
+        client?.chatAccept(peer, profile.name || undefined).catch(() => {});
+      }} chatTranslateTo={chatTranslate && translateToggleVisible(experimentalLlm) ? (language || systemLanguage()) : undefined} />}
       {tab === 'wallet' && (
         <WalletTab
           unit={walletUnit}
