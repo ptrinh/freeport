@@ -23,8 +23,9 @@ vi.mock('../src/receipts', () => ({ publishReceipt: vi.fn(async () => {}) }));
 vi.mock('../src/reputation', () => ({ fetchReputation: vi.fn(async () => ({})) }));
 vi.mock('../src/wot', () => ({ buildTrustMap: vi.fn(async () => new Map()) }));
 
-import { generateSecretKey, type Event } from 'nostr-tools/pure';
-import { makeCallOffer, mintCallId, type CallEnvelope } from '@freeport/protocol';
+import { generateSecretKey, getPublicKey, finalizeEvent, type Event } from 'nostr-tools/pure';
+import { getConversationKey, encrypt as nip44Encrypt } from 'nostr-tools/nip44';
+import { makeCallOffer, mintCallId, makeChatInvite, type CallEnvelope } from '@freeport/protocol';
 import { MobileClient } from '../src/client';
 import { LocalSigner } from '../src/signer';
 import { FakeRelay, flush } from './fake-relay';
@@ -112,6 +113,47 @@ describe('NIP-17 transport upgrade', () => {
     await flush();
     expect(kinds(1059)).toBe(0);
     expect(alice.convs()[0].messages[0]?.text).toBe('legacy path');
+  });
+
+  it('rejects a forged wrap whose rumor author ≠ seal author (NIP-59 spoof)', async () => {
+    const relay = new FakeRelay();
+    const bob = makeUser(relay);
+    await flush();
+    const bobPub = bob.client.pubkey;
+    const nowSec = Math.floor(Date.now() / 1000);
+
+    // Build a gift wrap to Bob: seal signed by `sealSk`, inner rumor authored
+    // by `rumorPub`. A chat invite is used because it's the one envelope a
+    // stranger is meant to send — so an accepted wrap creates a conversation.
+    const forge = (sealSk: Uint8Array, rumorPub: string, id: string): Event => {
+      const invite = makeChatInvite('Impersonator', undefined, false);
+      const rumor = { pubkey: rumorPub, created_at: nowSec, kind: 14, tags: [], content: JSON.stringify(invite), id };
+      const seal = finalizeEvent(
+        { kind: 13, created_at: nowSec, tags: [], content: nip44Encrypt(JSON.stringify(rumor), getConversationKey(sealSk, bobPub)) },
+        sealSk,
+      );
+      const ephem = generateSecretKey();
+      return finalizeEvent(
+        { kind: 1059, created_at: nowSec, tags: [['p', bobPub]], content: nip44Encrypt(JSON.stringify(seal), getConversationKey(ephem, bobPub)) },
+        ephem,
+      );
+    };
+
+    // Eve signs the seal but stamps Alice as the rumor author — the sender
+    // spoof nostr-tools' bare unwrapEvent would have accepted.
+    const eveSk = generateSecretKey();
+    const evePub = getPublicKey(eveSk);
+    const alicePub = getPublicKey(generateSecretKey());
+    relay.publish(RELAY, forge(eveSk, alicePub, 'forged'));
+    await flush();
+    expect(bob.client.conversations.has(alicePub)).toBe(false); // not routed as Alice
+    expect(bob.client.conversations.has(evePub)).toBe(false);   // dropped entirely
+
+    // Control: same payload authored honestly by Eve (rumor.pubkey = Eve) DOES
+    // create a conversation — proving the drop is the author check, not content.
+    relay.publish(RELAY, forge(eveSk, evePub, 'honest'));
+    await flush();
+    expect(bob.client.conversations.has(evePub)).toBe(true);
   });
 
   it('blocked peers are dropped AFTER unwrap (wrap authors are throwaway keys)', async () => {

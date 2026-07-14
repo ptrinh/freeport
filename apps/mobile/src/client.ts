@@ -4,8 +4,9 @@
  * React-state-friendly callbacks (React Native has WebSocket built in).
  */
 import { SimplePool } from 'nostr-tools/pool';
-import { type Event } from 'nostr-tools/pure';
-import { createRumor, createSeal, createWrap, unwrapEvent } from 'nostr-tools/nip59';
+import { type Event, verifyEvent } from 'nostr-tools/pure';
+import { createRumor, createSeal, createWrap } from 'nostr-tools/nip59';
+import { getConversationKey as nip44ConvKey, decrypt as nip44Decrypt } from 'nostr-tools/nip44';
 import { getPow } from 'nostr-tools/nip13';
 import { minePowAsync } from './pow';
 import { screenIntent, screenIntentContent } from './moderation';
@@ -1007,14 +1008,35 @@ export class MobileClient {
    */
   private processWrap(ev: Event): void {
     try {
-      const rumor = unwrapEvent(ev, this.signer.secretKey!);
+      const rumor = this.unwrapVerified(ev);
       if (!rumor?.pubkey || typeof rumor.content !== 'string') return;
       if (rumor.pubkey === this.pubkey) return; // our own outbound copy
       if (this.blocked.has(rumor.pubkey)) return;
       this.routePlaintext(rumor.content, rumor.pubkey, rumor.created_at, rumor.id);
     } catch {
-      /* not addressed to us / junk wrap */
+      /* not addressed to us / junk / FORGED wrap — dropped */
     }
+  }
+
+  /**
+   * Unwrap a NIP-59 gift wrap with the sender check nostr-tools' `unwrapEvent`
+   * omits. `unwrapEvent` is just two NIP-44 decrypts — it never verifies the
+   * seal's signature nor that the inner rumor's author matches the seal's
+   * author, so anyone could forge a rumor `pubkey` of a trusted contact and
+   * have it routed as an authenticated message (chat, negotiation, escrow).
+   *
+   * Here: (1) decrypt the wrap → seal, (2) `verifyEvent(seal)` so the seal is
+   * genuinely signed by `seal.pubkey`, (3) decrypt the seal → rumor, (4) require
+   * `rumor.pubkey === seal.pubkey`. Only then is the rumor author authenticated.
+   * Throws on any failure; the caller drops the wrap.
+   */
+  private unwrapVerified(wrap: Event): Event {
+    const sk = this.signer.secretKey!;
+    const seal = JSON.parse(nip44Decrypt(wrap.content, nip44ConvKey(sk, wrap.pubkey))) as Event;
+    if (!seal?.pubkey || !verifyEvent(seal)) throw new Error('bad seal');
+    const rumor = JSON.parse(nip44Decrypt(seal.content, nip44ConvKey(sk, seal.pubkey))) as Event;
+    if (rumor?.pubkey !== seal.pubkey) throw new Error('rumor/seal author mismatch');
+    return rumor;
   }
 
   /**
