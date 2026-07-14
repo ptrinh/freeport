@@ -852,5 +852,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "Τα νέα μηνύματα εξαφανίζονται μετά από 1 ώρα",
   "New messages disappear after 4 weeks": "Τα νέα μηνύματα εξαφανίζονται μετά από 4 εβδομάδες",
   "Search": "Αναζήτηση",
+  "Missed video call": "Αναπάντητη βιντεοκλήση",
 };
 export default c;

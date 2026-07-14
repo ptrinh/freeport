@@ -849,5 +849,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "မက်ဆေ့ချ်အသစ်များ ၁ နာရီအကြာတွင် ပျောက်ကွယ်သွားမည်",
   "New messages disappear after 4 weeks": "မက်ဆေ့ချ်အသစ်များ ၄ ပတ်အကြာတွင် ပျောက်ကွယ်သွားမည်",
   "Search": "ရှာဖွေရန်",
+  "Missed video call": "လွတ်သွားသော ဗီဒီယိုခေါ်ဆိုမှု",
 };
 export default c;

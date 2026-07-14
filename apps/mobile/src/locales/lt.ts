@@ -853,5 +853,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "Naujos žinutės išnyksta po 1 valandos",
   "New messages disappear after 4 weeks": "Naujos žinutės išnyksta po 4 savaičių",
   "Search": "Ieškoti",
+  "Missed video call": "Praleistas vaizdo skambutis",
 };
 export default c;

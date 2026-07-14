@@ -855,5 +855,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "Nové zprávy zmizí po 1 hodině",
   "New messages disappear after 4 weeks": "Nové zprávy zmizí po 4 týdnech",
   "Search": "Hledat",
+  "Missed video call": "Zmeškaný videohovor",
 };
 export default c;

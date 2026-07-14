@@ -849,5 +849,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "Ujumbe mpya hutoweka baada ya saa 1",
   "New messages disappear after 4 weeks": "Ujumbe mpya hutoweka baada ya wiki 4",
   "Search": "Tafuta",
+  "Missed video call": "Simu ya video uliyoikosa",
 };
 export default c;

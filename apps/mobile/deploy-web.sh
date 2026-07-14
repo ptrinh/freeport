@@ -163,6 +163,21 @@ const splash = `    <div id="ft-splash">
     <script>(function(){try{var ua=navigator.userAgent||"";var ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);var os=ios?"iOS":/Android/.test(ua)?"Android":null;if(os){var e=document.getElementById("ft-native");if(e)e.textContent="Sử dụng "+os+" app để có trải nghiệm tốt nhất.";}}catch(_){}})();</script>
 `;
 const reg = `    <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
+    <script>
+      // Self-heal a mid-deploy reload: if the hash-named bundle 404s (Pages
+      // serves the SPA fallback as text/html and the browser refuses to run
+      // it), retry once after a beat — by then the new deploy has propagated.
+      window.addEventListener("error", function (e) {
+        var el = e.target;
+        if (el && el.tagName === "SCRIPT" && el.src && !sessionStorage.getItem("ft-bundle-retry")) {
+          sessionStorage.setItem("ft-bundle-retry", "1");
+          var l = document.querySelector("#ft-splash .ft-load");
+          if (l) l.textContent = "Updating";
+          setTimeout(function () { location.reload(); }, 2500);
+        }
+      }, true);
+      window.addEventListener("load", function () { try { sessionStorage.removeItem("ft-bundle-retry"); } catch (_) {} });
+    </script>
 `;
 // Disable user scaling so pinch/double-tap zoom is off (native-app feel), and
 // extend under the notch. Rewrite whatever viewport Expo emitted.

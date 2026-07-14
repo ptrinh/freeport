@@ -852,5 +852,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "نئے پیغامات 1 گھنٹے بعد غائب ہو جاتے ہیں",
   "New messages disappear after 4 weeks": "نئے پیغامات 4 ہفتے بعد غائب ہو جاتے ہیں",
   "Search": "تلاش",
+  "Missed video call": "چھوٹی ہوئی ویڈیو کال",
 };
 export default c;

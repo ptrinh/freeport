@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "Tin nhắn mới tự xóa sau 1 giờ",
   "New messages disappear after 4 weeks": "Tin nhắn mới tự xóa sau 4 tuần",
   "Search": "Tìm kiếm",
+  "Missed video call": "Cuộc gọi video nhỡ",
 };
 export default c;

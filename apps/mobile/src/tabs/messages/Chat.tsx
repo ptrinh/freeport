@@ -197,9 +197,12 @@ const ChatBubble = React.memo(function ChatBubble({
   /** Stable id for the translation cache. */
   msgKey?: string;
 }) {
+  // Local call notices ("📞 Missed call") get the WhatsApp treatment: icon
+  // row, red for a missed incoming call, never translated.
+  const callNotice = /^(📞|📹) /.test(text);
   // Translated inbound text: main line = translation, original small + dim
   // below (the familiar chat-app pattern). Media/trip links are never touched.
-  const plainText = !isAudioMsg(text) && !isImageMsg(text) && !isTripMsg(text);
+  const plainText = !isAudioMsg(text) && !isImageMsg(text) && !isTripMsg(text) && !callNotice;
   const [translated, setTranslated] = useState<string | null>(null);
   useEffect(() => {
     setTranslated(null);
@@ -218,7 +221,20 @@ const ChatBubble = React.memo(function ChatBubble({
           <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn, { fontSize: 12 }]} numberOfLines={2}>{quote}</Text>
         </View>
       ) : null}
-      {isAudioMsg(text)
+      {callNotice
+        ? <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+            <View style={{ width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: dir === 'in' ? 'rgba(239,68,68,0.15)' : 'rgba(148,163,184,0.18)' }}>
+              <Ionicons
+                name={text.startsWith('📹') ? (dir === 'in' ? 'videocam' : 'videocam-outline') : (dir === 'in' ? 'call' : 'call-outline')}
+                size={14}
+                color={dir === 'in' ? '#ef4444' : (dir === 'out' ? '#f5f7fa' : palette.text2)}
+              />
+            </View>
+            <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn, { opacity: 0.9 }]}>
+              {text.replace(/^(📞|📹) /, '')}
+            </Text>
+          </View>
+        : isAudioMsg(text)
         ? <VoiceMessage url={text} dir={dir} />
         : isImageMsg(text)
         ? <Pressable onPress={() => onZoom(text)}>

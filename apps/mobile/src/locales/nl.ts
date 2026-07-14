@@ -852,5 +852,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "Nieuwe berichten verdwijnen na 1 uur",
   "New messages disappear after 4 weeks": "Nieuwe berichten verdwijnen na 4 weken",
   "Search": "Zoeken",
+  "Missed video call": "Gemiste video-oproep",
 };
 export default c;

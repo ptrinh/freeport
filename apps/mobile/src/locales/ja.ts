@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "新しいメッセージは1時間後に消えます",
   "New messages disappear after 4 weeks": "新しいメッセージは4週間後に消えます",
   "Search": "検索",
+  "Missed video call": "不在着信（ビデオ）",
 };
 export default c;

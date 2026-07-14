@@ -852,5 +852,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "Az új üzenetek 1 óra után eltűnnek",
   "New messages disappear after 4 weeks": "Az új üzenetek 4 hét után eltűnnek",
   "Search": "Keresés",
+  "Missed video call": "Nem fogadott videohívás",
 };
 export default c;

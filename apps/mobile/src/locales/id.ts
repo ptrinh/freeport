@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "Pesan baru menghilang setelah 1 jam",
   "New messages disappear after 4 weeks": "Pesan baru menghilang setelah 4 minggu",
   "Search": "Cari",
+  "Missed video call": "Panggilan video tak terjawab",
 };
 export default c;

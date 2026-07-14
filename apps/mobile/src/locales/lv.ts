@@ -852,5 +852,6 @@ const c: Record<string, string> = {
   "New messages disappear after 1 hour": "Jaunie ziņojumi pazūd pēc 1 stundas",
   "New messages disappear after 4 weeks": "Jaunie ziņojumi pazūd pēc 4 nedēļām",
   "Search": "Meklēt",
+  "Missed video call": "Neatbildēts videozvans",
 };
 export default c;

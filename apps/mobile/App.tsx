@@ -1079,9 +1079,12 @@ function AppInner() {
       turnEndpoint: () => 'https://turn.freeport.network',
       onState: setCallState,
       onStreams: (local, remote) => setCallStreams({ local, remote }),
-      onMissed: (peer, direction) => {
+      onMissed: (peer, direction, video) => {
+        const icon = video ? '📹 ' : '📞 ';
         client.chatLocalNotice(peer, direction === 'incoming' ? 'in' : 'out',
-          direction === 'incoming' ? '📞 ' + t('Missed call') : '📞 ' + t('No answer'));
+          direction === 'incoming'
+            ? icon + (video ? t('Missed video call') : t('Missed call'))
+            : icon + t('No answer'));
         if (direction === 'incoming' && AppState.currentState !== 'active' && !pushOnRef.current) {
           notify('Freeport', t('Missed call'), { tab: 'messages' });
         }

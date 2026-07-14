@@ -79,7 +79,7 @@ export interface CallManagerDeps {
   /** Streams for the UI (native MediaStream / DOM MediaStream). */
   onStreams: (local: any | null, remote: any | null) => void;
   /** A ring that nobody answered (either direction) — drives the chat notice. */
-  onMissed?: (peer: string, direction: 'incoming' | 'outgoing') => void;
+  onMissed?: (peer: string, direction: 'incoming' | 'outgoing', video?: boolean) => void;
   ringTimeoutMs?: number;
   gatherTimeoutMs?: number;
   /** Test seam. */
@@ -182,7 +182,7 @@ export class CallManager {
     this.ringTimer = setTimeout(() => {
       if (this.state.phase === 'outgoing' && this.state.callId === callId) {
         this.deps.send(peer, makeCallHangup(callId, 'missed')).catch(() => {});
-        this.deps.onMissed?.(peer, 'outgoing');
+        this.deps.onMissed?.(peer, 'outgoing', video);
         this.teardown();
         this.setState({ phase: 'ended', peer, callId, reason: 'missed' });
       }
@@ -206,7 +206,7 @@ export class CallManager {
       this.setState({ phase: 'incoming', peer: from, callId: env.call, video: !!env.video });
       this.ringTimer = setTimeout(() => {
         if (this.state.phase === 'incoming' && this.state.callId === env.call) {
-          this.deps.onMissed?.(from, 'incoming');
+          this.deps.onMissed?.(from, 'incoming', !!env.video);
           this.teardown();
           this.setState({ phase: 'ended', peer: from, callId: env.call, reason: 'missed' });
         }
@@ -228,7 +228,7 @@ export class CallManager {
       const wasRinging = this.state.phase === 'incoming';
       this.clearRing();
       this.teardown();
-      if (wasRinging && env.reason !== 'ended') this.deps.onMissed?.(from, 'incoming');
+      if (wasRinging && env.reason !== 'ended') this.deps.onMissed?.(from, 'incoming', !!this.state.video);
       this.setState({ phase: 'ended', peer: from, callId: env.call, reason: env.reason ?? 'ended' });
     }
   }
