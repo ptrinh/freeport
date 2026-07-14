@@ -60,7 +60,6 @@ function SettingsTab({
   experimentalWallet,
   onExperimentalWalletChange,
   experimentalChat,
-  onExperimentalChatChange,
   chatShowLastSeen,
   onChatShowLastSeenChange,
   chatReceipts,
@@ -124,7 +123,6 @@ function SettingsTab({
   experimentalWallet: boolean;
   onExperimentalWalletChange: (v: boolean) => void;
   experimentalChat: boolean;
-  onExperimentalChatChange: (v: boolean) => void;
   chatShowLastSeen: boolean;
   onChatShowLastSeenChange: (v: boolean) => void;
   chatReceipts: boolean;
@@ -924,14 +922,12 @@ function SettingsTab({
         onWalletEnabledChange={onExperimentalWalletChange}
         servicesEnabled={servicesEnabled}
         onServicesEnabledChange={onServicesEnabledChange}
-        chatEnabled={experimentalChat}
-        onChatEnabledChange={onExperimentalChatChange}
         llmEnabled={experimentalLlm}
         onLlmEnabledChange={onExperimentalLlmChange}
         llmSupported={conciergeModulePresent()}
       />
 
-      {/* Chat settings — its own section, only while the experiment is on. */}
+      {/* Chat settings — chat is a core feature now, section always shows. */}
       {experimentalChat && (
         <ChatSection
           showLastSeen={chatShowLastSeen}

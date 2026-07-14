@@ -36,8 +36,6 @@ function ExperimentalSection({
   onWalletEnabledChange,
   servicesEnabled,
   onServicesEnabledChange,
-  chatEnabled,
-  onChatEnabledChange,
   llmEnabled,
   onLlmEnabledChange,
   llmSupported = true,
@@ -46,8 +44,6 @@ function ExperimentalSection({
   onWalletEnabledChange: (v: boolean) => void;
   servicesEnabled: boolean;
   onServicesEnabledChange: (v: boolean) => void;
-  chatEnabled: boolean;
-  onChatEnabledChange: (v: boolean) => void;
   llmEnabled: boolean;
   onLlmEnabledChange: (v: boolean) => void;
   /** Device has an on-device model layer (Apple FM / Gemini Nano / Prompt API). */
@@ -98,21 +94,6 @@ function ExperimentalSection({
             </View>
             <View style={[s.switchTrack, walletEnabled && s.switchTrackOn]}>
               <View style={[s.switchThumb, walletEnabled && s.switchThumbOn]} />
-            </View>
-          </Pressable>
-          <Pressable
-            accessibilityRole="switch"
-            accessibilityState={{ checked: chatEnabled }}
-            style={s.toggleRow}
-            onPress={() => onChatEnabledChange(!chatEnabled)}
-          >
-            <Ionicons name="chatbubbles-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
-            <View style={{ flex: 1, marginEnd: 12 }}>
-              <Text style={s.toggleTitle}>{t('Chat')}</Text>
-              <Text style={s.dim}>{t('Encrypted 1:1 chat with friends, beyond deals. Invite-based — only people you share your link with can reach you.')}</Text>
-            </View>
-            <View style={[s.switchTrack, chatEnabled && s.switchTrackOn]}>
-              <View style={[s.switchThumb, chatEnabled && s.switchThumbOn]} />
             </View>
           </Pressable>
           {llmSupported ? (

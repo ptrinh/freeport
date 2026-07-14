@@ -213,9 +213,11 @@ Chat, calls (+ web screen share), NIP-17 gift wrap for chat/calls, zaps,
 NIP-15 storefronts, the on-device AI concierge and in-chat auto-translate all
 SHIPPED in 2026-07 (see git history for the full specs). What remains of each:
 
-- **Chat**: verify safety number (fingerprint compare), note-to-self, polish
-  (per-chat mute, local history search, pin/forward a message, share a
-  friend's invite). Group chat stays deferred (MLS/NIP-104 immature).
+- **Chat**: GRADUATED from Experimental (2026-07-14) — always on, the
+  Settings toggle is gone. Remaining: verify safety number (fingerprint
+  compare), note-to-self, polish (per-chat mute, pin/forward a message,
+  share a friend's invite). Group chat stays deferred (MLS/NIP-104
+  immature). In-conversation search shipped.
 - **NIP-17**: migrate the NEGOTIATION envelopes (big NIP-04 install base) —
   dual-rail: receive first, send behind a capability flag, then default.
 - **Calls**: native screen share (ReplayKit / MediaProjection), CallKit /

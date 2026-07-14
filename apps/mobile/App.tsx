@@ -363,7 +363,7 @@ function AppInner() {
   const [profile, setProfile] = useState<UserProfile>({ name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' });
   const [servicesEnabled, setServicesEnabled] = useState(false);
   const [experimentalWallet, setExperimentalWallet] = useState(false);
-  const [experimentalChat, setExperimentalChat] = useState(false);
+  const experimentalChat = true; // Chat graduated from Experimental — always on
   const [chatShowLastSeen, setChatShowLastSeen] = useState(false);
   const [chatReceipts, setChatReceipts] = useState(false);
   const [chatCallsEnabled, setChatCallsEnabled] = useState(false);
@@ -567,7 +567,6 @@ function AppInner() {
       const p = await loadPrefs();
       setServicesEnabled(p.servicesEnabled);
       setExperimentalWallet(p.experimentalWallet);
-      setExperimentalChat(p.experimentalChat);
       setChatShowLastSeen(p.chatShowLastSeen);
       setChatReceipts(p.chatReceipts);
       setChatCallsEnabled(p.chatCallsEnabled);
@@ -1408,7 +1407,6 @@ function AppInner() {
       {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} walletEnabled={experimentalWallet} onZap={(i) => setZapTarget(i)} products={products} shopMarket={SERVICE_MARKET} shopCurrency={defaultCurrency} onChatSeller={(pubkey) => {
         // Conversational checkout: a chat request to the seller. Implies the
         // Chat experiment (same consent model as opening an invite link).
-        if (!experimentalChat) { setExperimentalChat(true); savePrefs({ experimentalChat: true }).catch(() => {}); }
         client?.chatInvite(pubkey, profile.name || undefined).catch(() => {});
         setMessagesView('active');
         setTab('messages');
@@ -1417,7 +1415,6 @@ function AppInner() {
       {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} onStartCall={chatCallsEnabled && callsSupported() ? (peer, video) => callManagerRef.current?.startCall(peer, video) : undefined} onPayFriend={(peer, payAddress) => { setWalletPrefill({ mode: 'send', dest: payAddress }); setTab('wallet'); }} escrows={escrows} onPayEscrowInvoice={(invoice) => { setWalletPrefill({ mode: 'send', dest: invoice, memo: 'Escrow' }); setTab('wallet'); }} onAcceptChatInvite={(peer) => {
         // Same consent model as opening an invite link: answering YES to a
         // chat request implies wanting the feature.
-        if (!experimentalChat) { setExperimentalChat(true); savePrefs({ experimentalChat: true }).catch(() => {}); }
         client?.chatAccept(peer, profile.name || undefined).catch(() => {});
       }} chatTranslateTo={chatTranslate && translateToggleVisible(experimentalLlm) ? (language || systemLanguage()) : undefined} />}
       {tab === 'wallet' && (
@@ -1450,10 +1447,6 @@ function AppInner() {
             savePrefs({ experimentalWallet: v }).catch(() => {});
           }}
           experimentalChat={experimentalChat}
-          onExperimentalChatChange={(v) => {
-            setExperimentalChat(v);
-            savePrefs({ experimentalChat: v }).catch(() => {});
-          }}
           chatShowLastSeen={chatShowLastSeen}
           onChatShowLastSeenChange={(v) => {
             setChatShowLastSeen(v);
@@ -1703,10 +1696,6 @@ function AppInner() {
             setResolvedInvite(null);
             if (!sent) return;
             // Sending an invite implies the user wants the feature.
-            if (!experimentalChat) {
-              setExperimentalChat(true);
-              savePrefs({ experimentalChat: true }).catch(() => {});
-            }
             setMessagesView('active');
             setTab('messages');
           }}
