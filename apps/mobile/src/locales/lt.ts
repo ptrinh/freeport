@@ -813,5 +813,10 @@ const c: Record<string, string> = {
   "Description": "Aprašymas",
   "Price": "Kaina",
   "Currency": "Valiuta",
+  "Describe what you need": "Aprašykite, ko jums reikia",
+  "On-device AI — your request never leaves this phone.": "Dirbtinis intelektas įrenginyje — jūsų užklausa niekada nepalieka šio telefono.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "pvz. „Pavėžėti į oro uostą 17 val., iki 12 €“",
+  "Draft my post": "Sukurti skelbimo juodraštį",
+  "Could not draft that — try rephrasing.": "Nepavyko sukurti juodraščio — pabandykite performuluoti.",
 };
 export default c;

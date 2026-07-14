@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "Descrizione",
   "Price": "Prezzo",
   "Currency": "Valuta",
+  "Describe what you need": "Descrivi cosa ti serve",
+  "On-device AI — your request never leaves this phone.": "IA sul dispositivo — la tua richiesta non lascia mai questo telefono.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "es. «Corsa all'aeroporto alle 17, meno di 12 €»",
+  "Draft my post": "Crea la bozza del post",
+  "Could not draft that — try rephrasing.": "Impossibile creare la bozza — prova a riformulare.",
 };
 export default c;

@@ -852,5 +852,10 @@ const c: Record<string, string> = {
   "Description": "설명",
   "Price": "가격",
   "Currency": "통화",
+  "Describe what you need": "필요한 것을 설명하세요",
+  "On-device AI — your request never leaves this phone.": "온디바이스 AI — 요청은 이 휴대폰을 절대 벗어나지 않습니다.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "예: \"오후 5시에 공항까지, 15,000원 이하\"",
+  "Draft my post": "게시물 초안 작성",
+  "Could not draft that — try rephrasing.": "초안을 작성할 수 없습니다 — 다르게 표현해 보세요.",
 };
 export default c;

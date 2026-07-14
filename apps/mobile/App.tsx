@@ -100,6 +100,8 @@ import { callsSupported } from './src/calls/webrtc';
 import { defaultAvatarUrl as peerAvatarUrl } from './src/profile';
 import { unreadCount as convUnread, type Conversation } from './src/conversations';
 import { ZapSheet } from './src/ui/ZapSheet';
+import { ConciergeSheet } from './src/concierge/ConciergeSheet';
+import { conciergeAvailability } from './src/concierge/model';
 import { uiAlert } from './src/ui/alerts';
 import { SettingsTab } from './src/tabs/SettingsTab';
 import { Onboarding } from './src/tabs/Onboarding';
@@ -384,6 +386,10 @@ function AppInner() {
   const [zapTarget, setZapTarget] = useState<Intent | null>(null);
   /** Storefront products (NIP-15), keyed upstream by (pubkey, d). */
   const [products, setProducts] = useState<Product[]>([]);
+  /** AI concierge (on-device Apple Foundation Models, iOS 26+). */
+  const [conciergeOk, setConciergeOk] = useState(false);
+  const [showConcierge, setShowConcierge] = useState(false);
+  useEffect(() => { conciergeAvailability().then((a) => setConciergeOk(a === 'available')).catch(() => {}); }, []);
   const [location, setLocation] = useState<UserLocation>({ country: '', state: '', city: '' });
   // Mirror the latest location so the async launch auto-detect can tell whether
   // the user has manually changed it (e.g. picked a place during onboarding)
@@ -1619,6 +1625,34 @@ function AppInner() {
           }}
           onClose={() => setZapTarget(null)}
         />
+      )}
+      {showConcierge && (
+        <ConciergeSheet
+          ctx={{ servicesEnabled, defaultCurrency }}
+          onDraft={(draft) => {
+            setShowConcierge(false);
+            setPostDraft(draft); // PostTab prefills exactly like a Repost
+            setTab('post');
+          }}
+          onClose={() => setShowConcierge(false)}
+        />
+      )}
+      {/* Concierge entry: a sparkle FAB on the Post tab, only when the
+          on-device model is actually available (probe + Apple Intelligence). */}
+      {conciergeOk && tab === 'post' && (
+        <Pressable
+          onPress={() => setShowConcierge(true)}
+          accessibilityRole="button"
+          accessibilityLabel={t('Describe what you need')}
+          style={{
+            position: 'absolute', end: 18, bottom: insets.bottom + 76,
+            width: 50, height: 50, borderRadius: 25,
+            backgroundColor: palette.accent, alignItems: 'center', justifyContent: 'center',
+            shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 5, elevation: 6,
+          }}
+        >
+          <Ionicons name="sparkles" size={24} color="white" />
+        </Pressable>
       )}
       {resolvedInvite && (
         <InviteResolvedSheet

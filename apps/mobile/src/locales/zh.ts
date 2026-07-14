@@ -852,5 +852,10 @@ const c: Record<string, string> = {
   "Description": "描述",
   "Price": "价格",
   "Currency": "货币",
+  "Describe what you need": "描述你的需求",
+  "On-device AI — your request never leaves this phone.": "设备端 AI — 你的请求绝不会离开这部手机。",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "例如“下午5点去机场，80元以内”",
+  "Draft my post": "为我起草帖子",
+  "Could not draft that — try rephrasing.": "无法起草 — 请换个说法再试。",
 };
 export default c;

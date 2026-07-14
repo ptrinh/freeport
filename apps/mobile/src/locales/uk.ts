@@ -818,5 +818,10 @@ const c: Record<string, string> = {
   "Description": "Опис",
   "Price": "Ціна",
   "Currency": "Валюта",
+  "Describe what you need": "Опишіть, що вам потрібно",
+  "On-device AI — your request never leaves this phone.": "ШІ на пристрої — ваш запит ніколи не залишає цей телефон.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "напр. «Поїздка в аеропорт о 17:00, менше 300 грн»",
+  "Draft my post": "Створити чернетку допису",
+  "Could not draft that — try rephrasing.": "Не вдалося створити чернетку — спробуйте переформулювати.",
 };
 export default c;

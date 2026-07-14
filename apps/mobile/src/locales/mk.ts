@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "Опис",
   "Price": "Цена",
   "Currency": "Валута",
+  "Describe what you need": "Опишете што ви треба",
+  "On-device AI — your request never leaves this phone.": "ВИ на уредот — вашето барање никогаш не го напушта овој телефон.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "на пр. „Превоз до аеродромот во 17 ч, до 700 ден“",
+  "Draft my post": "Скицирај ја мојата објава",
+  "Could not draft that — try rephrasing.": "Не можев да го скицирам тоа — обидете се да преформулирате.",
 };
 export default c;

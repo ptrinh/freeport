@@ -809,5 +809,10 @@ const c: Record<string, string> = {
   "Description": "বিবরণ",
   "Price": "মূল্য",
   "Currency": "মুদ্রা",
+  "Describe what you need": "আপনার কী প্রয়োজন তা বর্ণনা করুন",
+  "On-device AI — your request never leaves this phone.": "ডিভাইসে থাকা AI — আপনার অনুরোধ কখনও এই ফোন ছেড়ে যায় না।",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "যেমন \"বিকেল ৫টায় বিমানবন্দরে যাত্রা, ৳৫০০-এর কম\"",
+  "Draft my post": "আমার পোস্ট খসড়া করুন",
+  "Could not draft that — try rephrasing.": "সেটি খসড়া করা গেল না — অন্যভাবে বলে দেখুন।",
 };
 export default c;

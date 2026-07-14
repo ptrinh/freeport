@@ -815,5 +815,10 @@ const c: Record<string, string> = {
   "Description": "Popis",
   "Price": "Cena",
   "Currency": "Měna",
+  "Describe what you need": "Popište, co potřebujete",
+  "On-device AI — your request never leaves this phone.": "AI přímo v zařízení — váš požadavek nikdy neopustí tento telefon.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "např. \"Cesta na letiště v 17:00, do 300 Kč\"",
+  "Draft my post": "Vytvořit koncept příspěvku",
+  "Could not draft that — try rephrasing.": "Koncept se nepodařilo vytvořit — zkuste to přeformulovat.",
 };
 export default c;

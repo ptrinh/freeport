@@ -809,5 +809,10 @@ const c: Record<string, string> = {
   "Description": "ဖော်ပြချက်",
   "Price": "ဈေးနှုန်း",
   "Currency": "ငွေကြေး",
+  "Describe what you need": "လိုအပ်တာကို ဖော်ပြပါ",
+  "On-device AI — your request never leaves this phone.": "စက်တွင်း AI — သင့်တောင်းဆိုချက်သည် ဤဖုန်းမှ ဘယ်တော့မှ ထွက်မသွားပါ။",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "ဥပမာ \"ညနေ ၅ နာရီတွင် လေဆိပ်သို့ ကားစီး၊ ၃၀၀၀ ကျပ်အောက်\"",
+  "Draft my post": "ကျွန်ုပ်၏ ပို့စ်ကို မူကြမ်းရေးပါ",
+  "Could not draft that — try rephrasing.": "မူကြမ်းရေး၍ မရပါ — စကားလုံးပြောင်း၍ ပြန်ကြိုးစားပါ။",
 };
 export default c;

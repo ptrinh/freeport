@@ -852,5 +852,10 @@ const c: Record<string, string> = {
   "Description": "Mô tả",
   "Price": "Giá",
   "Currency": "Tiền tệ",
+  "Describe what you need": "Mô tả điều bạn cần",
+  "On-device AI — your request never leaves this phone.": "AI trên thiết bị — yêu cầu của bạn không bao giờ rời khỏi điện thoại này.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "ví dụ \"Đi sân bay lúc 17h, dưới 250.000đ\"",
+  "Draft my post": "Soạn bài đăng của tôi",
+  "Could not draft that — try rephrasing.": "Không thể soạn — hãy thử diễn đạt lại.",
 };
 export default c;

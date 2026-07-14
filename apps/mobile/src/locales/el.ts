@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "Περιγραφή",
   "Price": "Τιμή",
   "Currency": "Νόμισμα",
+  "Describe what you need": "Περιγράψτε τι χρειάζεστε",
+  "On-device AI — your request never leaves this phone.": "AI στη συσκευή — το αίτημά σας δεν φεύγει ποτέ από αυτό το τηλέφωνο.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "π.χ. \"Διαδρομή προς το αεροδρόμιο στις 5 μ.μ., κάτω από 12 €\"",
+  "Draft my post": "Σύνταξη της ανάρτησής μου",
+  "Could not draft that — try rephrasing.": "Δεν ήταν δυνατή η σύνταξη — δοκιμάστε να το διατυπώσετε αλλιώς.",
 };
 export default c;

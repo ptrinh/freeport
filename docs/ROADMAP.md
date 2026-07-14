@@ -11,11 +11,14 @@ features are linked now, and the features arrive later as pure-JS OTA pushes.
 whenever a native module is added, and OTA updates for the new runtime never
 reach old binaries that lack the module.
 
-**Pre-linked as of 1.6.0** (feature JS not yet shipped):
-- `react-native-webrtc` (+ config plugin) — for audio/video calls + screen
-  share. Mic/camera permissions were already in the manifest (voice messages,
-  QR scan).
+**Pre-linked as of 1.6.0** (feature JS ships/shipped via OTA):
+- `react-native-webrtc` (+ config plugin) — audio/video calls + screen share
+  (calls JS has since shipped). Mic/camera permissions were already in the
+  manifest.
 - `react-native-webview` — for the mini-apps shell (and any embedded web flow).
+- `react-native-apple-llm` — Apple Foundation Models (iOS 26+) for the
+  on-device AI concierge (JS shipped; lights up on eligible devices once a
+  1.6.0+ binary is out).
 
 **Deliberately NOT pre-linked:**
 - Live Activity widget (iOS) — a Swift widget extension is a separate build
@@ -509,13 +512,17 @@ totals as a reputation input.
 
 ## AI concierge
 
-Freeport already ships personal agents (`packages/agent`). Surface one in the
-app as a natural-language concierge: "find me a ride to the airport at 5pm under
-$12" → it drafts the intent, posts it, watches for counter-offers, and surfaces
-the best matches for the human to confirm — the existing negotiate loop, driven
-by language instead of forms. On-brand for a project built with Claude Code.
-On-device or bring-your-own-model to keep it operator-free; a hosted model must
-be explicit opt-in (it sees your request text).
+**Status (2026-07): v1 SHIPPED — on-device only (decision: no cloud tier).**
+A ✨ button on the Post tab (shown only when the model is actually available)
+opens "Describe what you need" → Apple Foundation Models (iOS 26+, guided
+generation against a fixed schema) drafts the Post form via the same
+RepostDraft prefill the Repost feature uses — the human always reviews and
+posts. The request text never leaves the phone; there is deliberately NO
+hosted-model fallback. Module probe-gated (crash-class-#13 pattern); needs a
+1.6.0+ binary + Apple-Intelligence-capable hardware. Remaining: Android
+provider (Gemini Nano, once the Prompt API stabilises), watching offers /
+negotiation assistance (the `packages/agent` loop driven by language), and a
+deterministic template-parser tier for devices without any model.
 
 ## Persistent storefronts (NIP-15)
 

@@ -855,5 +855,10 @@ const c: Record<string, string> = {
   "Description": "Açıklama",
   "Price": "Fiyat",
   "Currency": "Para birimi",
+  "Describe what you need": "Neye ihtiyacınız olduğunu anlatın",
+  "On-device AI — your request never leaves this phone.": "Cihazda AI — isteğiniz bu telefondan asla ayrılmaz.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "örn. \"Saat 17.00'de havaalanına yolculuk, 150 TL altında\"",
+  "Draft my post": "Gönderimi taslak olarak oluştur",
+  "Could not draft that — try rephrasing.": "Taslak oluşturulamadı — farklı ifade etmeyi deneyin.",
 };
 export default c;

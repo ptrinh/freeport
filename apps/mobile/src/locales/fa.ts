@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "توضیحات",
   "Price": "قیمت",
   "Currency": "واحد پول",
+  "Describe what you need": "آنچه نیاز دارید را توصیف کنید",
+  "On-device AI — your request never leaves this phone.": "هوش مصنوعی روی دستگاه — درخواست شما هرگز از این گوشی خارج نمی‌شود.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "مثلاً «سفر به فرودگاه ساعت ۵ بعدازظهر، زیر ۱۵۰ هزار تومان»",
+  "Draft my post": "پیش‌نویس آگهی من",
+  "Could not draft that — try rephrasing.": "نتوانستیم پیش‌نویس کنیم — لطفاً جور دیگری بنویسید.",
 };
 export default c;

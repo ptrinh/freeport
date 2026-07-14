@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "Leírás",
   "Price": "Ár",
   "Currency": "Pénznem",
+  "Describe what you need": "Írja le, mire van szüksége",
+  "On-device AI — your request never leaves this phone.": "Eszközön futó MI — a kérése soha nem hagyja el ezt a telefont.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "pl. „Fuvar a reptérre 17 órakor, 4000 Ft alatt\"",
+  "Draft my post": "Bejegyzésem piszkozata",
+  "Could not draft that — try rephrasing.": "Nem sikerült piszkozatot készíteni — próbálja átfogalmazni.",
 };
 export default c;

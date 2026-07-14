@@ -852,5 +852,10 @@ const c: Record<string, string> = {
   "Description": "รายละเอียด",
   "Price": "ราคา",
   "Currency": "สกุลเงิน",
+  "Describe what you need": "อธิบายสิ่งที่คุณต้องการ",
+  "On-device AI — your request never leaves this phone.": "AI บนอุปกรณ์ — คำขอของคุณจะไม่ออกจากโทรศัพท์เครื่องนี้",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "เช่น \"ไปสนามบินตอน 17:00 ไม่เกิน 350 บาท\"",
+  "Draft my post": "ร่างโพสต์ให้ฉัน",
+  "Could not draft that — try rephrasing.": "ร่างไม่ได้ — ลองเรียบเรียงใหม่",
 };
 export default c;

@@ -852,5 +852,10 @@ const c: Record<string, string> = {
   "Description": "説明",
   "Price": "価格",
   "Currency": "通貨",
+  "Describe what you need": "必要なものを説明してください",
+  "On-device AI — your request never leaves this phone.": "オンデバイスAI — あなたのリクエストがこの端末から外に出ることはありません。",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "例：「17時に空港まで、1,200円以内」",
+  "Draft my post": "投稿の下書きを作成",
+  "Could not draft that — try rephrasing.": "下書きを作成できませんでした — 言い方を変えてお試しください。",
 };
 export default c;

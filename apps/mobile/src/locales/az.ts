@@ -809,5 +809,10 @@ const c: Record<string, string> = {
   "Description": "Təsvir",
   "Price": "Qiymət",
   "Currency": "Valyuta",
+  "Describe what you need": "Nəyə ehtiyacınız olduğunu təsvir edin",
+  "On-device AI — your request never leaves this phone.": "Cihazda AI — sorğunuz heç vaxt bu telefonu tərk etmir.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "məs. \"Hava limanına saat 17:00-da gediş, 20 ₼-dən ucuz\"",
+  "Draft my post": "Elanımı hazırla",
+  "Could not draft that — try rephrasing.": "Bunu hazırlamaq alınmadı — ifadəni dəyişib yenidən cəhd edin.",
 };
 export default c;

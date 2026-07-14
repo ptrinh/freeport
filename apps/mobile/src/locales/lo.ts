@@ -809,5 +809,10 @@ const c: Record<string, string> = {
   "Description": "ລາຍລະອຽດ",
   "Price": "ລາຄາ",
   "Currency": "ສະກຸນເງິນ",
+  "Describe what you need": "ອະທິບາຍສິ່ງທີ່ທ່ານຕ້ອງການ",
+  "On-device AI — your request never leaves this phone.": "AI ໃນອຸປະກອນ — ຄຳຮ້ອງຂໍຂອງທ່ານຈະບໍ່ອອກຈາກໂທລະສັບນີ້ເລີຍ.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "ຕົວຢ່າງ: «ໄປສະໜາມບິນຕອນ 5 ໂມງແລງ, ບໍ່ເກີນ 100,000 ກີບ»",
+  "Draft my post": "ຮ່າງໂພສຂອງຂ້ອຍ",
+  "Could not draft that — try rephrasing.": "ບໍ່ສາມາດຮ່າງໄດ້ — ລອງໃຊ້ຄຳເວົ້າໃໝ່.",
 };
 export default c;

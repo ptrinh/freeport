@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "Apraksts",
   "Price": "Cena",
   "Currency": "Valūta",
+  "Describe what you need": "Aprakstiet, kas jums nepieciešams",
+  "On-device AI — your request never leaves this phone.": "Mākslīgais intelekts ierīcē — jūsu pieprasījums nekad nepamet šo tālruni.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "piem. «Brauciens uz lidostu plkst. 17, līdz 12 €»",
+  "Draft my post": "Izveidot ieraksta melnrakstu",
+  "Could not draft that — try rephrasing.": "Neizdevās izveidot melnrakstu — mēģiniet pārformulēt.",
 };
 export default c;

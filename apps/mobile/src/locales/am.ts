@@ -809,5 +809,10 @@ const c: Record<string, string> = {
   "Description": "መግለጫ",
   "Price": "ዋጋ",
   "Currency": "ገንዘብ",
+  "Describe what you need": "የሚፈልጉትን ይግለጹ",
+  "On-device AI — your request never leaves this phone.": "በመሣሪያ ላይ ያለ AI — ጥያቄዎ ከዚህ ስልክ ፈጽሞ አይወጣም።",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "ለምሳሌ \"ከሰዓት በኋላ 5 ሰዓት ወደ አየር ማረፊያ፣ ከ500 ብር በታች\"",
+  "Draft my post": "ልጥፌን አዘጋጅ",
+  "Could not draft that — try rephrasing.": "ያንን ማርቀቅ አልተቻለም — በሌላ አገላለጽ ይሞክሩ።",
 };
 export default c;

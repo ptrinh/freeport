@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "Beskrivelse",
   "Price": "Pris",
   "Currency": "Valuta",
+  "Describe what you need": "Beskriv, hvad du har brug for",
+  "On-device AI — your request never leaves this phone.": "AI på enheden — din anmodning forlader aldrig denne telefon.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "f.eks. \"Tur til lufthavnen kl. 17, under 100 kr.\"",
+  "Draft my post": "Udkast til mit opslag",
+  "Could not draft that — try rephrasing.": "Kunne ikke lave et udkast — prøv at omformulere.",
 };
 export default c;

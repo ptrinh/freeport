@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "விளக்கம்",
   "Price": "விலை",
   "Currency": "நாணயம்",
+  "Describe what you need": "உங்களுக்கு என்ன தேவை என்பதை விவரிக்கவும்",
+  "On-device AI — your request never leaves this phone.": "சாதனத்தில் இயங்கும் AI — உங்கள் கோரிக்கை இந்த தொலைபேசியை விட்டு வெளியேறாது.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "எ.கா. \"மாலை 5 மணிக்கு விமான நிலையத்திற்கு பயணம், ₹900-க்கு கீழ்\"",
+  "Draft my post": "எனது இடுகையை வரையவும்",
+  "Could not draft that — try rephrasing.": "வரைய முடியவில்லை — வேறு விதமாக சொல்லிப் பாருங்கள்.",
 };
 export default c;

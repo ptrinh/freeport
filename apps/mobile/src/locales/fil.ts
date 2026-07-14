@@ -809,5 +809,10 @@ const c: Record<string, string> = {
   "Description": "Paglalarawan",
   "Price": "Presyo",
   "Currency": "Pera",
+  "Describe what you need": "Ilarawan ang kailangan mo",
+  "On-device AI — your request never leaves this phone.": "AI sa mismong device — hindi kailanman lumalabas sa telepono ang iyong request.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "hal. \"Byahe papuntang airport nang 5pm, mababa sa ₱600\"",
+  "Draft my post": "I-draft ang post ko",
+  "Could not draft that — try rephrasing.": "Hindi ma-draft iyon — subukang baguhin ang pananalita.",
 };
 export default c;

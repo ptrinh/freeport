@@ -809,5 +809,10 @@ const c: Record<string, string> = {
   "Description": "Maelezo",
   "Price": "Bei",
   "Currency": "Sarafu",
+  "Describe what you need": "Eleza unachohitaji",
+  "On-device AI — your request never leaves this phone.": "AI kwenye kifaa — ombi lako haliondoki kwenye simu hii kamwe.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "mfano \"Safari ya kwenda uwanja wa ndege saa 11 jioni, chini ya KSh 1,200\"",
+  "Draft my post": "Andaa rasimu ya chapisho langu",
+  "Could not draft that — try rephrasing.": "Haikuwezekana kuandaa rasimu — jaribu kueleza kwa njia nyingine.",
 };
 export default c;

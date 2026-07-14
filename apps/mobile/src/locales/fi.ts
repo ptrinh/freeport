@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "Kuvaus",
   "Price": "Hinta",
   "Currency": "Valuutta",
+  "Describe what you need": "Kuvaile, mitä tarvitset",
+  "On-device AI — your request never leaves this phone.": "Laitteen sisäinen tekoäly — pyyntösi ei koskaan poistu tästä puhelimesta.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "esim. ”Kyyti lentokentälle klo 17, alle 12 €”",
+  "Draft my post": "Luonnostele ilmoitukseni",
+  "Could not draft that — try rephrasing.": "Luonnostelu ei onnistunut — kokeile muotoilla uudelleen.",
 };
 export default c;

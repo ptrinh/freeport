@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "Përshkrimi",
   "Price": "Çmimi",
   "Currency": "Monedha",
+  "Describe what you need": "Përshkruani çfarë ju nevojitet",
+  "On-device AI — your request never leaves this phone.": "IA në pajisje — kërkesa juaj nuk largohet kurrë nga ky telefon.",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "p.sh. \"Udhëtim për në aeroport në orën 17:00, nën 1200 lekë\"",
+  "Draft my post": "Hartoni postimin tim",
+  "Could not draft that — try rephrasing.": "Nuk u hartua dot — provoni ta riformuloni.",
 };
 export default c;

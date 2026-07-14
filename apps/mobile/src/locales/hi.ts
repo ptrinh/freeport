@@ -852,5 +852,10 @@ const c: Record<string, string> = {
   "Description": "विवरण",
   "Price": "मूल्य",
   "Currency": "मुद्रा",
+  "Describe what you need": "बताएं आपको क्या चाहिए",
+  "On-device AI — your request never leaves this phone.": "डिवाइस पर ही AI — आपका अनुरोध कभी इस फ़ोन से बाहर नहीं जाता।",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "जैसे \"शाम 5 बजे एयरपोर्ट की राइड, ₹500 से कम\"",
+  "Draft my post": "मेरी पोस्ट का मसौदा बनाएं",
+  "Could not draft that — try rephrasing.": "उसका मसौदा नहीं बना सके — दोबारा शब्दों में कहकर देखें।",
 };
 export default c;

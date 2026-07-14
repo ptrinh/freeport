@@ -812,5 +812,10 @@ const c: Record<string, string> = {
   "Description": "تفصیل",
   "Price": "قیمت",
   "Currency": "کرنسی",
+  "Describe what you need": "بتائیں آپ کو کیا چاہیے",
+  "On-device AI — your request never leaves this phone.": "آلہ پر AI — آپ کی درخواست کبھی اس فون سے باہر نہیں جاتی۔",
+  "e.g. \"Ride to the airport at 5pm, under $12\"": "مثلاً \"شام 5 بجے ہوائی اڈے تک سفر، 500 روپے سے کم\"",
+  "Draft my post": "میری پوسٹ کا مسودہ بنائیں",
+  "Could not draft that — try rephrasing.": "مسودہ نہیں بن سکا — دوبارہ الفاظ بدل کر کوشش کریں۔",
 };
 export default c;
