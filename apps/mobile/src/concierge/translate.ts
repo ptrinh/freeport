@@ -10,7 +10,7 @@
  * the original untouched in every null case — translation is best-effort
  * decoration, never a gate.
  */
-import { Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 import { conciergeModulePresent } from './model';
 
 /** Per-device, per-language memo — translations are derived data, never
@@ -30,9 +30,62 @@ export function webTranslatorSupported(): boolean {
   return typeof g.Translator?.create === 'function' && typeof g.LanguageDetector?.create === 'function';
 }
 
-/** Sync gate for UI (settings row visibility). */
+/** Android: ML Kit on-device translation (58 languages, ~30MB per pack,
+ *  runs on virtually every Android device — no Gemini Nano needed). The
+ *  package guards NativeModules access itself, so the probe is init-safe. */
+export function androidTranslatorSupported(): boolean {
+  if (Platform.OS !== 'android') return false;
+  try {
+    return NativeModules.TranslateText != null && NativeModules.IdentifyLanguages != null;
+  } catch {
+    return false;
+  }
+}
+
+/** A DEDICATED translation model exists (not an LLM) — these paths don't
+ *  need the Local LLM AI master switch. */
+export function nonLlmTranslatorSupported(): boolean {
+  if (Platform.OS === 'web') return webTranslatorSupported();
+  return androidTranslatorSupported();
+}
+
+/** Sync gate: can THIS device translate at all (any provider). */
 export function translateSupported(): boolean {
-  return Platform.OS === 'web' ? webTranslatorSupported() : conciergeModulePresent();
+  if (Platform.OS === 'web') return webTranslatorSupported();
+  if (Platform.OS === 'android') return androidTranslatorSupported();
+  return conciergeModulePresent(); // iOS: Apple FM (an LLM)
+}
+
+/**
+ * The one gating rule for the Settings → Chat row AND the pipeline (tested):
+ * visible/active when a dedicated translator exists, OR the Local LLM AI
+ * switch is on and an LLM-based translator exists.
+ */
+export function translateToggleVisible(llmEnabled: boolean): boolean {
+  return nonLlmTranslatorSupported() || (llmEnabled && translateSupported());
+}
+
+async function translateAndroid(text: string, targetLang: string): Promise<string | null> {
+  try {
+    const [{ default: IdentifyLanguages }, { default: TranslateText }] = await Promise.all([
+      import('@react-native-ml-kit/identify-languages'),
+      import('@react-native-ml-kit/translate-text'),
+    ]);
+    const source = await IdentifyLanguages.identify(text);
+    if (!source || source === 'und' || source === targetLang) return null;
+    // Language-pack download happens lazily and only ever after the user
+    // enabled the toggle (same policy as the web provider).
+    const r: any = await TranslateText.translate({
+      text,
+      sourceLanguage: source as any,
+      targetLanguage: targetLang as any,
+      downloadModelIfNeeded: true,
+    });
+    const out = String(typeof r === 'string' ? r : r?.result ?? r?.translatedText ?? '').trim();
+    return out && out !== text.trim() ? out : null;
+  } catch {
+    return null; // unsupported pair / download failed / junk — show original
+  }
 }
 
 // Web: one detector + one translator per language pair, created lazily.
@@ -73,6 +126,7 @@ export async function translateMessage(text: string, key: string, targetLang: st
   if (cache.has(ck)) return cache.get(ck)!;
   const run = async (): Promise<string | null> => {
     if (Platform.OS === 'web') return translateWeb(text, targetLang);
+    if (Platform.OS === 'android') return translateAndroid(text, targetLang);
     try {
       const m = await import('react-native-apple-llm');
       if ((await m.isFoundationModelsEnabled()) !== 'available') return null;

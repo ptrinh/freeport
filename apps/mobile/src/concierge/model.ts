@@ -30,6 +30,15 @@ export function conciergeModulePresent(): boolean {
   if (Platform.OS === 'web') {
     return typeof (globalThis as any).LanguageModel?.create === 'function';
   }
+  if (Platform.OS === 'android') {
+    // Gemini Nano via AICore (react-native-gemini-nano) — Pixel 8+ hardware;
+    // the package uses getEnforcing at init, so probe BEFORE importing.
+    try {
+      return TurboModuleRegistry.get('GeminiNano') != null;
+    } catch {
+      return false;
+    }
+  }
   if (Platform.OS !== 'ios') return false;
   try {
     return TurboModuleRegistry.get('AppleLLMModule') != null;
@@ -50,6 +59,14 @@ export async function conciergeAvailability(): Promise<ConciergeAvailability> {
         case 'downloading': return 'model_not_ready';
         default: return 'unsupported';
       }
+    } catch {
+      return 'unsupported';
+    }
+  }
+  if (Platform.OS === 'android') {
+    try {
+      const g = await import('react-native-gemini-nano');
+      return (await g.isAvailable()) ? 'available' : 'unsupported';
     } catch {
       return 'unsupported';
     }
@@ -162,10 +179,32 @@ async function draftIntentWeb(text: string, ctx: ConciergeContext): Promise<Repo
   }
 }
 
+/** Android: Gemini Nano has no guided generation — prompt for strict JSON
+ *  and let parseToDraft reject anything malformed (the human reviews anyway). */
+async function draftIntentAndroid(text: string, ctx: ConciergeContext): Promise<RepostDraft | null> {
+  const g = await import('react-native-gemini-nano');
+  const prompt =
+    conciergeInstructions(ctx) +
+    ' Respond with ONLY a JSON object — no prose, no code fences — with these keys: ' +
+    'kind ("ride"|"service"), from, to, service, location, note (strings, empty when unknown), ' +
+    'price (number, 0 when not mentioned), currency (ISO code or empty).\n\nRequest: ' +
+    text.trim();
+  try {
+    const raw = await g.generateText(prompt, { temperature: 0.1, maxTokens: 256 });
+    // Tolerate fenced/padded output: parse the outermost {...} block.
+    const m = /\{[\s\S]*\}/.exec(String(raw ?? ''));
+    if (!m) return null;
+    return parseToDraft(JSON.parse(m[0]) as ConciergeParse, ctx);
+  } catch {
+    return null;
+  }
+}
+
 /** Natural language → draft, entirely on-device. Null = model couldn't parse. */
 export async function draftIntent(text: string, ctx: ConciergeContext): Promise<RepostDraft | null> {
   if (!text.trim()) return null;
   if (Platform.OS === 'web') return draftIntentWeb(text, ctx);
+  if (Platform.OS === 'android') return draftIntentAndroid(text, ctx);
   const m = await import('react-native-apple-llm');
   await m.configureSession({ instructions: conciergeInstructions(ctx) });
   try {
