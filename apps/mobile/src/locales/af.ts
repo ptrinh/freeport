@@ -856,5 +856,6 @@ const c: Record<string, string> = {
   "Share current location": "Deel huidige ligging",
   "Shared location": "Gedeelde ligging",
   "Could not get your location — check the location permission.": "Kon nie jou ligging kry nie — kontroleer die liggingtoestemming.",
+  "Tap to call back": "Tik om terug te bel",
 };
 export default c;

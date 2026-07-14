@@ -152,6 +152,27 @@ describe('CallManager', () => {
     expect(c.sent.length).toBe(echoes);
   });
 
+  it('caller cancel while ringing → peer records a missed call (not silent)', async () => {
+    // Caller side: cancel after a beat — the hangup must say 'missed'.
+    const a = makeManager();
+    await a.mgr.startCall(PEER, false);
+    a.mgr.hangup();
+    expect(a.sent[1].env.type).toBe(CALL_HANGUP);
+    expect(a.sent[1].env.reason).toBe('missed');
+    expect(a.missed).toEqual([{ peer: PEER, dir: 'outgoing' }]);
+    // Callee side: that hangup lands while still ringing → onMissed fires.
+    const b = makeManager();
+    b.mgr.handleSignal(PEER, { v: 1, type: 'call.offer', call: 'c1', sdp: 'x', video: false, ts: Math.floor(Date.now() / 1000) } as any);
+    expect(b.mgr.getState().phase).toBe('incoming');
+    b.mgr.handleSignal(PEER, { v: 1, type: 'call.hangup', call: 'c1', reason: 'missed', ts: Math.floor(Date.now() / 1000) } as any);
+    expect(b.missed).toEqual([{ peer: PEER, dir: 'incoming' }]);
+    // A normal post-answer 'ended' hangup must NOT create a missed entry.
+    const c = makeManager();
+    c.mgr.handleSignal(PEER, { v: 1, type: 'call.offer', call: 'c2', sdp: 'x', ts: Math.floor(Date.now() / 1000) } as any);
+    c.mgr.handleSignal(PEER, { v: 1, type: 'call.hangup', call: 'c2', reason: 'ended', ts: Math.floor(Date.now() / 1000) } as any);
+    expect(c.missed).toEqual([]);
+  });
+
   it('unanswered incoming ring times out to missed', async () => {
     const { mgr, missed } = makeManager();
     mgr.handleSignal(PEER, makeCallOffer(mintCallId(), 'sdp', false));

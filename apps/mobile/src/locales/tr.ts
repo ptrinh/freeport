@@ -899,5 +899,6 @@ const c: Record<string, string> = {
   "Share current location": "Mevcut konumu paylaş",
   "Shared location": "Paylaşılan konum",
   "Could not get your location — check the location permission.": "Konumunuz alınamadı — konum iznini kontrol edin.",
+  "Tap to call back": "Geri aramak için dokunun",
 };
 export default c;

@@ -896,5 +896,6 @@ const c: Record<string, string> = {
   "Share current location": "현재 위치 공유",
   "Shared location": "공유된 위치",
   "Could not get your location — check the location permission.": "위치를 가져올 수 없습니다 — 위치 권한을 확인하세요.",
+  "Tap to call back": "탭하여 다시 전화하기",
 };
 export default c;

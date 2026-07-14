@@ -853,5 +853,6 @@ const c: Record<string, string> = {
   "Share current location": "Կիսվել ընթացիկ տեղադրությամբ",
   "Shared location": "Կիսված տեղադրություն",
   "Could not get your location — check the location permission.": "Չհաջողվեց ստանալ ձեր տեղադրությունը — ստուգեք տեղադրության թույլտվությունը։",
+  "Tap to call back": "Հպեք՝ հետ զանգելու համար",
 };
 export default c;

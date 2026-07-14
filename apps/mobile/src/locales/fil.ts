@@ -853,5 +853,6 @@ const c: Record<string, string> = {
   "Share current location": "Ibahagi ang kasalukuyang lokasyon",
   "Shared location": "Ibinahaging lokasyon",
   "Could not get your location — check the location permission.": "Hindi makuha ang iyong lokasyon — tingnan ang pahintulot sa lokasyon.",
+  "Tap to call back": "I-tap para tumawag pabalik",
 };
 export default c;

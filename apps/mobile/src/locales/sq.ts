@@ -856,5 +856,6 @@ const c: Record<string, string> = {
   "Share current location": "Shpërnda vendndodhjen aktuale",
   "Shared location": "Vendndodhje e shpërndarë",
   "Could not get your location — check the location permission.": "Nuk u mor dot vendndodhja jote — kontrollo lejen e vendndodhjes.",
+  "Tap to call back": "Trokit për të telefonuar prapa",
 };
 export default c;

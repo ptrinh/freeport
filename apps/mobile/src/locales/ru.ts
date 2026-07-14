@@ -905,5 +905,6 @@ const c: Record<string, string> = {
   "Share current location": "Поделиться текущим местоположением",
   "Shared location": "Отправленное местоположение",
   "Could not get your location — check the location permission.": "Не удалось определить ваше местоположение — проверьте разрешение на доступ к геоданным.",
+  "Tap to call back": "Нажмите, чтобы перезвонить",
 };
 export default c;

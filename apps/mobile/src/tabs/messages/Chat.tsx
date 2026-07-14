@@ -190,6 +190,7 @@ const ChatBubble = React.memo(function ChatBubble({
   onLongPress,
   translateTo,
   msgKey,
+  onCallBack,
 }: {
   text: string;
   dir: 'in' | 'out';
@@ -206,6 +207,8 @@ const ChatBubble = React.memo(function ChatBubble({
   translateTo?: string;
   /** Stable id for the translation cache. */
   msgKey?: string;
+  /** Call notices: tap the card to call the peer back (friend chat only). */
+  onCallBack?: (video: boolean) => void;
 }) {
   // Local call notices ("📞 Missed call") get the WhatsApp treatment: icon
   // row, red for a missed incoming call, never translated.
@@ -232,18 +235,30 @@ const ChatBubble = React.memo(function ChatBubble({
         </View>
       ) : null}
       {callNotice
-        ? <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
-            <View style={{ width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: dir === 'in' ? 'rgba(239,68,68,0.15)' : 'rgba(148,163,184,0.18)' }}>
+        ? <Pressable
+            disabled={!onCallBack}
+            onPress={() => onCallBack?.(text.startsWith('📹'))}
+            accessibilityRole="button" accessibilityLabel={t('Tap to call back')}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 2, minWidth: 170 }}
+          >
+            <View style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: dir === 'in' ? 'rgba(239,68,68,0.16)' : 'rgba(148,163,184,0.18)' }}>
               <Ionicons
-                name={text.startsWith('📹') ? (dir === 'in' ? 'videocam' : 'videocam-outline') : (dir === 'in' ? 'call' : 'call-outline')}
-                size={14}
+                name={text.startsWith('📹') ? 'videocam' : 'call'}
+                size={19}
                 color={dir === 'in' ? '#ef4444' : (dir === 'out' ? '#f5f7fa' : palette.text2)}
               />
             </View>
-            <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn, { opacity: 0.9 }]}>
-              {text.replace(/^(📞|📹) /, '')}
-            </Text>
-          </View>
+            <View style={{ flexShrink: 1 }}>
+              <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn, { fontWeight: '700' }]}>
+                {text.replace(/^(📞|📹) /, '')}
+              </Text>
+              {onCallBack ? (
+                <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn, { fontSize: 12, opacity: 0.6, marginTop: 1 }]}>
+                  {t('Tap to call back')}
+                </Text>
+              ) : null}
+            </View>
+          </Pressable>
         : isAudioMsg(text)
         ? <VoiceMessage url={text} dir={dir} />
         : isImageMsg(text)
@@ -304,7 +319,7 @@ const REACT_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
  * chat (ChatThread, bound to a Negotiation) and the friend chat (bound to a
  * Conversation) — keep it free of either model.
  */
-export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title, onReact, translateTo, fullHeight = false, filterQuery = '' }: {
+export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title, onReact, translateTo, fullHeight = false, filterQuery = '', onCallBack }: {
   messages: { dir: 'in' | 'out'; text: string; ts: number; id?: string; quote?: string; reactions?: { emoji: string; dir: 'in' | 'out' }[] }[];
   onSend: (text: string, opts?: { replyTo?: string; quote?: string }) => Promise<void>;
   /** Grab-style one-tap replies rendered above the input ("I am here ✅", …). */
@@ -325,6 +340,8 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
   /** In-chat search (WhatsApp-style): non-empty → show only matching messages
    *  (comma-separated keywords, same syntax as Browse). */
   filterQuery?: string;
+  /** Missed-call cards: tap to redial the peer (friend chat). */
+  onCallBack?: (video: boolean) => void;
 }) {
   const [text, setText] = useState('');
   // Long-press action row target + the message being replied to.
@@ -424,6 +441,7 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
                 onLongPress={onReact && m.id ? () => setActionsFor(actionsFor === m.id ? null : m.id!) : undefined}
                 translateTo={translateTo}
                 msgKey={m.id ?? `${m.ts}-${m.dir}`}
+                onCallBack={onCallBack}
               />
               {actionsFor === m.id && onReact && m.id ? (
                 <View style={[s.row, { gap: 6, alignSelf: m.dir === 'out' ? 'flex-end' : 'flex-start', marginBottom: 6, flexWrap: 'wrap' }]}>

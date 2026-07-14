@@ -856,5 +856,6 @@ const c: Record<string, string> = {
   "Share current location": "Jelenlegi hely megosztása",
   "Shared location": "Megosztott hely",
   "Could not get your location — check the location permission.": "Nem sikerült lekérni a helyzetedet — ellenőrizd a helyhozzáférési engedélyt.",
+  "Tap to call back": "Koppintson a visszahíváshoz",
 };
 export default c;

@@ -857,5 +857,6 @@ const c: Record<string, string> = {
   "Share current location": "Bendrinti dabartinę vietą",
   "Shared location": "Bendrinama vieta",
   "Could not get your location — check the location permission.": "Nepavyko nustatyti jūsų vietos — patikrinkite vietos leidimą.",
+  "Tap to call back": "Palieskite, kad perskambintumėte",
 };
 export default c;

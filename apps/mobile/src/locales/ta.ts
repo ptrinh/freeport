@@ -856,5 +856,6 @@ const c: Record<string, string> = {
   "Share current location": "தற்போதைய இருப்பிடத்தைப் பகிர்",
   "Shared location": "பகிரப்பட்ட இருப்பிடம்",
   "Could not get your location — check the location permission.": "உங்கள் இருப்பிடத்தைப் பெற முடியவில்லை — இருப்பிட அனுமதியைச் சரிபார்க்கவும்.",
+  "Tap to call back": "மீண்டும் அழைக்க தட்டவும்",
 };
 export default c;

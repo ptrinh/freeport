@@ -856,5 +856,6 @@ const c: Record<string, string> = {
   "Share current location": "Jaga praegust asukohta",
   "Shared location": "Jagatud asukoht",
   "Could not get your location — check the location permission.": "Sinu asukohta ei õnnestunud tuvastada — kontrolli asukohaluba.",
+  "Tap to call back": "Puudutage tagasi helistamiseks",
 };
 export default c;

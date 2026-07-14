@@ -856,5 +856,6 @@ const c: Record<string, string> = {
   "Share current location": "Distribuie locația curentă",
   "Shared location": "Locație distribuită",
   "Could not get your location — check the location permission.": "Nu s-a putut obține locația ta — verifică permisiunea pentru locație.",
+  "Tap to call back": "Atinge pentru a suna înapoi",
 };
 export default c;

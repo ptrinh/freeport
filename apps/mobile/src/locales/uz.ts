@@ -853,5 +853,6 @@ const c: Record<string, string> = {
   "Share current location": "Joriy joylashuvni ulashish",
   "Shared location": "Ulashilgan joylashuv",
   "Could not get your location — check the location permission.": "Joylashuvingizni aniqlab bo‘lmadi — joylashuv ruxsatini tekshiring.",
+  "Tap to call back": "Qayta qo'ng'iroq qilish uchun bosing",
 };
 export default c;

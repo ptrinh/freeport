@@ -387,6 +387,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
             onReact={(id, emoji) => client?.chatReact(conv.peer, id, emoji).catch(() => {})}
             translateTo={translateTo}
             filterQuery={searchOpen ? searchQuery : ''}
+            onCallBack={onStartCall && conv.state === 'active' && !blocked ? (video) => onStartCall(conv.peer, video) : undefined}
           />
         </KeyboardAvoidingView>
         </View>

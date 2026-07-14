@@ -262,10 +262,16 @@ export class CallManager {
 
   /** Local hangup/cancel from any live phase. */
   hangup(): void {
-    const { phase, peer, callId } = this.state;
+    const { phase, peer, callId, video } = this.state;
     if (phase === 'idle' || phase === 'ended') return;
     this.clearRing();
-    this.deps.send(peer!, makeCallHangup(callId!, 'ended')).catch(() => {});
+    // Cancelling while the peer is still RINGING is a missed call on their
+    // side — 'ended' is reserved for tearing down an answered call (the
+    // receiver deliberately ignores it, which used to swallow the most
+    // common missed-call case: caller gives up after a few seconds).
+    const cancelledRing = phase === 'outgoing';
+    this.deps.send(peer!, makeCallHangup(callId!, cancelledRing ? 'missed' : 'ended')).catch(() => {});
+    if (cancelledRing) this.deps.onMissed?.(peer!, 'outgoing', !!video);
     this.teardown();
     this.setState({ phase: 'ended', peer, callId, reason: 'ended' });
   }

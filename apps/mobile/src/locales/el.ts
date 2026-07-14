@@ -856,5 +856,6 @@ const c: Record<string, string> = {
   "Share current location": "Κοινοποίηση τρέχουσας τοποθεσίας",
   "Shared location": "Κοινοποιημένη τοποθεσία",
   "Could not get your location — check the location permission.": "Δεν ήταν δυνατός ο εντοπισμός της τοποθεσίας σας — ελέγξτε την άδεια τοποθεσίας.",
+  "Tap to call back": "Πατήστε για επιστροφή κλήσης",
 };
 export default c;

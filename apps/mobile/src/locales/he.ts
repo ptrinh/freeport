@@ -856,5 +856,6 @@ const c: Record<string, string> = {
   "Share current location": "שיתוף המיקום הנוכחי",
   "Shared location": "מיקום ששותף",
   "Could not get your location — check the location permission.": "לא ניתן היה לקבל את המיקום שלך — בדוק את הרשאת המיקום.",
+  "Tap to call back": "הקש כדי להחזיר שיחה",
 };
 export default c;

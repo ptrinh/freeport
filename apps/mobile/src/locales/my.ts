@@ -853,5 +853,6 @@ const c: Record<string, string> = {
   "Share current location": "လက်ရှိတည်နေရာကို မျှဝေပါ",
   "Shared location": "မျှဝေထားသော တည်နေရာ",
   "Could not get your location — check the location permission.": "သင့်တည်နေရာကို ရယူ၍မရပါ — တည်နေရာ ခွင့်ပြုချက်ကို စစ်ဆေးပါ။",
+  "Tap to call back": "ပြန်ခေါ်ရန် တို့ပါ",
 };
 export default c;

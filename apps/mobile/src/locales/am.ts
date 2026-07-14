@@ -853,5 +853,6 @@ const c: Record<string, string> = {
   "Share current location": "የአሁኑን አካባቢ አጋራ",
   "Shared location": "የተጋራ አካባቢ",
   "Could not get your location — check the location permission.": "አካባቢዎን ማግኘት አልተቻለም — የአካባቢ ፈቃዱን ያረጋግጡ።",
+  "Tap to call back": "መልሰው ለመደወል ይንኩ",
 };
 export default c;

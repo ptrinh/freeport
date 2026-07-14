@@ -896,5 +896,6 @@ const c: Record<string, string> = {
   "Share current location": "मौजूदा स्थान साझा करें",
   "Shared location": "साझा किया गया स्थान",
   "Could not get your location — check the location permission.": "आपका स्थान प्राप्त नहीं हो सका — स्थान की अनुमति जाँचें।",
+  "Tap to call back": "कॉल बैक करने के लिए टैप करें",
 };
 export default c;

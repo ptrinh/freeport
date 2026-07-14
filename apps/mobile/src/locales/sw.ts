@@ -853,5 +853,6 @@ const c: Record<string, string> = {
   "Share current location": "Shiriki eneo la sasa",
   "Shared location": "Eneo lililoshirikiwa",
   "Could not get your location — check the location permission.": "Imeshindwa kupata eneo lako — angalia ruhusa ya eneo.",
+  "Tap to call back": "Gusa ili kupiga simu tena",
 };
 export default c;

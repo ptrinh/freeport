@@ -856,5 +856,6 @@ const c: Record<string, string> = {
   "Share current location": "Kopīgot pašreizējo atrašanās vietu",
   "Shared location": "Kopīgotā atrašanās vieta",
   "Could not get your location — check the location permission.": "Neizdevās noteikt jūsu atrašanās vietu — pārbaudiet atrašanās vietas atļauju.",
+  "Tap to call back": "Pieskarieties, lai atzvanītu",
 };
 export default c;

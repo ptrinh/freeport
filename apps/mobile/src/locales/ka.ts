@@ -853,5 +853,6 @@ const c: Record<string, string> = {
   "Share current location": "მიმდინარე მდებარეობის გაზიარება",
   "Shared location": "გაზიარებული მდებარეობა",
   "Could not get your location — check the location permission.": "თქვენი მდებარეობის მიღება ვერ მოხერხდა — შეამოწმეთ მდებარეობის ნებართვა.",
+  "Tap to call back": "შეეხეთ დასარეკად",
 };
 export default c;

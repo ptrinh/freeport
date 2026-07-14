@@ -858,5 +858,6 @@ const c: Record<string, string> = {
   "Share current location": "Udostępnij bieżącą lokalizację",
   "Shared location": "Udostępniona lokalizacja",
   "Could not get your location — check the location permission.": "Nie udało się ustalić Twojej lokalizacji — sprawdź uprawnienie do lokalizacji.",
+  "Tap to call back": "Dotknij, aby oddzwonić",
 };
 export default c;

@@ -856,5 +856,6 @@ const c: Record<string, string> = {
   "Share current location": "Del gjeldende posisjon",
   "Shared location": "Delt posisjon",
   "Could not get your location — check the location permission.": "Kunne ikke hente posisjonen din — sjekk posisjonstillatelsen.",
+  "Tap to call back": "Trykk for å ringe tilbake",
 };
 export default c;

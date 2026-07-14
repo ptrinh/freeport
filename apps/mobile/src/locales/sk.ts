@@ -859,5 +859,6 @@ const c: Record<string, string> = {
   "Share current location": "Zdieľať aktuálnu polohu",
   "Shared location": "Zdieľaná poloha",
   "Could not get your location — check the location permission.": "Nepodarilo sa zistiť vašu polohu — skontrolujte povolenie polohy.",
+  "Tap to call back": "Klepnutím zavoláte späť",
 };
 export default c;
