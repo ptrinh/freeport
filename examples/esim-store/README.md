@@ -1,11 +1,11 @@
 # eSIM Demo Shop — Freeport mini-app example
 
 A single-file demo mini-app for the Freeport mini-app shell (NIP-07 + WebLN +
-`window.freeport.paySpark`). Published at **https://freeport.network/demo-app/**
+`window.freeport.paySpark`). Published at **https://freeport.network/esim-store/**
 by `apps/mobile/deploy-web.sh`.
 
 Try it: Freeport app → Settings → Experimental → enable **Mini-apps** →
-add `freeport.network/demo-app` (pasting this repo's GitHub URL works too).
+add `freeport.network/esim-store` (pasting this repo's GitHub URL works too).
 
 What it demonstrates:
 

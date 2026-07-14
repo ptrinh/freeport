@@ -34,7 +34,7 @@ function resolveDemoAlias(input: string): string {
   const m = /^https:\/\/github\.com\/ptrinh\/freeport(?:\/tree\/[^/]+)?\/examples\/([a-z0-9-]+)\/?$/i.exec(input);
   if (m) return `https://freeport.network/${m[1]}/`;
   // Bare repo root → the original eSIM demo shop.
-  if (/^https:\/\/github\.com\/ptrinh\/freeport\/?$/i.test(input)) return 'https://freeport.network/demo-app/';
+  if (/^https:\/\/github\.com\/ptrinh\/freeport\/?$/i.test(input)) return 'https://freeport.network/esim-store/';
   return input;
 }
 

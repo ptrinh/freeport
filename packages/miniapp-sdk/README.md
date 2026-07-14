@@ -30,6 +30,6 @@ Notes:
 - Your page must be embeddable: don't send `X-Frame-Options: DENY` or a
   `frame-ancestors` policy that excludes `https://freeport.network`.
 
-Example app: [`examples/demo-app`](../../examples/demo-app) — the eSIM Demo
-Shop published at https://freeport.network/demo-app/. Full architecture &
+Example app: [`examples/esim-store`](../../examples/esim-store) — the eSIM Demo
+Shop published at https://freeport.network/esim-store/. Full architecture &
 threat model: [`docs/miniapps-security.md`](../../docs/miniapps-security.md).

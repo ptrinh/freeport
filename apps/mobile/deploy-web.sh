@@ -66,6 +66,7 @@ node scripts/hash-bundles.mjs dist
 echo "▸ Writing _redirects + inline www→apex redirect…"
 cat > dist/_redirects <<'REDIR'
 https://www.freeport.network/* https://freeport.network/:splat 301
+/demo-app/* /esim-store/:splat 301
 REDIR
 sed -i '' 's#<head>#<head><script>if(location.hostname==="www.freeport.network")location.replace("https://freeport.network"+location.pathname+location.search+location.hash);</script>#' dist/index.html
 
@@ -221,8 +222,8 @@ echo "▸ Deploying to Cloudflare Pages…"
 # Mini-app demo shop — a plain static page served next to the SPA. The app's
 # add-flow also maps the repo's GitHub URL to this path.
 echo "▸ Adding mini-app demos + SDK (/sdk.js)…"
-mkdir -p dist/demo-app dist/insurance-store
-cp ../../examples/demo-app/index.html ../../examples/demo-app/icon.png dist/demo-app/
+mkdir -p dist/esim-store dist/insurance-store
+cp ../../examples/esim-store/index.html ../../examples/esim-store/icon.png dist/esim-store/
 cp ../../examples/insurance-store/index.html ../../examples/insurance-store/icon.png dist/insurance-store/
 cp ../../packages/miniapp-sdk/freeport-sdk.js dist/sdk.js
 

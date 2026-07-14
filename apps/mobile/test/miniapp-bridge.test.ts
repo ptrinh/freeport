@@ -367,17 +367,17 @@ describe('freeport.saveFile', () => {
   });
 });
 
-describe('launch URLs (demo-app style paths)', () => {
+describe('launch URLs (esim-store style paths)', () => {
   it('registerApp keeps the path as the launch url; permissions key on the origin', () => {
     const f = new MiniAppFirewall();
-    const rec = f.registerApp('https://freeport.network/demo-app/?x=1#frag', 'Demo', T0);
+    const rec = f.registerApp('https://freeport.network/esim-store/?x=1#frag', 'Demo', T0);
     expect(rec.origin).toBe('https://freeport.network');
-    expect(rec.url).toBe('https://freeport.network/demo-app/?x=1');
+    expect(rec.url).toBe('https://freeport.network/esim-store/?x=1');
   });
 
   it('a tampered store cannot relocate the launch url outside the origin', () => {
     const f = new MiniAppFirewall();
-    f.registerApp('https://freeport.network/demo-app/', 'Demo', T0);
+    f.registerApp('https://freeport.network/esim-store/', 'Demo', T0);
     const blob = JSON.parse(f.serialize());
     blob.apps[0].url = 'https://evil.example/phish';
     const f2 = MiniAppFirewall.restore(JSON.stringify(blob));

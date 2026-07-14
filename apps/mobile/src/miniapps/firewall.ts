@@ -64,7 +64,7 @@ export interface AppPermissions {
 export interface MiniAppRecord {
   /** Normalized https origin — the trust unit for everything. */
   origin: string;
-  /** Launch URL (may carry a path, e.g. https://freeport.network/demo-app/).
+  /** Launch URL (may carry a path, e.g. https://freeport.network/esim-store/).
    *  Always inside `origin`; permissions are still keyed by origin alone. */
   url: string;
   name: string;
