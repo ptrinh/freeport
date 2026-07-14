@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Freeport — Delete Your Account</title>
+<meta name="description" content="How to delete your Freeport account and data. Freeport is self-custodial: your account is a key on your own device, and deleting it wipes everything locally." />
+<meta name="color-scheme" content="dark light" />
+<style>
+  :root { color-scheme: dark light; }
+  body { margin: 0; background: #06080c; color: #e7ecf3;
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 32px 20px 80px; }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 30px; margin: 0 0 4px; }
+  h2 { font-size: 20px; margin: 32px 0 8px; }
+  .sub { color: #8b97a6; margin: 0 0 24px; }
+  a { color: #6ea8ff; }
+  code { background: #11151c; padding: 1px 5px; border-radius: 5px; }
+  ol, ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+  .muted { color: #8b97a6; }
+  .box { background: #0c1017; border: 1px solid #1c2430; border-radius: 10px; padding: 14px 18px; margin: 16px 0; }
+  hr { border: none; border-top: 1px solid #1c2430; margin: 28px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Delete your Freeport account</h1>
+  <p class="sub">Freeport (developer: Phil T · <code>uk.trinh.freeport</code>)</p>
+
+  <p>Freeport is a <strong>self-custodial, peer-to-peer app</strong>. There is no
+  Freeport server that holds an account for you: your "account" is a
+  cryptographic key (a Nostr identity) generated and stored <strong>on your own
+  device</strong>, together with your local settings, saved addresses, messages,
+  and — if you enabled the wallet — your wallet keys. We do not have a database
+  of users to delete from.</p>
+
+  <h2>Delete everything, in the app</h2>
+  <p>You can permanently erase your account and all of its data directly in the
+  app, with no request and no waiting:</p>
+  <ol>
+    <li>Open <strong>Freeport</strong>.</li>
+    <li>Go to the <strong>Settings</strong> tab.</li>
+    <li>Scroll to the bottom and tap <strong>Delete account</strong>.</li>
+    <li>Confirm. This immediately and irreversibly wipes the identity key,
+      profile, settings, address book, messages, wallet keys, and all other
+      local data from the device.</li>
+  </ol>
+  <div class="box">
+    <strong>This cannot be undone.</strong> Because Freeport is self-custodial,
+    no one — including the developer — can recover a deleted key. If you might
+    want your identity or funds back later, export a backup <em>before</em>
+    deleting (Settings → back up your identity).
+  </div>
+
+  <h2>What is deleted</h2>
+  <ul>
+    <li><strong>Deleted immediately:</strong> everything stored on your device —
+      your key/identity, display name and profile, phone number (kept local
+      only), saved addresses, chat history, and wallet keys.</li>
+    <li><strong>Cloud backup (if you created one):</strong> a backup you saved
+      to iCloud/Google or a file is under your control — delete that file to
+      remove it.</li>
+    <li><strong>Public events already broadcast to Nostr relays</strong>
+      (e.g. listings you posted) are outside any single party's control and may
+      persist on relays you do not operate. Listings carry an expiration tag
+      (NIP-40), but each relay decides how long to keep data. Treat anything you
+      published publicly as potentially permanent.</li>
+  </ul>
+
+  <h2>Prefer to uninstall?</h2>
+  <p>Uninstalling the app also removes the local copy of your data from the
+  device. Using <strong>Delete account</strong> first is the thorough option, as
+  it clears the secure keystore entries explicitly.</p>
+
+  <h2>Need help?</h2>
+  <p>If you can't access the app but want confirmation that no server-side
+  account exists for you (it doesn't), email
+  <a href="mailto:privacy@freeport.network">privacy@freeport.network</a>.</p>
+
+  <hr />
+  <p class="muted">Freeport · a peer-to-peer marketplace on Nostr ·
+    <a href="https://freeport.network">freeport.network</a> ·
+    <a href="https://freeport.network/privacy">Privacy Policy</a></p>
+</main>
+</body>
+</html>

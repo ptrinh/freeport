@@ -216,6 +216,13 @@ echo "▸ Publishing acceptable-use policy at /aup…"
 mkdir -p dist/aup
 cp store/aup.html dist/aup/index.html
 
+# Account-deletion instructions — the URL the Play Data safety form points to
+# for "how users request account deletion". Freeport is self-custodial, so this
+# describes the in-app Delete account flow (Settings → Delete account).
+echo "▸ Publishing account-deletion page at /delete-account…"
+mkdir -p dist/delete-account
+cp store/delete-account.html dist/delete-account/index.html
+
 # The marketing/landing page (same files GitHub Pages serves from docs/) also
 # lives at /intro on the app domain, so freeport.network/intro is the shareable
 # front door. Assets are referenced relatively, so a straight copy works.
