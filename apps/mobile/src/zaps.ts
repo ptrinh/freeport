@@ -60,6 +60,9 @@ export async function zapInvoice(
     nostrParam = `&nostr=${encodeURIComponent(JSON.stringify(zapReq))}`;
   }
   try {
+    // The callback URL comes from the (untrusted) LNURL server — require https
+    // so it can't downgrade us to http (MITM invoice swap) or hit a non-web scheme.
+    if (!/^https:\/\//i.test(info.callback)) return null;
     const sep = info.callback.includes('?') ? '&' : '?';
     const r = await fetch(`${info.callback}${sep}amount=${msats}${nostrParam}`);
     const j = await r.json();
@@ -68,7 +71,10 @@ export async function zapInvoice(
     // LNURL endpoint must not hand back an inflated invoice (parity with
     // wallet/lnurl.ts). ±1 sat slack for rounding.
     const got = bolt11Sats(j.pr);
-    if (got != null && Math.abs(got - opts.amountSat) > 1) return null;
+    // Reject when we CAN'T confirm the amount too (amountless / unparseable
+    // invoice) — otherwise a hostile endpoint sidesteps the check by omitting
+    // the amount. Parity with wallet/lnurl.ts. ±1 sat slack for rounding.
+    if (got == null || Math.abs(got - opts.amountSat) > 1) return null;
     return { pr: j.pr, zap };
   } catch {
     return null;

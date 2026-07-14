@@ -96,8 +96,15 @@ cat > dist/_headers <<'HDRS'
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: browsing-topics=()
-  Content-Security-Policy: frame-ancestors 'self' https://freeport.network https://www.freeport.network https://freeport.trinh.uk
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Content-Security-Policy: frame-ancestors 'self' https://freeport.network https://www.freeport.network https://freeport.trinh.uk; object-src 'none'; base-uri 'none'
 HDRS
+# CSP scope note: object-src 'none' + base-uri 'none' shut off two XSS
+# amplifiers (plugin embeds and <base>-tag hijack) with zero risk to the app.
+# We deliberately DON'T set script-src/default-src/connect-src: the app opens
+# WebSockets to user-configured Nostr relays (any wss:// host — no fixed
+# allowlist possible) and boots from inline scripts, so a strict policy would
+# break core function. HSTS is 2y + preload to stop first-visit SSL-strip.
 # Clickjacking note: NO X-Frame-Options — it can't express multiple origins, and
 # SAMEORIGIN would block the mini-app WEB shell (freeport.network) from framing
 # a demo served cross-origin at apps.freeport.network (same Pages project). CSP

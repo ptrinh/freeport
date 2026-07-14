@@ -748,6 +748,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Jou huidige skakel en QR werk nie meer nie. Enigiemand met wie jy reeds gesels, word nie geraak nie.",
   "Generate": "Genereer",
   "Copy link": "Kopieer skakel",
+  "Share link": "Deel skakel",
   "Generate new invite link": "Genereer nuwe uitnodigingskakel",
   "Chat invite": "Geselsuitnodiging",
   "This is your own invite link.": "Dit is jou eie uitnodigingskakel.",

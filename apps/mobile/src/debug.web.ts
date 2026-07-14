@@ -57,8 +57,30 @@ let registeredClient: DebugClient | null = null;
 let getIntents: (() => unknown[]) | null = null;
 
 /** Storage keys whose VALUES are secret and must never be dumped/listed by the
- *  debug API (they're still wiped by the clear path, which uses profileKeys). */
-const SECRET_KEYS = new Set(['freeport.nsec']);
+ *  debug API (they're still wiped by the clear path, which uses profileKeys).
+ *  Beyond the raw nsec this covers private message content and the chat-invite
+ *  secret; other keys (prefs, profile, escrows) are dumped but field-scrubbed. */
+const SECRET_KEYS = new Set([
+  'freeport.nsec', 'freeport.conversations', 'freeport.chatInvite',
+]);
+
+/** Field names whose values are secret wherever they appear in a dumped value:
+ *  NWC connection string, escrow preimage (= funds), phone, seed/mnemonic, any
+ *  key/token/password. Matched case-insensitively as a substring. */
+const SECRET_FIELD = /nsec|nwc|preimage|mnemonic|seed|phone|passphrase|password|secret|privkey|priv_key|token/i;
+
+/** Deep-copy a parsed value, replacing any secret-named field with a marker so
+ *  a `freeport.dump()` can't hand a self-XSS victim their NWC secret / preimage
+ *  / phone. Depth-bounded against pathological nesting. */
+function scrub(v: unknown, depth = 0): unknown {
+  if (depth > 6 || v == null || typeof v !== 'object') return v;
+  if (Array.isArray(v)) return v.map((x) => scrub(x, depth + 1));
+  const out: Record<string, unknown> = {};
+  for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+    out[k] = SECRET_FIELD.test(k) ? '[redacted]' : scrub(val, depth + 1);
+  }
+  return out;
+}
 
 /** Logical localStorage keys for the active profile (prefix stripped). */
 function profileKeys(): string[] {
@@ -99,7 +121,13 @@ function makeApi(): FreeportDebug {
   return {
     get profile() { return profileId(); },
     get npub() { return registeredNpub; },
-    get client() { return registeredClient; },
+    // A read-only projection — never the live client itself, whose `.signer`
+    // would expose the raw secret key on the console (a self-XSS jackpot).
+    get client() {
+      const c = registeredClient;
+      if (!c) return null;
+      return { pubkey: c.pubkey, relays: c.relays, negotiations: c.negotiations };
+    },
     relays() { return registeredClient?.connectedRelayCount?.() ?? 0; },
     negotiations() { return registeredClient?.negotiations ? [...registeredClient.negotiations.values()] : []; },
     intents() { return getIntents?.() ?? []; },
@@ -110,7 +138,7 @@ function makeApi(): FreeportDebug {
       // instrument for a "paste this in your console" self-XSS scam — don't
       // hand it out.
       const out: Record<string, unknown> = {};
-      for (const k of profileKeys()) if (!SECRET_KEYS.has(k)) out[k] = readKey(k);
+      for (const k of profileKeys()) if (!SECRET_KEYS.has(k)) out[k] = scrub(readKey(k));
       return out;
     },
     state() {

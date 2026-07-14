@@ -745,6 +745,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Titigil sa paggana ang kasalukuyan mong link at QR. Hindi maaapektuhan ang mga kausap mo na.",
   "Generate": "Gumawa",
   "Copy link": "Kopyahin ang link",
+  "Share link": "Ibahagi ang link",
   "Generate new invite link": "Gumawa ng bagong link ng imbitasyon",
   "Chat invite": "Imbitasyon sa chat",
   "This is your own invite link.": "Ito ang sarili mong link ng imbitasyon.",

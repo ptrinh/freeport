@@ -788,6 +788,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Tautan dan QR Anda saat ini akan berhenti berfungsi. Orang yang sudah Anda ajak mengobrol tidak terpengaruh.",
   "Generate": "Buat",
   "Copy link": "Salin tautan",
+  "Share link": "Bagikan tautan",
   "Generate new invite link": "Buat tautan undangan baru",
   "Chat invite": "Undangan obrolan",
   "This is your own invite link.": "Ini adalah tautan undangan Anda sendiri.",

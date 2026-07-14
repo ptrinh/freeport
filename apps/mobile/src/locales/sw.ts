@@ -745,6 +745,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Kiungo chako cha sasa na QR vitaacha kufanya kazi. Wale unaozungumza nao tayari hawataathirika.",
   "Generate": "Tengeneza",
   "Copy link": "Nakili kiungo",
+  "Share link": "Shiriki kiungo",
   "Generate new invite link": "Tengeneza kiungo kipya cha mwaliko",
   "Chat invite": "Mwaliko wa gumzo",
   "This is your own invite link.": "Hiki ni kiungo chako mwenyewe cha mwaliko.",

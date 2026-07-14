@@ -49,6 +49,11 @@ export interface SubRecord {
   lastSeenAt: number;
 }
 
+/** Hard ceiling on stored subscriptions — a subscribe endpoint with no auth
+ *  must not let anyone grow subscriptions.json without bound (disk/memory DoS).
+ *  Overridable for large self-hosted deployments. */
+const MAX_SUBSCRIPTIONS = Number(process.env.MAX_SUBSCRIPTIONS ?? 100_000);
+
 export class SubStore {
   private map = new Map<string, SubRecord>();
   // Secondary indexes (rebuilt from `map`; kept in sync on put/remove).
@@ -109,7 +114,8 @@ export class SubStore {
     // mid-write can no longer leave a half-written (corrupt) subscriptions.json,
     // which the loader would discard on boot — wiping every push subscription.
     const tmp = `${this.path}.tmp`;
-    writeFileSync(tmp, JSON.stringify([...this.map.values()], null, 2));
+    // 0600: the file holds push endpoints + p256dh/auth keys — keep it owner-only.
+    writeFileSync(tmp, JSON.stringify([...this.map.values()], null, 2), { mode: 0o600 });
     renameSync(tmp, this.path);
   }
 
@@ -137,6 +143,11 @@ export class SubStore {
 
   private put(id: string, partial: Omit<SubRecord, 'id' | 'createdAt' | 'lastSeenAt'>): SubRecord {
     const old = this.map.get(id);
+    // New (not-updating-in-place) records are rejected once the store is full,
+    // so a flood of unique tokens can't grow storage without bound.
+    if (!old && this.map.size >= MAX_SUBSCRIPTIONS) {
+      throw new Error('subscription limit reached');
+    }
     if (old) this.unindex(old);
     const now = Date.now();
     const rec: SubRecord = { id, ...partial, createdAt: old?.createdAt ?? now, lastSeenAt: now };

@@ -78,7 +78,7 @@ async function prfFromAssertion(): Promise<Uint8Array> {
       publicKey: {
         challenge: crypto.getRandomValues(new Uint8Array(32)),
         rpId: rpId(),
-        userVerification: 'preferred',
+        userVerification: 'required',
         extensions: { prf: { eval: { first: PRF_SALT } } },
       },
     });
@@ -91,7 +91,7 @@ async function prfFromAssertion(): Promise<Uint8Array> {
   const res: any = await mod.get({
     challenge: b64url(crypto.getRandomValues(new Uint8Array(32))),
     rpId: rpId(),
-    userVerification: 'preferred',
+    userVerification: 'required',
     extensions: { prf: { eval: { first: b64url(PRF_SALT) } } },
   });
   const first = res?.clientExtensionResults?.prf?.results?.first;
@@ -121,7 +121,7 @@ export async function createPasskeyIdentity(accountLabel: string): Promise<Uint8
     rp: { name: RP_NAME, id: rpId() },
     user: { id: userId, name: accountLabel || 'Freeport', displayName: accountLabel || 'Freeport' },
     pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
-    authenticatorSelection: { residentKey: 'required', userVerification: 'preferred' },
+    authenticatorSelection: { residentKey: 'required', userVerification: 'required' },
     extensions: { prf: { eval: { first: PRF_SALT } } },
   } as any;
   if (Platform.OS === 'web') {
@@ -165,7 +165,7 @@ export async function attemptImmediatePasskeySignIn(): Promise<Uint8Array | null
       publicKey: {
         challenge: crypto.getRandomValues(new Uint8Array(32)),
         rpId: rpId(),
-        userVerification: 'preferred',
+        userVerification: 'required',
         extensions: { prf: { eval: { first: PRF_SALT } } },
       },
       mediation: 'immediate',

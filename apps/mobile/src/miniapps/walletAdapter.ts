@@ -30,6 +30,7 @@ export function makeBridgeWallet(getWallet: (() => Promise<WalletProvider | null
         if (tok && w.payToken) {
           // Enough of the stablecoin to cover the charge?
           if (tok.amount < opts.token.amount) throw new Error('insufficient balance');
+          // Paid in stablecoin units, not sats → no sat spend to account for.
           return w.payToken(address, tok, opts.token.amount);
         }
         // Wallet holds no such stablecoin → pay the equivalent VALUE in sats
@@ -40,12 +41,13 @@ export function makeBridgeWallet(getWallet: (() => Promise<WalletProvider | null
         const sats = Math.max(1, Math.round((opts.token.amount / btcUsd) * 100_000_000));
         const bal = await w.balance().catch(() => ({ sats: 0 }));
         if ((bal.sats || 0) < sats) throw new Error('insufficient balance');
-        return w.pay(address, sats);
+        // Report the sats actually spent so the bridge can record it against caps.
+        return { ...(await w.pay(address, sats)), sats };
       }
       const need = opts.sats || 0;
       const bal = await w.balance().catch(() => ({ sats: 0 }));
       if ((bal.sats || 0) < need) throw new Error('insufficient balance');
-      return w.pay(address, need);
+      return { ...(await w.pay(address, need)), sats: need };
     },
   };
 }

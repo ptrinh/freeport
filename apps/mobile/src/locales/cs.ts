@@ -751,6 +751,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Váš současný odkaz a QR kód přestanou fungovat. Lidí, se kterými už chatujete, se to nedotkne.",
   "Generate": "Vygenerovat",
   "Copy link": "Kopírovat odkaz",
+  "Share link": "Sdílet odkaz",
   "Generate new invite link": "Vygenerovat nový odkaz s pozvánkou",
   "Chat invite": "Pozvánka k chatu",
   "This is your own invite link.": "Toto je váš vlastní odkaz s pozvánkou.",

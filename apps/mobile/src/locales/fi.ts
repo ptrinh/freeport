@@ -748,6 +748,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Nykyinen linkkisi ja QR-koodisi lakkaavat toimimasta. Tämä ei vaikuta niihin, joiden kanssa jo keskustelet.",
   "Generate": "Luo",
   "Copy link": "Kopioi linkki",
+  "Share link": "Jaa linkki",
   "Generate new invite link": "Luo uusi kutsulinkki",
   "Chat invite": "Keskustelukutsu",
   "This is your own invite link.": "Tämä on oma kutsulinkkisi.",

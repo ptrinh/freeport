@@ -417,15 +417,24 @@ export function InviteSheet({ client, myName, onClose }: {
   }, [client]);
 
   const link = code ? `${webBase()}/#invite=${code}` : '';
+  // Native has no clipboard module in the binary (see AboutSection), so the
+  // native action is a real Share, not a copy — the button is labelled to match.
+  const nativeShare = Platform.OS !== 'web';
   const copy = async () => {
     if (!link) return;
-    try {
-      if (Platform.OS === 'web' && (navigator as any)?.clipboard) {
-        await (navigator as any).clipboard.writeText(link);
+    if (!nativeShare) {
+      try {
+        await (navigator as any)?.clipboard?.writeText(link);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-      } else await Share.share({ message: link });
-    } catch { /* user dismissed the share sheet */ }
+      } catch { /* clipboard denied */ }
+      return;
+    }
+    // The OS share sheet must NOT be presented while this <Modal> is on screen:
+    // on iOS that wedges touch handling and the whole app stops responding
+    // (user report). Dismiss the sheet first, then share once it's gone.
+    onClose();
+    setTimeout(() => { Share.share({ message: link }).catch(() => {}); }, 350);
   };
   const rotate = async () => {
     if (!client || busy) return;
@@ -457,8 +466,8 @@ export function InviteSheet({ client, myName, onClose }: {
               <View style={[s.btnRow, { marginTop: 12 }]}>
                 <Pressable style={[s.btnAccept, { flex: 1 }]} onPress={copy}>
                   <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
-                    <Ionicons name="copy-outline" size={14} color="white" />
-                    <Text style={s.btnText}>{copied ? t('Copied') : t('Copy link')}</Text>
+                    <Ionicons name={nativeShare ? 'share-outline' : 'copy-outline'} size={14} color="white" />
+                    <Text style={s.btnText}>{copied ? t('Copied') : nativeShare ? t('Share link') : t('Copy link')}</Text>
                   </View>
                 </Pressable>
                 <Pressable style={[s.btnGhost, { flex: 1 }]} onPress={rotate} disabled={busy}>

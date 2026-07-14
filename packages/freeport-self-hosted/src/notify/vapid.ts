@@ -8,7 +8,7 @@
  * via env so subscriptions survive redeploys.
  */
 import webpush from 'web-push';
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 export interface Vapid { publicKey: string; privateKey: string; subject: string; }
@@ -24,7 +24,13 @@ export function loadVapid(keysPath: string): Vapid {
   }
   const gen = webpush.generateVAPIDKeys();
   mkdirSync(dirname(keysPath), { recursive: true });
-  writeFileSync(keysPath, JSON.stringify(gen, null, 2));
+  // The file holds the VAPID PRIVATE key — create it 0600 (owner-only) so a
+  // co-tenant / other local user can't read it and forge pushes as this server.
+  // tmp-with-mode then rename so the restrictive mode exists before any content
+  // and the write is atomic.
+  const tmp = `${keysPath}.tmp`;
+  writeFileSync(tmp, JSON.stringify(gen, null, 2), { mode: 0o600 });
+  renameSync(tmp, keysPath);
   return { publicKey: gen.publicKey, privateKey: gen.privateKey, subject };
 }
 

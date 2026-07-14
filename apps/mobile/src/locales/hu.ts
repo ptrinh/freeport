@@ -748,6 +748,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "A jelenlegi linked és QR-kódod nem fog többé működni. Akikkel már csevegsz, azokra ez nincs hatással.",
   "Generate": "Létrehozás",
   "Copy link": "Link másolása",
+  "Share link": "Link megosztása",
   "Generate new invite link": "Új meghívólink létrehozása",
   "Chat invite": "Csevegési meghívó",
   "This is your own invite link.": "Ez a saját meghívólinked.",

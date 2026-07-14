@@ -788,6 +788,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "現在のリンクとQRコードは使えなくなります。すでにチャットしている相手には影響ありません。",
   "Generate": "生成",
   "Copy link": "リンクをコピー",
+  "Share link": "リンクを共有",
   "Generate new invite link": "新しい招待リンクを生成",
   "Chat invite": "チャットの招待",
   "This is your own invite link.": "これはあなた自身の招待リンクです。",

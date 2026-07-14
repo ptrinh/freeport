@@ -791,6 +791,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "سيتوقف رابطك ورمز QR الحاليان عن العمل. لن يتأثر أي شخص تتحدث معه بالفعل.",
   "Generate": "إنشاء",
   "Copy link": "نسخ الرابط",
+  "Share link": "مشاركة الرابط",
   "Generate new invite link": "إنشاء رابط دعوة جديد",
   "Chat invite": "دعوة دردشة",
   "This is your own invite link.": "هذا هو رابط الدعوة الخاص بك.",

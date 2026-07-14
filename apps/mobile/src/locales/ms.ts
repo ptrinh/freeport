@@ -745,6 +745,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Pautan dan QR semasa anda berhenti berfungsi. Orang yang sudah bersembang dengan anda tidak terjejas.",
   "Generate": "Jana",
   "Copy link": "Salin pautan",
+  "Share link": "Kongsi pautan",
   "Generate new invite link": "Jana pautan jemputan baharu",
   "Chat invite": "Jemputan sembang",
   "This is your own invite link.": "Ini pautan jemputan anda sendiri.",

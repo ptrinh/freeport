@@ -32,6 +32,13 @@ function sameOrigin(url: string, origin: string): boolean {
   try { return new URL(url).origin === origin; } catch { return false; }
 }
 
+/** Fresh per-shell secret tying bridge RPC to the main frame (see shim.ts). */
+function makeSessionToken(): string {
+  const b = new Uint8Array(16);
+  (globalThis.crypto as Crypto | undefined)?.getRandomValues?.(b);
+  return Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+}
+
 export function MiniAppShell({
   app,
   firewall,
@@ -87,12 +94,13 @@ export function MiniAppShell({
   // Re-probe the manifest on open so a late-added manifest clears Unverified;
   // a verified app never needs the liveness banner.
   const verified = useVerifiedProbe(app, firewall);
+  const token = useMemo(() => makeSessionToken(), []);
   const onMessage = useCallback(async (e: { nativeEvent: { data: string } }) => {
     if (e.nativeEvent.data === HELLO) { setAlive(true); return; }
     setAlive(true); // any real bridge traffic counts too
-    const res = await bridge.handleMessage(e.nativeEvent.data);
+    const res = await bridge.handleMessage(e.nativeEvent.data, token);
     if (res) webRef.current?.injectJavaScript(encodeResponseJs(res));
-  }, [bridge]);
+  }, [bridge, token]);
 
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
@@ -114,7 +122,10 @@ export function MiniAppShell({
           source={{ uri: app.url || app.origin }}
           style={{ flex: 1 }}
           // Security posture — see module docblock before touching any of these.
-          injectedJavaScriptBeforeContentLoaded={MINIAPP_SHIM}
+          // The token statement is prepended (not interpolated into the shim)
+          // and, like the shim, lands in the main frame only — so sub-iframes
+          // can't read it and their forged bridge calls are rejected.
+          injectedJavaScriptBeforeContentLoaded={`window.__fpT=${JSON.stringify(token)};${MINIAPP_SHIM}`}
           injectedJavaScriptForMainFrameOnly
           originWhitelist={['https://*']}
           incognito

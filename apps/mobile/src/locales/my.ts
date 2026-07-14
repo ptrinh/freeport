@@ -745,6 +745,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "သင့်လက်ရှိ လင့်ခ်နှင့် QR အလုပ်မလုပ်တော့ပါ။ သင် ယခင်က စကားပြောနေသူများကို မထိခိုက်ပါ။",
   "Generate": "ထုတ်ရန်",
   "Copy link": "လင့်ခ် ကူးရန်",
+  "Share link": "လင့်ခ် မျှဝေရန်",
   "Generate new invite link": "ဖိတ်ကြားချက် လင့်ခ်အသစ် ထုတ်ရန်",
   "Chat invite": "စကားပြော ဖိတ်ကြားချက်",
   "This is your own invite link.": "ဤသည် သင့်ကိုယ်ပိုင် ဖိတ်ကြားချက် လင့်ခ် ဖြစ်သည်။",

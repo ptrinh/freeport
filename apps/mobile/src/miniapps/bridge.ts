@@ -48,7 +48,7 @@ export interface BridgeWallet {
   /** Amount encoded in the invoice, sats. null = zero-amount invoice. */
   parseAmount(bolt11: string): number | null;
   /** Pay a Spark address — sats, or a stablecoin token amount. */
-  paySpark(address: string, opts: { sats?: number; token?: { ticker: string; amount: number } }): Promise<{ preimage?: string }>;
+  paySpark(address: string, opts: { sats?: number; token?: { ticker: string; amount: number } }): Promise<{ preimage?: string; sats?: number }>;
 }
 
 /** Read-only profile signals an app may request, resolved lazily by the shell.
@@ -72,7 +72,7 @@ export interface BridgeDeps {
   now?: () => number;
 }
 
-interface RpcMessage { __fp: 1; id: string; method: string; params?: Record<string, unknown> }
+interface RpcMessage { __fp: 1; id: string; method: string; params?: Record<string, unknown>; t?: string }
 interface RpcResponse { id: string; ok: boolean; result?: unknown; error?: string }
 
 // Big enough to carry a small saveFile payload (a receipt/ticket/certificate,
@@ -104,11 +104,19 @@ export class MiniAppBridge {
    * back to the page, or null when the message is not ours / unanswerable
    * (malformed traffic is dropped silently — no oracle for probing).
    */
-  async handleMessage(raw: string): Promise<string | null> {
+  async handleMessage(raw: string, expectToken?: string): Promise<string | null> {
     if (typeof raw !== 'string' || raw.length > MAX_MESSAGE_BYTES) return null;
     let msg: RpcMessage;
     try { msg = JSON.parse(raw); } catch { return null; }
     if (!msg || msg.__fp !== 1 || typeof msg.id !== 'string' || !msg.id || msg.id.length > 64 || typeof msg.method !== 'string') return null;
+    // Native only: the per-session token proves this message came from the
+    // main-frame shim, not a cross-origin sub-iframe (ad/analytics/widget) that
+    // reached window.ReactNativeWebView.postMessage directly — that global is
+    // exposed to EVERY frame, and onMessage can't tell us which frame sent it,
+    // so without this a subframe's RPC would be judged under the host app's
+    // origin and inherit its grants. Web passes no token: there the dedicated
+    // MessageChannel port IS the capability and a stray frame never holds it.
+    if (expectToken !== undefined && msg.t !== expectToken) return null;
     if (this.pending >= MAX_PENDING) return this.reply({ id: msg.id, ok: false, error: 'busy' });
     this.pending++;
     try {
@@ -267,8 +275,16 @@ export class MiniAppBridge {
             sats: typeof p.sats === 'number' ? p.sats : undefined,
             token: p.token as { ticker: string; amount: number } | undefined,
           };
-          const { preimage } = await wallet.paySpark(p.address as string, opts);
-          return { id, ok: true, result: { preimage: preimage ?? '' } };
+          const r = await wallet.paySpark(p.address as string, opts);
+          // A token charge reserves 0 sats up front (the sat cost isn't known
+          // until the wallet converts), so record the real sats spent now that
+          // we have them. Safe post-await: paySpark always requires a per-payment
+          // approval — there's no auto-approve headroom to race against.
+          if (reserved === 0 && typeof r.sats === 'number' && r.sats > 0) {
+            this.deps.firewall.recordSpend(this.origin, r.sats, this.now());
+            this.deps.persist();
+          }
+          return { id, ok: true, result: { preimage: r.preimage ?? '' } };
         }
       }
     } catch (e) {

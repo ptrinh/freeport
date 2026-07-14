@@ -38,7 +38,9 @@ const subSchema = z.object({
     keys: z.object({ p256dh: z.string(), auth: z.string() }),
   }).optional(),
   // …or native transport (Expo push token, iOS/Android app). Exactly one.
-  expoPushToken: z.string().optional(),
+  // Constrain the shape (Expo tokens are ExponentPushToken[...] / ExpoPushToken[...])
+  // so a flood of junk strings can't each mint a distinct stored record.
+  expoPushToken: z.string().regex(/^Expo(nent)?PushToken\[[^\]]{1,200}\]$/).optional(),
   filters: z.object({
     kinds: z.array(z.number().int()).max(20).optional(),
     topics: z.array(z.string()).max(50).optional(),
@@ -84,9 +86,15 @@ export function mountNotify(app: Express, relays: string[], dataDir: string, lim
     const parsed = subSchema.safeParse(req.body);
     if (!parsed.success) { res.status(400).json({ error: parsed.error.issues }); return; }
     const { subscription, expoPushToken, filters, pubkey } = parsed.data;
-    const rec = expoPushToken
-      ? store.upsertExpo(expoPushToken, filters, pubkey)
-      : store.upsertWeb(subscription!, filters, pubkey);
+    let rec;
+    try {
+      rec = expoPushToken
+        ? store.upsertExpo(expoPushToken, filters, pubkey)
+        : store.upsertWeb(subscription!, filters, pubkey);
+    } catch {
+      // Store full (MAX_SUBSCRIPTIONS) — refuse rather than grow unbounded.
+      res.status(503).json({ error: 'subscription limit reached' }); return;
+    }
     watcher.refresh(); // pick up any new kinds / pubkeys
     res.json({ ok: true, id: rec.id });
   });

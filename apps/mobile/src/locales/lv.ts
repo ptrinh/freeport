@@ -748,6 +748,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Jūsu pašreizējā saite un QR kods pārstās darboties. Tas neietekmē tos, ar kuriem jau tērzējat.",
   "Generate": "Izveidot",
   "Copy link": "Kopēt saiti",
+  "Share link": "Kopīgot saiti",
   "Generate new invite link": "Izveidot jaunu ielūguma saiti",
   "Chat invite": "Tērzēšanas ielūgums",
   "This is your own invite link.": "Šī ir jūsu paša ielūguma saite.",

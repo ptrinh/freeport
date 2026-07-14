@@ -8,6 +8,13 @@
  * JSON-RPC over ReactNativeWebView.postMessage and judged by the firewall on
  * the native side. Page JS can of course replace this object — that only lets
  * a page lie to itself; the bridge trusts none of it.
+ *
+ * Each RPC carries `window.__fpT`, a per-session token the shell injects into
+ * the MAIN FRAME ONLY (as a separate statement prepended at inject time; this
+ * body stays zero-interpolation). ReactNativeWebView.postMessage is reachable
+ * from every frame, so a cross-origin sub-iframe could otherwise call the
+ * bridge and be judged under the host app's origin — the token, which a
+ * cross-origin frame cannot read from the main frame, is what fences it out.
  */
 export const MINIAPP_SHIM = `(function () {
   if (window.__fpMiniApp) return; window.__fpMiniApp = true;
@@ -18,7 +25,7 @@ export const MINIAPP_SHIM = `(function () {
       if (!window.ReactNativeWebView) return reject(new Error('no bridge'));
       var id = String(++seq) + '.' + Math.random().toString(36).slice(2);
       pending[id] = { resolve: resolve, reject: reject };
-      window.ReactNativeWebView.postMessage(JSON.stringify({ __fp: 1, id: id, method: method, params: params || {} }));
+      window.ReactNativeWebView.postMessage(JSON.stringify({ __fp: 1, t: window.__fpT, id: id, method: method, params: params || {} }));
     });
   }
   window.__fpBridgeResolve = function (msg) {

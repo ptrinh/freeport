@@ -788,6 +788,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "ลิงก์และ QR ปัจจุบันของคุณจะใช้ไม่ได้อีก คนที่คุณแชทด้วยอยู่แล้วจะไม่ได้รับผลกระทบ",
   "Generate": "สร้าง",
   "Copy link": "คัดลอกลิงก์",
+  "Share link": "แชร์ลิงก์",
   "Generate new invite link": "สร้างลิงก์คำเชิญใหม่",
   "Chat invite": "คำเชิญแชท",
   "This is your own invite link.": "นี่คือลิงก์คำเชิญของคุณเอง",

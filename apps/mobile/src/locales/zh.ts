@@ -788,6 +788,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "你当前的链接和二维码将失效。已在聊天的人不受影响。",
   "Generate": "生成",
   "Copy link": "复制链接",
+  "Share link": "分享链接",
   "Generate new invite link": "生成新的邀请链接",
   "Chat invite": "聊天邀请",
   "This is your own invite link.": "这是你自己的邀请链接。",

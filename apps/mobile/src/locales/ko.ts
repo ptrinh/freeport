@@ -788,6 +788,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "현재 링크와 QR이 작동을 멈춥니다. 이미 채팅 중인 상대에게는 영향이 없습니다.",
   "Generate": "생성",
   "Copy link": "링크 복사",
+  "Share link": "링크 공유",
   "Generate new invite link": "새 초대 링크 생성",
   "Chat invite": "채팅 초대",
   "This is your own invite link.": "회원님 본인의 초대 링크입니다.",

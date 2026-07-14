@@ -67,6 +67,20 @@ describe('message parsing (hostile input)', () => {
     expect(await bridge.handleMessage(raw)).toBeNull();
   });
 
+  it('when a session token is expected, a message without / with the wrong token is dropped', async () => {
+    // Native: a cross-origin sub-iframe reaching ReactNativeWebView.postMessage
+    // can't know the main-frame token, so its forged RPC must be rejected.
+    const { bridge } = makeBridge();
+    const noToken = JSON.stringify({ __fp: 1, id: 'a', method: 'getPublicKey' });
+    const wrong = JSON.stringify({ __fp: 1, id: 'b', method: 'getPublicKey', t: 'deadbeef' });
+    const right = JSON.stringify({ __fp: 1, id: 'c', method: 'getPublicKey', t: 'secret-token' });
+    expect(await bridge.handleMessage(noToken, 'secret-token')).toBeNull();
+    expect(await bridge.handleMessage(wrong, 'secret-token')).toBeNull();
+    // The correctly-tokened call is handled (getPublicKey needs no approval).
+    const ok = await bridge.handleMessage(right, 'secret-token');
+    expect(ok ? JSON.parse(ok).ok : null).toBe(true);
+  });
+
   it('unknown methods come back as a generic denial', async () => {
     const { bridge } = makeBridge();
     expect(await call(bridge, 'getSecretKey')).toEqual({ id: 'r1', ok: false, error: 'denied' });

@@ -748,6 +748,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Lidhja dhe QR-ja jote aktuale nuk funksionojnë më. Kushdo me të cilin bisedon tashmë nuk preket.",
   "Generate": "Krijo",
   "Copy link": "Kopjo lidhjen",
+  "Share link": "Ndaj lidhjen",
   "Generate new invite link": "Krijo lidhje të re ftese",
   "Chat invite": "Ftesë për bisedë",
   "This is your own invite link.": "Kjo është lidhja jote e ftesës.",

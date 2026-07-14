@@ -61,6 +61,11 @@ export async function wipeAllLocalData(): Promise<void> {
     // Mini-app grants are per-identity: an app trusted to sign as account A
     // must never inherit that trust for account B.
     'freeport.miniapps',
+    // Sensitive residue "Delete account" must not leave behind — escrow
+    // preimages are spendable funds; conversations are private DM history; the
+    // chat-invite key is a standing secret. On web these live in localStorage,
+    // so a later account on the same browser could otherwise read them.
+    'freeport.escrows', 'freeport.conversations', 'freeport.chatInvite',
   ];
   await Promise.all(KEYS.map((k) => kvDelete(k).catch(() => {})));
 }

@@ -748,6 +748,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Din nuvarande länk och QR-kod slutar fungera. De du redan chattar med påverkas inte.",
   "Generate": "Skapa",
   "Copy link": "Kopiera länk",
+  "Share link": "Dela länk",
   "Generate new invite link": "Skapa ny inbjudningslänk",
   "Chat invite": "Chattinbjudan",
   "This is your own invite link.": "Det här är din egen inbjudningslänk.",

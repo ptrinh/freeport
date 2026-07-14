@@ -754,6 +754,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Vaša trenutna povezava in koda QR nehata delovati. Na osebe, s katerimi že klepetate, to ne vpliva.",
   "Generate": "Ustvari",
   "Copy link": "Kopiraj povezavo",
+  "Share link": "Deli povezavo",
   "Generate new invite link": "Ustvari novo povezavo za povabilo",
   "Chat invite": "Povabilo h klepetu",
   "This is your own invite link.": "To je vaša lastna povezava za povabilo.",

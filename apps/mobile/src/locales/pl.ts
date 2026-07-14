@@ -750,6 +750,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Twój obecny link i kod QR przestaną działać. Osoby, z którymi już rozmawiasz, nie odczują zmian.",
   "Generate": "Wygeneruj",
   "Copy link": "Kopiuj link",
+  "Share link": "Udostępnij link",
   "Generate new invite link": "Wygeneruj nowy link z zaproszeniem",
   "Chat invite": "Zaproszenie do czatu",
   "This is your own invite link.": "To jest Twój własny link z zaproszeniem.",

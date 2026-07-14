@@ -748,6 +748,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Ο τρέχων σύνδεσμος και ο κωδικός QR παύουν να λειτουργούν. Όσοι ήδη συνομιλούν μαζί σου δεν επηρεάζονται.",
   "Generate": "Δημιουργία",
   "Copy link": "Αντιγραφή συνδέσμου",
+  "Share link": "Κοινοποίηση συνδέσμου",
   "Generate new invite link": "Δημιουργία νέου συνδέσμου πρόσκλησης",
   "Chat invite": "Πρόσκληση συνομιλίας",
   "This is your own invite link.": "Αυτός είναι ο δικός σου σύνδεσμος πρόσκλησης.",

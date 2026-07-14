@@ -745,6 +745,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Ձեր ընթացիկ հղումն ու QR-ը կդադարեն աշխատել։ Նրանք, ում հետ արդեն զրուցում եք, չեն ազդվի։",
   "Generate": "Ստեղծել",
   "Copy link": "Պատճենել հղումը",
+  "Share link": "Կիսվել հղումով",
   "Generate new invite link": "Ստեղծել նոր հրավերի հղում",
   "Chat invite": "Զրույցի հրավեր",
   "This is your own invite link.": "Սա ձեր սեփական հրավերի հղումն է։",

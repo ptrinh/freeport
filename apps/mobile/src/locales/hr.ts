@@ -748,6 +748,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Vaša trenutna poveznica i QR prestat će raditi. Osobe s kojima već razgovarate nisu pogođene.",
   "Generate": "Generiraj",
   "Copy link": "Kopiraj poveznicu",
+  "Share link": "Podijeli poveznicu",
   "Generate new invite link": "Generiraj novu poveznicu za pozivnicu",
   "Chat invite": "Pozivnica za razgovor",
   "This is your own invite link.": "Ovo je vaša vlastita poveznica za pozivnicu.",

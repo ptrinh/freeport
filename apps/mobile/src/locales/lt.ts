@@ -749,6 +749,7 @@ const c: Record<string, string> = {
   "Your current link and QR stop working. Anyone you already chat with is unaffected.": "Dabartinė nuoroda ir QR kodas nustos veikti. Tai nepaveiks tų, su kuriais jau kalbatės.",
   "Generate": "Kurti",
   "Copy link": "Kopijuoti nuorodą",
+  "Share link": "Dalytis nuoroda",
   "Generate new invite link": "Sukurti naują kvietimo nuorodą",
   "Chat invite": "Pokalbio kvietimas",
   "This is your own invite link.": "Tai jūsų paties kvietimo nuoroda.",
