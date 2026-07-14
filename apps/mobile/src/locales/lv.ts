@@ -879,5 +879,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "Vēl nav pievienota neviena mini-lietotne. Ielīmējiet URL vai skenējiet QR kodu.",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "Tīmekļa lietotnes, kas izmanto jūsu Freeport identitāti un maku. Izolētas smilškastē — katrai jutīgai darbībai nepieciešams jūsu apstiprinājums.",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Tīmekļa lietotnes, kas izmanto jūsu Freeport identitāti un maku — mobilajā lietotnē.",
+  "wants to read your wallet balance": "vēlas nolasīt jūsu maka atlikumu",
+  "wants to read your location": "vēlas nolasīt jūsu atrašanās vietu",
 };
 export default c;

@@ -324,7 +324,7 @@ describe('persistence', () => {
     f.recordSpend(APP, 1200, T0);
     const f2 = MiniAppFirewall.restore(f.serialize());
     expect(f2.getApp(APP)!.perms).toEqual({
-      pubkey: true, kinds: [30023], encryptPeers: [], decryptPeers: [PEER], spendCapDaySats: 5000,
+      pubkey: true, kinds: [30023], encryptPeers: [], decryptPeers: [PEER], spendCapDaySats: 5000, reads: [],
     });
     expect(f2.spentToday(APP, T0)).toBe(1200);
     // restored spend still enforces the cap: 1200 spent leaves 3800 of headroom

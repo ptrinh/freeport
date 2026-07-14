@@ -88,6 +88,8 @@
       args = args || {};
       return rpc('freeport.paySpark', { address: args.address, sats: args.sats, token: args.token });
     },
+    getBalance: function () { return rpc('freeport.getBalance'); },
+    getLocation: function () { return rpc('freeport.getLocation'); },
     isConnected: function () { return !!port; },
     shellOrigin: function () { return shellOrigin; }
   };

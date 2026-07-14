@@ -876,5 +876,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "Bado hakuna mini-app zilizoongezwa. Bandika URL au changanua msimbo wa QR.",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "Programu za wavuti zinazotumia utambulisho na pochi yako ya Freeport. Zimewekwa kwenye sandbox — kila kitendo nyeti kinahitaji idhini yako.",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Programu za wavuti zinazotumia utambulisho na pochi yako ya Freeport — kwenye programu ya simu.",
+  "wants to read your wallet balance": "inataka kusoma salio la pochi yako",
+  "wants to read your location": "inataka kusoma eneo lako",
 };
 export default c;

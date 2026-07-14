@@ -879,5 +879,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "Ühtegi mini-rakendust pole veel lisatud. Kleebi URL või skanni QR-kood.",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "Veebirakendused, mis kasutavad sinu Freeporti identiteeti ja rahakotti. Liivakastis eraldatud — iga tundlik toiming vajab sinu nõusolekut.",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Veebirakendused, mis kasutavad sinu Freeporti identiteeti ja rahakotti — mobiilirakenduses.",
+  "wants to read your wallet balance": "soovib lugeda sinu rahakoti saldot",
+  "wants to read your location": "soovib lugeda sinu asukohta",
 };
 export default c;

@@ -876,5 +876,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "mini-app မထည့်ရသေးပါ။ URL တစ်ခု ကူးထည့်ပါ သို့မဟုတ် QR ကုဒ်ကို စကင်ဖတ်ပါ။",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "သင်၏ Freeport အထောက်အထား နှင့် ပိုက်ဆံအိတ်ကို အသုံးပြုသော ဝဘ်အက်ပ်များ။ Sandbox ဖြင့် ကန့်သတ်ထားသည် — အရေးကြီးသော လုပ်ဆောင်ချက်တိုင်းအတွက် သင်၏ ခွင့်ပြုချက် လိုအပ်သည်။",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "သင်၏ Freeport အထောက်အထား နှင့် ပိုက်ဆံအိတ်ကို အသုံးပြုသော ဝဘ်အက်ပ်များ — မိုဘိုင်းအက်ပ်ပေါ်တွင်။",
+  "wants to read your wallet balance": "သင့်ပိုက်ဆံအိတ် လက်ကျန်ငွေကို ဖတ်လိုသည်",
+  "wants to read your location": "သင့်တည်နေရာကို ဖတ်လိုသည်",
 };
 export default c;

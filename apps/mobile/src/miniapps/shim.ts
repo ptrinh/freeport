@@ -47,7 +47,9 @@ export const MINIAPP_SHIM = `(function () {
     paySpark: function (args) {
       args = args || {};
       return rpc('freeport.paySpark', { address: args.address, sats: args.sats, token: args.token });
-    }
+    },
+    getBalance: function () { return rpc('freeport.getBalance'); },
+    getLocation: function () { return rpc('freeport.getLocation'); }
   };
   window.webln = {
     enable: function () { return rpc('webln.enable'); },

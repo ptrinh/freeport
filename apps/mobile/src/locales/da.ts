@@ -879,5 +879,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "Der er endnu ikke tilføjet nogen mini-apps. Indsæt en URL, eller scan en QR-kode.",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "Webapps, der bruger din Freeport-identitet og -tegnebog. Sandboxed — hver følsom handling kræver din godkendelse.",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Webapps, der bruger din Freeport-identitet og -tegnebog — på mobilappen.",
+  "wants to read your wallet balance": "vil læse saldoen i din wallet",
+  "wants to read your location": "vil læse din placering",
 };
 export default c;

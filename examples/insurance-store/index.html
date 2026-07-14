@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Freeport Insurance Store — Mini-app</title>
+<!-- Freeport web-shell SDK: exposes window.nostr/webln/freeport when embedded
+     in the Freeport web shell. Inside the native shell the shim is injected
+     and this script exits immediately. -->
+<script src="https://freeport.network/sdk.js"></script>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: #06080c; color: #e8edf2; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 20px 16px 56px; }
+  header { display: flex; align-items: center; gap: 12px; padding: 8px 0 16px; }
+  .logo { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg,#10b981,#0ea5e9); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  h1 { font-size: 20px; margin: 0; }
+  .sub { color: #8b97a6; font-size: 12px; margin-top: 2px; }
+  h2 { font-size: 16px; margin: 22px 0 8px; }
+  .banner { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 12px 14px; font-size: 13px; color: #c9d5e0; line-height: 1.5; }
+  .banner.warn { border-color: #7c2d12; color: #fdba74; }
+  .prods { display: grid; gap: 10px; }
+  .prod { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 14px; }
+  .prod .n { font-weight: 700; }
+  .prod .d { color: #8b97a6; font-size: 12px; margin-top: 2px; }
+  button { background: #10b981; color: #04120c; border: 0; border-radius: 10px; padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  button.ghost { background: transparent; border: 1px solid #10b981; color: #34d399; }
+  button:disabled { opacity: .5; cursor: default; }
+  label { display: block; font-size: 12px; color: #8b97a6; margin: 10px 0 4px; }
+  input { width: 100%; background: #0a0d12; color: #e8edf2; border: 1px solid #1f2937; border-radius: 8px; padding: 10px; font-size: 15px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .signals { background: #06121f; border: 1px solid #0e3a4f; border-radius: 12px; padding: 12px 14px; font-size: 13px; }
+  .signals .row { display: flex; justify-content: space-between; padding: 3px 0; color: #c9d5e0; }
+  .signals .row span:last-child { color: #7dd3fc; font-variant-numeric: tabular-nums; }
+  .muted { color: #5c6675; font-size: 11px; margin-top: 8px; line-height: 1.5; }
+  .cert { background: #fff; color: #0b1a2b; border-radius: 12px; padding: 20px; margin-top: 12px; }
+  .cert h3 { margin: 0 0 2px; font-size: 17px; }
+  .cert .co-sub { color: #5b6b7b; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+  .cert table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+  .cert td { padding: 6px 0; border-bottom: 1px solid #e5eaf0; vertical-align: top; }
+  .cert td:first-child { color: #5b6b7b; width: 42%; }
+  .cert .prem { font-size: 24px; font-weight: 800; color: #0b7a4b; }
+  .err { color: #f87171; font-size: 13px; margin-top: 10px; min-height: 1em; }
+  .actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .hidden { display: none; }
+  footer { margin-top: 28px; color: #4b5a6e; font-size: 11px; line-height: 1.6; text-align: center; }
+  a { color: #34d399; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">🛡️</div>
+    <div>
+      <h1>Freeport Insurance Store</h1>
+      <div class="sub">A Freeport mini-app demo — not a real insurer</div>
+    </div>
+  </header>
+
+  <div id="bridge-note" class="banner warn hidden">
+    This is a <b>Freeport mini-app</b>. Open it inside Freeport (Settings →
+    Experimental → Mini-apps, add <b>freeport.network/insurance-store</b>) to
+    get a quote against your Freeport identity, reputation &amp; wallet.
+  </div>
+
+  <div id="intro" class="banner">
+    Pick a policy. We underwrite the premium from your Freeport profile — your
+    reputation and account history (public, read from your npub) plus your
+    wallet balance and region (private, shared only with your approval). Demo
+    only: the form auto-fills, and payment goes to a donation address.
+  </div>
+
+  <!-- STEP 1: products -->
+  <div id="step-products">
+    <h2>Choose coverage</h2>
+    <div class="prods" id="prods"></div>
+  </div>
+
+  <!-- STEP 2: applicant form -->
+  <div id="step-form" class="hidden">
+    <h2>Applicant details</h2>
+    <div class="banner" style="margin-bottom:12px">Selected: <b id="sel-name"></b></div>
+    <label>Legal name</label>
+    <input id="f-name" autocomplete="off">
+    <div class="grid2">
+      <div><label>ID number</label><input id="f-id" autocomplete="off"></div>
+      <div><label>Date of birth</label><input id="f-dob" type="date"></div>
+    </div>
+    <div class="signals" style="margin-top:14px">
+      <div style="font-weight:700;color:#e8edf2;margin-bottom:4px">Freeport signals</div>
+      <div class="row"><span>npub</span><span id="s-npub">—</span></div>
+      <div class="row"><span>Reputation score</span><span id="s-score">—</span></div>
+      <div class="row"><span>Karma points</span><span id="s-karma">—</span></div>
+      <div class="row"><span>Completed deals</span><span id="s-deals">—</span></div>
+      <div class="row"><span>Ratings</span><span id="s-ratings">—</span></div>
+      <div class="row"><span>Account age</span><span id="s-age">—</span></div>
+      <div class="row"><span>Region</span><span id="s-region">—</span></div>
+      <div class="row"><span>Wallet balance</span><span id="s-bal">—</span></div>
+    </div>
+    <div class="muted" id="s-note">Reputation, deals, ratings and account age are read from your public npub. Region and balance are private — the app asks your permission for each.</div>
+    <div class="actions">
+      <button id="btn-quote">Get quote</button>
+      <button class="ghost" id="btn-back">Back</button>
+    </div>
+    <div class="err" id="form-err"></div>
+  </div>
+
+  <!-- STEP 3: quote + certificate -->
+  <div id="step-quote" class="hidden">
+    <h2>Your quote</h2>
+    <div id="cert"></div>
+    <div class="actions">
+      <button id="btn-pdf" class="ghost">Download PDF</button>
+      <button id="btn-purchase">Purchase</button>
+      <button class="ghost" id="btn-restart">Start over</button>
+    </div>
+    <div class="err" id="quote-err"></div>
+  </div>
+
+  <!-- STEP 4: paid -->
+  <div id="step-done" class="hidden">
+    <h2>✓ Insured</h2>
+    <div class="banner">Payment received. Your Certificate of Insurance is ready.</div>
+    <div class="actions">
+      <button id="btn-pdf2">Download Certificate (PDF)</button>
+      <button class="ghost" id="btn-restart2">Buy another</button>
+    </div>
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <footer>
+    Demo only — no policy is underwritten and the premium goes to a Freeport
+    donation address. Source:
+    <a href="https://github.com/ptrinh/freeport/tree/main/examples/insurance-store">github.com/ptrinh/freeport</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var DONATION = 'spark1pgss8767mv3pe7cuakkux5fgemra9u0f707ymc8gpdame6xvlg0qeh5c20sg0h';
+
+  // Base premiums in USDT (NOT shown to the user — the displayed price is the
+  // base scaled by the computed risk coefficient).
+  var PRODUCTS = [
+    { id: 'single', name: 'Single trip insurance', desc: 'One journey, door to door', base: 1 },
+    { id: '24h',    name: '24 hours insurance',    desc: 'Any travel within 24 hours', base: 2 },
+    { id: '7d',     name: '7 days insurance',      desc: 'One week of coverage', base: 5 },
+    { id: '1m',     name: '1 month insurance',     desc: '30 days of coverage', base: 10 },
+    { id: '1y',     name: '1 year insurance',      desc: 'Annual multi-trip cover', base: 40 },
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { product: null, npub: '', pubkeyHex: '', rep: null, region: null, balanceSats: 0, quote: null };
+
+  var inShell = !!(window.nostr && window.freeport);
+  if (!inShell) $('bridge-note').classList.remove('hidden');
+
+  function show(step) {
+    ['products', 'form', 'quote', 'done'].forEach(function (s) {
+      $('step-' + s).classList.toggle('hidden', s !== step);
+    });
+  }
+  function setErr(id, m) { $(id).textContent = m || ''; }
+
+  // ── bech32 npub encoder (BIP-173), so we can display npub from the hex
+  //    pubkey getPublicKey returns — npub is derivable from the key, so we do
+  //    it here rather than asking the bridge for it. ──────────────────────────
+  var CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+  function polymod(v) { var b = 1; for (var i = 0; i < v.length; i++) { var t = b >> 25; b = ((b & 0x1ffffff) << 5) ^ v[i]; for (var j = 0; j < 5; j++) b ^= ((t >> j) & 1) ? [0x3b6a57b2,0x26508e6d,0x1ea119fa,0x3d4233dd,0x2a1462b3][j] : 0; } return b; }
+  function hrpExpand(h) { var o = [], i; for (i = 0; i < h.length; i++) o.push(h.charCodeAt(i) >> 5); o.push(0); for (i = 0; i < h.length; i++) o.push(h.charCodeAt(i) & 31); return o; }
+  function checksum(h, d) { var v = hrpExpand(h).concat(d).concat([0,0,0,0,0,0]); var m = polymod(v) ^ 1; var o = []; for (var i = 0; i < 6; i++) o.push((m >> 5 * (5 - i)) & 31); return o; }
+  function convert(data) { var acc = 0, bits = 0, out = [], max = 31; for (var i = 0; i < data.length; i++) { acc = (acc << 8) | data[i]; bits += 8; while (bits >= 5) { bits -= 5; out.push((acc >> bits) & max); } } if (bits > 0) out.push((acc << (5 - bits)) & max); return out; }
+  function npubEncode(hex) {
+    var bytes = []; for (var i = 0; i < hex.length; i += 2) bytes.push(parseInt(hex.substr(i, 2), 16));
+    var data = convert(bytes); var chk = checksum('npub', data); var s = 'npub1';
+    data.concat(chk).forEach(function (d) { s += CHARSET.charAt(d); });
+    return s;
+  }
+  function shortNpub(np) { return np ? np.slice(0, 10) + '…' + np.slice(-6) : '—'; }
+
+  // ── demo auto-fill ──────────────────────────────────────────────────────
+  var NAMES = ['Alex Tan', 'Maria Santos', 'Chen Wei', 'Priya Nair', 'Jonas Berg', 'Fatima Zahra'];
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function randomFill() {
+    $('f-name').value = pick(NAMES);
+    $('f-id').value = 'ID' + Math.floor(1e7 + Math.random() * 9e7);
+    var y = 1965 + Math.floor(Math.random() * 40);
+    $('f-dob').value = y + '-' + pad(1 + Math.floor(Math.random() * 12)) + '-' + pad(1 + Math.floor(Math.random() * 28));
+  }
+  function ageFromDob(dob) {
+    var d = new Date(dob); if (isNaN(d)) return 0;
+    var t = new Date(); var a = t.getFullYear() - d.getFullYear();
+    if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) a--;
+    return Math.max(0, a);
+  }
+
+  function h32(s) { var h = 2166136261 >>> 0; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h; }
+
+  // ╔════════════════════════════════════════════════════════════════════════╗
+  // ║ DEMO STUB — replace with a real lookup.                                 ║
+  // ║                                                                         ║
+  // ║ Account age, karma points, reputation score, ratings and completed     ║
+  // ║ deals are all PUBLIC Nostr data: given the npub, anyone can query the   ║
+  // ║ relays and compute them (that's exactly why the Freeport bridge does    ║
+  // ║ NOT hand them over — the app is expected to look them up itself).       ║
+  // ║                                                                         ║
+  // ║ A production app would, from its own backend or a relay pool, fetch:    ║
+  // ║   • kind 0/1 events           → account age (oldest event)              ║
+  // ║   • kind 32103 (karma)        → karma points + ratings count            ║
+  // ║   • kind 32104 (deal receipt) → completed / proven deals                ║
+  // ║ and derive the reputation score from trust-weighted karma.              ║
+  // ║                                                                         ║
+  // ║ Here we FAKE it: a deterministic pseudo-profile seeded by the npub, so  ║
+  // ║ the same identity always yields the same numbers (like a real lookup    ║
+  // ║ would) without touching the network. Do not ship this stub.             ║
+  // ╚════════════════════════════════════════════════════════════════════════╝
+  function deriveReputationFromNpub(npub) {
+    var h = h32(npub || 'anon');
+    var deals = h % 40;                                 // completed/proven deals
+    var ratings = deals === 0 ? 0 : deals + ((h >> 5) % 10);
+    var karmaPoints = ratings === 0 ? 0 : ratings * 2 + ((h >> 11) % 20); // net karma points
+    var score = deals === 0 ? 0 : Math.round((0.4 + ((h >> 9) % 160) / 100) * 100) / 100; // 0.40..1.99
+    var accountAgeDays = (h >> 3) % 1500;               // days since first activity
+    return {
+      deals: deals, ratings: ratings, karmaPoints: karmaPoints,
+      score: score, accountAgeDays: accountAgeDays, newAccount: accountAgeDays < 7,
+    };
+  }
+
+  // ── risk coefficient + premium ────────────────────────────────────────────
+  function riskCoefficient(age, rep, region, balanceSats) {
+    var c = 1.0;
+    // Applicant age: youngest and oldest cost more.
+    if (age < 25) c += 0.25; else if (age > 70) c += 0.6; else if (age > 60) c += 0.3;
+    // Reputation: a proven, well-rated identity is lower risk.
+    c -= Math.min(0.35, rep.score * 0.15);
+    c -= Math.min(0.2, rep.deals * 0.01);
+    c -= Math.min(0.15, rep.karmaPoints * 0.003);
+    if (rep.newAccount) c += 0.4; else if (rep.accountAgeDays < 90) c += 0.15;
+    if (rep.ratings === 0) c += 0.1;
+    // Wallet ability to pay claims excess (very mild signal).
+    if (balanceSats < 1000) c += 0.1;
+    // Region loading (demo: unknown region slightly higher).
+    if (!region || !region.country) c += 0.1;
+    return Math.max(0.6, Math.round(c * 100) / 100);
+  }
+
+  function fmtAge(days) {
+    if (days >= 365) return (days / 365).toFixed(1) + ' yr';
+    if (days >= 30) return Math.round(days / 30) + ' mo';
+    return days + ' d';
+  }
+  function fmtRegion(r) { return r && (r.city || r.country) ? [r.city, r.state, r.country].filter(Boolean).join(', ') : 'Unknown'; }
+
+  // ── render ──────────────────────────────────────────────────────────────
+  PRODUCTS.forEach(function (p) {
+    var el = document.createElement('div');
+    el.className = 'prod';
+    el.innerHTML = '<div><div class="n">' + p.name + '</div><div class="d">' + p.desc + '</div></div>';
+    var b = document.createElement('button'); b.textContent = 'Buy';
+    b.onclick = function () { startForm(p); };
+    if (!inShell) b.disabled = true;
+    el.appendChild(b); $('prods').appendChild(el);
+  });
+
+  function startForm(p) {
+    state.product = p;
+    $('sel-name').textContent = p.name;
+    randomFill();
+    ['s-npub','s-score','s-karma','s-deals','s-ratings','s-age','s-region','s-bal'].forEach(function (id) { $(id).textContent = '…'; });
+    setErr('form-err', '');
+    show('form');
+    loadSignals();
+  }
+
+  function loadSignals() {
+    // Identity → npub → derived public reputation.
+    window.nostr.getPublicKey().then(function (hex) {
+      state.pubkeyHex = String(hex || '');
+      state.npub = state.pubkeyHex ? npubEncode(state.pubkeyHex) : '';
+      // Public reputation is looked up FROM the npub (demo stub, see above).
+      state.rep = deriveReputationFromNpub(state.npub);
+      $('s-npub').textContent = shortNpub(state.npub);
+      $('s-score').textContent = state.rep.score.toFixed(2);
+      $('s-karma').textContent = state.rep.karmaPoints;
+      $('s-deals').textContent = state.rep.deals;
+      $('s-ratings').textContent = state.rep.ratings;
+      $('s-age').textContent = fmtAge(state.rep.accountAgeDays);
+    }).catch(function (e) { setErr('form-err', e.message || 'Sign-in denied.'); });
+    // Private signals (each prompts an approval dialog).
+    window.freeport.getLocation().then(function (r) { state.region = r; $('s-region').textContent = fmtRegion(r); })
+      .catch(function () { state.region = null; $('s-region').textContent = 'Not shared'; });
+    window.freeport.getBalance().then(function (b) { state.balanceSats = (b && b.sats) || 0; $('s-bal').textContent = state.balanceSats.toLocaleString() + ' sats'; })
+      .catch(function () { state.balanceSats = 0; $('s-bal').textContent = 'Not shared'; });
+  }
+
+  $('btn-back').onclick = function () { show('products'); };
+  $('btn-restart').onclick = $('btn-restart2') && function () { show('products'); };
+  $('btn-restart2').onclick = function () { show('products'); };
+
+  $('btn-quote').onclick = function () {
+    setErr('form-err', '');
+    var name = $('f-name').value.trim(), idno = $('f-id').value.trim(), dob = $('f-dob').value;
+    if (!name || !idno || !dob) { setErr('form-err', 'Please complete all fields.'); return; }
+    if (!state.rep) { setErr('form-err', 'Still reading your Freeport signals…'); return; }
+    var age = ageFromDob(dob);
+    var coeff = riskCoefficient(age, state.rep, state.region, state.balanceSats);
+    var premium = Math.round(state.product.base * coeff * 100) / 100;
+    var policyNo = 'FP-' + state.product.id.toUpperCase() + '-' + (h32(state.pubkeyHex + idno + dob) >>> 0).toString(16).toUpperCase().slice(0, 8);
+    state.quote = {
+      name: name, idno: idno, dob: dob, age: age, coeff: coeff, premium: premium,
+      policyNo: policyNo, issued: new Date().toISOString().slice(0, 10),
+    };
+    renderCert();
+    show('quote');
+  };
+
+  function certHtml(paid) {
+    var q = state.quote, p = state.product;
+    return '<div class="cert" id="cert-body">' +
+      '<div class="co-sub">Certificate of Insurance' + (paid ? ' — PAID' : ' — QUOTE') + '</div>' +
+      '<h3>Freeport Insurance Store</h3>' +
+      '<table>' +
+      row('Policy number', q.policyNo) +
+      row('Product', p.name) +
+      row('Insured', q.name) +
+      row('ID number', q.idno) +
+      row('Date of birth', q.dob + ' (age ' + q.age + ')') +
+      row('npub', state.npub) +
+      row('Risk coefficient', q.coeff.toFixed(2) + '×') +
+      row('Issued', q.issued) +
+      row('Status', paid ? 'ACTIVE' : 'Quotation (unpaid)') +
+      '</table>' +
+      '<div style="margin-top:14px"><span class="prem">' + q.premium + ' USDT</span>' +
+      ' <span style="color:#5b6b7b;font-size:12px">premium</span></div>' +
+      '<div style="color:#5b6b7b;font-size:10px;margin-top:12px">Specimen document — demo only, no cover is provided.</div>' +
+      '</div>';
+  }
+  function row(k, v) { return '<tr><td>' + k + '</td><td>' + String(v) + '</td></tr>'; }
+  function renderCert() { $('cert').innerHTML = certHtml(false); }
+
+  // ── PDF (minimal, hand-built single-page PDF; no external libs) ───────────
+  function buildPdf(paid) {
+    var q = state.quote, p = state.product;
+    var lines = [
+      ['Certificate of Insurance' + (paid ? ' - PAID' : ' - QUOTE'), 18],
+      ['Freeport Insurance Store', 11],
+      ['', 6],
+      ['Policy number:   ' + q.policyNo, 12],
+      ['Product:         ' + p.name, 12],
+      ['Insured:         ' + q.name, 12],
+      ['ID number:       ' + q.idno, 12],
+      ['Date of birth:   ' + q.dob + '  (age ' + q.age + ')', 12],
+      ['npub:            ' + state.npub, 8],
+      ['Risk coefficient:' + q.coeff.toFixed(2) + 'x', 12],
+      ['Issued:          ' + q.issued, 12],
+      ['Status:          ' + (paid ? 'ACTIVE' : 'Quotation (unpaid)'), 12],
+      ['', 6],
+      ['Premium:         ' + q.premium + ' USDT', 16],
+      ['', 10],
+      ['Specimen document - demo only, no cover is provided.', 9],
+    ];
+    function esc(s) { return s.replace(/([\\()])/g, '\\$1'); }
+    var y = 780, body = 'BT\n';
+    lines.forEach(function (l) { body += '/F1 ' + l[1] + ' Tf\n1 0 0 1 60 ' + y + ' Tm\n(' + esc(l[0]) + ') Tj\n'; y -= (l[1] + 8); });
+    body += 'ET';
+    var objs = [
+      '<< /Type /Catalog /Pages 2 0 R >>',
+      '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+      '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>',
+      '<< /Length ' + body.length + ' >>\nstream\n' + body + '\nendstream',
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>',
+    ];
+    var pdf = '%PDF-1.4\n', offsets = [];
+    objs.forEach(function (o, i) { offsets.push(pdf.length); pdf += (i + 1) + ' 0 obj\n' + o + '\nendobj\n'; });
+    var xref = pdf.length;
+    pdf += 'xref\n0 ' + (objs.length + 1) + '\n0000000000 65535 f \n';
+    offsets.forEach(function (o) { pdf += ('0000000000' + o).slice(-10) + ' 00000 n \n'; });
+    pdf += 'trailer\n<< /Size ' + (objs.length + 1) + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF';
+    return pdf;
+  }
+  function downloadPdf(paid) {
+    var blob = new Blob([buildPdf(paid)], { type: 'application/pdf' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = state.quote.policyNo + (paid ? '-certificate' : '-quote') + '.pdf';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+  $('btn-pdf').onclick = function () { downloadPdf(false); };
+  $('btn-pdf2').onclick = function () { downloadPdf(true); };
+
+  // ── purchase ──────────────────────────────────────────────────────────────
+  $('btn-purchase').onclick = function () {
+    setErr('quote-err', '');
+    var btn = $('btn-purchase'); btn.disabled = true; btn.textContent = 'Paying…';
+    window.freeport.paySpark({ address: DONATION, token: { ticker: 'USDT', amount: state.quote.premium } })
+      .then(function () {
+        $('cert').innerHTML = '';
+        show('done');
+      })
+      .catch(function (e) {
+        btn.disabled = false; btn.textContent = 'Purchase';
+        setErr('quote-err', e && e.message ? e.message : 'Payment failed.');
+      });
+  };
+
+  show('products');
+})();
+</script>
+</body>
+</html>

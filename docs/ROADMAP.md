@@ -258,8 +258,11 @@ Remaining: a Nostr-published directory/blocklist, per-app spend-cap UI.
 The idea: Freeport as an **identity + wallet provider for web apps** — the
 WeChat/Zalo mini-program concept done the Nostr way (no curated store, no
 operator; apps are added by URL/QR). Standard surfaces: NIP-07
-(`window.nostr`), WebLN (`window.webln`), plus the `window.freeport.paySpark`
-extension for Spark/stablecoin payments. The full permission model (kind
+(`window.nostr`), WebLN (`window.webln`), plus `window.freeport` extensions —
+`paySpark` (Spark/stablecoin payments) and the private reads `getBalance` /
+`getLocation` (public data like reputation is intentionally not bridged — the
+app derives it from the npub). Two worked examples: `examples/demo-app` (eSIM
+shop) and `examples/insurance-store` (npub-derived underwriting + PDF cert). The full permission model (kind
 allowlist, default-deny decrypt, spend caps, per-payment approval) lives in
 `apps/mobile/src/miniapps/firewall.ts` and its adversarial test suite —
 that code is the spec now. Architecture & threat model:

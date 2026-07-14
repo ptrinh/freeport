@@ -879,5 +879,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "Még nincs hozzáadott mini-alkalmazás. Illessz be egy URL-t vagy olvass be egy QR-kódot.",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "Webalkalmazások, amelyek a Freeport-identitásodat és -tárcádat használják. Homokozóban futnak — minden érzékeny művelethez a jóváhagyásod szükséges.",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Webalkalmazások, amelyek a Freeport-identitásodat és -tárcádat használják — a mobilalkalmazásban.",
+  "wants to read your wallet balance": "szeretné elolvasni a tárcád egyenlegét",
+  "wants to read your location": "szeretné elolvasni a helyzeted",
 };
 export default c;

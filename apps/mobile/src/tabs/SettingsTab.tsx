@@ -53,6 +53,7 @@ import { MiniAppsSection } from '../miniapps/MiniAppsSection';
 import { loadFirewall } from '../miniapps/store';
 import type { MiniAppFirewall, MiniAppRecord } from '../miniapps/firewall';
 import { activeWalletProvider } from '../wallet';
+import { makeBridgeContext } from '../miniapps/context';
 
 // Loaded on demand: react-native-webview only exists in 1.6.0+ binaries, so the
 // shell must never be evaluated at startup on an older runtime.
@@ -966,6 +967,7 @@ function SettingsTab({
             firewall={miniAppFw}
             signer={signerRef.current}
             getWallet={experimentalWallet ? () => activeWalletProvider(walletNwcUrl) : null}
+            context={makeBridgeContext(experimentalWallet ? () => activeWalletProvider(walletNwcUrl) : null)}
             onClose={() => setOpenMiniApp(null)}
           />
         </React.Suspense>

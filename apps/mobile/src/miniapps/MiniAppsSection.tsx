@@ -16,6 +16,16 @@ function appLabel(url: string): string {
   try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }
 }
 
+/** Convenience: the example apps' GitHub source links resolve to their
+ *  published homes, so pasting either the repo URL or the web URL works. */
+function resolveDemoAlias(input: string): string {
+  const m = /^https:\/\/github\.com\/ptrinh\/freeport(?:\/tree\/[^/]+)?\/examples\/([a-z0-9-]+)\/?$/i.exec(input);
+  if (m) return `https://freeport.network/${m[1]}/`;
+  // Bare repo root → the original eSIM demo shop.
+  if (/^https:\/\/github\.com\/ptrinh\/freeport\/?$/i.test(input)) return 'https://freeport.network/demo-app/';
+  return input;
+}
+
 export function MiniAppsSection({
   firewall,
   onOpenApp,
@@ -32,11 +42,7 @@ export function MiniAppsSection({
 
   const add = (input: string) => {
     setErr('');
-    // Convenience alias: the demo shop's GitHub link resolves to its published
-    // home, so both the repo URL and the web URL work.
-    if (/^https:\/\/github\.com\/ptrinh\/freeport([/?#]|$)/i.test(input.trim())) {
-      input = 'https://freeport.network/demo-app/';
-    }
+    input = resolveDemoAlias(input.trim());
     const { origin, warnings } = evaluateAdd(input);
     if (!origin) { setErr(t('Enter a valid https:// URL.')); return; }
     if (warnings.includes('punycode')) {

@@ -18,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { s, palette } from '../ui/theme';
 import type { Signer } from '../signer';
 import type { MiniAppFirewall, MiniAppRecord } from './firewall';
-import { MiniAppBridge, encodeResponseJs, type ApprovalRequest, type ApprovalResult } from './bridge';
+import { MiniAppBridge, encodeResponseJs, type ApprovalRequest, type ApprovalResult, type BridgeContext } from './bridge';
 import { MINIAPP_SHIM } from './shim';
 import { persistFirewall } from './store';
 import { makeBridgeWallet } from './walletAdapter';
@@ -34,6 +34,7 @@ export function MiniAppShell({
   firewall,
   signer,
   getWallet,
+  context,
   onClose,
 }: {
   app: MiniAppRecord;
@@ -42,6 +43,8 @@ export function MiniAppShell({
   /** Resolved lazily so the wallet only spins up when a mini-app asks for it.
    *  null = wallet feature off → webln calls fail cleanly. */
   getWallet: (() => Promise<WalletProvider | null>) | null;
+  /** Read-signal provider (balance/reputation/location); null disables reads. */
+  context?: BridgeContext | null;
   onClose: () => void;
 }) {
   const webRef = useRef<WebView>(null);
@@ -56,6 +59,7 @@ export function MiniAppShell({
       firewall,
       signer,
       wallet: makeBridgeWallet(getWallet),
+      context,
       persist: persistFirewall,
       approve: (req) => {
         const turn = approvalChain.current.then(
@@ -65,7 +69,7 @@ export function MiniAppShell({
         return turn;
       },
     }, app.origin);
-  }, [app.origin, firewall, signer, getWallet]);
+  }, [app.origin, firewall, signer, getWallet, context]);
 
   const onMessage = useCallback(async (e: { nativeEvent: { data: string } }) => {
     const res = await bridge.handleMessage(e.nativeEvent.data);

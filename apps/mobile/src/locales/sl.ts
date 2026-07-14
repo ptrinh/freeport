@@ -885,5 +885,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "Dodane še ni nobene mini-aplikacije. Prilepite URL ali skenirajte kodo QR.",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "Spletne aplikacije, ki uporabljajo vašo identiteto in denarnico Freeport. V peskovniku — vsako občutljivo dejanje zahteva vašo odobritev.",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Spletne aplikacije, ki uporabljajo vašo identiteto in denarnico Freeport — v mobilni aplikaciji.",
+  "wants to read your wallet balance": "želi prebrati stanje vaše denarnice",
+  "wants to read your location": "želi prebrati vašo lokacijo",
 };
 export default c;

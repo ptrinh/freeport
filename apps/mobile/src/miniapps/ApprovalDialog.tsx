@@ -23,12 +23,14 @@ function askTitle(req: ApprovalRequest): string {
     case 'kind-sensitive': case 'kind-unlisted': return t('wants to sign an event as you');
     case 'encrypt-peer': return t('wants to encrypt a message');
     case 'decrypt-peer': return t('wants to READ an encrypted message');
+    case 'read-balance': return t('wants to read your wallet balance');
+    case 'read-location': return t('wants to read your location');
     default: return t('wants to send a payment');
   }
 }
 
 export function ApprovalDialog({ req, onDone }: { req: ApprovalRequest; onDone: (r: ApprovalResult) => void }) {
-  const grantable = ['pubkey', 'wallet-info', 'kind-unlisted', 'encrypt-peer', 'decrypt-peer'].includes(req.reason);
+  const grantable = ['pubkey', 'wallet-info', 'kind-unlisted', 'encrypt-peer', 'decrypt-peer', 'read-balance', 'read-location'].includes(req.reason);
   const isPayment = req.method === 'webln.sendPayment' || req.method === 'freeport.paySpark';
   const sensitive = req.reason === 'kind-sensitive' || req.reason === 'decrypt-peer';
   const [armed, setArmed] = useState(false);

@@ -879,5 +879,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "இதுவரை எந்த மினி-ஆப்பும் சேர்க்கப்படவில்லை. ஒரு URL ஐ ஒட்டவும் அல்லது QR குறியீட்டை ஸ்கேன் செய்யவும்.",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "உங்கள் Freeport அடையாளத்தையும் பணப்பையையும் பயன்படுத்தும் வலை ஆப்புகள். சாண்ட்பாக்ஸில் இயங்குகின்றன — ஒவ்வொரு உணர்திறன் செயலுக்கும் உங்கள் ஒப்புதல் தேவை.",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "உங்கள் Freeport அடையாளத்தையும் பணப்பையையும் பயன்படுத்தும் வலை ஆப்புகள் — மொபைல் ஆப்பில்.",
+  "wants to read your wallet balance": "உங்கள் வாலட்டின் இருப்பைப் படிக்க விரும்புகிறது",
+  "wants to read your location": "உங்கள் இருப்பிடத்தைப் படிக்க விரும்புகிறது",
 };
 export default c;

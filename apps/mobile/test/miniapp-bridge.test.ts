@@ -272,6 +272,49 @@ describe('freeport.paySpark (Spark address / stablecoin payments)', () => {
   });
 });
 
+describe('freeport read methods (private signals only)', () => {
+  function withContext(over?: { approveResult?: { ok: boolean; remember?: boolean } }) {
+    const b = makeBridge(over);
+    const context = {
+      balance: vi.fn(async () => ({ sats: 12345 })),
+      location: vi.fn(async () => ({ country: 'SG', state: '', city: 'Singapore' })),
+    };
+    const bridge = new MiniAppBridge({
+      firewall: b.firewall, signer, wallet: b.wallet, context,
+      persist: b.persist, approve: b.approve, now: () => T0 + 15_000,
+    }, APP + '/index.html');
+    return { ...b, bridge, context };
+  }
+
+  it.each([
+    ['freeport.getBalance', 'balance'],
+    ['freeport.getLocation', 'location'],
+  ] as const)('%s asks then allows after grant, returns the coarse value', async (method, ctxKey) => {
+    const { bridge, context, approve } = withContext({ approveResult: { ok: true, remember: true } });
+    const first = await call(bridge, method);
+    expect(first.ok).toBe(true);
+    expect((context as any)[ctxKey]).toHaveBeenCalled();
+    const second = await call(bridge, method, undefined, 'r2');
+    expect(second.ok).toBe(true);
+    expect(approve).toHaveBeenCalledTimes(1); // grant remembered
+  });
+
+  it('user rejection blocks the read', async () => {
+    const { bridge, context } = withContext({ approveResult: { ok: false } });
+    expect((await call(bridge, 'freeport.getBalance')).ok).toBe(false);
+    expect(context.balance).not.toHaveBeenCalled();
+  });
+
+  it('no context wired → reads fail cleanly even after approval', async () => {
+    const { bridge } = makeBridge({ approveResult: { ok: true } }); // makeBridge has no context
+    expect(await call(bridge, 'freeport.getBalance')).toEqual({ id: 'r1', ok: false, error: 'unavailable' });
+  });
+
+  it('reputation is NOT bridged — it is derivable from the npub', () => {
+    expect(BRIDGE_METHODS).not.toContain('freeport.getReputation');
+  });
+});
+
 describe('launch URLs (demo-app style paths)', () => {
   it('registerApp keeps the path as the launch url; permissions key on the origin', () => {
     const f = new MiniAppFirewall();

@@ -880,5 +880,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "Kol kas nepridėta jokių mini-programų. Įklijuokite URL arba nuskaitykite QR kodą.",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "Interneto programos, naudojančios jūsų Freeport tapatybę ir piniginę. Izoliuotos smėlio dėžėje — kiekvienas jautrus veiksmas reikalauja jūsų patvirtinimo.",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Interneto programos, naudojančios jūsų Freeport tapatybę ir piniginę — mobiliojoje programėlėje.",
+  "wants to read your wallet balance": "nori perskaityti jūsų piniginės likutį",
+  "wants to read your location": "nori perskaityti jūsų vietą",
 };
 export default c;

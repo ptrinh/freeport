@@ -876,5 +876,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "ჯერ არცერთი მინი-აპი არ დამატებულა. ჩასვით URL ან დაასკანერეთ QR კოდი.",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "ვებ-აპები, რომლებიც იყენებენ თქვენს Freeport ვინაობასა და საფულეს. იზოლირებული (sandbox) — ყოველი მგრძნობიარე მოქმედება საჭიროებს თქვენს დადასტურებას.",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "ვებ-აპები, რომლებიც იყენებენ თქვენს Freeport ვინაობასა და საფულეს — მობილურ აპში.",
+  "wants to read your wallet balance": "სურს წაიკითხოს თქვენი საფულის ბალანსი",
+  "wants to read your location": "სურს წაიკითხოს თქვენი მდებარეობა",
 };
 export default c;

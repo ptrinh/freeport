@@ -21,7 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { s, palette } from '../ui/theme';
 import type { Signer } from '../signer';
 import type { MiniAppFirewall, MiniAppRecord } from './firewall';
-import { MiniAppBridge, type ApprovalRequest, type ApprovalResult } from './bridge';
+import { MiniAppBridge, type ApprovalRequest, type ApprovalResult, type BridgeContext } from './bridge';
 import { persistFirewall } from './store';
 import { makeBridgeWallet } from './walletAdapter';
 import { ApprovalDialog } from './ApprovalDialog';
@@ -32,12 +32,14 @@ export function MiniAppShell({
   firewall,
   signer,
   getWallet,
+  context,
   onClose,
 }: {
   app: MiniAppRecord;
   firewall: MiniAppFirewall;
   signer: Signer;
   getWallet: (() => Promise<WalletProvider | null>) | null;
+  context?: BridgeContext | null;
   onClose: () => void;
 }) {
   const frameRef = useRef<HTMLIFrameElement | null>(null);
@@ -49,6 +51,7 @@ export function MiniAppShell({
     firewall,
     signer,
     wallet: makeBridgeWallet(getWallet),
+    context,
     persist: persistFirewall,
     approve: (req) => {
       const turn = approvalChain.current.then(
@@ -57,7 +60,7 @@ export function MiniAppShell({
       approvalChain.current = turn.catch(() => {});
       return turn;
     },
-  }, app.origin), [app.origin, firewall, signer, getWallet]);
+  }, app.origin), [app.origin, firewall, signer, getWallet, context]);
 
   useEffect(() => () => { portRef.current?.close(); portRef.current = null; }, []);
 

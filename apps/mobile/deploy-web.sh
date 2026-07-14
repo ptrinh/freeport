@@ -220,9 +220,10 @@ cp store/llms.txt dist/llms.txt
 echo "▸ Deploying to Cloudflare Pages…"
 # Mini-app demo shop — a plain static page served next to the SPA. The app's
 # add-flow also maps the repo's GitHub URL to this path.
-echo "▸ Adding mini-app demo (freeport.network/demo-app) + SDK (/sdk.js)…"
-mkdir -p dist/demo-app
+echo "▸ Adding mini-app demos + SDK (/sdk.js)…"
+mkdir -p dist/demo-app dist/insurance-store
 cp ../../examples/demo-app/index.html dist/demo-app/index.html
+cp ../../examples/insurance-store/index.html dist/insurance-store/index.html
 cp ../../packages/miniapp-sdk/freeport-sdk.js dist/sdk.js
 
 npx wrangler pages deploy dist --project-name freeport --branch main --commit-dirty=true

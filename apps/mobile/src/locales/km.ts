@@ -876,5 +876,7 @@ const c: Record<string, string> = {
   "No mini-apps added yet. Paste a URL or scan a QR code.": "មិនទាន់មានមីនីអែបត្រូវបានបន្ថែមនៅឡើយទេ។ បិទភ្ជាប់ URL ឬស្កេនកូដ QR។",
   "Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.": "កម្មវិធីវេបដែលប្រើអត្តសញ្ញាណ និងកាបូប Freeport របស់អ្នក។ ដាក់ក្នុងសាំងបុក (sandbox) — សកម្មភាពរសើបនីមួយៗត្រូវការការអនុម័តរបស់អ្នក។",
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "កម្មវិធីវេបដែលប្រើអត្តសញ្ញាណ និងកាបូប Freeport របស់អ្នក — នៅលើកម្មវិធីទូរស័ព្ទ។",
+  "wants to read your wallet balance": "ចង់អានសមតុល្យកាបូបរបស់អ្នក",
+  "wants to read your location": "ចង់អានទីតាំងរបស់អ្នក",
 };
 export default c;

@@ -98,7 +98,19 @@ security lives in WebView-land.
 | `webln.makeInvoice` | allow (receive-only), rate-limited | — |
 | `webln.sendPayment` | ask | auto-allow only under the user-set per-app daily cap |
 | `freeport.paySpark` | ask EVERY time | never — caps don't apply |
+| `freeport.getBalance` / `getLocation` | ask | yes (per app) |
 | anything else | **deny** | — |
+
+**What the read methods deliberately do NOT include.** Only *private* signals
+are bridged: wallet balance and coarse home location, neither of which exists
+on any relay. Everything public about an identity — reputation score, karma,
+ratings, completed deals, account age — is derivable from the npub the app
+already learns via `getPublicKey`, so re-exposing it through the bridge would
+be security theater (it would look like a guarded secret while being freely
+queryable). The app is expected to look those up itself; the `insurance-store`
+example shows exactly this split (`deriveReputationFromNpub()` for public data,
+`getBalance`/`getLocation` for private). Bridged reads return coarse summaries
+only — a sats total, a country/state/city — never raw events or coordinates.
 
 Sensitive kinds (`ALWAYS_ASK_KINDS`): `0, 3, 4, 5, 1059, 30018, 30078,
 32101–32105`. The rationale is marketplace-specific: kind 4/1059 lets an app

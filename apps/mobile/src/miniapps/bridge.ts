@@ -49,11 +49,20 @@ export interface BridgeWallet {
   paySpark(address: string, opts: { sats?: number; token?: { ticker: string; amount: number } }): Promise<{ preimage?: string }>;
 }
 
+/** Read-only profile signals an app may request, resolved lazily by the shell.
+ *  Each returns a deliberately COARSE, safe subset — never raw history. */
+export interface BridgeContext {
+  balance(): Promise<{ sats: number }>;
+  location(): Promise<{ country: string; state: string; city: string }>;
+}
+
 export interface BridgeDeps {
   firewall: MiniAppFirewall;
   signer: Signer;
   approve: (req: ApprovalRequest) => Promise<ApprovalResult>;
   wallet: BridgeWallet | null;
+  /** Read-context provider; null disables the freeport.get* read methods. */
+  context?: BridgeContext | null;
   /** Called after any state change worth persisting (grants, spend). */
   persist: () => void;
   now?: () => number;
@@ -181,16 +190,23 @@ export class MiniAppBridge {
       else if (method === 'signEvent' && typeof kind === 'number') firewall.grantKind(this.origin, kind);
       else if ((method === 'nip04.encrypt' || method === 'nip44.encrypt') && typeof peer === 'string') firewall.grantPeer(this.origin, 'encrypt', peer);
       else if ((method === 'nip04.decrypt' || method === 'nip44.decrypt') && typeof peer === 'string') firewall.grantPeer(this.origin, 'decrypt', peer);
+      else if (method === 'freeport.getBalance' || method === 'freeport.getLocation') firewall.grantRead(this.origin, method);
     } catch { /* ungrantable (sensitive kind) — the approval stays one-shot */ }
     this.deps.persist();
   }
 
   private async execute(id: string, method: BridgeMethod, p: Record<string, unknown>, template: EventTemplate | null, invoice: string): Promise<RpcResponse> {
-    const { signer, wallet } = this.deps;
+    const { signer, wallet, context } = this.deps;
     try {
       switch (method) {
         case 'getPublicKey':
           return { id, ok: true, result: signer.pubkey };
+        case 'freeport.getBalance':
+          if (!context) return { id, ok: false, error: 'unavailable' };
+          return { id, ok: true, result: await context.balance() };
+        case 'freeport.getLocation':
+          if (!context) return { id, ok: false, error: 'unavailable' };
+          return { id, ok: true, result: await context.location() };
         case 'signEvent': {
           const ev: Event = await signer.signEvent(template!);
           return { id, ok: true, result: ev };

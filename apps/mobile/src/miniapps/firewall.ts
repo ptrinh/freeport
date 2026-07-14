@@ -20,8 +20,17 @@ export const BRIDGE_METHODS = [
   // Freeport extension: pay a Spark address (sats or a stablecoin token).
   // ALWAYS per-payment approval — spend caps never auto-allow these.
   'freeport.paySpark',
+  // Freeport read extensions — the PRIVATE signals an app cannot otherwise
+  // obtain. Anything public (reputation, karma, deal counts, account age) is
+  // derivable from the npub the app already learns via getPublicKey, so it is
+  // deliberately NOT bridged — the app looks that up itself. Each asks once
+  // and is grantable per-app.
+  'freeport.getBalance', 'freeport.getLocation',
 ] as const;
 export type BridgeMethod = (typeof BRIDGE_METHODS)[number];
+
+/** The read methods an app can hold a standing grant for. */
+export const READ_METHODS = ['freeport.getBalance', 'freeport.getLocation'] as const;
 
 /**
  * Kinds that ALWAYS require a per-event approval dialog — a standing grant is
@@ -45,6 +54,8 @@ export interface AppPermissions {
   decryptPeers: string[];
   /** Payments up to this many sats/day auto-approve. 0 = every payment asks. */
   spendCapDaySats: number;
+  /** Read methods granted (freeport.getBalance / getReputation / getLocation). */
+  reads: string[];
 }
 
 export interface MiniAppRecord {
@@ -64,7 +75,8 @@ export type DenyReason =
 export type AskReason =
   | 'pubkey' | 'kind-unlisted' | 'kind-sensitive' | 'encrypt-peer' | 'decrypt-peer'
   | 'payment' | 'payment-over-cap' | 'payment-global-cap' | 'payment-unknown-amount'
-  | 'payment-cooldown' | 'wallet-info';
+  | 'payment-cooldown' | 'wallet-info'
+  | 'read-balance' | 'read-location';
 
 export type Verdict =
   | { action: 'allow' }
@@ -180,7 +192,7 @@ export class MiniAppFirewall {
     if (existing) return existing;
     const rec: MiniAppRecord = {
       origin, url: normalizeLaunchUrl(input) ?? origin, name, addedAt: now,
-      perms: { pubkey: false, kinds: [], encryptPeers: [], decryptPeers: [], spendCapDaySats: 0 },
+      perms: { pubkey: false, kinds: [], encryptPeers: [], decryptPeers: [], spendCapDaySats: 0, reads: [] },
     };
     this.apps.set(origin, rec);
     return rec;
@@ -216,6 +228,12 @@ export class MiniAppFirewall {
     const p = this.mustApp(origin).perms;
     const list = dir === 'encrypt' ? p.encryptPeers : p.decryptPeers;
     if (!list.includes(peer)) list.push(peer);
+  }
+
+  grantRead(origin: string, method: string): void {
+    if (!(READ_METHODS as readonly string[]).includes(method)) throw new Error('not a read method');
+    const p = this.mustApp(origin).perms;
+    if (!p.reads.includes(method)) p.reads.push(method);
   }
 
   setSpendCap(origin: string, sats: number): void {
@@ -329,6 +347,11 @@ export class MiniAppFirewall {
         return { action: 'allow' };
       }
 
+      case 'freeport.getBalance':
+        return app.perms.reads.includes(method) ? { action: 'allow' } : this.ask(origin, 'read-balance');
+      case 'freeport.getLocation':
+        return app.perms.reads.includes(method) ? { action: 'allow' } : this.ask(origin, 'read-location');
+
       case 'freeport.paySpark': {
         const address = p?.address;
         if (typeof address !== 'string' || !/^spark1[a-z0-9]{8,512}$/.test(address)) {
@@ -415,6 +438,7 @@ export class MiniAppFirewall {
             encryptPeers: (a.perms?.encryptPeers ?? []).filter((x) => HEX64.test(x)),
             decryptPeers: (a.perms?.decryptPeers ?? []).filter((x) => HEX64.test(x)),
             spendCapDaySats: Math.max(0, Number(a.perms?.spendCapDaySats) || 0),
+            reads: (a.perms?.reads ?? []).filter((m) => (READ_METHODS as readonly string[]).includes(m)),
           },
         });
       }
