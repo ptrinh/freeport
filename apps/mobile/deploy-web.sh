@@ -95,9 +95,15 @@ cat > dist/_headers <<'HDRS'
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  X-Frame-Options: SAMEORIGIN
-  Content-Security-Policy: frame-ancestors 'self'
   Permissions-Policy: browsing-topics=()
+  Content-Security-Policy: frame-ancestors 'self' https://freeport.network https://www.freeport.network https://freeport.trinh.uk
+HDRS
+# Clickjacking note: NO X-Frame-Options — it can't express multiple origins, and
+# SAMEORIGIN would block the mini-app WEB shell (freeport.network) from framing
+# a demo served cross-origin at apps.freeport.network (same Pages project). CSP
+# frame-ancestors above allows exactly the Freeport shell origins to frame, and
+# blocks every other site (the modern, multi-origin-capable control).
+cat >> dist/_headers <<'HDRS'
 /breez_sdk_spark_wasm_bg.wasm
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=86400
