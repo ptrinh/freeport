@@ -67,6 +67,9 @@
       else p.reject(new Error(msg.error || 'denied'));
     };
     if (port.start) port.start();
+    // Liveness ack: tells the shell a mini-app SDK picked up the port (hides
+    // its "not a mini-app" notice). Carries no authority.
+    try { port.postMessage('__fp_hello'); } catch (err) {}
     while (queue.length) port.postMessage(queue.shift());
     try { window.dispatchEvent(new Event('freeport:connected')); } catch (err) {}
   });

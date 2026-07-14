@@ -893,5 +893,10 @@ const c: Record<string, string> = {
   "Title is required.": "Název je povinný.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Přetažením aplikace přeuspořádáte. Klepnutím na ✕ ji odeberete.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Zatím žádné aplikace — klepnutím na \"Přidat aplikaci\" přidáte pomocí URL nebo QR kódu.",
+  "Mini-app manifest found": "Manifest mini-aplikace nalezen",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Manifest mini-aplikace nebyl nalezen — může jít o běžnou webovou stránku. Přidejte ji, jen pokud jí důvěřujete.",
+  "May request": "Může požadovat",
+  "Unverified": "Neověřeno",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Tato stránka nepoužila žádné funkce Freeport — nemusí jít o mini-aplikaci.",
 };
 export default c;

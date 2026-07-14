@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "Kichwa kinahitajika.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Buruta programu ili kupanga upya. Gusa ✕ ili kuondoa.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Bado hakuna programu — gusa \"Ongeza programu\" ili kuongeza kwa URL au msimbo wa QR.",
+  "Mini-app manifest found": "Manifesto ya programu ndogo imepatikana",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Hakuna manifesto ya programu ndogo iliyopatikana — hii inaweza kuwa tovuti ya kawaida. Iongeze tu ikiwa unaiamini.",
+  "May request": "Inaweza kuomba",
+  "Unverified": "Haijathibitishwa",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Ukurasa huu haujatumia kipengele chochote cha Freeport — huenda si programu ndogo.",
 };
 export default c;

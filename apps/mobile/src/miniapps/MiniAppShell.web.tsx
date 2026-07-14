@@ -25,6 +25,7 @@ import { MiniAppBridge, type ApprovalRequest, type ApprovalResult, type BridgeCo
 import { persistFirewall } from './store';
 import { makeBridgeWallet } from './walletAdapter';
 import { ApprovalDialog } from './ApprovalDialog';
+import { NotMiniAppNotice, UnverifiedChip, HELLO } from './shellNotices';
 import type { WalletProvider } from '../wallet';
 
 export function MiniAppShell({
@@ -46,6 +47,8 @@ export function MiniAppShell({
   const portRef = useRef<MessagePort | null>(null);
   const [approval, setApproval] = useState<{ req: ApprovalRequest; resolve: (r: ApprovalResult) => void } | null>(null);
   const approvalChain = useRef<Promise<unknown>>(Promise.resolve());
+  // Liveness: flips when the SDK acks the handshake (or any bridge traffic).
+  const [alive, setAlive] = useState(false);
 
   const bridge = useMemo(() => new MiniAppBridge({
     firewall,
@@ -83,6 +86,8 @@ export function MiniAppShell({
     portRef.current = ch.port1;
     ch.port1.onmessage = async (ev: MessageEvent) => {
       if (typeof ev.data !== 'string') return;
+      if (ev.data === HELLO) { setAlive(true); return; } // SDK picked up the port
+      setAlive(true); // any real bridge traffic counts too
       // This port exists only inside a document served from app.origin (the
       // handshake below pins targetOrigin), so requests on it carry that
       // origin's authority — a navigated-away frame never gets a port at all.
@@ -105,10 +110,12 @@ export function MiniAppShell({
             <Text style={s.toggleTitle} numberOfLines={1}>{app.name || app.origin}</Text>
             <Text style={[s.dim, { marginTop: 0 }]} numberOfLines={1}>{app.origin.replace('https://', '')}</Text>
           </View>
+          {app.verified ? null : <UnverifiedChip />}
           <Pressable onPress={onClose} hitSlop={10}>
             <Ionicons name="close" size={24} color={palette.text} />
           </Pressable>
         </View>
+        <NotMiniAppNotice alive={alive} />
         {React.createElement('iframe', {
           ref: frameRef,
           src: app.url || app.origin,

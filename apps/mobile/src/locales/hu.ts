@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "A cím megadása kötelező.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Húzza az alkalmazásokat az átrendezéshez. Koppintson a ✕ gombra az eltávolításhoz.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Még nincs alkalmazás — koppintson az \"Alkalmazás hozzáadása\" gombra URL vagy QR-kód általi hozzáadáshoz.",
+  "Mini-app manifest found": "Mini-app manifeszt megtalálva",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Nem található mini-app manifeszt — ez lehet egy hétköznapi webhely. Csak akkor add hozzá, ha megbízol benne.",
+  "May request": "Kérheti",
+  "Unverified": "Nem ellenőrzött",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Ez az oldal nem használt Freeport-funkciókat — lehet, hogy nem mini-app.",
 };
 export default c;

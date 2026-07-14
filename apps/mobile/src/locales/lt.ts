@@ -891,5 +891,10 @@ const c: Record<string, string> = {
   "Title is required.": "Pavadinimas privalomas.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Vilkite programėles, kad pertvarkytumėte. Palieskite ✕, kad pašalintumėte.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Programėlių dar nėra — palieskite \"Pridėti programėlę\", kad pridėtumėte pagal URL arba QR kodą.",
+  "Mini-app manifest found": "Rastas mini programėlės manifestas",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Mini programėlės manifestas nerastas — tai gali būti įprasta svetainė. Pridėkite ją tik jei ja pasitikite.",
+  "May request": "Gali prašyti",
+  "Unverified": "Nepatvirtinta",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Šis puslapis nenaudojo jokių Freeport funkcijų — tai gali būti ne mini programėlė.",
 };
 export default c;

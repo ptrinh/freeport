@@ -933,5 +933,10 @@ const c: Record<string, string> = {
   "Title is required.": "Başlık gerekli.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Yeniden düzenlemek için uygulamaları sürükleyin. Kaldırmak için ✕ öğesine dokunun.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Henüz uygulama yok — URL veya QR koduyla eklemek için \"Uygulama ekle\" öğesine dokunun.",
+  "Mini-app manifest found": "Mini uygulama manifestosu bulundu",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Mini uygulama manifestosu bulunamadı — bu sıradan bir web sitesi olabilir. Yalnızca güveniyorsanız ekleyin.",
+  "May request": "İsteyebilir",
+  "Unverified": "Doğrulanmadı",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Bu sayfa hiçbir Freeport özelliğini kullanmadı — mini uygulama olmayabilir.",
 };
 export default c;

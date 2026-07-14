@@ -896,5 +896,10 @@ const c: Record<string, string> = {
   "Title is required.": "Назва обовʼязкова.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Перетягуйте застосунки, щоб змінити порядок. Торкніться ✕, щоб видалити.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Застосунків ще немає — торкніться \"Додати застосунок\", щоб додати за URL або QR-кодом.",
+  "Mini-app manifest found": "Знайдено маніфест мінізастосунку",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Маніфест мінізастосунку не знайдено — можливо, це звичайний вебсайт. Додавайте його, лише якщо довіряєте йому.",
+  "May request": "Може запитувати",
+  "Unverified": "Не підтверджено",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Ця сторінка не використовувала жодних функцій Freeport — можливо, це не мінізастосунок.",
 };
 export default c;

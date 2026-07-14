@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "මාතෘකාව අවශ්‍යයි.",
   "Drag apps to rearrange. Tap ✕ to remove.": "නැවත සකසන්න යෙදුම් ඇදගෙන යන්න. ඉවත් කිරීමට ✕ තට්ටු කරන්න.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "තවම යෙදුම් නැත — URL හෝ QR කේතය මගින් එකතු කිරීමට \"යෙදුම එක් කරන්න\" තට්ටු කරන්න.",
+  "Mini-app manifest found": "කුඩා යෙදුම් manifest එක හමු විය",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "කුඩා යෙදුම් manifest එකක් හමු නොවීය — මෙය සාමාන්‍ය වෙබ් අඩවියක් විය හැක. ඔබ එය විශ්වාස කරන්නේ නම් පමණක් එය එක් කරන්න.",
+  "May request": "ඉල්ලිය හැක",
+  "Unverified": "සත්‍යාපනය නොකළ",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "මෙම පිටුව කිසිදු Freeport විශේෂාංගයක් භාවිත කර නැත — එය කුඩා යෙදුමක් නොවිය හැක.",
 };
 export default c;

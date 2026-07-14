@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "Վերնագիրը պարտադիր է։",
   "Drag apps to rearrange. Tap ✕ to remove.": "Քաշեք հավելվածները՝ վերադասավորելու համար։ Հպեք ✕՝ հեռացնելու համար։",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Դեռ հավելվածներ չկան — հպեք \"Ավելացնել հավելված\"՝ URL-ով կամ QR կոդով ավելացնելու համար։",
+  "Mini-app manifest found": "Մինի-հավելվածի մանիֆեստը գտնվեց",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Մինի-հավելվածի մանիֆեստ չգտնվեց — սա կարող է սովորական կայք լինել։ Ավելացրեք այն միայն եթե վստահում եք դրան։",
+  "May request": "Կարող է պահանջել",
+  "Unverified": "Չհաստատված",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Այս էջը չի օգտագործել Freeport-ի որևէ գործառույթ — այն կարող է մինի-հավելված չլինել։",
 };
 export default c;

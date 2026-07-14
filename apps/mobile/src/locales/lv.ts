@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "Nosaukums ir obligāts.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Velciet lietotnes, lai pārkārtotu. Pieskarieties ✕, lai noņemtu.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Vēl nav lietotņu — pieskarieties \"Pievienot lietotni\", lai pievienotu ar URL vai QR kodu.",
+  "Mini-app manifest found": "Atrasts mini lietotnes manifests",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Mini lietotnes manifests nav atrasts — šī var būt parasta tīmekļa vietne. Pievienojiet to tikai tad, ja tai uzticaties.",
+  "May request": "Var pieprasīt",
+  "Unverified": "Nav pārbaudīts",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Šī lapa neizmantoja nevienu Freeport funkciju — tā, iespējams, nav mini lietotne.",
 };
 export default c;

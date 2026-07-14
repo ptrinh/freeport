@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "ርዕስ ያስፈልጋል።",
   "Drag apps to rearrange. Tap ✕ to remove.": "ለማስተካከል መተግበሪያዎችን ጎትት። ለማስወገድ ✕ ንካ።",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "እስካሁን መተግበሪያ የለም — በURL ወይም QR ኮድ ለመጨመር \"መተግበሪያ አክል\" ንካ።",
+  "Mini-app manifest found": "የሚኒ መተግበሪያ ማኒፌስት ተገኝቷል",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "የሚኒ መተግበሪያ ማኒፌስት አልተገኘም — ይህ ተራ ድር ጣቢያ ሊሆን ይችላል። የሚያምኑት ከሆነ ብቻ ያክሉት።",
+  "May request": "ሊጠይቅ ይችላል",
+  "Unverified": "ያልተረጋገጠ",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "ይህ ገጽ ምንም የFreeport ባህሪያት አልተጠቀመም — ሚኒ መተግበሪያ ላይሆን ይችላል።",
 };
 export default c;

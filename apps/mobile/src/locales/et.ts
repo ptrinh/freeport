@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "Pealkiri on kohustuslik.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Lohista rakendusi ümberkorraldamiseks. Eemaldamiseks puuduta ✕.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Rakendusi veel pole — puuduta \"Lisa rakendus\", et lisada URL-i või QR-koodiga.",
+  "Mini-app manifest found": "Minirakenduse manifest leitud",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Minirakenduse manifesti ei leitud — see võib olla tavaline veebisait. Lisa see ainult siis, kui usaldad seda.",
+  "May request": "Võib taotleda",
+  "Unverified": "Kinnitamata",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "See leht ei kasutanud ühtegi Freeporti funktsiooni — see ei pruugi olla minirakendus.",
 };
 export default c;

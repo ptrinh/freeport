@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "სათაური სავალდებულოა.",
   "Drag apps to rearrange. Tap ✕ to remove.": "გადაათრიეთ აპები გადასაწყობად. წასაშლელად შეეხეთ ✕-ს.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "აპები ჯერ არ არის — შეეხეთ \"აპის დამატება\"-ს, რომ დაამატოთ URL-ით ან QR კოდით.",
+  "Mini-app manifest found": "მინი-აპის მანიფესტი ნაპოვნია",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "მინი-აპის მანიფესტი ვერ მოიძებნა — ეს შესაძლოა ჩვეულებრივი ვებსაიტი იყოს. დაამატეთ მხოლოდ იმ შემთხვევაში, თუ ენდობით მას.",
+  "May request": "შეიძლება მოითხოვოს",
+  "Unverified": "დაუდასტურებელი",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "ამ გვერდს არ გამოუყენებია Freeport-ის არცერთი ფუნქცია — შესაძლოა ის მინი-აპი არ იყოს.",
 };
 export default c;

@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "ခေါင်းစဉ် လိုအပ်သည်။",
   "Drag apps to rearrange. Tap ✕ to remove.": "ပြန်စီရန် အက်ပ်များကို ဆွဲပါ။ ဖယ်ရှားရန် ✕ ကို တို့ပါ။",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "အက်ပ် မရှိသေးပါ — URL သို့မဟုတ် QR ကုဒ်ဖြင့် ထည့်ရန် \"အက်ပ် ထည့်ရန်\" ကို တို့ပါ။",
+  "Mini-app manifest found": "မီနီအက်ပ် manifest တွေ့ရှိပါသည်",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "မီနီအက်ပ် manifest မတွေ့ပါ — ၎င်းသည် သာမန်ဝဘ်ဆိုက်ဖြစ်နိုင်သည်။ ယုံကြည်မှသာ ထည့်ပါ။",
+  "May request": "တောင်းဆိုနိုင်သည်",
+  "Unverified": "အတည်မပြုရသေး",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "ဤစာမျက်နှာသည် Freeport လုပ်ဆောင်ချက်များကို အသုံးမပြုခဲ့ပါ — ၎င်းသည် မီနီအက်ပ်မဟုတ်နိုင်ပါ။",
 };
 export default c;

@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "Nimi vaaditaan.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Järjestä sovellukset uudelleen vetämällä. Poista napauttamalla ✕.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Ei vielä sovelluksia — lisää URL-osoitteella tai QR-koodilla napauttamalla \"Lisää sovellus\".",
+  "Mini-app manifest found": "Minisovelluksen manifesti löytyi",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Minisovelluksen manifestia ei löytynyt — tämä voi olla tavallinen verkkosivusto. Lisää se vain, jos luotat siihen.",
+  "May request": "Voi pyytää",
+  "Unverified": "Vahvistamaton",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Tämä sivu ei käyttänyt mitään Freeportin ominaisuuksia — se ei ehkä ole minisovellus.",
 };
 export default c;

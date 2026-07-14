@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "Başlıq tələb olunur.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Yenidən düzmək üçün tətbiqləri sürüşdürün. Silmək üçün ✕ toxunun.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Hələ tətbiq yoxdur — URL və ya QR kodla əlavə etmək üçün \"Tətbiq əlavə et\" toxunun.",
+  "Mini-app manifest found": "Mini-tətbiq manifesti tapıldı",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Mini-tətbiq manifesti tapılmadı — bu adi bir vebsayt ola bilər. Yalnız etibar edirsinizsə əlavə edin.",
+  "May request": "Tələb edə bilər",
+  "Unverified": "Təsdiqlənməyib",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Bu səhifə heç bir Freeport funksiyasından istifadə etmədi — mini-tətbiq olmaya bilər.",
 };
 export default c;

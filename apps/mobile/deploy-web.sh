@@ -97,6 +97,10 @@ cat > dist/_headers <<'HDRS'
   Cache-Control: public, max-age=86400
 /.well-known/apple-app-site-association
   Content-Type: application/json
+/esim-store/freeport.json
+  Access-Control-Allow-Origin: *
+/insurance-store/freeport.json
+  Access-Control-Allow-Origin: *
 HDRS
 
 # Use our own PNG favicon. Expo's generated /favicon.ico ignores web.favicon
@@ -223,8 +227,8 @@ echo "▸ Deploying to Cloudflare Pages…"
 # add-flow also maps the repo's GitHub URL to this path.
 echo "▸ Adding mini-app demos + SDK (/sdk.js)…"
 mkdir -p dist/esim-store dist/insurance-store
-cp ../../examples/esim-store/index.html ../../examples/esim-store/icon.png dist/esim-store/
-cp ../../examples/insurance-store/index.html ../../examples/insurance-store/icon.png dist/insurance-store/
+cp ../../examples/esim-store/{index.html,icon.png,freeport.json} dist/esim-store/
+cp ../../examples/insurance-store/{index.html,icon.png,freeport.json} dist/insurance-store/
 cp ../../packages/miniapp-sdk/freeport-sdk.js dist/sdk.js
 
 npx wrangler pages deploy dist --project-name freeport --branch main --commit-dirty=true

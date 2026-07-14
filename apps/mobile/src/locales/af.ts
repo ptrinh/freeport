@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "Titel is verpligtend.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Sleep programme om te herrangskik. Tik ✕ om te verwyder.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Nog geen programme nie — tik \"Voeg program by\" om een per URL of QR-kode by te voeg.",
+  "Mini-app manifest found": "Mini-app-manifes gevind",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Geen mini-app-manifes gevind nie — dit is dalk 'n gewone webwerf. Voeg dit net by as jy dit vertrou.",
+  "May request": "Kan versoek",
+  "Unverified": "Ongeverifieer",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Hierdie bladsy het geen Freeport-funksies gebruik nie — dit is dalk nie 'n mini-app nie.",
 };
 export default c;

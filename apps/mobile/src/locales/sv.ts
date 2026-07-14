@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "Titel krävs.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Dra appar för att ordna om. Tryck på ✕ för att ta bort.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Inga appar än — tryck på \"Lägg till app\" för att lägga till en via URL eller QR-kod.",
+  "Mini-app manifest found": "Miniapp-manifest hittades",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Inget miniapp-manifest hittades — det här kan vara en vanlig webbplats. Lägg bara till den om du litar på den.",
+  "May request": "Kan begära",
+  "Unverified": "Overifierad",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Den här sidan har inte använt några Freeport-funktioner — det kanske inte är en miniapp.",
 };
 export default c;

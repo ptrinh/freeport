@@ -1,15 +1,33 @@
 /**
- * Add-app metadata probe — fetch the app page and pull out a display title
- * and icon so every launcher tile has both (the Apps grid requires them).
+ * Add-app metadata probe — establish that a URL is a mini-app and pull out a
+ * display title + icon so every launcher tile has both (the Apps grid
+ * requires them).
  *
- * The response is UNTRUSTED text: it is only regex-mined for <title> and
- * <link rel=…icon…> and never rendered or executed. On web the fetch is
- * usually CORS-blocked — callers fall back to hostname + /favicon.ico.
+ * Primary source: the app's MANIFEST, `freeport.json` resolved against the
+ * launch URL directory (per-app, so several apps can share an origin):
+ *
+ *   { "name": "eSIM Demo Shop", "icon": "icon.png",
+ *     "permissions": ["getPublicKey", "freeport.paySpark"] }
+ *
+ * A manifest present and valid ⇒ `verified: true`. No manifest ⇒ fall back to
+ * mining the page HTML for <title>/<link rel=…icon…> and mark unverified —
+ * the add flow warns but may still allow (no gatekeeper). Verification is a
+ * LABEL, not a security boundary: a hostile page can serve a perfect
+ * manifest; the firewall remains the real defense.
+ *
+ * All responses are UNTRUSTED text — parsed, never rendered or executed. On
+ * web these fetches are CORS-blocked unless the app allows it (our published
+ * demos do); callers fall back to hostname + /favicon.ico.
  */
+import { BRIDGE_METHODS } from './firewall';
 
 export interface AppMeta {
   title: string | null;
   icon: string | null;
+  /** True when a valid freeport.json manifest was found at the app URL. */
+  verified: boolean;
+  /** Bridge methods the manifest declares it may use (informational). */
+  permissions: string[];
 }
 
 const FETCH_TIMEOUT_MS = 8000;
@@ -43,20 +61,62 @@ function pickTitle(html: string): string | null {
   return title ? title.slice(0, 60) : null;
 }
 
-/** Fetch title + icon for an app URL. Never throws — {null, null} on failure. */
-export async function fetchAppMeta(url: string): Promise<AppMeta> {
+async function fetchText(url: string, accept: string): Promise<string | null> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
   try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
-    try {
-      const res = await fetch(url, { signal: ctrl.signal, headers: { Accept: 'text/html' } });
-      if (!res.ok) return { title: null, icon: null };
-      const html = (await res.text()).slice(0, MAX_HTML_BYTES);
-      return { title: pickTitle(html), icon: pickIcon(html, res.url || url) };
-    } finally {
-      clearTimeout(timer);
-    }
+    const res = await fetch(url, { signal: ctrl.signal, headers: { Accept: accept } });
+    if (!res.ok) return null;
+    return (await res.text()).slice(0, MAX_HTML_BYTES);
   } catch {
-    return { title: null, icon: null };
+    return null;
+  } finally {
+    clearTimeout(timer);
   }
+}
+
+/** The manifest URL for a launch URL: `freeport.json` next to the app page. */
+export function manifestUrl(launchUrl: string): string | null {
+  try {
+    const u = new URL('freeport.json', launchUrl);
+    return u.protocol === 'https:' ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+function parseManifest(text: string, base: string): AppMeta | null {
+  let m: unknown;
+  try { m = JSON.parse(text); } catch { return null; }
+  if (!m || typeof m !== 'object') return null;
+  const o = m as Record<string, unknown>;
+  const name = typeof o.name === 'string' ? o.name.replace(/\s+/g, ' ').trim().slice(0, 60) : '';
+  if (!name) return null; // name is the one hard requirement
+  let icon: string | null = null;
+  if (typeof o.icon === 'string' && o.icon) {
+    try {
+      const u = new URL(o.icon, base);
+      if (u.protocol === 'https:') icon = u.toString();
+    } catch { /* bad icon → tile falls back */ }
+  }
+  const permissions = Array.isArray(o.permissions)
+    ? o.permissions.filter((p): p is string => (BRIDGE_METHODS as readonly string[]).includes(p as string))
+    : [];
+  return { title: name, icon, verified: true, permissions };
+}
+
+/** Probe an app URL: manifest first (⇒ verified), HTML fallback (⇒ not).
+ *  Never throws — worst case {title:null, icon:null, verified:false}. */
+export async function fetchAppMeta(url: string): Promise<AppMeta> {
+  const mUrl = manifestUrl(url);
+  if (mUrl) {
+    const text = await fetchText(mUrl, 'application/json');
+    if (text) {
+      const meta = parseManifest(text, mUrl);
+      if (meta) return meta;
+    }
+  }
+  const html = await fetchText(url, 'text/html');
+  if (!html) return { title: null, icon: null, verified: false, permissions: [] };
+  return { title: pickTitle(html), icon: pickIcon(html, url), verified: false, permissions: [] };
 }

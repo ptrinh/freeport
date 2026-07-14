@@ -930,5 +930,10 @@ const c: Record<string, string> = {
   "Title is required.": "请填写标题。",
   "Drag apps to rearrange. Tap ✕ to remove.": "拖动应用以重新排列。点按 ✕ 移除。",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "暂无应用 — 点按\"添加应用\"，通过网址或二维码添加。",
+  "Mini-app manifest found": "已找到小程序清单",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "未找到小程序清单 — 这可能是一个普通网站。仅在您信任时才添加。",
+  "May request": "可能请求",
+  "Unverified": "未验证",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "此页面未使用任何 Freeport 功能 — 它可能不是小程序。",
 };
 export default c;

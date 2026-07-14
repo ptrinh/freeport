@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "Sarlavha talab qilinadi.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Qayta tartiblash uchun ilovalarni suring. Olib tashlash uchun ✕ ni bosing.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Hozircha ilova yo'q — URL yoki QR kod orqali qo'shish uchun \"Ilova qo'shish\" ni bosing.",
+  "Mini-app manifest found": "Mini-ilova manifesti topildi",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Mini-ilova manifesti topilmadi — bu oddiy veb-sayt bo'lishi mumkin. Faqat unga ishonsangiz qo'shing.",
+  "May request": "So'rashi mumkin",
+  "Unverified": "Tasdiqlanmagan",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Bu sahifa hech qanday Freeport funksiyasidan foydalanmadi — u mini-ilova bo'lmasligi mumkin.",
 };
 export default c;

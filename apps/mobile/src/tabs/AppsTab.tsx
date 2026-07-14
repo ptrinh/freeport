@@ -101,6 +101,7 @@ export function AppsTab({
   const [url, setUrl] = useState('https://');
   const [pendingInput, setPendingInput] = useState('');
   const [pendingIcon, setPendingIcon] = useState<string | undefined>(undefined);
+  const [pendingMeta, setPendingMeta] = useState<{ verified: boolean; permissions: string[] }>({ verified: false, permissions: [] });
   const [title, setTitle] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -125,7 +126,7 @@ export function AppsTab({
   };
 
   const closeAddSheet = () => {
-    setAddStep(null); setErr(''); setBusy(false); setPendingInput(''); setPendingIcon(undefined); setTitle('');
+    setAddStep(null); setErr(''); setBusy(false); setPendingInput(''); setPendingIcon(undefined); setPendingMeta({ verified: false, permissions: [] }); setTitle('');
   };
 
   /** Step 1 → 2: validate the URL, probe it for a title + icon. */
@@ -148,6 +149,7 @@ export function AppsTab({
     // itself falls back to a letter glyph if that image never loads.
     setPendingIcon(meta.icon ?? `${origin}/favicon.ico`);
     setTitle(meta.title ?? new URL(origin).hostname.replace(/^www\./, ''));
+    setPendingMeta({ verified: meta.verified, permissions: meta.permissions });
     setAddStep('confirm');
   };
 
@@ -160,7 +162,7 @@ export function AppsTab({
     try {
       // Register with the full input so the launch URL keeps its path
       // (permissions are still keyed by origin inside the firewall).
-      fw.registerApp(pendingInput, name.slice(0, 60), Date.now(), pendingIcon);
+      fw.registerApp(pendingInput, name.slice(0, 60), Date.now(), pendingIcon, pendingMeta.verified);
     } catch {
       setErr(t('This app is on the community blocklist.'));
       return;
@@ -314,6 +316,22 @@ export function AppsTab({
               <View style={{ alignItems: 'center', marginTop: 12 }}>
                 <TileIcon icon={pendingIcon} name={title || '?'} seed={pendingInput} />
                 <Text style={[s.dim, { marginTop: 6 }]} numberOfLines={1}>{pendingInput.replace('https://', '')}</Text>
+                {pendingMeta.verified ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 }}>
+                    <Ionicons name="shield-checkmark" size={14} color="#10b981" />
+                    <Text style={[s.dim, { color: '#10b981' }]}>{t('Mini-app manifest found')}</Text>
+                  </View>
+                ) : (
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 5, marginTop: 6, paddingHorizontal: 4 }}>
+                    <Ionicons name="warning-outline" size={14} color="#f59e0b" style={{ marginTop: 2 }} />
+                    <Text style={[s.dim, { color: '#f59e0b', flex: 1 }]}>{t('No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.')}</Text>
+                  </View>
+                )}
+                {pendingMeta.permissions.length > 0 ? (
+                  <Text style={[s.dim, { marginTop: 6, paddingHorizontal: 4 }]} numberOfLines={3}>
+                    {t('May request')}: {pendingMeta.permissions.join(', ')}
+                  </Text>
+                ) : null}
                 <TextInput
                   style={[s.input, { alignSelf: 'stretch', marginTop: 10 }]}
                   value={title}

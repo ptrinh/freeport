@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "தலைப்பு தேவை.",
   "Drag apps to rearrange. Tap ✕ to remove.": "மறுவரிசைப்படுத்த ஆப்ஸை இழுக்கவும். அகற்ற ✕ ஐ தட்டவும்.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "இன்னும் ஆப்ஸ் இல்லை — URL அல்லது QR குறியீடு மூலம் சேர்க்க \"ஆப் சேர்\" ஐ தட்டவும்.",
+  "Mini-app manifest found": "மினி ஆப் manifest கண்டறியப்பட்டது",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "மினி ஆப் manifest எதுவும் கண்டறியப்படவில்லை — இது ஒரு சாதாரண இணையதளமாக இருக்கலாம். நீங்கள் நம்பினால் மட்டுமே இதைச் சேர்க்கவும்.",
+  "May request": "கோரலாம்",
+  "Unverified": "சரிபார்க்கப்படவில்லை",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "இந்தப் பக்கம் எந்த Freeport அம்சத்தையும் பயன்படுத்தவில்லை — இது மினி ஆப் அல்லாமல் இருக்கலாம்.",
 };
 export default c;

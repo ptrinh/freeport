@@ -930,5 +930,10 @@ const c: Record<string, string> = {
   "Title is required.": "제목은 필수입니다.",
   "Drag apps to rearrange. Tap ✕ to remove.": "앱을 드래그하여 재정렬하세요. ✕를 탭하여 제거하세요.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "아직 앱이 없습니다 — \"앱 추가\"를 탭하여 URL 또는 QR 코드로 추가하세요.",
+  "Mini-app manifest found": "미니앱 매니페스트를 찾음",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "미니앱 매니페스트를 찾을 수 없음 — 일반 웹사이트일 수 있습니다. 신뢰하는 경우에만 추가하세요.",
+  "May request": "요청 가능",
+  "Unverified": "미확인",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "이 페이지는 Freeport 기능을 사용하지 않았습니다 — 미니앱이 아닐 수 있습니다.",
 };
 export default c;

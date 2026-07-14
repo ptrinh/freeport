@@ -65,4 +65,23 @@ export const MINIAPP_SHIM = `(function () {
     },
     sendPayment: function (paymentRequest) { return rpc('webln.sendPayment', { invoice: paymentRequest }); }
   };
+  // One-shot liveness ping: the first time page JS touches any of the three
+  // API globals, tell the shell "this page behaves like a mini-app". A page
+  // that never looks at them trips the shell's not-a-mini-app notice. Carries
+  // no authority — it only hides a warning banner.
+  var alive = false;
+  function hello() {
+    if (alive) return; alive = true;
+    try { window.ReactNativeWebView.postMessage('__fp_hello'); } catch (e) {}
+  }
+  ['nostr', 'webln', 'freeport'].forEach(function (k) {
+    var v = window[k];
+    try {
+      Object.defineProperty(window, k, {
+        configurable: true,
+        get: function () { hello(); return v; },
+        set: function (nv) { v = nv; }
+      });
+    } catch (e) {}
+  });
 })(); true;`;

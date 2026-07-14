@@ -1,0 +1,6 @@
+{
+  "name": "Freeport Insurance Store",
+  "icon": "icon.png",
+  "description": "Demo mini-app: travel insurance quotes priced from npub-derived reputation, paid in USDT/sats, with a PDF certificate.",
+  "permissions": ["getPublicKey", "freeport.getBalance", "freeport.getLocation", "freeport.paySpark", "freeport.saveFile"]
+}

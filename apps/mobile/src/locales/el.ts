@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "Ο τίτλος είναι υποχρεωτικός.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Σύρετε τις εφαρμογές για αναδιάταξη. Πατήστε ✕ για αφαίρεση.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Δεν υπάρχουν εφαρμογές ακόμη — πατήστε \"Προσθήκη εφαρμογής\" για προσθήκη μέσω URL ή κωδικού QR.",
+  "Mini-app manifest found": "Βρέθηκε δήλωση μίνι εφαρμογής",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Δεν βρέθηκε δήλωση μίνι εφαρμογής — αυτός μπορεί να είναι ένας συνηθισμένος ιστότοπος. Προσθέστε τον μόνο αν τον εμπιστεύεστε.",
+  "May request": "Μπορεί να ζητήσει",
+  "Unverified": "Μη επαληθευμένο",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Αυτή η σελίδα δεν χρησιμοποίησε καμία λειτουργία του Freeport — μπορεί να μην είναι μίνι εφαρμογή.",
 };
 export default c;

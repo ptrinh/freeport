@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "Атау міндетті.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Қайта реттеу үшін қолданбаларды сүйреңіз. Жою үшін ✕ түртіңіз.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Әзірге қолданба жоқ — URL немесе QR коды арқылы қосу үшін \"Қолданба қосу\" түртіңіз.",
+  "Mini-app manifest found": "Мини-қолданба манифесі табылды",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Мини-қолданба манифесі табылмады — бұл әдеттегі веб-сайт болуы мүмкін. Оған сенсеңіз ғана қосыңыз.",
+  "May request": "Сұрауы мүмкін",
+  "Unverified": "Расталмаған",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Бұл бет ешқандай Freeport мүмкіндігін пайдаланбады — ол мини-қолданба болмауы мүмкін.",
 };
 export default c;

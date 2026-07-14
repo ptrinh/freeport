@@ -930,5 +930,10 @@ const c: Record<string, string> = {
   "Title is required.": "Cần nhập tên.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Kéo ứng dụng để sắp xếp lại. Chạm ✕ để xóa.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Chưa có ứng dụng nào — chạm \"Thêm ứng dụng\" để thêm bằng URL hoặc mã QR.",
+  "Mini-app manifest found": "Đã tìm thấy manifest ứng dụng mini",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Không tìm thấy manifest ứng dụng mini — đây có thể là một trang web thông thường. Chỉ thêm nếu bạn tin tưởng nó.",
+  "May request": "Có thể yêu cầu",
+  "Unverified": "Chưa xác minh",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Trang này chưa dùng bất kỳ tính năng Freeport nào — có thể đây không phải ứng dụng mini.",
 };
 export default c;

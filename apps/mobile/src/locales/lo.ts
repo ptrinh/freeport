@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "ຕ້ອງການຊື່.",
   "Drag apps to rearrange. Tap ✕ to remove.": "ລາກແອັບເພື່ອຈັດລຽງໃໝ່. ແຕະ ✕ ເພື່ອລຶບ.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "ຍັງບໍ່ມີແອັບ — ແຕະ \"ເພີ່ມແອັບ\" ເພື່ອເພີ່ມດ້ວຍ URL ຫຼື ລະຫັດ QR.",
+  "Mini-app manifest found": "ພົບ manifest ຂອງມິນິແອັບ",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "ບໍ່ພົບ manifest ຂອງມິນິແອັບ — ນີ້ອາດເປັນເວັບໄຊທຳມະດາ ເພີ່ມມັນສະເພາະເມື່ອທ່ານໄວ້ວາງໃຈເທົ່ານັ້ນ",
+  "May request": "ອາດຮ້ອງຂໍ",
+  "Unverified": "ຍັງບໍ່ໄດ້ຢືນຢັນ",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "ໜ້ານີ້ບໍ່ໄດ້ໃຊ້ຄຸນສົມບັດ Freeport ໃດໆ — ມັນອາດບໍ່ແມ່ນມິນິແອັບ",
 };
 export default c;

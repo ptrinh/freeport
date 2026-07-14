@@ -75,6 +75,10 @@ export interface MiniAppRecord {
   /** Tile icon (https URL, often a CDN — any origin is fine: it's only ever
    *  rendered as an image, never executed). */
   icon?: string;
+  /** A valid freeport.json manifest was found when the app was added. A LABEL
+   *  for the UI (unverified apps show a warning chip) — never a policy input:
+   *  a hostile page can serve a perfect manifest. */
+  verified?: boolean;
   addedAt: number;
   perms: AppPermissions;
 }
@@ -215,7 +219,7 @@ export class MiniAppFirewall {
 
   // ── App registry ──────────────────────────────────────────────────────────
 
-  registerApp(input: string, name: string, now: number, icon?: string): MiniAppRecord {
+  registerApp(input: string, name: string, now: number, icon?: string, verified?: boolean): MiniAppRecord {
     const origin = normalizeOrigin(input);
     if (!origin) throw new Error('invalid origin');
     if (this.blocklist.has(origin)) throw new Error('blocklisted');
@@ -225,12 +229,13 @@ export class MiniAppFirewall {
       // Re-adding refreshes the display metadata but NEVER the grants.
       existing.name = name || existing.name;
       if (sanitizeIcon(icon)) existing.icon = sanitizeIcon(icon)!;
+      if (verified !== undefined) existing.verified = verified;
       return existing;
     }
     // A same-origin sibling already carries the origin's perms — share them.
     const sibling = this.appByOrigin(origin);
     const rec: MiniAppRecord = {
-      origin, url, name, icon: sanitizeIcon(icon), addedAt: now,
+      origin, url, name, icon: sanitizeIcon(icon), verified: !!verified, addedAt: now,
       perms: sibling?.perms
         ?? { pubkey: false, kinds: [], encryptPeers: [], decryptPeers: [], spendCapDaySats: 0, reads: [] },
     };
@@ -540,6 +545,7 @@ export class MiniAppFirewall {
           url,
           name: String(a.name ?? '').slice(0, 100),
           icon: sanitizeIcon(a.icon),
+          verified: !!a.verified,
           addedAt: Number(a.addedAt) || 0,
           perms,
         });

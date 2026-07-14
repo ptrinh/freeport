@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "כותרת נדרשת.",
   "Drag apps to rearrange. Tap ✕ to remove.": "גררו אפליקציות כדי לסדר מחדש. הקישו ✕ כדי להסיר.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "אין עדיין אפליקציות — הקישו \"הוסף אפליקציה\" כדי להוסיף לפי כתובת URL או קוד QR.",
+  "Mini-app manifest found": "נמצא מניפסט של מיני-אפליקציה",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "לא נמצא מניפסט של מיני-אפליקציה — ייתכן שזהו אתר רגיל. הוסף אותו רק אם אתה סומך עליו.",
+  "May request": "עשוי לבקש",
+  "Unverified": "לא מאומת",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "דף זה לא השתמש באף תכונה של Freeport — ייתכן שאינו מיני-אפליקציה.",
 };
 export default c;

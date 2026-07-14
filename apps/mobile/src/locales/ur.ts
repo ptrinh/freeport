@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "عنوان درکار ہے۔",
   "Drag apps to rearrange. Tap ✕ to remove.": "ترتیب بدلنے کے لیے ایپس کو گھسیٹیں۔ ہٹانے کے لیے ✕ پر ٹیپ کریں۔",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "ابھی کوئی ایپ نہیں — URL یا QR کوڈ سے شامل کرنے کے لیے \"ایپ شامل کریں\" پر ٹیپ کریں۔",
+  "Mini-app manifest found": "منی ایپ مینی فیسٹ مل گیا",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "کوئی منی ایپ مینی فیسٹ نہیں ملا — یہ ایک عام ویب سائٹ ہو سکتی ہے۔ اسے صرف اسی صورت میں شامل کریں جب آپ اس پر بھروسا کرتے ہوں۔",
+  "May request": "درخواست کر سکتا ہے",
+  "Unverified": "غیر تصدیق شدہ",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "اس صفحے نے کوئی Freeport خصوصیت استعمال نہیں کی — ممکن ہے یہ منی ایپ نہ ہو۔",
 };
 export default c;

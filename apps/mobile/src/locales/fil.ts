@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "Title is required.": "Kailangan ang pamagat.",
   "Drag apps to rearrange. Tap ✕ to remove.": "I-drag ang mga app para ayusin. I-tap ang ✕ para alisin.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Wala pang app — i-tap ang \"Magdagdag ng App\" para magdagdag sa pamamagitan ng URL o QR code.",
+  "Mini-app manifest found": "May nakitang manifest ng mini-app",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Walang nakitang manifest ng mini-app — maaaring ordinaryong website ito. Idagdag lang ito kung pinagkakatiwalaan mo.",
+  "May request": "Maaaring humiling",
+  "Unverified": "Hindi na-verify",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Hindi gumamit ang page na ito ng anumang feature ng Freeport — maaaring hindi ito mini-app.",
 };
 export default c;

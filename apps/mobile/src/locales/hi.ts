@@ -930,5 +930,10 @@ const c: Record<string, string> = {
   "Title is required.": "शीर्षक आवश्यक है।",
   "Drag apps to rearrange. Tap ✕ to remove.": "पुनर्व्यवस्थित करने के लिए ऐप्स खींचें। हटाने के लिए ✕ टैप करें।",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "अभी तक कोई ऐप नहीं — URL या QR कोड से जोड़ने के लिए \"ऐप जोड़ें\" टैप करें।",
+  "Mini-app manifest found": "मिनी-ऐप मैनिफेस्ट मिला",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "कोई मिनी-ऐप मैनिफेस्ट नहीं मिला — यह एक सामान्य वेबसाइट हो सकती है। इसे तभी जोड़ें जब आप इस पर भरोसा करते हों।",
+  "May request": "अनुरोध कर सकता है",
+  "Unverified": "असत्यापित",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "इस पेज ने कोई Freeport सुविधा उपयोग नहीं की — यह मिनी-ऐप नहीं भी हो सकता है।",
 };
 export default c;

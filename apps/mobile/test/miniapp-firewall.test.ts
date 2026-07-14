@@ -379,6 +379,17 @@ describe('persistence', () => {
     expect(f2.listApps().map((a) => a.origin)).toEqual(['https://c.example', APP, 'https://b.example']);
   });
 
+  it('verified flag round-trips and re-adding can upgrade it', () => {
+    const f = new MiniAppFirewall();
+    f.registerApp(APP, 'Rides', T0); // added without a manifest
+    expect(f.getApp(APP)!.verified).toBe(false);
+    const f2 = MiniAppFirewall.restore(f.serialize());
+    expect(f2.getApp(APP)!.verified).toBe(false);
+    f2.registerApp(APP, 'Rides', T0, undefined, true); // re-add, manifest now present
+    expect(f2.getApp(APP)!.verified).toBe(true);
+    expect(MiniAppFirewall.restore(f2.serialize()).getApp(APP)!.verified).toBe(true);
+  });
+
   it('two apps on the same origin are separate tiles sharing one grant set', () => {
     const f = new MiniAppFirewall();
     const shop = f.registerApp('https://freeport.network/esim-store/', 'eSIM', T0);

@@ -930,5 +930,10 @@ const c: Record<string, string> = {
   "Title is required.": "ต้องระบุชื่อ",
   "Drag apps to rearrange. Tap ✕ to remove.": "ลากแอปเพื่อจัดเรียงใหม่ แตะ ✕ เพื่อลบ",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "ยังไม่มีแอป — แตะ \"เพิ่มแอป\" เพื่อเพิ่มด้วย URL หรือรหัส QR",
+  "Mini-app manifest found": "พบ manifest ของมินิแอป",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "ไม่พบ manifest ของมินิแอป — นี่อาจเป็นเว็บไซต์ทั่วไป เพิ่มเฉพาะเมื่อคุณเชื่อถือเท่านั้น",
+  "May request": "อาจขอ",
+  "Unverified": "ยังไม่ยืนยัน",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "หน้านี้ไม่ได้ใช้ฟีเจอร์ Freeport ใด ๆ — อาจไม่ใช่มินิแอป",
 };
 export default c;

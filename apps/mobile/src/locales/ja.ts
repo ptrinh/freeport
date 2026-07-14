@@ -930,5 +930,10 @@ const c: Record<string, string> = {
   "Title is required.": "タイトルは必須です。",
   "Drag apps to rearrange. Tap ✕ to remove.": "アプリをドラッグして並べ替え。✕ をタップして削除。",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "アプリがまだありません — \"アプリを追加\" をタップして URL または QR コードで追加してください。",
+  "Mini-app manifest found": "ミニアプリのマニフェストが見つかりました",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "ミニアプリのマニフェストが見つかりません — 通常のウェブサイトの可能性があります。信頼できる場合のみ追加してください。",
+  "May request": "要求する可能性",
+  "Unverified": "未検証",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "このページはFreeportの機能を一度も使用していません — ミニアプリではない可能性があります。",
 };
 export default c;

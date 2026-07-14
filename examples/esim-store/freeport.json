@@ -1,0 +1,6 @@
+{
+  "name": "eSIM Demo Shop",
+  "icon": "icon.png",
+  "description": "Demo mini-app: buy an eSIM with your Freeport wallet (Spark/USDT or sats).",
+  "permissions": ["freeport.paySpark"]
+}

@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "Насловот е задолжителен.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Влечете апликации за прераспоредување. Допрете ✕ за отстранување.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Сè уште нема апликации — допрете \"Додај апликација\" за да додадете преку URL или QR код.",
+  "Mini-app manifest found": "Пронајден е манифест на мини-апликација",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Не е пронајден манифест на мини-апликација — ова можеби е обична веб-локација. Додајте ја само ако ѝ верувате.",
+  "May request": "Може да побара",
+  "Unverified": "Непотврдено",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Оваа страница не користела ниту една функција на Freeport — можеби не е мини-апликација.",
 };
 export default c;

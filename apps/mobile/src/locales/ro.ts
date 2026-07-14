@@ -890,5 +890,10 @@ const c: Record<string, string> = {
   "Title is required.": "Titlul este obligatoriu.",
   "Drag apps to rearrange. Tap ✕ to remove.": "Trage aplicațiile pentru a le rearanja. Atinge ✕ pentru a elimina.",
   "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Încă nu există aplicații — atinge \"Adaugă aplicație\" pentru a adăuga una prin URL sau cod QR.",
+  "Mini-app manifest found": "Manifest de mini-aplicație găsit",
+  "No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.": "Nu a fost găsit niciun manifest de mini-aplicație — acesta poate fi un site web obișnuit. Adaugă-l doar dacă ai încredere în el.",
+  "May request": "Poate solicita",
+  "Unverified": "Neverificat",
+  "This page hasn't used any Freeport features — it may not be a mini-app.": "Această pagină nu a folosit nicio funcție Freeport — este posibil să nu fie o mini-aplicație.",
 };
 export default c;

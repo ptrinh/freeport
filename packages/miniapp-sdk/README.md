@@ -20,6 +20,34 @@ re-validates every message, permissions are keyed to the browser-authenticated
 frame origin, and every sensitive action (signing, decrypting, paying) shows an
 approval dialog rendered in the parent DOM where the iframe cannot reach.
 
+## Manifest (`freeport.json`)
+
+Publish a manifest **next to your app's page** (resolved as
+`new URL('freeport.json', launchUrl)` — per-app, so several apps can share an
+origin):
+
+```json
+{
+  "name": "eSIM Demo Shop",
+  "icon": "icon.png",
+  "description": "Buy an eSIM with your Freeport wallet.",
+  "permissions": ["getPublicKey", "freeport.paySpark"]
+}
+```
+
+- `name` (required, ≤60 chars) and `icon` (path or https URL) drive the
+  launcher tile; `permissions` (optional) previews which bridge methods you
+  intend to call in the add-app dialog.
+- Serve it with `Access-Control-Allow-Origin: *` so the WEB shell can read it
+  cross-origin (the native shell has no CORS).
+- Apps **without** a manifest can still be added, but are labeled
+  **Unverified** at add time and in the shell header. The manifest is a
+  courtesy label, not a security boundary — the firewall judges every call
+  regardless.
+- The shell also watches for mini-app behavior at launch (the SDK acks the
+  handshake; the native shim pings on first API access). A page that never
+  touches the API shows a "may not be a mini-app" notice.
+
 Notes:
 
 - The SDK only activates when embedded (`window !== window.top` or an opener
