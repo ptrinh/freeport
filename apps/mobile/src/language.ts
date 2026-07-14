@@ -84,7 +84,7 @@ export const LANGUAGES: Language[] = [
   { code: 'uz', name: 'Uzbek', native: 'Oʻzbekcha' },
   // Hidden from the picker for now (kept as a catalog so existing users who
   // already selected it keep a fully-translated UI):
-  // { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt' },
+  { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt' },
 ];
 
 export const LANGUAGE_CODES: string[] = LANGUAGES.map((l) => l.code);

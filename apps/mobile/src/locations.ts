@@ -59,43 +59,39 @@ export const COUNTRIES: CountryData[] = [
   // FIRST in pickers, rendered with a globe instead of a flag. levels: 1 →
   // no state/city drill-down; currency falls back to USD.
   { code: 'XX', name: 'Other', levels: 1, states: {} },
-  // Vietnam is hidden from the location picker for now (pending legal review
-  // of the VN market). Functional per-country data (currency, dial codes,
-  // reverse-geocode language) is intentionally kept so posts/deals originating
-  // there still render correctly for everyone else.
-  // {
-  //   code: 'VN',
-  //   name: 'Vietnam',
-  //   levels: 2,
-  //   states: {
-  //     'Hồ Chí Minh': ['Quận 1', 'Quận 3', 'Quận 5', 'Quận 7', 'Bình Thạnh', 'Phú Nhuận', 'Thủ Đức', 'Gò Vấp', 'Tân Bình'],
-  //     'Hà Nội': ['Hoàn Kiếm', 'Ba Đình', 'Đống Đa', 'Cầu Giấy', 'Hai Bà Trưng', 'Tây Hồ', 'Long Biên', 'Hà Đông'],
-  //     'Đà Nẵng': ['Hải Châu', 'Thanh Khê', 'Sơn Trà', 'Ngũ Hành Sơn', 'Liên Chiểu'],
-  //     'Hải Phòng': ['Hồng Bàng', 'Lê Chân', 'Ngô Quyền', 'Hải An'],
-  //     'Cần Thơ': ['Ninh Kiều', 'Bình Thủy', 'Cái Răng'],
-  //     'Bình Dương': ['Thủ Dầu Một', 'Dĩ An', 'Thuận An'],
-  //     'Đồng Nai': ['Biên Hòa', 'Long Khánh'],
-  //     'Khánh Hòa': ['Nha Trang', 'Cam Ranh'],
-  //     'Lâm Đồng': ['Đà Lạt', 'Bảo Lộc'],
-  //     'Quảng Ninh': ['Hạ Long', 'Cẩm Phả', 'Móng Cái'],
-  //     'Thừa Thiên Huế': ['Huế'],
-  //     'Bà Rịa – Vũng Tàu': ['Vũng Tàu', 'Bà Rịa'],
-  //   },
-  // },
-  // Singapore is hidden from the location picker for now (same reasoning as
-  // Vietnam above). Functional per-country data (currency, dial codes) stays.
-  // {
-  //   code: 'SG',
-  //   name: 'Singapore',
-  //   levels: 1,
-  //   states: {
-  //     Central: ['Orchard', 'Newton', 'Bukit Timah', 'Toa Payoh', 'Bishan', 'Marina'],
-  //     East: ['Bedok', 'Tampines', 'Pasir Ris', 'Changi', 'Katong'],
-  //     'North-East': ['Hougang', 'Sengkang', 'Punggol', 'Serangoon', 'Ang Mo Kio'],
-  //     North: ['Woodlands', 'Yishun', 'Sembawang'],
-  //     West: ['Jurong East', 'Jurong West', 'Clementi', 'Bukit Batok', 'Choa Chu Kang'],
-  //   },
-  // },
+  // Re-enabled 2026-07 (was hidden pending legal review of the VN market).
+  {
+    code: 'VN',
+    name: 'Vietnam',
+    levels: 2,
+    states: {
+      'Hồ Chí Minh': ['Quận 1', 'Quận 3', 'Quận 5', 'Quận 7', 'Bình Thạnh', 'Phú Nhuận', 'Thủ Đức', 'Gò Vấp', 'Tân Bình'],
+      'Hà Nội': ['Hoàn Kiếm', 'Ba Đình', 'Đống Đa', 'Cầu Giấy', 'Hai Bà Trưng', 'Tây Hồ', 'Long Biên', 'Hà Đông'],
+      'Đà Nẵng': ['Hải Châu', 'Thanh Khê', 'Sơn Trà', 'Ngũ Hành Sơn', 'Liên Chiểu'],
+      'Hải Phòng': ['Hồng Bàng', 'Lê Chân', 'Ngô Quyền', 'Hải An'],
+      'Cần Thơ': ['Ninh Kiều', 'Bình Thủy', 'Cái Răng'],
+      'Bình Dương': ['Thủ Dầu Một', 'Dĩ An', 'Thuận An'],
+      'Đồng Nai': ['Biên Hòa', 'Long Khánh'],
+      'Khánh Hòa': ['Nha Trang', 'Cam Ranh'],
+      'Lâm Đồng': ['Đà Lạt', 'Bảo Lộc'],
+      'Quảng Ninh': ['Hạ Long', 'Cẩm Phả', 'Móng Cái'],
+      'Thừa Thiên Huế': ['Huế'],
+      'Bà Rịa – Vũng Tàu': ['Vũng Tàu', 'Bà Rịa'],
+    },
+  },
+  // Re-enabled 2026-07 (was hidden alongside Vietnam).
+  {
+    code: 'SG',
+    name: 'Singapore',
+    levels: 1,
+    states: {
+      Central: ['Orchard', 'Newton', 'Bukit Timah', 'Toa Payoh', 'Bishan', 'Marina'],
+      East: ['Bedok', 'Tampines', 'Pasir Ris', 'Changi', 'Katong'],
+      'North-East': ['Hougang', 'Sengkang', 'Punggol', 'Serangoon', 'Ang Mo Kio'],
+      North: ['Woodlands', 'Yishun', 'Sembawang'],
+      West: ['Jurong East', 'Jurong West', 'Clementi', 'Bukit Batok', 'Choa Chu Kang'],
+    },
+  },
   {
     code: 'TH',
     name: 'Thailand',
