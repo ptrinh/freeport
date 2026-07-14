@@ -13,10 +13,13 @@ import * as ExpoCore from 'expo-modules-core';
  *     — otherwise an `undefined?.()` call would mis-read as "absent" and hide
  *     the Scan button on binaries that DO ship the camera.
  */
-function hasExpoNativeModule(name: string): boolean {
+export function hasExpoNativeModule(name: string): boolean {
   try {
     const req = (ExpoCore as any).requireOptionalNativeModule;
-    if (typeof req === 'function') return !!req(name);
+    // Check BOTH layers: on some binaries requireOptionalNativeModule returns
+    // null even though the module sits in the JSI registry (Scan button
+    // missing on a 1.5.2 store build that demonstrably ships ExpoCamera).
+    if (typeof req === 'function' && !!req(name)) return true;
     return !!(globalThis as any).expo?.modules?.[name];
   } catch {
     return false;

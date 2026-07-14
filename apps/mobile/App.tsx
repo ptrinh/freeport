@@ -45,7 +45,7 @@ import {
 } from '@freeport/protocol';
 import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, restoreNsec } from './src/identity';
 import { createPasskeyIdentity, signInWithPasskey } from './src/passkey';
-import { restoreSettingsSync } from './src/relaySync';
+import { restoreSettingsSync, fillMissingProfileFromRelays } from './src/relaySync';
 import { dealFiat } from './src/wallet/fiatConvert';
 import { nsecEncode } from 'nostr-tools/nip19';
 import { restoreBackupText, buildCloudBundle, restoreFromBundleText } from './src/backup';
@@ -1324,7 +1324,10 @@ function AppInner() {
             }}
             onFinish={finishOnboarding}
             onRestore={async (text, passphrase) => {
-              await restoreBackupText(text, passphrase); // throws on bad file/passphrase
+              const sk = await restoreBackupText(text, passphrase); // throws on bad file/passphrase
+              // Old backups can predate the avatar — pull what the network
+              // already knows for any field the bundle left empty.
+              try { await fillMissingProfileFromRelays(sk); } catch { /* offline — local copy stands */ }
               finishOnboarding();
             }}
             onPasskeyCreate={async () => {
@@ -1338,7 +1341,8 @@ function AppInner() {
             onCloudRestore={async () => {
               const data = await cloudRestore();
               if (!data) return false; // no backup found
-              await restoreFromBundleText(data); // restores key + settings + saved addresses
+              const sk = await restoreFromBundleText(data); // restores key + settings + saved addresses
+              try { await fillMissingProfileFromRelays(sk); } catch { /* offline — local copy stands */ }
               finishOnboarding();
               return true;
             }}

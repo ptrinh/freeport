@@ -48,6 +48,45 @@ export async function publishSettingsSync(sk: Uint8Array, relays: string[] = DEF
 }
 
 /**
+ * Fill profile fields a restore left EMPTY from what the network already
+ * knows (sync bundle first, then the public kind:0). File/cloud bundles can
+ * predate the avatar — name and phone restore but the picture is missing
+ * (user report). Never overwrites fields the bundle did carry.
+ */
+export async function fillMissingProfileFromRelays(sk: Uint8Array, relays: string[] = DEFAULT_RELAYS): Promise<void> {
+  const current = await loadProfile();
+  if (current.picture && current.name && current.about && current.gallery.length) return;
+  const pk = getPublicKey(sk);
+  const pool = new SimplePool();
+  try {
+    let remote: Partial<UserProfile> | null = null;
+    const ev = await pool.get(relays, { kinds: [SYNC_KIND], authors: [pk], '#d': [SYNC_D] }).catch(() => null);
+    if (ev?.content) {
+      try { remote = JSON.parse(nip44.decrypt(ev.content, selfKey(sk)))?.profile ?? null; } catch { /* fall through */ }
+    }
+    if (!remote) {
+      const meta = await pool.get(relays, { kinds: [0], authors: [pk] }).catch(() => null);
+      if (meta?.content) {
+        try {
+          const k0 = JSON.parse(meta.content);
+          remote = { name: k0.name, picture: k0.picture, about: k0.about, gallery: Array.isArray(k0.gallery) ? k0.gallery : undefined };
+        } catch { /* unusable */ }
+      }
+    }
+    if (!remote) return;
+    await saveProfile({
+      ...current,
+      name: current.name || (remote.name ?? ''),
+      picture: current.picture || (remote.picture ?? ''),
+      about: current.about || (remote.about ?? ''),
+      gallery: current.gallery.length ? current.gallery : (remote.gallery ?? []),
+    });
+  } finally {
+    pool.close(relays);
+  }
+}
+
+/**
  * Pull settings for a freshly signed-in key. Applies the encrypted sync
  * bundle when one exists; otherwise falls back to the public kind:0 profile
  * so at least the visible identity survives. Best-effort: resolves false

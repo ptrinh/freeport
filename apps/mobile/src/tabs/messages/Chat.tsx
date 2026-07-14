@@ -113,6 +113,7 @@ function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
     uiAlert(t('Voice memo'), e instanceof Error ? e.message : undefined);
   };
   const waveWidth = useRef(0);
+  const waveRef = useRef<any>(null);
   const rate = st.rate ?? 1;
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, minWidth: 190, paddingVertical: 2 }}>
@@ -135,12 +136,23 @@ function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
       </Pressable>
       {/* Tap anywhere on the waveform to jump there (WhatsApp scrubbing). */}
       <Pressable
+        ref={waveRef}
         style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2.5, height: 26 }}
         onLayout={(e) => { waveWidth.current = e.nativeEvent.layout.width; }}
         accessibilityRole="adjustable" accessibilityLabel={t('Voice memo')}
         onPress={(e) => {
-          const x = e.nativeEvent.locationX ?? 0;
-          if (waveWidth.current > 0) seekVoice(url, x / waveWidth.current, onStatus).catch(fail);
+          const w = waveWidth.current;
+          if (w <= 0) return;
+          const jump = (x: number) => seekVoice(url, Math.max(0, Math.min(1, x / w)), onStatus).catch(fail);
+          // RN-web clicks carry no locationX (it read as 0 → every tap
+          // restarted the clip, user report). Fall back to the DOM offsetX,
+          // then to pageX minus the measured container edge.
+          const ne = e.nativeEvent as any;
+          if (typeof ne.locationX === 'number' && ne.locationX > 0) jump(ne.locationX);
+          else if (typeof ne.offsetX === 'number' && ne.offsetX > 0) jump(ne.offsetX);
+          else if (typeof ne.pageX === 'number' && (waveRef.current as any)?.measureInWindow) {
+            (waveRef.current as any).measureInWindow((wx: number) => jump(ne.pageX - wx));
+          }
         }}
       >
         {bars.map((h, i) => (

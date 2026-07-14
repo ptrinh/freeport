@@ -47,6 +47,12 @@ function fmtRowTime(ts: number): string {
   return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 }
 
+/** "npub1e…6yq8" — enough to spot an imposter reusing a friend's name. */
+function shortNpub(peerHex: string): string {
+  const np = npubFromHex(peerHex);
+  return np.slice(0, 6) + '…' + np.slice(-4);
+}
+
 function lastLine(conv: Conversation): string {
   const m = conv.messages[conv.messages.length - 1];
   if (!m) return t('Say hello 👋');
@@ -108,6 +114,7 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
           <Avatar uri={avatarUri(c, client)} />
           <View style={{ flex: 1 }}>
             <Text style={s.cardTitle} numberOfLines={1}>{chatDisplayName(c, client)}</Text>
+            <Text style={[s.dim, { fontSize: 10 }]} numberOfLines={1}>{shortNpub(c.peer)}</Text>
             <Text style={s.dim}>{t('wants to chat with you')}</Text>
           </View>
           <Pressable
@@ -132,7 +139,10 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
           <Pressable key={c.peer} style={[s.card, { marginHorizontal: 0, flexDirection: 'row', alignItems: 'center', gap: 10 }]} onPress={() => onOpen(c.peer)}>
             <Avatar uri={avatarUri(c, client)} />
             <View style={{ flex: 1 }}>
-              <Text style={s.cardTitle} numberOfLines={1}>{chatDisplayName(c, client)}</Text>
+              <View style={[s.row, { alignItems: 'baseline', gap: 6 }]}>
+                <Text style={[s.cardTitle, { flexShrink: 1 }]} numberOfLines={1}>{chatDisplayName(c, client)}</Text>
+                <Text style={[s.dim, { fontSize: 10 }]} numberOfLines={1}>{shortNpub(c.peer)}</Text>
+              </View>
               <Text style={s.dim} numberOfLines={1}>
                 {c.state === 'pending_out' ? t('Invite sent — waiting for accept') : lastLine(c)}
               </Text>
@@ -255,7 +265,10 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
           </Pressable>
           <Avatar uri={avatarUri(conv, client)} size={32} />
           <View style={{ flexShrink: 1 }}>
-            <Text style={s.cardTitle} numberOfLines={1}>{chatDisplayName(conv, client)}</Text>
+            <View style={[s.row, { alignItems: 'baseline', gap: 6 }]}>
+              <Text style={[s.cardTitle, { flexShrink: 1 }]} numberOfLines={1}>{chatDisplayName(conv, client)}</Text>
+              <Text style={[s.dim, { fontSize: 10 }]} numberOfLines={1}>{shortNpub(conv.peer)}</Text>
+            </View>
             {online ? (
               <View style={[s.row, { gap: 3, alignItems: 'center', marginTop: 1 }]}>
                 <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: '#22c55e' }} />
