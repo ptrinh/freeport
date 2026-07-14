@@ -164,19 +164,22 @@ const splash = `    <div id="ft-splash">
 `;
 const reg = `    <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
     <script>
-      // Self-heal a mid-deploy reload: if the hash-named bundle 404s (Pages
-      // serves the SPA fallback as text/html and the browser refuses to run
-      // it), retry once after a beat — by then the new deploy has propagated.
+      // Self-heal a mid-deploy reload: if the APP BUNDLE fails to run (Pages
+      // serves the SPA fallback as text/html during edge propagation), retry
+      // ONCE. Strictly guarded — only _expo bundle scripts, only while the
+      // splash is still up (app never mounted), one retry per session, flag
+      // never auto-cleared (a v1 that reloaded on ANY script error and
+      // re-armed on load caused an infinite refresh loop).
       window.addEventListener("error", function (e) {
         var el = e.target;
-        if (el && el.tagName === "SCRIPT" && el.src && !sessionStorage.getItem("ft-bundle-retry")) {
-          sessionStorage.setItem("ft-bundle-retry", "1");
-          var l = document.querySelector("#ft-splash .ft-load");
-          if (l) l.textContent = "Updating";
-          setTimeout(function () { location.reload(); }, 2500);
-        }
+        if (!el || el.tagName !== "SCRIPT" || !el.src || el.src.indexOf("/_expo/") === -1) return;
+        if (!document.getElementById("ft-splash")) return; // app already mounted — never reload under the user
+        var k = "ft-bundle-retry";
+        try { if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k, "1"); } catch (_) { return; }
+        var l = document.querySelector("#ft-splash .ft-load");
+        if (l) l.textContent = "Updating";
+        setTimeout(function () { location.reload(); }, 2500);
       }, true);
-      window.addEventListener("load", function () { try { sessionStorage.removeItem("ft-bundle-retry"); } catch (_) {} });
     </script>
 `;
 // Disable user scaling so pinch/double-tap zoom is off (native-app feel), and
