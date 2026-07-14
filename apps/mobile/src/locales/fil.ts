@@ -824,5 +824,7 @@ const c: Record<string, string> = {
   "Attach file": "Maglakip ng file",
   "This file type is not allowed for safety reasons.": "Hindi pinapayagan ang uri ng file na ito para sa mga kadahilanang pangkaligtasan.",
   "Menu": "Menu",
+  "Speak instead of typing": "Magsalita sa halip na mag-type",
+  "Voice input uses your browser's dictation.": "Gumagamit ang voice input ng diktasyon ng iyong browser.",
 };
 export default c;

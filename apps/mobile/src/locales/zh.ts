@@ -867,5 +867,7 @@ const c: Record<string, string> = {
   "Attach file": "附加文件",
   "This file type is not allowed for safety reasons.": "出于安全原因，不允许此文件类型。",
   "Menu": "菜单",
+  "Speak instead of typing": "用说话代替打字",
+  "Voice input uses your browser's dictation.": "语音输入使用浏览器的听写功能。",
 };
 export default c;

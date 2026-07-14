@@ -824,5 +824,7 @@ const c: Record<string, string> = {
   "Attach file": "ແນບໄຟລ໌",
   "This file type is not allowed for safety reasons.": "ບໍ່ອະນຸຍາດໄຟລ໌ປະເພດນີ້ ດ້ວຍເຫດຜົນດ້ານຄວາມປອດໄພ.",
   "Menu": "ເມນູ",
+  "Speak instead of typing": "ເວົ້າແທນການພິມ",
+  "Voice input uses your browser's dictation.": "ການປ້ອນສຽງໃຊ້ການບອກຄຳຂອງໂປຣແກຣມທ່ອງເວັບຂອງທ່ານ.",
 };
 export default c;

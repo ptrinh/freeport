@@ -1651,6 +1651,7 @@ function AppInner() {
       {showConcierge && (
         <ConciergeSheet
           ctx={{ servicesEnabled, defaultCurrency }}
+          lang={language || systemLanguage()}
           onDraft={(draft) => {
             setShowConcierge(false);
             setPostDraft(draft); // PostTab prefills exactly like a Repost

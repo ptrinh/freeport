@@ -824,5 +824,7 @@ const c: Record<string, string> = {
   "Attach file": "ფაილის მიმაგრება",
   "This file type is not allowed for safety reasons.": "ამ ტიპის ფაილი უსაფრთხოების მიზეზების გამო დაუშვებელია.",
   "Menu": "მენიუ",
+  "Speak instead of typing": "აკრეფის ნაცვლად ისაუბრეთ",
+  "Voice input uses your browser's dictation.": "ხმოვანი შეყვანა იყენებს თქვენი ბრაუზერის კარნახს.",
 };
 export default c;

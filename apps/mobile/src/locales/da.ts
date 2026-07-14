@@ -827,5 +827,7 @@ const c: Record<string, string> = {
   "Attach file": "Vedhæft fil",
   "This file type is not allowed for safety reasons.": "Denne filtype er ikke tilladt af sikkerhedsmæssige årsager.",
   "Menu": "Menu",
+  "Speak instead of typing": "Tal i stedet for at skrive",
+  "Voice input uses your browser's dictation.": "Stemmeinput bruger diktering i din browser.",
 };
 export default c;

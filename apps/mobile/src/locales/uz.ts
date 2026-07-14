@@ -824,5 +824,7 @@ const c: Record<string, string> = {
   "Attach file": "Fayl biriktirish",
   "This file type is not allowed for safety reasons.": "Bu fayl turi xavfsizlik sabablari tufayli ruxsat etilmagan.",
   "Menu": "Menyu",
+  "Speak instead of typing": "Yozish o'rniga gapiring",
+  "Voice input uses your browser's dictation.": "Ovozli kiritish brauzeringizning diktovka funksiyasidan foydalanadi.",
 };
 export default c;

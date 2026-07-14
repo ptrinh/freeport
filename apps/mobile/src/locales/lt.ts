@@ -828,5 +828,7 @@ const c: Record<string, string> = {
   "Attach file": "Pridėti failą",
   "This file type is not allowed for safety reasons.": "Šis failo tipas neleidžiamas saugumo sumetimais.",
   "Menu": "Meniu",
+  "Speak instead of typing": "Kalbėkite, o ne rašykite",
+  "Voice input uses your browser's dictation.": "Balso įvestis naudoja jūsų naršyklės diktavimą.",
 };
 export default c;

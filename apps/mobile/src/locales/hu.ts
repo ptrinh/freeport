@@ -827,5 +827,7 @@ const c: Record<string, string> = {
   "Attach file": "Fájl csatolása",
   "This file type is not allowed for safety reasons.": "Ez a fájltípus biztonsági okokból nem engedélyezett.",
   "Menu": "Menü",
+  "Speak instead of typing": "Beszélj gépelés helyett",
+  "Voice input uses your browser's dictation.": "A hangbevitel a böngésződ diktálási funkcióját használja.",
 };
 export default c;

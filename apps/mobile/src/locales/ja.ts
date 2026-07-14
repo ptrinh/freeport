@@ -867,5 +867,7 @@ const c: Record<string, string> = {
   "Attach file": "ファイルを添付",
   "This file type is not allowed for safety reasons.": "この種類のファイルは安全上の理由で許可されていません。",
   "Menu": "メニュー",
+  "Speak instead of typing": "入力する代わりに話す",
+  "Voice input uses your browser's dictation.": "音声入力はブラウザの音声認識を使用します。",
 };
 export default c;

@@ -824,5 +824,7 @@ const c: Record<string, string> = {
   "Attach file": "Lampirkan fail",
   "This file type is not allowed for safety reasons.": "Jenis fail ini tidak dibenarkan atas sebab keselamatan.",
   "Menu": "Menu",
+  "Speak instead of typing": "Bercakap dan bukan menaip",
+  "Voice input uses your browser's dictation.": "Input suara menggunakan imlak pelayar anda.",
 };
 export default c;

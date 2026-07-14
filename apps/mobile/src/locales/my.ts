@@ -824,5 +824,7 @@ const c: Record<string, string> = {
   "Attach file": "ဖိုင်ပူးတွဲရန်",
   "This file type is not allowed for safety reasons.": "လုံခြုံရေးအကြောင်းပြချက်ကြောင့် ဤဖိုင်အမျိုးအစားကို ခွင့်မပြုပါ။",
   "Menu": "မီနူး",
+  "Speak instead of typing": "ရိုက်နှိပ်မည့်အစား ပြောပါ",
+  "Voice input uses your browser's dictation.": "အသံဖြင့်ထည့်သွင်းခြင်းသည် သင့်ဘရောက်ဆာ၏ အသံဖြင့်စာရိုက်ခြင်းကို အသုံးပြုသည်။",
 };
 export default c;

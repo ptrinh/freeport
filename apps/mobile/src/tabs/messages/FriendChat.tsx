@@ -23,7 +23,7 @@ import { webBase } from '../../webBase';
 import { fmtClock } from '../../ui/format';
 import { s, palette } from '../../ui/theme';
 import { confirmAsync } from '../../ui/alerts';
-import { ChatCore, SAFE_ATTACH_EXTENSIONS } from './Chat';
+import { ChatCore, SAFE_ATTACH_EXTENSIONS, isAudioMsg, isImageMsg, isTripMsg, isDocMsg, docMsgName } from './Chat';
 import { uploadFile, UploadError } from '../../upload';
 
 /** Display name: their invite/accept name → kind:0 profile → npub prefix. */
@@ -49,7 +49,13 @@ function lastLine(conv: Conversation): string {
   const m = conv.messages[conv.messages.length - 1];
   if (!m) return t('Say hello 👋');
   const prefix = m.dir === 'out' ? t('You') + ': ' : '';
-  return prefix + (m.text.length > 60 ? m.text.slice(0, 57) + '…' : m.text);
+  // Media messages are URLs on the wire — show a friendly label, not the link.
+  const body = isAudioMsg(m.text) ? '🎙 ' + t('Voice memo')
+    : isImageMsg(m.text) ? '📷 ' + t('Photo')
+    : isTripMsg(m.text) ? '📍 ' + t('Live location')
+    : isDocMsg(m.text) ? '📄 ' + docMsgName(m.text)
+    : m.text;
+  return prefix + (body.length > 60 ? body.slice(0, 57) + '…' : body);
 }
 
 function Avatar({ uri, size = 44 }: { uri: string; size?: number }) {
@@ -230,7 +236,11 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
   );
   return (
     <Modal visible transparent={false} animationType="slide" onRequestClose={onClose}>
-      <View style={[s.appShell, { flex: 1 }]}>
+      {/* Same shell + centered phone-width column as the main app — RN-web
+          modals portal outside #freeport-shell, so without this the content
+          shrink-wrapped narrow and lost the side backdrop (user report). */}
+      <View nativeID="freeport-shell-modal" style={s.appShell}>
+        <View style={s.root}>
         {/* Compact header: name + tight presence line, ONLY call/video icons
             inline, everything else behind the burger menu (user request). */}
         <View style={[s.row, { paddingHorizontal: 12, paddingVertical: 7, gap: 8, borderBottomWidth: 1, borderBottomColor: palette.border, alignItems: 'center' }]}>
@@ -329,6 +339,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
             translateTo={translateTo}
           />
         </KeyboardAvoidingView>
+        </View>
       </View>
     </Modal>
   );

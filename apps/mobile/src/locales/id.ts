@@ -867,5 +867,7 @@ const c: Record<string, string> = {
   "Attach file": "Lampirkan file",
   "This file type is not allowed for safety reasons.": "Jenis file ini tidak diizinkan karena alasan keamanan.",
   "Menu": "Menu",
+  "Speak instead of typing": "Bicara alih-alih mengetik",
+  "Voice input uses your browser's dictation.": "Input suara menggunakan dikte peramban Anda.",
 };
 export default c;

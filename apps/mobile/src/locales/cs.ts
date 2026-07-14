@@ -830,5 +830,7 @@ const c: Record<string, string> = {
   "Attach file": "Připojit soubor",
   "This file type is not allowed for safety reasons.": "Tento typ souboru není z bezpečnostních důvodů povolen.",
   "Menu": "Nabídka",
+  "Speak instead of typing": "Mluvte místo psaní",
+  "Voice input uses your browser's dictation.": "Hlasový vstup využívá diktování ve vašem prohlížeči.",
 };
 export default c;

@@ -827,5 +827,7 @@ const c: Record<string, string> = {
   "Attach file": "Allega file",
   "This file type is not allowed for safety reasons.": "Questo tipo di file non è consentito per motivi di sicurezza.",
   "Menu": "Menu",
+  "Speak instead of typing": "Parla invece di digitare",
+  "Voice input uses your browser's dictation.": "L'input vocale usa la dettatura del tuo browser.",
 };
 export default c;

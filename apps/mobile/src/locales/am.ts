@@ -824,5 +824,7 @@ const c: Record<string, string> = {
   "Attach file": "ፋይል አያይዝ",
   "This file type is not allowed for safety reasons.": "ይህ የፋይል ዓይነት ለደህንነት ሲባል አይፈቀድም።",
   "Menu": "ምናሌ",
+  "Speak instead of typing": "ከመተየብ ይልቅ ይናገሩ",
+  "Voice input uses your browser's dictation.": "የድምፅ ግቤት የአሳሽዎን ንግግር-ወደ-ጽሑፍ ይጠቀማል።",
 };
 export default c;

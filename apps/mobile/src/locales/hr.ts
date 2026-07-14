@@ -827,5 +827,7 @@ const c: Record<string, string> = {
   "Attach file": "Priloži datoteku",
   "This file type is not allowed for safety reasons.": "Ova vrsta datoteke nije dopuštena iz sigurnosnih razloga.",
   "Menu": "Izbornik",
+  "Speak instead of typing": "Govorite umjesto tipkanja",
+  "Voice input uses your browser's dictation.": "Glasovni unos koristi diktiranje vašeg preglednika.",
 };
 export default c;

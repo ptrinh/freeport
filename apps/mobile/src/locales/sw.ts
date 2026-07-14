@@ -824,5 +824,7 @@ const c: Record<string, string> = {
   "Attach file": "Ambatisha faili",
   "This file type is not allowed for safety reasons.": "Aina hii ya faili hairuhusiwi kwa sababu za usalama.",
   "Menu": "Menyu",
+  "Speak instead of typing": "Zungumza badala ya kuandika",
+  "Voice input uses your browser's dictation.": "Ingizo la sauti hutumia uandishi kwa sauti wa kivinjari chako.",
 };
 export default c;

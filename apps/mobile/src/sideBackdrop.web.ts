@@ -113,5 +113,7 @@ export function applySideBackdrop(stroke: string, seed = ''): void {
   // Targets the appShell (nativeID="freeport-shell" → DOM id). The centred
   // column has its own opaque bg on top, so the pattern only shows in the
   // blank side margins.
-  el.textContent = `#freeport-shell{background-image:url("${uri}");background-repeat:repeat;background-position:center top;}`;
+  // Both the main shell AND full-screen modals (chat window) — RN-web Modals
+  // portal OUTSIDE #freeport-shell, which lost the pattern (user report).
+  el.textContent = `#freeport-shell,#freeport-shell-modal{background-image:url("${uri}");background-repeat:repeat;background-position:center top;}`;
 }

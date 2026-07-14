@@ -827,5 +827,7 @@ const c: Record<string, string> = {
   "Attach file": "Lisa fail",
   "This file type is not allowed for safety reasons.": "See failitüüp ei ole turvakaalutlustel lubatud.",
   "Menu": "Menüü",
+  "Speak instead of typing": "Räägi trükkimise asemel",
+  "Voice input uses your browser's dictation.": "Häälsisend kasutab sinu brauseri dikteerimist.",
 };
 export default c;

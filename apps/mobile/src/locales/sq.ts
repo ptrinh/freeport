@@ -827,5 +827,7 @@ const c: Record<string, string> = {
   "Attach file": "Bashkëngjit skedar",
   "This file type is not allowed for safety reasons.": "Ky lloj skedari nuk lejohet për arsye sigurie.",
   "Menu": "Menyja",
+  "Speak instead of typing": "Flisni në vend që të shkruani",
+  "Voice input uses your browser's dictation.": "Hyrja me zë përdor diktimin e shfletuesit tuaj.",
 };
 export default c;

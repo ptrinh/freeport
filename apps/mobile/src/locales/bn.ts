@@ -824,5 +824,7 @@ const c: Record<string, string> = {
   "Attach file": "ফাইল সংযুক্ত করুন",
   "This file type is not allowed for safety reasons.": "নিরাপত্তার কারণে এই ফাইলের ধরন অনুমোদিত নয়।",
   "Menu": "মেনু",
+  "Speak instead of typing": "টাইপ করার বদলে বলুন",
+  "Voice input uses your browser's dictation.": "ভয়েস ইনপুট আপনার ব্রাউজারের ডিকটেশন ব্যবহার করে।",
 };
 export default c;
