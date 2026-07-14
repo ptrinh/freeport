@@ -50,7 +50,13 @@ export class FakeRelay {
   }
 
   subscribeMany(_relays: string[], filterOrFilters: Filter | Filter[], handlers: { onevent: (ev: Event) => void; oneose?: () => void }) {
-    const filters = Array.isArray(filterOrFilters) ? filterOrFilters : [filterOrFilters];
+    // Mirror the REAL SimplePool API: subscribeMany takes ONE filter. An
+    // array once slipped into production behind an `as any` and silently
+    // killed all DM delivery — the fake must be as strict as the real thing.
+    if (Array.isArray(filterOrFilters)) {
+      throw new Error('SimplePool.subscribeMany takes a single Filter — got an array (use one subscription per filter)');
+    }
+    const filters = [filterOrFilters];
     const sub: Sub = { filters, onevent: handlers.onevent, oneose: handlers.oneose, closed: false };
     this.subs.add(sub);
     for (const ev of this.events) {

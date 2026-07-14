@@ -780,20 +780,17 @@ export class MobileClient {
     // guard makes any overlap harmless.
     const floor = Math.floor(Date.now() / 1000) - DM_BACKFILL_MAX_SECONDS;
     const since = Math.max(floor, this.dmLastSeenTs - DM_BACKFILL_MARGIN_SECONDS);
-    // NIP-17: wrap timestamps are randomized up to ~2 days into the past
-    // (metadata privacy), so the 1059 filter reaches 2 days further back than
-    // the kind-4 one; rumor ids in seenEventIds make the overlap harmless.
-    const filters: any[] = [{ kinds: [4], '#p': [this.pubkey], since }];
-    if (this.nip17Supported()) filters.push({ kinds: [1059], '#p': [this.pubkey], since: since - 2 * 24 * 3600 });
-    const sub = this.pool.subscribeMany(
+    // SimplePool.subscribeMany takes ONE filter (an array here once slipped
+    // through behind an `as any` and silently killed ALL DM delivery on
+    // updated clients — the type error was real). Kind 4 and the NIP-17
+    // kind-1059 wraps are therefore two separate subscriptions; the 1059 one
+    // reaches 2 days further back because wrap timestamps are randomized
+    // into the past, and rumor-id replay guards make the overlap harmless.
+    const dmSub = this.pool.subscribeMany(
       this.relays,
-      filters as any,
+      { kinds: [4], '#p': [this.pubkey], since },
       {
         onevent: async (ev: Event) => {
-          if (ev.kind === 1059) {
-            this.processWrap(ev);
-            return;
-          }
           if (ev.created_at > this.dmLastSeenTs && ev.created_at <= this.watchStartTs + 300) {
             this.dmLastSeenTs = ev.created_at;
             void this.persistNegotiations(); // debounced; also writes dmLastSeen
@@ -808,7 +805,14 @@ export class MobileClient {
         },
       },
     );
-    return () => { clearInterval(sweepTimer); sub.close(); };
+    const wrapSub = this.nip17Supported()
+      ? this.pool.subscribeMany(
+          this.relays,
+          { kinds: [1059], '#p': [this.pubkey], since: since - 2 * 24 * 3600 },
+          { onevent: (ev: Event) => this.processWrap(ev) },
+        )
+      : null;
+    return () => { clearInterval(sweepTimer); dmSub.close(); wrapSub?.close(); };
   }
 
   /** Route one decrypted plaintext through the three envelope families. */

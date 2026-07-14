@@ -40,12 +40,13 @@ function makeUser(relay: FakeRelay) {
   return { client, signals, convs: () => [...client.conversations.values()] };
 }
 
-/** Wire spy: count events by kind as they hit the relay. */
+/** Wire spy: count events by kind as they hit the relay (one sub per
+ *  filter — the real subscribeMany takes a single Filter). */
 function kindSpy(relay: FakeRelay) {
   const counts = new Map<number, number>();
-  relay.subscribeMany(RELAY, [{ kinds: [4] }, { kinds: [1059] }] as any, {
-    onevent: (ev: Event) => counts.set(ev.kind, (counts.get(ev.kind) ?? 0) + 1),
-  });
+  const onevent = (ev: Event) => counts.set(ev.kind, (counts.get(ev.kind) ?? 0) + 1);
+  relay.subscribeMany(RELAY, { kinds: [4] } as any, { onevent });
+  relay.subscribeMany(RELAY, { kinds: [1059] } as any, { onevent });
   return (kind: number) => counts.get(kind) ?? 0;
 }
 
