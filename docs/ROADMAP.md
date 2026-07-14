@@ -17,8 +17,13 @@ reach old binaries that lack the module.
   manifest.
 - `react-native-webview` — for the mini-apps shell (and any embedded web flow).
 - `react-native-apple-llm` — Apple Foundation Models (iOS 26+) for the
-  on-device AI concierge (JS shipped; lights up on eligible devices once a
-  1.6.0+ binary is out).
+  on-device AI concierge + chat translate (JS shipped; lights up on eligible
+  devices once a 1.6.0+ binary is out).
+- `@react-native-ml-kit/translate-text` + `identify-languages` — Android
+  on-device translation (ML Kit, 58 languages, ~30MB packs, runs on
+  virtually every Android device — no Gemini Nano needed).
+- `react-native-gemini-nano` (+ config plugin) — Gemini Nano via AICore for
+  the Android concierge (Pixel 8+ hardware only).
 
 **Deliberately NOT pre-linked:**
 - Live Activity widget (iOS) — a Swift widget extension is a separate build
@@ -167,8 +172,11 @@ relay data. Roughly ordered by value-for-effort:
   Apple Foundation Models layer as the concierge — no cloud path at all, so
   the roadmap's leak warning is moot by construction. Serialized session use,
   per-(message, language) cache, null-safe (any failure just shows the
-  original). Needs a 1.6.0+ binary on Apple-Intelligence hardware; Android
-  follows with the Gemini Nano provider.
+  original). Needs a 1.6.0+ binary on Apple-Intelligence hardware. Android
+  SHIPPED too (ML Kit on-device translation — a dedicated translator, not an
+  LLM, so it bypasses the Local LLM AI switch; runs on virtually every
+  Android device). Chrome Android / Safari lack the Translator API — the row
+  self-hides on mobile web until they ship it.
 
 ### Non-goals (need a central operator)
 CUSTODIAL wallets/escrow (the self-custodial wallet has shipped — Breez Spark +
@@ -524,10 +532,12 @@ generation against a fixed schema) drafts the Post form via the same
 RepostDraft prefill the Repost feature uses — the human always reviews and
 posts. The request text never leaves the phone; there is deliberately NO
 hosted-model fallback. Module probe-gated (crash-class-#13 pattern); needs a
-1.6.0+ binary + Apple-Intelligence-capable hardware. Remaining: Android
-provider (Gemini Nano, once the Prompt API stabilises), watching offers /
-negotiation assistance (the `packages/agent` loop driven by language), and a
-deterministic template-parser tier for devices without any model.
+1.6.0+ binary + Apple-Intelligence-capable hardware. Android provider
+SHIPPED (react-native-gemini-nano / AICore, Pixel 8+ — no guided generation,
+so it prompts for strict JSON and parseToDraft rejects anything malformed).
+Remaining: watching offers / negotiation assistance (the `packages/agent`
+loop driven by language), and a deterministic template-parser tier for
+devices without any model.
 
 ## Persistent storefronts (NIP-15)
 
