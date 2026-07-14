@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Animated,
   Easing,
   findNodeHandle,
@@ -38,6 +37,7 @@ import { suggestPrice, estimateFare } from '../pricing';
 import { COUNTRY_NAME, type Currency } from '../locations';
 import { scrollNodeIntoView, type ScrollableNode } from '../scrollToNode';
 import { s, palette } from '../ui/theme';
+import { uiAlert } from '../ui/alerts';
 import { defaultIntentTime, fmtClock, fmtClockTitle, timeToWindow, snapToStep, shortPlace, myPostTitle, vehicleLabel, fmtPayment, parsePayment } from '../ui/format';
 import { Field, SelectField, SideToggle, PostButton, ImagePickerField, TimeField, DurationField, PaymentField, WaitingBar } from '../ui/fields';
 
@@ -431,12 +431,12 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
     const newIsLong = flexible || (Math.floor(time.getTime() / 1000) - nowChk) > 7200;
     if (liveRides.length >= 3) {
       setLimitErr(t('You can have at most 3 live ride requests at a time. Cancel one in My Requests first.'));
-      Alert.alert(t('Too many requests'), t('You can have at most 3 live ride requests at a time. Cancel one in My Requests first.'));
+      uiAlert(t('Too many requests'), t('You can have at most 3 live ride requests at a time. Cancel one in My Requests first.'));
       return;
     }
     if (newIsLong && liveRides.some(isLong)) {
       setLimitErr(t('You can have only 1 flexible or long (over 2 hours) ride request at a time. Cancel it, or pick a pickup time within 2 hours.'));
-      Alert.alert(t('Too many open-ended requests'), t('You can have only 1 flexible or long (over 2 hours) ride request at a time. Cancel it, or pick a pickup time within 2 hours.'));
+      uiAlert(t('Too many open-ended requests'), t('You can have only 1 flexible or long (over 2 hours) ride request at a time. Cancel it, or pick a pickup time within 2 hours.'));
       return;
     }
     setLimitErr('');
@@ -471,9 +471,9 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
       // (Alert is a no-op on web, so the cleared form is the "posted" signal).
       setTo(''); setNote(''); setImages([]);
       onPosted?.(); // collapse the form, reveal My Requests
-      Alert.alert(t('Posted'), t('Your ride request is live.'));
+      uiAlert(t('Posted'), t('Your ride request is live.'));
     } catch (e: any) {
-      Alert.alert(t('Not allowed'), e?.message ?? t('Could not post.'));
+      uiAlert(t('Not allowed'), e?.message ?? t('Could not post.'));
     } finally { setPosting(false); }
   };
 
@@ -599,9 +599,9 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
       // Clear content fields so a second tap can't re-post the same listing.
       setService(''); setNotes(''); setImages([]);
       onPosted?.(); // collapse the form, reveal My Posts
-      Alert.alert(t('Posted'), side === 'offer' ? t('Your service offer is live.') : t('Your service request is live.'));
+      uiAlert(t('Posted'), side === 'offer' ? t('Your service offer is live.') : t('Your service request is live.'));
     } catch (e: any) {
-      Alert.alert(t('Not allowed'), e?.message ?? t('Could not post.'));
+      uiAlert(t('Not allowed'), e?.message ?? t('Could not post.'));
     } finally { setPosting(false); }
   };
 

@@ -12,6 +12,7 @@ import { ActivityIndicator, Animated, Image, Modal, PanResponder, Pressable, Scr
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../i18n';
 import { s, palette } from '../ui/theme';
+import { confirmAsync } from '../ui/alerts';
 import type { Signer } from '../signer';
 import { evaluateAdd, type MiniAppFirewall, type MiniAppRecord } from '../miniapps/firewall';
 import { loadFirewall, persistFirewall } from '../miniapps/store';
@@ -191,23 +192,40 @@ export function AppsTab({
     closeAddSheet();
   };
 
-  const remove = (origin: string) => {
+  const remove = async (app: MiniAppRecord) => {
     if (!fw) return;
-    fw.removeApp(origin);
+    // Removing drops the app AND its granted permissions — confirm, since an
+    // accidental ✕ tap otherwise silently destroys trust state the user then
+    // has to re-approve one dialog at a time.
+    const ok = await confirmAsync(
+      t('Remove {name}?', { name: app.name }),
+      t('This deletes the app and the permissions you granted it. You can add it again later.'),
+      t('Remove'),
+    );
+    if (!ok) return;
+    fw.removeApp(app.url);
     persistFirewall();
     refresh();
   };
 
+  // Handlers read current state through refs so ONE PanResponder per tile can
+  // be created once and reused — recreating them every render (the old
+  // `{...makePan(i).panHandlers}`) dropped in-flight gestures.
+  const editRef = useRef(edit); editRef.current = edit;
+  const appsRef = useRef(apps); appsRef.current = apps;
+  const walletOffsetRef = useRef(walletOffset); walletOffsetRef.current = walletOffset;
+
   /** Drop the dragged tile: translate its grid slot by the gesture delta. */
   const commitDrag = (index: number, dx: number, dy: number) => {
+    const list = appsRef.current;
     if (!fw || gridW.current <= 0) return;
     const cellW = gridW.current / COLS;
-    const vis = walletOffset + index;
+    const vis = walletOffsetRef.current + index;
     const col = Math.min(COLS - 1, Math.max(0, Math.round(vis % COLS + dx / cellW)));
     const row = Math.max(0, Math.floor(vis / COLS) + Math.round(dy / CELL_H));
-    const target = Math.min(apps.length - 1, Math.max(0, row * COLS + col - walletOffset));
+    const target = Math.min(list.length - 1, Math.max(0, row * COLS + col - walletOffsetRef.current));
     if (target === index) return;
-    const next = [...apps];
+    const next = [...list];
     const [moved] = next.splice(index, 1);
     next.splice(target, 0, moved);
     setApps(next);
@@ -215,14 +233,25 @@ export function AppsTab({
     persistFirewall();
   };
 
-  const makePan = (index: number) => PanResponder.create({
-    onStartShouldSetPanResponder: () => edit,
-    onMoveShouldSetPanResponder: () => edit,
-    onPanResponderGrant: () => { setDragIdx(index); pan.setValue({ x: 0, y: 0 }); },
-    onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], { useNativeDriver: false }),
-    onPanResponderRelease: (_e, g) => { commitDrag(index, g.dx, g.dy); setDragIdx(null); pan.setValue({ x: 0, y: 0 }); },
-    onPanResponderTerminate: () => { setDragIdx(null); pan.setValue({ x: 0, y: 0 }); },
-  });
+  // Lazily-built, stable-per-index PanResponders. Capture the gesture only in
+  // edit mode AND only after a clear (>8px) move, so a plain vertical swipe
+  // still scrolls the grid instead of being swallowed as a drag.
+  const pansRef = useRef(new Map<number, ReturnType<typeof PanResponder.create>>());
+  const getPan = (index: number) => {
+    let p = pansRef.current.get(index);
+    if (!p) {
+      p = PanResponder.create({
+        onStartShouldSetPanResponder: () => false,
+        onMoveShouldSetPanResponder: (_e, g) => editRef.current && (g.dx * g.dx + g.dy * g.dy) > 64,
+        onPanResponderGrant: () => { setDragIdx(index); pan.setValue({ x: 0, y: 0 }); },
+        onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], { useNativeDriver: false }),
+        onPanResponderRelease: (_e, g) => { commitDrag(index, g.dx, g.dy); setDragIdx(null); pan.setValue({ x: 0, y: 0 }); },
+        onPanResponderTerminate: () => { setDragIdx(null); pan.setValue({ x: 0, y: 0 }); },
+      });
+      pansRef.current.set(index, p);
+    }
+    return p;
+  };
 
   const tileStyle = { width: `${100 / COLS}%` as const, height: CELL_H };
 
@@ -286,10 +315,10 @@ export function AppsTab({
                     dragging && { transform: pan.getTranslateTransform(), zIndex: 10, elevation: 10, opacity: 0.85 },
                   ]}
                 >
-                  <View {...makePan(i).panHandlers}>{body}</View>
+                  <View {...getPan(i).panHandlers}>{body}</View>
                   <Pressable
                     hitSlop={8}
-                    onPress={() => remove(app.url)}
+                    onPress={() => void remove(app)}
                     style={{ position: 'absolute', top: 0, right: '14%', width: 22, height: 22, borderRadius: 11, backgroundColor: palette.muted, alignItems: 'center', justifyContent: 'center', zIndex: 11 }}
                   >
                     <Ionicons name="close" size={14} color="#fff" />

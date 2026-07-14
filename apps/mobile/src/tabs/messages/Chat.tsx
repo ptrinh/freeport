@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Linking,
   Modal,
@@ -373,14 +372,14 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
           await onSend(url); // rendered as a voice memo on both sides
         }
       } catch (e) {
-        Alert.alert('Voice memo failed', e instanceof UploadError ? e.message : (e as Error).message || 'Try again.');
+        uiAlert(t('Voice memo failed'), e instanceof UploadError ? e.message : (e as Error).message || t('Try again.'));
       } finally { setUploading(false); }
     } else {
       try {
         await startRecording();
         setRecording(true);
       } catch (e) {
-        Alert.alert('Cannot record', (e as Error).message || 'Microphone unavailable.');
+        uiAlert(t('Cannot record'), (e as Error).message || t('Microphone unavailable.'));
       }
     }
   };
@@ -411,7 +410,7 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
       const url = await uploadImage(result.assets[0]);
       await onSend(url); // sent as a chat message; rendered as an image on the other side
     } catch (e) {
-      Alert.alert('Upload failed', e instanceof UploadError ? e.message : 'Try again.');
+      uiAlert(t('Upload failed'), e instanceof UploadError ? e.message : t('Try again.'));
     } finally { setUploading(false); }
   };
 

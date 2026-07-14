@@ -1,4 +1,4 @@
-import React, { useDeferredValue, useEffect, useRef, useState } from 'react';
+import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
@@ -193,7 +193,10 @@ export function DealsTab({
   const [completedKeyword, setCompletedKeyword] = useState('');
   const completedKw = useDeferredValue(completedKeyword.trim().toLowerCase());
   const negoText = (n: Negotiation) => (searchableText(n.intent, client) + ' ' + (n.theirContact ?? '')).toLowerCase();
-  const sorted = [...negos]
+  // Memoized: the filter builds a searchable string per nego and this component
+  // re-renders on every parent flush and every keystroke — recompute only when
+  // the inputs actually change, not on unrelated renders.
+  const sorted = useMemo(() => [...negos]
     .filter((n) => {
       // The keyword box lives at the Messages ROOT — it filters BOTH views
       // (and the chat rows below), comma-separated like Browse.
@@ -202,7 +205,8 @@ export function DealsTab({
       if (!isDone(n) || n.updatedAt < completedCutoff) return false;
       return true;
     })
-    .sort((a, b) => b.updatedAt - a.updatedAt);
+    .sort((a, b) => b.updatedAt - a.updatedAt),
+    [negos, view, completedKw, completedCutoff, client]);
 
   const header = (
     <View>
@@ -916,7 +920,9 @@ export function DealsTab({
                       // A driver must have vehicle details on file — they're sent to the
                       // passenger over DM on confirm so they can identify the car.
                       if (iAmDriver && (!profile.vehicleModel?.trim() || !profile.plateNumber?.trim())) {
-                        Alert.alert(
+                        // uiAlert, not Alert.alert (a no-op on web) — else the
+                        // driver taps Accept and nothing visibly happens.
+                        uiAlert(
                           t('Vehicle details required'),
                           t('Add your vehicle model and plate number in Profile before accepting a ride. They are shared with the passenger over encrypted DM when the deal is confirmed.'),
                         );

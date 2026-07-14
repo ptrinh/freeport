@@ -947,9 +947,13 @@ function AppInner() {
       kvSet('freeport.chatSeenTs', String(now)).catch(() => {});
     }
   }, [tab, negos]);
-  const unreadChats = tab === 'messages'
+  // Badge counts reduce over every message of every negotiation/conversation;
+  // memoized so they don't re-run on every AppInner render (e.g. the 80ms
+  // intents flush during backfill), only when their inputs actually change.
+  const unreadChats = React.useMemo(() => tab === 'messages'
     ? 0
-    : negos.reduce((n, g) => n + (g.messages?.filter((m) => m.dir === 'in' && m.ts > chatSeenTs).length ?? 0), 0);
+    : negos.reduce((n, g) => n + (g.messages?.filter((m) => m.dir === 'in' && m.ts > chatSeenTs).length ?? 0), 0),
+    [tab, negos, chatSeenTs]);
 
   // When opening Messages (menu tap or notification), jump to the sub-tab where
   // the newest UNREAD activity is: an inbound chat message, or a just-confirmed
@@ -981,16 +985,18 @@ function AppInner() {
   // Driver's side a passenger-confirmed deal arrives with no `messages` entry and
   // unreadChats stays 0, leaving the Messages tab without its badge. Count deals
   // that confirmed/updated since the user last opened Messages so the badge shows.
-  const unreadDeals = tab === 'messages'
+  const unreadDeals = React.useMemo(() => tab === 'messages'
     ? 0
-    : negos.filter((n) => n.state === 'confirmed' && n.updatedAt > chatSeenTs).length;
+    : negos.filter((n) => n.state === 'confirmed' && n.updatedAt > chatSeenTs).length,
+    [tab, negos, chatSeenTs]);
 
   // Friend chat: unread messages + pending incoming invites join the badge.
   // Pending invites count even while the experiment is OFF — the request row
   // renders regardless, so the badge must lead the user to it.
-  const chatBadge = tab === 'messages'
+  const chatBadge = React.useMemo(() => tab === 'messages'
     ? 0
-    : conversations.reduce((n, c) => (blocked.has(c.peer) ? n : n + (experimentalChat ? convUnread(c) : 0) + (c.state === 'pending_in' ? 1 : 0)), 0);
+    : conversations.reduce((n, c) => (blocked.has(c.peer) ? n : n + (experimentalChat ? convUnread(c) : 0) + (c.state === 'pending_in' ? 1 : 0)), 0),
+    [tab, conversations, blocked, experimentalChat]);
 
   const pendingCount = negos.filter(
     (n) => n.state === 'open' && n.termsBy === 'them' || n.state === 'accepted_by_them',
@@ -1732,9 +1738,19 @@ function AppInner() {
           }}
         />
       )}
-      <View style={[s.tabbar, { paddingBottom: insets.bottom }]}>
-        {visibleTabs.map((tk) => (
-          <Pressable key={tk} onPress={() => (tk === 'messages' ? openMessages() : setTab(tk))} style={[s.tab, barTab === tk && s.tabActive]}>
+      <View style={[s.tabbar, { paddingBottom: insets.bottom }]} accessibilityRole="tablist">
+        {visibleTabs.map((tk) => {
+          const tabName = t(tk === 'post' && role === 'passenger' ? 'Request' : tk === 'browse' ? 'Browse' : tk === 'messages' ? 'Messages' : tk === 'settings' ? 'Settings' : tk === 'wallet' ? 'Wallet' : tk === 'apps' ? 'Apps' : 'Post');
+          const badge = tk === 'messages' ? pendingCount : tk === 'settings' ? requiredCount : 0;
+          return (
+          <Pressable
+            key={tk}
+            onPress={() => (tk === 'messages' ? openMessages() : setTab(tk))}
+            style={[s.tab, barTab === tk && s.tabActive]}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: barTab === tk }}
+            accessibilityLabel={badge > 0 ? t('{name}, {n} new', { name: tabName, n: badge }) : tabName}
+          >
             <Animated.View style={{ alignSelf: 'stretch', alignItems: 'center', paddingVertical: anim.tabPad }}>
               <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 {tourTab === tk && (
@@ -1761,11 +1777,12 @@ function AppInner() {
                 )}
               </View>
               <Animated.View style={{ height: anim.labelH, opacity: anim.labelOpacity, overflow: 'hidden', justifyContent: 'center' }}>
-                <Text style={[s.tabText, barTab === tk && s.tabTextActive]}>{t(tk === 'post' && role === 'passenger' ? 'Request' : tk === 'browse' ? 'Browse' : tk === 'messages' ? 'Messages' : tk === 'settings' ? 'Settings' : tk === 'wallet' ? 'Wallet' : tk === 'apps' ? 'Apps' : 'Post')}</Text>
+                <Text style={[s.tabText, barTab === tk && s.tabTextActive]}>{tabName}</Text>
               </Animated.View>
             </Animated.View>
           </Pressable>
-        ))}
+          );
+        })}
       </View>
       {curTourStep && tourStep != null && curTourStep.final && (
         <View style={s.tourFinalBackdrop} pointerEvents="auto">
