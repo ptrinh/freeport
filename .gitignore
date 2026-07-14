@@ -44,3 +44,4 @@ apps/desktop/src-tauri/binaries/
 # freeport-self-hosted web bundle (built by build-web.sh / Docker)
 packages/freeport-self-hosted/web-dist/
 packages/freeport-self-hosted/.web-export/
+apps/mobile/freeport-source.zip
