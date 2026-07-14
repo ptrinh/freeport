@@ -69,6 +69,8 @@ export interface VoicePlayback {
   positionMillis: number;
   durationMillis: number;
   done?: boolean;
+  /** Playback speed (1 or 2) — WhatsApp-style, remembered across clips. */
+  rate?: number;
 }
 
 // One clip at a time (WhatsApp behavior). NOTE: this file REPLACES voice.ts
@@ -76,11 +78,44 @@ export interface VoicePlayback {
 // toggleVoice here once made the play button a silent no-op on web).
 let currentUrl: string | null = null;
 let currentListener: ((st: VoicePlayback) => void) | null = null;
+let playbackRate = 1;
+
+/** Current playback speed (applies to the next clip too). */
+export function voiceRate(): number {
+  return playbackRate;
+}
+
+/** Set playback speed (1 or 2); applies immediately to the playing clip. */
+export async function setVoiceRate(rate: number): Promise<void> {
+  playbackRate = rate;
+  if (audioEl) {
+    audioEl.playbackRate = rate;
+    emit(audioEl);
+  }
+}
+
+/** Jump to a fraction (0–1) of the clip; starts playback if needed. Streams
+ *  with unknown duration (Chrome webm) can't seek — silently skipped. */
+export async function seekVoice(url: string, fraction: number, onStatus: (st: VoicePlayback) => void): Promise<void> {
+  if (currentUrl !== url || !audioEl) await toggleVoice(url, onStatus);
+  else currentListener = onStatus;
+  const el = audioEl;
+  if (!el) return;
+  const apply = () => {
+    if (Number.isFinite(el.duration) && el.duration > 0) {
+      el.currentTime = Math.max(0, Math.min(1, fraction)) * el.duration;
+    }
+  };
+  if (el.readyState >= 1) apply();
+  else el.addEventListener('loadedmetadata', apply, { once: true });
+  if (el.paused) await el.play().catch(() => {});
+  emit(el);
+}
 
 function emit(el: HTMLAudioElement, done = false): void {
   // Chrome reports Infinity duration for streamed MediaRecorder output.
   const dur = Number.isFinite(el.duration) ? el.duration * 1000 : 0;
-  currentListener?.({ playing: !el.paused && !el.ended, positionMillis: el.currentTime * 1000, durationMillis: dur, done });
+  currentListener?.({ playing: !el.paused && !el.ended, positionMillis: el.currentTime * 1000, durationMillis: dur, done, rate: playbackRate });
 }
 
 /** Toggle play/pause; starting a different clip stops the previous one. */
@@ -98,6 +133,7 @@ export async function toggleVoice(url: string, onStatus: (st: VoicePlayback) => 
     audioEl = null;
   }
   const el = new Audio(url);
+  el.playbackRate = playbackRate;
   audioEl = el;
   currentUrl = url;
   currentListener = onStatus;

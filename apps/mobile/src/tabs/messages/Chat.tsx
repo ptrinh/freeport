@@ -17,7 +17,7 @@ import { type Negotiation, type ProposedTerms } from '@freeport/protocol';
 import { t } from '../../i18n';
 import { matchesKeywords } from '../../browseFilter';
 import { uploadImage, uploadFile, UploadError } from '../../upload';
-import { startRecording, stopRecording, toggleVoice, type VoicePlayback } from '../../voice';
+import { startRecording, stopRecording, toggleVoice, seekVoice, setVoiceRate, type VoicePlayback } from '../../voice';
 import { defaultIntentTime, timeToWindow, parsePayment, fmtPayment } from '../../ui/format';
 import { currencyForMarket, type Currency } from '../../locations';
 import { s, palette } from '../../ui/theme';
@@ -106,6 +106,14 @@ function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
   const timeLabel = st.playing || st.positionMillis > 0
     ? fmtMs(st.positionMillis)
     : st.durationMillis > 0 ? fmtMs(st.durationMillis) : '';
+  const onStatus = (next: VoicePlayback) =>
+    setSt(next.done ? { playing: false, positionMillis: 0, durationMillis: next.durationMillis, rate: next.rate } : next);
+  const fail = (e: unknown) => {
+    setSt({ playing: false, positionMillis: 0, durationMillis: 0 });
+    uiAlert(t('Voice memo'), e instanceof Error ? e.message : undefined);
+  };
+  const waveWidth = useRef(0);
+  const rate = st.rate ?? 1;
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, minWidth: 190, paddingVertical: 2 }}>
       <Pressable
@@ -113,21 +121,35 @@ function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
         accessibilityRole="button" accessibilityLabel={t('Voice memo')}
         onPress={() => {
           setSt((cur) => ({ ...cur, playing: !cur.playing })); // optimistic — instant feedback
-          toggleVoice(url, (next) =>
-            setSt(next.done ? { playing: false, positionMillis: 0, durationMillis: next.durationMillis } : next),
-          ).catch((e) => {
-            setSt({ playing: false, positionMillis: 0, durationMillis: 0 });
-            uiAlert(t('Voice memo'), e instanceof Error ? e.message : undefined);
-          });
+          toggleVoice(url, onStatus).catch(fail);
+        }}
+        onLongPress={() => {
+          // Hold the play button → toggle 2× speed (starts playback if idle).
+          const next = rate === 2 ? 1 : 2;
+          setSt((cur) => ({ ...cur, rate: next }));
+          setVoiceRate(next).catch(() => {});
+          if (!st.playing) toggleVoice(url, onStatus).catch(fail);
         }}
       >
         <Ionicons name={st.playing ? 'pause' : 'play'} size={24} color={active} />
       </Pressable>
-      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2.5, height: 26 }}>
+      {/* Tap anywhere on the waveform to jump there (WhatsApp scrubbing). */}
+      <Pressable
+        style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2.5, height: 26 }}
+        onLayout={(e) => { waveWidth.current = e.nativeEvent.layout.width; }}
+        accessibilityRole="adjustable" accessibilityLabel={t('Voice memo')}
+        onPress={(e) => {
+          const x = e.nativeEvent.locationX ?? 0;
+          if (waveWidth.current > 0) seekVoice(url, x / waveWidth.current, onStatus).catch(fail);
+        }}
+      >
         {bars.map((h, i) => (
-          <View key={i} style={{ width: 3, borderRadius: 1.5, height: h, backgroundColor: (i + 1) / bars.length <= progress ? active : dim }} />
+          <View key={i} pointerEvents="none" style={{ width: 3, borderRadius: 1.5, height: h, backgroundColor: (i + 1) / bars.length <= progress ? active : dim }} />
         ))}
-      </View>
+      </Pressable>
+      {rate === 2 ? (
+        <Text style={{ fontSize: 10, fontWeight: '700', color: active, borderWidth: 1, borderColor: dim, borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1 }}>2×</Text>
+      ) : null}
       <Text style={{ fontSize: 11, color: dim, minWidth: 30, textAlign: 'right' }}>{timeLabel}</Text>
     </View>
   );

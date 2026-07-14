@@ -56,12 +56,43 @@ export interface VoicePlayback {
   positionMillis: number;
   durationMillis: number;
   done?: boolean;
+  /** Playback speed (1 or 2) — WhatsApp-style, remembered across clips. */
+  rate?: number;
 }
 
 // ONE clip plays at a time (WhatsApp behavior): starting another stops the
 // previous and notifies its bubble so its UI resets.
 let currentUrl: string | null = null;
 let currentListener: ((st: VoicePlayback) => void) | null = null;
+let playbackRate = 1;
+
+/** Current playback speed (applies to the next clip too). */
+export function voiceRate(): number {
+  return playbackRate;
+}
+
+/** Set playback speed (1 or 2); applies immediately to the playing clip. */
+export async function setVoiceRate(rate: number): Promise<void> {
+  playbackRate = rate;
+  if (sound) {
+    try { await sound.setRateAsync(rate, true); } catch { /* not loaded */ }
+  }
+}
+
+/** Jump to a fraction (0–1) of the clip; starts playback if needed. Clips
+ *  with unknown duration (some web streams) can't seek — silently skipped. */
+export async function seekVoice(url: string, fraction: number, onStatus: (st: VoicePlayback) => void): Promise<void> {
+  if (currentUrl !== url || !sound) await toggleVoice(url, onStatus);
+  else currentListener = onStatus;
+  const s = sound;
+  if (!s) return;
+  const st: any = await s.getStatusAsync();
+  if (!st.isLoaded) return;
+  if (Number.isFinite(st.durationMillis) && st.durationMillis > 0) {
+    await s.setPositionAsync(Math.max(0, Math.min(1, fraction)) * st.durationMillis);
+  }
+  if (!st.isPlaying) await s.playAsync().catch(() => {});
+}
 
 /** Toggle play/pause for a clip; starting a different clip stops the last. */
 export async function toggleVoice(url: string, onStatus: (st: VoicePlayback) => void): Promise<void> {
@@ -97,12 +128,14 @@ export async function toggleVoice(url: string, onStatus: (st: VoicePlayback) => 
       positionMillis: st.positionMillis ?? 0,
       durationMillis: dur,
       done: !!st.didJustFinish,
+      rate: playbackRate,
     });
     if (st.didJustFinish) {
       s.unloadAsync().catch(() => {});
       if (sound === s) { sound = null; currentUrl = null; }
     }
   });
+  if (playbackRate !== 1) await s.setRateAsync(playbackRate, true).catch(() => {});
   // Belt-and-braces: some expo-av web versions ignore shouldPlay in the
   // initial status when created from an async chain.
   await s.playAsync().catch(() => {});
