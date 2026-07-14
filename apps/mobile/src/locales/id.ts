@@ -935,5 +935,6 @@ const c: Record<string, string> = {
   "May request": "Dapat meminta",
   "Unverified": "Belum diverifikasi",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Halaman ini tidak menggunakan fitur Freeport apa pun — mungkin bukan aplikasi mini.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "Tidak ada manifes freeport.json yang ditemukan — situs ini tidak dapat ditambahkan sebagai aplikasi mini.",
 };
 export default c;

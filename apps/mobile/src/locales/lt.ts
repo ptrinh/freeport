@@ -896,5 +896,6 @@ const c: Record<string, string> = {
   "May request": "Gali prašyti",
   "Unverified": "Nepatvirtinta",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Šis puslapis nenaudojo jokių Freeport funkcijų — tai gali būti ne mini programėlė.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifestas nerastas — šios svetainės negalima pridėti kaip mini programėlės.",
 };
 export default c;

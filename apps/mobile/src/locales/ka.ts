@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "May request": "შეიძლება მოითხოვოს",
   "Unverified": "დაუდასტურებელი",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "ამ გვერდს არ გამოუყენებია Freeport-ის არცერთი ფუნქცია — შესაძლოა ის მინი-აპი არ იყოს.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json მანიფესტი ვერ მოიძებნა — ამ საიტის მინი-აპად დამატება შეუძლებელია.",
 };
 export default c;

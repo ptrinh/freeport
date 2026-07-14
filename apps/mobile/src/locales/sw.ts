@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "May request": "Inaweza kuomba",
   "Unverified": "Haijathibitishwa",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Ukurasa huu haujatumia kipengele chochote cha Freeport — huenda si programu ndogo.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "Hakuna manifesto ya freeport.json iliyopatikana — tovuti hii haiwezi kuongezwa kama programu ndogo.",
 };
 export default c;

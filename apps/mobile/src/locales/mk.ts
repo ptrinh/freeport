@@ -895,5 +895,6 @@ const c: Record<string, string> = {
   "May request": "Може да побара",
   "Unverified": "Непотврдено",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Оваа страница не користела ниту една функција на Freeport — можеби не е мини-апликација.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "Не е пронајден манифест freeport.json — оваа веб-локација не може да се додаде како мини-апликација.",
 };
 export default c;

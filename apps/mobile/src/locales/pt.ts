@@ -938,5 +938,6 @@ const c: Record<string, string> = {
   "May request": "Pode solicitar",
   "Unverified": "Não verificado",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Esta página não usou nenhum recurso do Freeport — pode não ser um mini-app.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "Nenhum manifesto freeport.json encontrado — este site não pode ser adicionado como mini-app.",
 };
 export default c;

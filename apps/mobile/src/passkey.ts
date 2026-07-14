@@ -46,6 +46,14 @@ const fromB64url = (s: string) => Uint8Array.from(atob(s.replace(/-/g, '+').repl
 
 async function nativeModule(): Promise<any | null> {
   try {
+    // Probe the native registry BEFORE importing: react-native-passkeys calls
+    // requireNativeModule at module top-level, so on binaries that don't link
+    // it (≤1.4.x) the import blows up inside Metro's module loader and
+    // surfaces as a global error despite this try/catch (GlitchTip issue 19).
+    // requireOptionalNativeModule returns null instead of throwing. (Imported
+    // lazily — expo-modules-core can't load in the node test environment.)
+    const core: any = await import('expo-modules-core').catch(() => null);
+    if (!core?.requireOptionalNativeModule?.('ReactNativePasskeys')) return null;
     const mod: any = await import('react-native-passkeys');
     return (await mod.isSupported?.()) ? mod : null;
   } catch { return null; }

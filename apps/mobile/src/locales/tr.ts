@@ -938,5 +938,6 @@ const c: Record<string, string> = {
   "May request": "İsteyebilir",
   "Unverified": "Doğrulanmadı",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Bu sayfa hiçbir Freeport özelliğini kullanmadı — mini uygulama olmayabilir.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifestosu bulunamadı — bu site mini uygulama olarak eklenemez.",
 };
 export default c;

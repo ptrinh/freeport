@@ -40,10 +40,9 @@ origin):
   intend to call in the add-app dialog.
 - Serve it with `Access-Control-Allow-Origin: *` so the WEB shell can read it
   cross-origin (the native shell has no CORS).
-- Apps **without** a manifest can still be added, but are labeled
-  **Unverified** at add time and in the shell header. The manifest is a
-  courtesy label, not a security boundary — the firewall judges every call
-  regardless.
+- The manifest is **required**: a URL without a valid `freeport.json`
+  cannot be added as a mini-app. It is still not a security boundary — the
+  firewall judges every call regardless of what the manifest claims.
 - The shell also watches for mini-app behavior at launch (the SDK acks the
   handshake; the native shim pings on first API access). A page that never
   touches the API shows a "may not be a mini-app" notice.

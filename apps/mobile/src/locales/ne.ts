@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "May request": "अनुरोध गर्न सक्छ",
   "Unverified": "अपुष्ट",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "यस पृष्ठले कुनै पनि Freeport सुविधा प्रयोग गरेको छैन — यो मिनी-एप नहुन सक्छ।",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "कुनै freeport.json म्यानिफेस्ट फेला परेन — यो साइटलाई मिनी-एपको रूपमा थप्न सकिँदैन।",
 };
 export default c;

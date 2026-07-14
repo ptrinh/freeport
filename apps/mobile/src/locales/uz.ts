@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "May request": "So'rashi mumkin",
   "Unverified": "Tasdiqlanmagan",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Bu sahifa hech qanday Freeport funksiyasidan foydalanmadi — u mini-ilova bo'lmasligi mumkin.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifesti topilmadi — bu saytni mini-ilova sifatida qo'shib bo'lmaydi.",
 };
 export default c;

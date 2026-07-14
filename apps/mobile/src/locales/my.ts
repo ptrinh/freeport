@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "May request": "တောင်းဆိုနိုင်သည်",
   "Unverified": "အတည်မပြုရသေး",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "ဤစာမျက်နှာသည် Freeport လုပ်ဆောင်ချက်များကို အသုံးမပြုခဲ့ပါ — ၎င်းသည် မီနီအက်ပ်မဟုတ်နိုင်ပါ။",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifest မတွေ့ပါ — ဤဝဘ်ဆိုက်ကို မီနီအက်ပ်အဖြစ် ထည့်၍မရပါ။",
 };
 export default c;

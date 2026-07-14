@@ -895,5 +895,6 @@ const c: Record<string, string> = {
   "May request": "Kan begära",
   "Unverified": "Overifierad",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Den här sidan har inte använt några Freeport-funktioner — det kanske inte är en miniapp.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "Inget freeport.json-manifest hittades — den här webbplatsen kan inte läggas till som en miniapp.",
 };
 export default c;

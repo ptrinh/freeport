@@ -898,5 +898,6 @@ const c: Record<string, string> = {
   "May request": "Môže požadovať",
   "Unverified": "Neoverené",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Táto stránka nepoužila žiadne funkcie Freeport — nemusí ísť o miniaplikáciu.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "Manifest freeport.json sa nenašiel — túto stránku nemožno pridať ako miniaplikáciu.",
 };
 export default c;

@@ -895,5 +895,6 @@ const c: Record<string, string> = {
   "May request": "Võib taotleda",
   "Unverified": "Kinnitamata",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "See leht ei kasutanud ühtegi Freeporti funktsiooni — see ei pruugi olla minirakendus.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifesti ei leitud — seda saiti ei saa minirakendusena lisada.",
 };
 export default c;

@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "May request": "Կարող է պահանջել",
   "Unverified": "Չհաստատված",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Այս էջը չի օգտագործել Freeport-ի որևէ գործառույթ — այն կարող է մինի-հավելված չլինել։",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json մանիֆեստ չգտնվեց — այս կայքը հնարավոր չէ ավելացնել որպես մինի-հավելված։",
 };
 export default c;

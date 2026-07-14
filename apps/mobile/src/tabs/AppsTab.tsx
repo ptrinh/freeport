@@ -144,12 +144,18 @@ export function AppsTab({
     setBusy(true);
     const meta = await fetchAppMeta(input);
     setBusy(false);
+    // A valid freeport.json manifest is REQUIRED — no manifest, no add. (On
+    // web the manifest must also be served with CORS; the SDK README says so.)
+    if (!meta.verified) {
+      setErr(t("No freeport.json manifest found — this site can't be added as a mini-app."));
+      return;
+    }
     setPendingInput(input);
-    // Every tile needs an icon: fall back to the site favicon, and the tile
-    // itself falls back to a letter glyph if that image never loads.
+    // The tile falls back to the site favicon / a letter glyph if the
+    // manifest icon is missing or never loads.
     setPendingIcon(meta.icon ?? `${origin}/favicon.ico`);
     setTitle(meta.title ?? new URL(origin).hostname.replace(/^www\./, ''));
-    setPendingMeta({ verified: meta.verified, permissions: meta.permissions });
+    setPendingMeta({ verified: true, permissions: meta.permissions });
     setAddStep('confirm');
   };
 
@@ -316,17 +322,10 @@ export function AppsTab({
               <View style={{ alignItems: 'center', marginTop: 12 }}>
                 <TileIcon icon={pendingIcon} name={title || '?'} seed={pendingInput} />
                 <Text style={[s.dim, { marginTop: 6 }]} numberOfLines={1}>{pendingInput.replace('https://', '')}</Text>
-                {pendingMeta.verified ? (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 }}>
-                    <Ionicons name="shield-checkmark" size={14} color="#10b981" />
-                    <Text style={[s.dim, { color: '#10b981' }]}>{t('Mini-app manifest found')}</Text>
-                  </View>
-                ) : (
-                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 5, marginTop: 6, paddingHorizontal: 4 }}>
-                    <Ionicons name="warning-outline" size={14} color="#f59e0b" style={{ marginTop: 2 }} />
-                    <Text style={[s.dim, { color: '#f59e0b', flex: 1 }]}>{t('No mini-app manifest found — this may be an ordinary website. Add it only if you trust it.')}</Text>
-                  </View>
-                )}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 }}>
+                  <Ionicons name="shield-checkmark" size={14} color="#10b981" />
+                  <Text style={[s.dim, { color: '#10b981' }]}>{t('Mini-app manifest found')}</Text>
+                </View>
                 {pendingMeta.permissions.length > 0 ? (
                   <Text style={[s.dim, { marginTop: 6, paddingHorizontal: 4 }]} numberOfLines={3}>
                     {t('May request')}: {pendingMeta.permissions.join(', ')}

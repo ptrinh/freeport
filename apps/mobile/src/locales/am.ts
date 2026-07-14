@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "May request": "ሊጠይቅ ይችላል",
   "Unverified": "ያልተረጋገጠ",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "ይህ ገጽ ምንም የFreeport ባህሪያት አልተጠቀመም — ሚኒ መተግበሪያ ላይሆን ይችላል።",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "የfreeport.json ማኒፌስት አልተገኘም — ይህ ጣቢያ እንደ ሚኒ መተግበሪያ ሊታከል አይችልም።",
 };
 export default c;

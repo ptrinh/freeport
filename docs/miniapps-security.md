@@ -172,16 +172,16 @@ territory can do:
   navigate to, embed, and read each other, so per-path grants would be a
   false boundary (tested: restore() collapses any per-tile divergence a
   tampered store tries to smuggle in).
-- **Verification is a label, never a policy input.** At add time the shell
-  probes `freeport.json` next to the app page; a valid manifest marks the
-  tile "verified" and previews the permissions the app intends to request.
-  No manifest ⇒ an amber Unverified warning at add time and in the shell
-  header — the app can still be added (no gatekeeper). At launch, a page
-  that never touches the mini-app API (SDK handshake ack on web, first
-  API-global access in the native shim) gets a dismissible "may not be a
-  mini-app" notice. None of these signals grant or deny anything — the
-  firewall judges every call identically either way, because a hostile page
-  can serve a perfect manifest.
+- **A manifest is required to add; verification is still never a policy
+  input.** At add time the shell probes `freeport.json` next to the app
+  page — no valid manifest, no add. The manifest also previews the
+  permissions the app intends to request. At launch, a page that never
+  touches the mini-app API (SDK handshake ack on web, first API-global
+  access in the native shim) gets a dismissible "may not be a mini-app"
+  notice, and records added before the requirement show an Unverified chip.
+  None of these signals loosen anything — the firewall judges every call
+  identically either way, because a hostile page can serve a perfect
+  manifest. The gate only stops accidental adds of ordinary websites.
 - **One incognito WebView per app** — app A cannot read app B's cookies or
   storage. `https` only; `file:`, `data:`, `javascript:` URLs never load;
   popups and multiple windows are disabled.

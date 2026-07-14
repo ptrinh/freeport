@@ -895,5 +895,6 @@ const c: Record<string, string> = {
   "May request": "கோரலாம்",
   "Unverified": "சரிபார்க்கப்படவில்லை",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "இந்தப் பக்கம் எந்த Freeport அம்சத்தையும் பயன்படுத்தவில்லை — இது மினி ஆப் அல்லாமல் இருக்கலாம்.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifest எதுவும் கண்டறியப்படவில்லை — இந்த இணையதளத்தை மினி ஆப்பாகச் சேர்க்க முடியாது.",
 };
 export default c;

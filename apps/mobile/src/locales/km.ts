@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "May request": "អាចស្នើសុំ",
   "Unverified": "មិនបានផ្ទៀងផ្ទាត់",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "ទំព័រនេះមិនបានប្រើមុខងារ Freeport ណាមួយឡើយ — វាអាចមិនមែនជាកម្មវិធីមីនីទេ។",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "រកមិនឃើញ manifest freeport.json ទេ — មិនអាចបញ្ចូលគេហទំព័រនេះជាកម្មវិធីមីនីបានទេ។",
 };
 export default c;

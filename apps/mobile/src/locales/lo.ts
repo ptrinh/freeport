@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "May request": "ອາດຮ້ອງຂໍ",
   "Unverified": "ຍັງບໍ່ໄດ້ຢືນຢັນ",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "ໜ້ານີ້ບໍ່ໄດ້ໃຊ້ຄຸນສົມບັດ Freeport ໃດໆ — ມັນອາດບໍ່ແມ່ນມິນິແອັບ",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "ບໍ່ພົບ manifest freeport.json — ບໍ່ສາມາດເພີ່ມເວັບໄຊນີ້ເປັນມິນິແອັບໄດ້",
 };
 export default c;

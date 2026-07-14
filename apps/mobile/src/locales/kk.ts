@@ -892,5 +892,6 @@ const c: Record<string, string> = {
   "May request": "Сұрауы мүмкін",
   "Unverified": "Расталмаған",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Бұл бет ешқандай Freeport мүмкіндігін пайдаланбады — ол мини-қолданба болмауы мүмкін.",
+  "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json манифесі табылмады — бұл сайтты мини-қолданба ретінде қосу мүмкін емес.",
 };
 export default c;
