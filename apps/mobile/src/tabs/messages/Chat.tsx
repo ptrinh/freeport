@@ -381,14 +381,13 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
           returnKeyType="send"
           blurOnSubmit={false}
         />
-        <Pressable style={[s.chatAttach, uploading && { opacity: 0.6 }]} onPress={attach} disabled={uploading || recording} accessibilityRole="button" accessibilityLabel={t('Attach photo')}>
-          {uploading ? <ActivityIndicator color="#93c5fd" /> : <Ionicons name="image" size={18} color="#93c5fd" />}
+        {/* Bare icons (WhatsApp-style), no Send button — Enter / the
+            keyboard's send key submits. Recording turns the mic red. */}
+        <Pressable style={{ paddingHorizontal: 8, opacity: uploading ? 0.5 : 1 }} onPress={attach} disabled={uploading || recording} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Attach photo')}>
+          {uploading ? <ActivityIndicator color={palette.text2} /> : <Ionicons name="image-outline" size={22} color={palette.text2} />}
         </Pressable>
-        <Pressable style={[s.chatAttach, recording && s.chatAttachRec]} onPress={toggleRecord} disabled={uploading} accessibilityRole="button" accessibilityLabel={recording ? t('Stop recording') : t('Record voice memo')}>
-          <Ionicons name={recording ? 'stop' : 'mic'} size={18} color={recording ? '#fff' : '#93c5fd'} />
-        </Pressable>
-        <Pressable style={[s.pinBtn, sending && { opacity: 0.6 }]} onPress={send} disabled={sending} accessibilityRole="button" accessibilityLabel={t('Send message')}>
-          {sending ? <ActivityIndicator color="white" /> : <Ionicons name="send" size={18} color="white" />}
+        <Pressable style={{ paddingHorizontal: 8 }} onPress={toggleRecord} disabled={uploading} hitSlop={8} accessibilityRole="button" accessibilityLabel={recording ? t('Stop recording') : t('Record voice memo')}>
+          <Ionicons name={recording ? 'stop-circle' : 'mic-outline'} size={22} color={recording ? palette.danger : palette.text2} />
         </Pressable>
       </View>
     </>
