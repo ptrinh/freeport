@@ -92,11 +92,20 @@ async function fetchText(url: string, accept: string): Promise<string | null> {
   }
 }
 
-/** The manifest URL for a launch URL: `freeport.json` next to the app page. */
+/** The manifest URL for a launch URL: `freeport.json` next to the app page.
+ *  A directory-style path with no trailing slash and no file extension
+ *  (`…/esim-store`) is treated as a directory, so the manifest resolves to
+ *  `…/esim-store/freeport.json` — NOT `…/freeport.json` at the root, which is
+ *  what bare `new URL('freeport.json', '…/esim-store')` would (wrongly) give. */
 export function manifestUrl(launchUrl: string): string | null {
   try {
-    const u = new URL('freeport.json', launchUrl);
-    return u.protocol === 'https:' ? u.toString() : null;
+    const u = new URL(launchUrl);
+    const last = u.pathname.split('/').pop() || '';
+    const base = !u.pathname.endsWith('/') && !last.includes('.')
+      ? `${u.origin}${u.pathname}/`   // …/esim-store → …/esim-store/
+      : launchUrl;
+    const m = new URL('freeport.json', base);
+    return m.protocol === 'https:' ? m.toString() : null;
   } catch {
     return null;
   }

@@ -41,6 +41,14 @@ describe('manifestUrl', () => {
     expect(manifestUrl('https://shop.example')).toBe('https://shop.example/freeport.json');
     expect(manifestUrl('not a url')).toBeNull();
   });
+
+  it('treats a slashless, extensionless path as a directory (…/esim-store)', () => {
+    // Bug: bare new URL() dropped the last segment → root freeport.json.
+    expect(manifestUrl('https://apps.freeport.network/esim-store')).toBe('https://apps.freeport.network/esim-store/freeport.json');
+    expect(manifestUrl('https://apps.freeport.network/esim-store/')).toBe('https://apps.freeport.network/esim-store/freeport.json');
+    // A real file path resolves the manifest as its sibling.
+    expect(manifestUrl('https://shop.example/store/index.html')).toBe('https://shop.example/store/freeport.json');
+  });
 });
 
 describe('fetchAppMeta', () => {
