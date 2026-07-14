@@ -864,5 +864,7 @@ const c: Record<string, string> = {
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Les messages de chat entrants sont traduits sur cet appareil — rien n'est envoyé nulle part.",
   "Local LLM AI": "AI LLM locale",
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Fonctionnalités AI sur l'appareil (rédaction d'annonces, traduction des discussions). Fonctionne entièrement sur cet appareil — rien n'est envoyé nulle part.",
+  "Device not supported": "Appareil non pris en charge",
+  "Requires \"Local LLM AI\" in Experimental settings.": "Nécessite \"Local LLM AI\" dans les paramètres expérimentaux.",
 };
 export default c;

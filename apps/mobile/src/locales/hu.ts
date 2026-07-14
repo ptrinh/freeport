@@ -821,5 +821,7 @@ const c: Record<string, string> = {
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "A bejövő csevegőüzenetek fordítása ezen az eszközön történik — semmit nem küldünk el sehová.",
   "Local LLM AI": "Helyi LLM AI",
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Eszközön futó AI-funkciók (bejegyzés vázlatolása, csevegés fordítása). Teljes egészében ezen az eszközön fut — semmi sem kerül elküldésre sehová.",
+  "Device not supported": "Az eszköz nem támogatott",
+  "Requires \"Local LLM AI\" in Experimental settings.": "A \"Local LLM AI\" szükséges a Kísérleti beállításokban.",
 };
 export default c;

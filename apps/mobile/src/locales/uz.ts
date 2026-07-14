@@ -818,5 +818,7 @@ const c: Record<string, string> = {
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Kiruvchi chat xabarlari shu qurilmada tarjima qilinadi — hech narsa hech qayerga yuborilmaydi.",
   "Local LLM AI": "Mahalliy LLM AI",
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Qurilmadagi AI funksiyalari (post yozish, chat tarjimasi). Butunlay shu qurilmada ishlaydi — hech narsa hech qayerga yuborilmaydi.",
+  "Device not supported": "Qurilma qoʻllab-quvvatlanmaydi",
+  "Requires \"Local LLM AI\" in Experimental settings.": "Tajriba sozlamalarida \"Local LLM AI\" talab qilinadi.",
 };
 export default c;

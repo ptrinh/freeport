@@ -52,6 +52,7 @@ vi.mock('react-native-apple-llm', () => {
 
 import {
   translateToggleVisible,
+  translateGate,
   translateSupported,
   nonLlmTranslatorSupported,
   translateMessage,
@@ -101,6 +102,33 @@ describe('translate row gating (translateToggleVisible)', () => {
     (globalThis as any).Translator = { create: () => {} };
     (globalThis as any).LanguageDetector = { create: () => {} };
     expect(translateToggleVisible(false)).toBe(true);
+  });
+});
+
+describe('translate row tri-state (translateGate)', () => {
+  it('Android + ML Kit: available regardless of the LLM switch', () => {
+    expect(translateGate(false)).toBe('available');
+  });
+
+  it('Android without ML Kit: unsupported (LLM switch cannot help)', () => {
+    state.mlkitTranslate = false;
+    expect(translateGate(false)).toBe('unsupported');
+    expect(translateGate(true)).toBe('unsupported');
+  });
+
+  it("iOS + Apple FM: 'needs_llm_switch' when off, 'available' when on", () => {
+    state.os = 'ios';
+    state.appleLlm = true;
+    expect(translateGate(false)).toBe('needs_llm_switch');
+    expect(translateGate(true)).toBe('available');
+  });
+
+  it('iOS old binary / bare web: unsupported', () => {
+    state.os = 'ios';
+    state.appleLlm = false;
+    expect(translateGate(true)).toBe('unsupported');
+    state.os = 'web';
+    expect(translateGate(true)).toBe('unsupported');
   });
 });
 

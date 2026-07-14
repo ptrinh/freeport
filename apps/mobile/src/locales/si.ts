@@ -818,5 +818,7 @@ const c: Record<string, string> = {
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "පැමිණෙන කතාබස් පණිවිඩ මෙම උපාංගයේදීම පරිවර්තනය වේ — කිසිවක් කිසිම තැනකට යවනු නොලැබේ.",
   "Local LLM AI": "දේශීය LLM AI",
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "උපාංගය තුළම ක්‍රියා කරන AI විශේෂාංග (පළ කිරීම් කෙටුම්පත් කිරීම, කතාබස් පරිවර්තනය). මුළුමනින්ම මෙම උපාංගය තුළ ක්‍රියා කරයි — කිසිවක් කිසිම තැනකට යවනු නොලැබේ.",
+  "Device not supported": "උපාංගය සහාය නොදක්වයි",
+  "Requires \"Local LLM AI\" in Experimental settings.": "පර්යේෂණාත්මක සැකසීම්වල \"Local LLM AI\" අවශ්‍යයි.",
 };
 export default c;

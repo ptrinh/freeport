@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { t } from '../../i18n';
 import { Ionicons } from '@expo/vector-icons';
 import { s, palette } from '../../ui/theme';
-import { translateToggleVisible } from '../../concierge/translate';
+import { translateGate } from '../../concierge/translate';
 
 /**
  * Settings → Chat — only rendered while the Chat experiment is on. Both
@@ -86,19 +86,38 @@ function ChatSection({
             value={receipts}
             onChange={onReceiptsChange}
           />
-          {/* Dedicated translation models (web Translator API, Android ML
-              Kit) aren't LLMs — they don't need the Local LLM AI master
-              switch. The LLM path (Apple FM) does. Rule lives in
-              translateToggleVisible (tested). */}
-          {translateToggleVisible(llmEnabled) && (
-            <Toggle
-              icon="language-outline"
-              title={t('Translate messages')}
-              desc={t('Incoming chat messages are translated on this device — nothing is sent anywhere.')}
-              value={translate}
-              onChange={onTranslateChange}
-            />
-          )}
+          {/* Always rendered; live only when a translator is usable.
+              Dedicated models (web Translator API, Android ML Kit) aren't
+              LLMs — they don't need the Local LLM AI master switch; the LLM
+              path (Apple FM) does. Rule lives in translateGate (tested). */}
+          {(() => {
+            const gate = translateGate(llmEnabled);
+            if (gate === 'available') {
+              return (
+                <Toggle
+                  icon="language-outline"
+                  title={t('Translate messages')}
+                  desc={t('Incoming chat messages are translated on this device — nothing is sent anywhere.')}
+                  value={translate}
+                  onChange={onTranslateChange}
+                />
+              );
+            }
+            return (
+              <View accessibilityRole="switch" accessibilityState={{ checked: false, disabled: true }} style={[s.toggleRow, { opacity: 0.45 }]}>
+                <Ionicons name="language-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
+                <View style={{ flex: 1, marginEnd: 12 }}>
+                  <Text style={s.toggleTitle}>{t('Translate messages')}</Text>
+                  <Text style={s.dim}>
+                    {gate === 'needs_llm_switch'
+                      ? t('Requires "Local LLM AI" in Experimental settings.')
+                      : t('Device not supported')}
+                  </Text>
+                </View>
+                <View style={s.switchTrack}><View style={s.switchThumb} /></View>
+              </View>
+            );
+          })()}
           {callsSupported ? (
             <>
               <Toggle

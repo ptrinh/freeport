@@ -65,6 +65,18 @@ export function translateToggleVisible(llmEnabled: boolean): boolean {
   return nonLlmTranslatorSupported() || (llmEnabled && translateSupported());
 }
 
+/**
+ * Tri-state for the Settings row (tested): the switch is always RENDERED;
+ * this decides whether it's live, and which note explains a disabled one.
+ */
+export type TranslateGate = 'available' | 'needs_llm_switch' | 'unsupported';
+export function translateGate(llmEnabled: boolean): TranslateGate {
+  if (translateToggleVisible(llmEnabled)) return 'available';
+  // An LLM translator exists but the master switch is off — actionable.
+  if (translateSupported()) return 'needs_llm_switch';
+  return 'unsupported';
+}
+
 async function translateAndroid(text: string, targetLang: string): Promise<string | null> {
   try {
     const [{ default: IdentifyLanguages }, { default: TranslateText }] = await Promise.all([

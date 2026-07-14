@@ -861,5 +861,7 @@ const c: Record<string, string> = {
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Tin nhắn trò chuyện đến được dịch ngay trên thiết bị này — không có gì được gửi đi đâu cả.",
   "Local LLM AI": "LLM AI cục bộ",
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Tính năng AI trên thiết bị (soạn bài đăng, dịch trò chuyện). Chạy hoàn toàn trên thiết bị này — không có gì được gửi đi đâu cả.",
+  "Device not supported": "Thiết bị không được hỗ trợ",
+  "Requires \"Local LLM AI\" in Experimental settings.": "Cần bật \"Local LLM AI\" trong cài đặt Thử nghiệm.",
 };
 export default c;

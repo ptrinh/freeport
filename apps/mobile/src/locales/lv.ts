@@ -821,5 +821,7 @@ const c: Record<string, string> = {
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Ienākošie tērzēšanas ziņojumi tiek tulkoti šajā ierīcē — nekas nekur netiek sūtīts.",
   "Local LLM AI": "Lokālais LLM AI",
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "AI funkcijas ierīcē (ierakstu melnraksti, tērzēšanas tulkošana). Viss notiek tikai šajā ierīcē — nekas netiek nekur sūtīts.",
+  "Device not supported": "Ierīce netiek atbalstīta",
+  "Requires \"Local LLM AI\" in Experimental settings.": "Nepieciešams \"Local LLM AI\" eksperimentālajos iestatījumos.",
 };
 export default c;

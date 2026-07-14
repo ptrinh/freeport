@@ -818,5 +818,7 @@ const c: Record<string, string> = {
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Ujumbe unaoingia wa gumzo hutafsiriwa kwenye kifaa hiki — hakuna kinachotumwa popote.",
   "Local LLM AI": "LLM AI ya Ndani",
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Vipengele vya AI kwenye kifaa (kuandika machapisho, kutafsiri mazungumzo). Hufanya kazi kabisa kwenye kifaa hiki — hakuna kinachotumwa popote.",
+  "Device not supported": "Kifaa hakitumiki",
+  "Requires \"Local LLM AI\" in Experimental settings.": "Inahitaji \"Local LLM AI\" katika mipangilio ya majaribio.",
 };
 export default c;

@@ -48,6 +48,7 @@ import { AboutSection } from './settings/AboutSection';
 import { ExperimentalSection } from './settings/ExperimentalSection';
 import { ChatSection } from './settings/ChatSection';
 import { callsSupported } from '../calls/webrtc';
+import { conciergeModulePresent } from '../concierge/model';
 
 function SettingsTab({
   npub,
@@ -927,6 +928,7 @@ function SettingsTab({
         onChatEnabledChange={onExperimentalChatChange}
         llmEnabled={experimentalLlm}
         onLlmEnabledChange={onExperimentalLlmChange}
+        llmSupported={conciergeModulePresent()}
       />
 
       {/* Chat settings — its own section, only while the experiment is on. */}

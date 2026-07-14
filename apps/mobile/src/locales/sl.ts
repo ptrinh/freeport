@@ -827,5 +827,7 @@ const c: Record<string, string> = {
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Dohodna klepetalna sporočila se prevajajo v tej napravi — nič se ne pošlje nikamor.",
   "Local LLM AI": "Lokalni LLM AI",
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Funkcije AI v napravi (osnutki objav, prevajanje klepeta). Deluje v celoti v tej napravi — nič se nikamor ne pošlje.",
+  "Device not supported": "Naprava ni podprta",
+  "Requires \"Local LLM AI\" in Experimental settings.": "Zahteva \"Local LLM AI\" v eksperimentalnih nastavitvah.",
 };
 export default c;
