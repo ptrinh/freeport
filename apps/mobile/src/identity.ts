@@ -57,6 +57,9 @@ export async function wipeAllLocalData(): Promise<void> {
     'freeport.celebrated', 'freeport.expiredLog', 'freeport.expiredSeen',
     'freeport.expoPushToken', 'freeport.geoOk', 'freeport.guidanceSeen', 'freeport.notifDismiss',
     'freeport.pushOn', 'freeport.autoContactSent', 'freeport.suspendNotifiedAt',
+    // Mini-app grants are per-identity: an app trusted to sign as account A
+    // must never inherit that trust for account B.
+    'freeport.miniapps',
   ];
   await Promise.all(KEYS.map((k) => kvDelete(k).catch(() => {})));
 }

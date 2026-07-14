@@ -218,6 +218,12 @@ echo "▸ Publishing /llms.txt (agent-readable site guide)…"
 cp store/llms.txt dist/llms.txt
 
 echo "▸ Deploying to Cloudflare Pages…"
+# Mini-app demo shop — a plain static page served next to the SPA. The app's
+# add-flow also maps the repo's GitHub URL to this path.
+echo "▸ Adding mini-app demo (freeport.network/demo-app)…"
+mkdir -p dist/demo-app
+cp ../../examples/demo-app/index.html dist/demo-app/index.html
+
 npx wrangler pages deploy dist --project-name freeport --branch main --commit-dirty=true
 
 # Censorship-resilient mirror: rebuild the single-file offline app from this

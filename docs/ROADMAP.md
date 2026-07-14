@@ -234,6 +234,20 @@ SHIPPED in 2026-07 (see git history for the full specs). What remains of each:
 
 ## Mini-apps — a decentralized super-app shell (NIP-07 + WebLN)
 
+**Status (2026-07): v1 SHIPPED (experimental toggle, native-only).** The
+architecture is policy/mechanism-split: `miniapps/firewall.ts` is the single
+choke point every bridge RPC passes through (per-origin permission table,
+sensitive-kind always-ask list, per-app + global daily spend caps, payment
+cooldown, sign/invoice rate limits, ask-flood cap, audit log) — pure TS with
+its own adversarial suite; `bridge.ts` translates shim RPCs into firewall
+facts (payment amounts parsed from the invoice native-side, never
+app-claimed; sign templates field-whitelisted) and `MiniAppShell.tsx` is the
+hardened WebView (static shim, main-frame-only, incognito per app, navigation
+locked to the registered origin, popups off, responses escape-encoded).
+Add by URL or QR under Settings → Mini-apps; punycode lookalike origins are
+refused outright. Remaining below: web postMessage mode, a Nostr-published
+directory/blocklist, per-app spend-cap UI.
+
 Turn Freeport into a host that injects its **portable identity** and
 **self-custodial wallet** into third-party web apps — the WeChat/Zalo
 mini-program idea, done the Nostr way (no curated store, no operator).

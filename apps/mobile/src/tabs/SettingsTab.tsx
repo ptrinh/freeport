@@ -49,6 +49,16 @@ import { ExperimentalSection } from './settings/ExperimentalSection';
 import { ChatSection } from './settings/ChatSection';
 import { callsSupported } from '../calls/webrtc';
 import { conciergeModulePresent } from '../concierge/model';
+import { MiniAppsSection } from '../miniapps/MiniAppsSection';
+import { loadFirewall } from '../miniapps/store';
+import type { MiniAppFirewall, MiniAppRecord } from '../miniapps/firewall';
+import { activeWalletProvider } from '../wallet';
+
+// Loaded on demand: react-native-webview only exists in 1.6.0+ binaries, so the
+// shell must never be evaluated at startup on an older runtime.
+const MiniAppShellLazy = React.lazy(() =>
+  import('../miniapps/MiniAppShell').then((m) => ({ default: m.MiniAppShell })),
+);
 
 function SettingsTab({
   npub,
@@ -72,6 +82,9 @@ function SettingsTab({
   onChatTranslateChange,
   experimentalLlm,
   onExperimentalLlmChange,
+  experimentalMiniApps,
+  onExperimentalMiniAppsChange,
+  walletNwcUrl,
   requiredLocOk,
   requiredNotifOk,
   onDismissNotif,
@@ -135,6 +148,10 @@ function SettingsTab({
   onChatTranslateChange: (v: boolean) => void;
   experimentalLlm: boolean;
   onExperimentalLlmChange: (v: boolean) => void;
+  experimentalMiniApps: boolean;
+  onExperimentalMiniAppsChange: (v: boolean) => void;
+  /** Stored NWC url ('' = built-in wallet) — mini-apps resolve their WebLN wallet with it. */
+  walletNwcUrl: string;
   requiredLocOk: boolean;
   requiredNotifOk: boolean;
   onDismissNotif: () => void;
@@ -266,6 +283,14 @@ function SettingsTab({
     return () => { cancelled = true; };
   }, [cloudOn]);
   const [identityOpen, setIdentityOpen] = useState(false);
+  // Mini-apps: the firewall loads once the feature is on; the shell opens per app.
+  const [miniAppFw, setMiniAppFw] = useState<MiniAppFirewall | null>(null);
+  const [openMiniApp, setOpenMiniApp] = useState<MiniAppRecord | null>(null);
+  useEffect(() => {
+    if (experimentalMiniApps && Platform.OS !== 'web' && !miniAppFw) {
+      void loadFirewall().then(setMiniAppFw).catch(() => {});
+    }
+  }, [experimentalMiniApps, miniAppFw]);
   const [profileOpen, setProfileOpen] = useState(true);
   const [locationOpen, setLocationOpen] = useState(false);
   const [featuresOpen, setFeaturesOpen] = useState(false);
@@ -925,7 +950,25 @@ function SettingsTab({
         llmEnabled={experimentalLlm}
         onLlmEnabledChange={onExperimentalLlmChange}
         llmSupported={conciergeModulePresent()}
+        miniAppsEnabled={experimentalMiniApps}
+        onMiniAppsEnabledChange={onExperimentalMiniAppsChange}
       />
+
+      {/* Mini-apps registry — native-only shell for NIP-07/WebLN web apps. */}
+      {experimentalMiniApps && Platform.OS !== 'web' && miniAppFw ? (
+        <MiniAppsSection firewall={miniAppFw} onOpenApp={setOpenMiniApp} />
+      ) : null}
+      {openMiniApp && miniAppFw && signerRef.current ? (
+        <React.Suspense fallback={null}>
+          <MiniAppShellLazy
+            app={openMiniApp}
+            firewall={miniAppFw}
+            signer={signerRef.current}
+            getWallet={experimentalWallet ? () => activeWalletProvider(walletNwcUrl) : null}
+            onClose={() => setOpenMiniApp(null)}
+          />
+        </React.Suspense>
+      ) : null}
 
       {/* Chat settings — chat is a core feature now, section always shows. */}
       {experimentalChat && (

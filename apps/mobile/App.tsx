@@ -44,6 +44,7 @@ import {
   type Negotiation,
 } from '@freeport/protocol';
 import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, restoreNsec } from './src/identity';
+import { resetFirewall as resetMiniAppFirewall } from './src/miniapps/store';
 import { createPasskeyIdentity, signInWithPasskey } from './src/passkey';
 import { restoreSettingsSync, fillMissingProfileFromRelays } from './src/relaySync';
 import { dealFiat } from './src/wallet/fiatConvert';
@@ -370,6 +371,7 @@ function AppInner() {
   const [chatCallsTurn, setChatCallsTurn] = useState(false);
   const [chatTranslate, setChatTranslate] = useState(false);
   const [experimentalLlm, setExperimentalLlm] = useState(false);
+  const [experimentalMiniApps, setExperimentalMiniApps] = useState(false);
   // Calls: one manager per client; prefs read through a ref so the manager's
   // event-time reads never see a stale closure.
   const callPrefsRef = useRef({ callsEnabled: false, turnEnabled: false });
@@ -573,6 +575,7 @@ function AppInner() {
       setChatCallsTurn(p.chatCallsTurn);
       setChatTranslate(p.chatTranslate);
       setExperimentalLlm(p.experimentalLlm);
+      setExperimentalMiniApps(p.experimentalMiniApps);
       setWalletNwcUrl(p.walletNwcUrl);
       setWalletUnit(p.walletUnit === 'sats' ? 'local' : p.walletUnit); // header is fiat-only now
       setLocation(p.location);
@@ -1480,6 +1483,12 @@ function AppInner() {
             setExperimentalLlm(v);
             savePrefs({ experimentalLlm: v }).catch(() => {});
           }}
+          experimentalMiniApps={experimentalMiniApps}
+          onExperimentalMiniAppsChange={(v) => {
+            setExperimentalMiniApps(v);
+            savePrefs({ experimentalMiniApps: v }).catch(() => {});
+          }}
+          walletNwcUrl={walletNwcUrl}
           requiredLocOk={locOk}
           requiredNotifOk={notifSatisfied}
           onDismissNotif={dismissNotif}
@@ -1611,6 +1620,7 @@ function AppInner() {
             await kvSet('freeport.pushOn', '0').catch(() => {});
             // Erase EVERYTHING on this device (key, profile, settings, posts, deals…).
             await wipeAllLocalData();
+            resetMiniAppFirewall(); // drop in-memory mini-app grants with the store
             setFareConfig(null); setFareConfigState(null);
             if (useNip07) setUseNip07(false);
             const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };

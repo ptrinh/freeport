@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 import { t } from '../../i18n';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { s, palette } from '../../ui/theme';
@@ -39,6 +39,8 @@ function ExperimentalSection({
   llmEnabled,
   onLlmEnabledChange,
   llmSupported = true,
+  miniAppsEnabled,
+  onMiniAppsEnabledChange,
 }: {
   walletEnabled: boolean;
   onWalletEnabledChange: (v: boolean) => void;
@@ -48,6 +50,8 @@ function ExperimentalSection({
   onLlmEnabledChange: (v: boolean) => void;
   /** Device has an on-device model layer (Apple FM / Gemini Nano / Prompt API). */
   llmSupported?: boolean;
+  miniAppsEnabled: boolean;
+  onMiniAppsEnabledChange: (v: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -124,7 +128,25 @@ function ExperimentalSection({
           )}
           {/* Calls shipped — the toggle lives under Settings → Chat (with the
               TURN fallback + IP note), per the roadmap spec. */}
-          <ComingSoonRow icon="apps-outline" title={t('Mini-apps')} desc={t('Web apps that use your Freeport identity & wallet — coming soon.')} />
+          {Platform.OS !== 'web' ? (
+            <Pressable
+              accessibilityRole="switch"
+              accessibilityState={{ checked: miniAppsEnabled }}
+              style={s.toggleRow}
+              onPress={() => onMiniAppsEnabledChange(!miniAppsEnabled)}
+            >
+              <Ionicons name="apps-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
+              <View style={{ flex: 1, marginEnd: 12 }}>
+                <Text style={s.toggleTitle}>{t('Mini-apps')}</Text>
+                <Text style={s.dim}>{t('Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.')}</Text>
+              </View>
+              <View style={[s.switchTrack, miniAppsEnabled && s.switchTrackOn]}>
+                <View style={[s.switchThumb, miniAppsEnabled && s.switchThumbOn]} />
+              </View>
+            </Pressable>
+          ) : (
+            <ComingSoonRow icon="apps-outline" title={t('Mini-apps')} desc={t('Web apps that use your Freeport identity & wallet — on the mobile app.')} />
+          )}
           {/* Zaps shipped — the ⚡ chip lives on Browse cards (wallet on). */}
         </>
       )}

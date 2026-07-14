@@ -89,6 +89,8 @@ export interface Prefs {
   /** Experimental: master switch for ALL on-device AI features (concierge,
    *  chat translate). Off by default; nothing AI-related renders without it. */
   experimentalLlm: boolean;
+  /** Experimental: mini-apps shell (NIP-07 + WebLN WebView host). Native-only. */
+  experimentalMiniApps: boolean;
 }
 
 const DEFAULTS: Prefs = {
@@ -122,6 +124,7 @@ const DEFAULTS: Prefs = {
   chatCallsTurn: false,
   chatTranslate: false,
   experimentalLlm: false,
+  experimentalMiniApps: false,
 };
 
 /** Public-instance hostnames we've renamed. Installs that saved one of these

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>eSIM Demo Shop — Freeport Mini-app</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: #06080c; color: #e8edf2; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 20px 16px 48px; }
+  header { display: flex; align-items: center; gap: 12px; padding: 8px 0 18px; }
+  .logo { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg,#0ea5e9,#6366f1); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  h1 { font-size: 20px; margin: 0; }
+  .sub { color: #8b97a6; font-size: 12px; margin-top: 2px; }
+  .banner { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 12px 14px; font-size: 13px; color: #c9d5e0; line-height: 1.5; }
+  .banner.warn { border-color: #7c2d12; color: #fdba74; }
+  .id { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
+  .id button { flex: none; }
+  .npub { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #38bdf8; word-break: break-all; }
+  .card { background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 18px; margin-top: 16px; }
+  .card h2 { margin: 0 0 4px; font-size: 17px; }
+  .desc { color: #8b97a6; font-size: 13px; line-height: 1.5; margin: 6px 0 14px; }
+  .price { font-size: 22px; font-weight: 800; }
+  .price small { font-size: 12px; color: #8b97a6; font-weight: 400; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  button { background: #2563eb; color: #fff; border: 0; border-radius: 10px; padding: 11px 20px; font-size: 15px; font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  button.ghost { background: transparent; border: 1px solid #2563eb; color: #60a5fa; }
+  .esim { margin-top: 14px; background: #06121f; border: 1px dashed #0ea5e9; border-radius: 12px; padding: 14px; }
+  .esim .lpa { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #7dd3fc; word-break: break-all; }
+  .esim .ok { color: #34d399; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .err { color: #f87171; font-size: 13px; margin-top: 10px; min-height: 1em; }
+  footer { margin-top: 28px; color: #4b5a6e; font-size: 11px; line-height: 1.6; text-align: center; }
+  a { color: #38bdf8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">📶</div>
+    <div>
+      <h1>eSIM Demo Shop</h1>
+      <div class="sub">A Freeport mini-app demo — nothing here is a real eSIM</div>
+    </div>
+  </header>
+
+  <div id="bridge-note" class="banner warn" hidden>
+    This shop is a <b>Freeport mini-app</b>. Open the Freeport app →
+    Settings → Experimental → Mini-apps, then add
+    <b>freeport.network/demo-app</b> to shop with your Freeport identity &amp; wallet.
+  </div>
+
+  <div class="banner" id="intro">
+    Demo of the mini-app bridge: sign in with your Nostr key (NIP-07) and pay
+    with the built-in wallet — the shop never sees your private key, and every
+    payment needs your approval in a native Freeport dialog.
+  </div>
+
+  <div class="id">
+    <button id="login" class="ghost">Sign in with Freeport</button>
+    <div class="npub" id="who"></div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <h2>Free eSIM</h2>
+        <div class="price">0 <small>sats</small></div>
+      </div>
+      <button id="buy-free" disabled>Buy</button>
+    </div>
+    <div class="desc">100 MB · 1 day · demo coverage only. Free — issued instantly to your Freeport identity.</div>
+    <div class="esim" id="esim-free" hidden></div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <h2>Global eSIM</h2>
+        <div class="price">5 <small>USDT</small></div>
+      </div>
+      <button id="buy-global" disabled>Buy</button>
+    </div>
+    <div class="desc">10 GB · 30 days · 120 countries (pretend). Paid in USDT over Spark via your Freeport wallet.</div>
+    <div class="esim" id="esim-global" hidden></div>
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <footer>
+    Demo only — no eSIM is ever provisioned and the USDT payment goes to a demo
+    address. Source:
+    <a href="https://github.com/ptrinh/freeport/tree/main/examples/demo-app">github.com/ptrinh/freeport</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  // Demo Spark address the Global eSIM payment goes to.
+  var PAY_TO = 'spark1pgss8767mv3pe7cuakkux5fgemra9u0f707ymc8gpdame6xvlg0qeh5c20sg0h';
+
+  var pubkey = '';
+  var $ = function (id) { return document.getElementById(id); };
+
+  var inShell = !!(window.nostr && window.freeport);
+  if (!inShell) {
+    $('bridge-note').hidden = false;
+    $('login').disabled = true;
+  }
+
+  function setErr(msg) { $('err').textContent = msg || ''; }
+
+  // Fake activation code, deterministically derived from the buyer's pubkey so
+  // the demo feels personal. NOT a real eSIM.
+  function fakeEsim(plan) {
+    var seed = (pubkey || 'anon') + '|' + plan;
+    var h = 0;
+    for (var i = 0; i < seed.length; i++) { h = (h * 31 + seed.charCodeAt(i)) >>> 0; }
+    var code = h.toString(16).toUpperCase().padStart(8, '0');
+    return 'LPA:1$demo.freeport.network$' + plan + '-' + code;
+  }
+
+  function showEsim(id, plan, note) {
+    var box = $(id);
+    box.hidden = false;
+    box.innerHTML = '<div class="ok">✓ ' + note + '</div>' +
+      '<div class="lpa">' + fakeEsim(plan) + '</div>' +
+      '<div class="desc" style="margin:8px 0 0">Add this activation code in Settings → Cellular (it will not actually work — demo!).</div>';
+  }
+
+  $('login').addEventListener('click', function () {
+    setErr('');
+    window.nostr.getPublicKey().then(function (pk) {
+      pubkey = String(pk || '');
+      $('who').textContent = pubkey ? 'npub…' + pubkey.slice(-8) : '';
+      $('login').textContent = 'Signed in';
+      $('login').disabled = true;
+      $('buy-free').disabled = false;
+      $('buy-global').disabled = false;
+    }).catch(function (e) { setErr(e && e.message ? e.message : 'Sign-in was denied.'); });
+  });
+
+  $('buy-free').addEventListener('click', function () {
+    setErr('');
+    // 0 sats — nothing to pay, issue straight away.
+    showEsim('esim-free', 'FREE', 'Free eSIM issued');
+  });
+
+  $('buy-global').addEventListener('click', function () {
+    setErr('');
+    var btn = $('buy-global');
+    btn.disabled = true; btn.textContent = 'Paying…';
+    window.freeport.paySpark({ address: PAY_TO, token: { ticker: 'USDT', amount: 5 } })
+      .then(function () {
+        btn.textContent = 'Paid';
+        showEsim('esim-global', 'GLOBAL', 'Payment received — Global eSIM issued');
+      })
+      .catch(function (e) {
+        btn.disabled = false; btn.textContent = 'Buy';
+        setErr(e && e.message ? e.message : 'Payment failed.');
+      });
+  });
+})();
+</script>
+</body>
+</html>
