@@ -49,7 +49,6 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "react-native-gemini-nano",
       "expo-asset",
       "@react-native-community/datetimepicker",
       [

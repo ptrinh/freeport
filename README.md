@@ -53,9 +53,24 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 - **Reputation**: peer-rated karma, co-signed deal receipts, proven-deal
   counts, web-of-trust weighting. Sybil resistance stays open — treat
   zero-history identities with caution.
+- **Chat (experimental)**: invite-based 1:1 encrypted chat beyond deals —
+  QR/link invites, replies, emoji reactions, disappearing messages,
+  delivery/read receipts, in-chat Lightning payments. Between updated
+  clients it upgrades to NIP-17 gift wrap, so relays can't even see who
+  talks to whom.
+- **Calls (experimental)**: peer-to-peer audio/video calls in chat (WebRTC,
+  end-to-end encrypted, signaling over encrypted DMs — no call server),
+  with screen sharing on web. Optional TURN fallback.
+- **Zaps & Shops**: NIP-57 zap tipping on posts (verifiable receipts), and
+  NIP-15 storefronts — durable seller listings with a conversational
+  "chat with seller" checkout.
+- **On-device AI (experimental)**: describe what you need in any language
+  and it drafts your post; incoming chat messages auto-translate. Runs
+  entirely on your device (Apple Intelligence / Android ML Kit + Gemini
+  Nano / Chrome built-in AI) — your words never leave it.
 - **Notifications & Telegram**: content-blind push, plus a Telegram bridge —
   market feeds in groups, one-tap broadcast of organic posts, personal pings.
-- **56 languages**, full RTL.
+- **56 languages**, full RTL, in-chat translation.
 
 ## Non-goals (v1)
 
