@@ -238,7 +238,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
             <Ionicons name="arrow-back" size={22} color={palette.text} />
           </Pressable>
           <Avatar uri={avatarUri(conv, client)} size={32} />
-          <View style={{ flex: 1 }}>
+          <View style={{ flexShrink: 1 }}>
             <Text style={s.cardTitle} numberOfLines={1}>{chatDisplayName(conv, client)}</Text>
             {online ? (
               <View style={[s.row, { gap: 3, alignItems: 'center', marginTop: 1 }]}>
@@ -249,19 +249,22 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
               <Text style={[s.dim, { fontSize: 10, marginTop: 1 }]}>{t('Last seen {time}', { time: fmtRowTime(lastSeen) })}</Text>
             ) : null}
           </View>
-          {onStartCall && conv.state === 'active' && !blocked ? (
-            <>
-              <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Voice call')} onPress={() => onStartCall(conv.peer, false)}>
-                <Ionicons name="call-outline" size={20} color={palette.text2} />
-              </Pressable>
-              <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Video call')} onPress={() => onStartCall(conv.peer, true)}>
-                <Ionicons name="videocam-outline" size={20} color={palette.text2} />
-              </Pressable>
-            </>
-          ) : null}
-          <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Menu')} onPress={() => setMenuOpen(true)}>
-            <Ionicons name="ellipsis-vertical" size={20} color={palette.text2} />
-          </Pressable>
+          {/* Icons pinned RIGHT; the back/avatar/name group stays left. */}
+          <View style={[s.row, { gap: 16, alignItems: 'center', marginStart: 'auto' }]}>
+            {onStartCall && conv.state === 'active' && !blocked ? (
+              <>
+                <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Voice call')} onPress={() => onStartCall(conv.peer, false)}>
+                  <Ionicons name="call-outline" size={20} color={palette.text2} />
+                </Pressable>
+                <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Video call')} onPress={() => onStartCall(conv.peer, true)}>
+                  <Ionicons name="videocam-outline" size={20} color={palette.text2} />
+                </Pressable>
+              </>
+            ) : null}
+            <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Menu')} onPress={() => setMenuOpen(true)}>
+              <Ionicons name="ellipsis-vertical" size={20} color={palette.text2} />
+            </Pressable>
+          </View>
         </View>
         {attaching ? (
           <View style={[s.row, { justifyContent: 'center', paddingVertical: 6, gap: 8 }]}>
