@@ -885,5 +885,10 @@ const c: Record<string, string> = {
   "File": "Skedari",
   "wants to save a file to your device": "dëshiron të ruajë një skedar në pajisjen tuaj",
   "Loading…": "Duke u ngarkuar…",
+  "Add App": "Shto aplikacion",
+  "App title": "Titulli i aplikacionit",
+  "Title is required.": "Titulli është i detyrueshëm.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Tërhiqni aplikacionet për t'i risistemuar. Prekni ✕ për ta hequr.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Ende s'ka aplikacione — prekni \"Shto aplikacion\" për të shtuar një me URL ose kod QR.",
 };
 export default c;

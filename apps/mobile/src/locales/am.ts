@@ -882,5 +882,10 @@ const c: Record<string, string> = {
   "File": "ፋይል",
   "wants to save a file to your device": "ፋይል ወደ መሣሪያዎ ማስቀመጥ ይፈልጋል",
   "Loading…": "በመጫን ላይ…",
+  "Add App": "መተግበሪያ አክል",
+  "App title": "የመተግበሪያ ርዕስ",
+  "Title is required.": "ርዕስ ያስፈልጋል።",
+  "Drag apps to rearrange. Tap ✕ to remove.": "ለማስተካከል መተግበሪያዎችን ጎትት። ለማስወገድ ✕ ንካ።",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "እስካሁን መተግበሪያ የለም — በURL ወይም QR ኮድ ለመጨመር \"መተግበሪያ አክል\" ንካ።",
 };
 export default c;

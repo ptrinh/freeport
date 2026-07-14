@@ -125,6 +125,24 @@
   </div>
 </section>
 
+<section id="features">
+  <div class="wrap">
+    <h2 data-i18n="in_h">What's inside</h2>
+    <p class="lead" data-i18n="in_lead">A full marketplace toolkit — self-custodial, encrypted, and yours. The newest pieces are opt-in: flip them on under Settings → Experimental.</p>
+    <div class="grid">
+      <div class="feat"><div class="ic">⚡</div><h3 data-i18n="in1_h">Built-in Lightning wallet</h3><p data-i18n="in1_p">Self-custodial Bitcoin Lightning + USDT wallet, derived from your Nostr key — one backup covers identity and funds. Your own lightning address, QR pay, and one-tap Pay on confirmed deals.</p></div>
+      <div class="feat"><div class="ic">💬</div><h3 data-i18n="in2_h">Encrypted chat &amp; calls</h3><p data-i18n="in2_p">1:1 encrypted chat with voice messages, reactions, disappearing messages and in-chat payments — plus peer-to-peer audio/video calls with no call server in the middle.</p></div>
+      <div class="feat"><div class="ic">🛡️</div><h3 data-i18n="in3_h">Escrow without a custodian</h3><p data-i18n="in3_p">Conditional Lightning payments (HODL invoices) on confirmed deals. The protocol enforces the lock — nobody ever holds the money in between, and unreleased funds auto-refund.</p></div>
+      <div class="feat"><div class="ic">🧩</div><h3 data-i18n="in4_h">Mini-apps</h3><p data-i18n="in4_p">Third-party web apps run inside Freeport with your portable identity and wallet — sandboxed behind a permission firewall where every sensitive action needs your approval. Add any app by URL or QR.</p></div>
+      <div class="feat"><div class="ic">🏪</div><h3 data-i18n="in5_h">Shops &amp; zaps</h3><p data-i18n="in5_p">Durable seller storefronts with a conversational checkout, and Lightning zap tipping on posts with verifiable receipts.</p></div>
+      <div class="feat"><div class="ic">🤖</div><h3 data-i18n="in6_h">On-device AI</h3><p data-i18n="in6_p">Describe what you need in any language and it drafts your post; incoming messages auto-translate. Runs entirely on your device — your words never leave it.</p></div>
+      <div class="feat"><div class="ic">📣</div><h3 data-i18n="in7_h">Telegram bridge</h3><p data-i18n="in7_p">Market feeds in your Telegram groups, one-tap broadcast of group posts to the open network, and personal pings when something needs you.</p></div>
+      <div class="feat"><div class="ic">🌍</div><h3 data-i18n="in8_h">Runs everywhere, speaks everything</h3><p data-i18n="in8_p">iOS, Android, web, and desktop apps — plus the whole app as a single offline HTML file. 56 languages with full right-to-left support.</p></div>
+      <div class="feat"><div class="ic">🔓</div><h3 data-i18n="in9_h">Open source, made to fork</h3><p data-i18n="in9_p">MIT-licensed, no investor deck. Any community can stand up its own market — own name, city, relays — by changing configuration, not architecture.</p></div>
+    </div>
+  </div>
+</section>
+
 <section id="manifesto">
   <div class="wrap">
     <h2 data-i18n="m_h">Why Freeport exists</h2>
@@ -202,6 +220,17 @@ const I18N = {
     s1_h: "Đăng hoặc duyệt", s1_p: "Yêu cầu một chuyến xe hay dịch vụ, hoặc duyệt những gì người gần bạn đang chào.",
     s2_h: "Thương lượng", s2_p: "Đề nghị và đối-đề nghị qua lại riêng tư cho đến khi cả hai đồng ý.",
     s3_h: "Chốt giao dịch", s3_p: "Xác nhận, trao đổi thông tin liên hệ qua tin nhắn mã hóa, rồi gặp nhau.",
+    in_h: "Có gì bên trong",
+    in_lead: "Một bộ công cụ chợ trọn vẹn — tự quản lý khóa, mã hóa, và là của bạn. Các tính năng mới nhất là tùy chọn: bật trong Cài đặt → Thử nghiệm.",
+    in1_h: "Ví Lightning tích hợp", in1_p: "Ví Bitcoin Lightning + USDT tự quản lý, sinh từ khóa Nostr của bạn — một bản sao lưu giữ cả danh tính lẫn tiền. Địa chỉ lightning riêng, thanh toán QR, và nút Pay một chạm trên giao dịch đã chốt.",
+    in2_h: "Chat &amp; gọi mã hóa", in2_p: "Chat 1:1 mã hóa với tin nhắn thoại, cảm xúc, tin nhắn tự hủy và thanh toán trong chat — cùng gọi thoại/video ngang hàng, không máy chủ cuộc gọi ở giữa.",
+    in3_h: "Ký quỹ không cần bên giữ tiền", in3_p: "Thanh toán Lightning có điều kiện (hóa đơn HODL) trên giao dịch đã chốt. Giao thức tự thực thi khóa — không ai giữ tiền ở giữa, tiền chưa giải phóng tự hoàn lại.",
+    in4_h: "Mini-app", in4_p: "Ứng dụng web bên thứ ba chạy ngay trong Freeport với danh tính và ví di động của bạn — cách ly sau một tường lửa cấp quyền, mọi thao tác nhạy cảm đều cần bạn duyệt. Thêm app bằng URL hoặc QR.",
+    in5_h: "Cửa hàng &amp; zap", in5_p: "Gian hàng bền vững cho người bán với thanh toán kiểu trò chuyện, và tip zap Lightning trên bài đăng với biên nhận kiểm chứng được.",
+    in6_h: "AI trên thiết bị", in6_p: "Mô tả điều bạn cần bằng bất kỳ ngôn ngữ nào, AI soạn bài đăng cho bạn; tin nhắn đến tự dịch. Chạy hoàn toàn trên thiết bị — lời của bạn không bao giờ rời khỏi máy.",
+    in7_h: "Cầu nối Telegram", in7_p: "Bảng tin chợ ngay trong nhóm Telegram của bạn, phát bài đăng của nhóm lên mạng mở bằng một chạm, và thông báo riêng khi có việc cần bạn.",
+    in8_h: "Chạy mọi nơi, nói mọi thứ tiếng", in8_p: "Ứng dụng iOS, Android, web và desktop — cộng cả bản offline: toàn bộ app trong một file HTML duy nhất. 56 ngôn ngữ, hỗ trợ đầy đủ chữ viết phải-sang-trái.",
+    in9_h: "Mã nguồn mở, sinh ra để fork", in9_p: "Giấy phép MIT, không deck gọi vốn. Bất kỳ cộng đồng nào cũng có thể dựng chợ riêng — tên riêng, thành phố riêng, relay riêng — chỉ bằng cấu hình, không phải kiến trúc.",
     m_h: "Vì sao Freeport tồn tại",
     m1_h: "Là một dự án nghiên cứu", m1_p: "Hạ tầng thuần P2P có thể đi xa đến đâu? Người mua, người bán, hành khách, tài xế gặp nhau qua Nostr, thanh toán bằng Lightning hoặc tiền mặt. Không có gì ở giữa cần xin phép để tồn tại.",
     m2_h: "Là một luận đề", m2_p: "Chợ ngang hàng với hệ thống uy tín là khả thi. Khi mỗi người sở hữu uy tín của chính mình, thị trường tự điều tiết.",

@@ -885,5 +885,10 @@ const c: Record<string, string> = {
   "File": "Fișier",
   "wants to save a file to your device": "vrea să salveze un fișier pe dispozitivul tău",
   "Loading…": "Se încarcă…",
+  "Add App": "Adaugă aplicație",
+  "App title": "Titlul aplicației",
+  "Title is required.": "Titlul este obligatoriu.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Trage aplicațiile pentru a le rearanja. Atinge ✕ pentru a elimina.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Încă nu există aplicații — atinge \"Adaugă aplicație\" pentru a adăuga una prin URL sau cod QR.",
 };
 export default c;

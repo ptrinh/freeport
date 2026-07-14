@@ -20,6 +20,7 @@ import { loadPrefs, savePrefs, type Prefs } from './prefs';
 import { loadProfile, saveProfile, type UserProfile } from './profile';
 import { loadAddressBook, replaceAddressBook, type AddressBook } from './addressbook';
 import { kvGet, kvSet } from './kv';
+import { exportFirewallState, importFirewallState } from './miniapps/store';
 
 const FILE_NAME = 'freeport-backup.json';
 const CREATED_KEY = 'freeport.created'; // account-age timestamp
@@ -43,17 +44,19 @@ async function buildBundle(sk: Uint8Array, passphrase: string): Promise<string> 
     addressBook: await loadAddressBook(),
     created: flags.created,
     rated: flags.rated,
+    miniapps: await exportFirewallState(), // Apps-tab registry + grants
   });
 }
 
 /** Apply the extras (profile + settings + address book + local flags) from a bundle. */
 async function applyExtras(extras: BackupExtras): Promise<void> {
-  const { profile, prefs, addressBook, created, rated } = extras;
+  const { profile, prefs, addressBook, created, rated, miniapps } = extras;
   if (profile && typeof profile === 'object') await saveProfile(profile as UserProfile);
   if (prefs && typeof prefs === 'object') await savePrefs(prefs as Partial<Prefs>);
   if (addressBook && typeof addressBook === 'object') await replaceAddressBook(addressBook as AddressBook);
   if (typeof created === 'string' && created) await kvSet(CREATED_KEY, created);
   if (typeof rated === 'string' && rated) await kvSet(RATED_KEY, rated);
+  await importFirewallState(miniapps);
 }
 
 /**
@@ -74,9 +77,10 @@ export async function buildCloudBundle(sk: Uint8Array): Promise<string> {
     prefs: await loadPrefs(),
     addressBook: await loadAddressBook(),
     created: flags.created,
-    // `rated` is intentionally omitted from the CLOUD bundle: it grows with the
-    // number of rated deals and could push past the ~4KB Block Store limit. It's
-    // only a re-prompt-avoidance flag, and the (size-unlimited) file backup keeps it.
+    // `rated` and `miniapps` are intentionally omitted from the CLOUD bundle:
+    // both grow without bound (rated-deal ids; the mini-app audit log) and could
+    // push past the ~4KB Block Store limit. The (size-unlimited) file backup
+    // carries them.
   });
 }
 

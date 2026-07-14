@@ -888,5 +888,10 @@ const c: Record<string, string> = {
   "File": "Súbor",
   "wants to save a file to your device": "chce uložiť súbor do vášho zariadenia",
   "Loading…": "Načítava sa…",
+  "Add App": "Pridať aplikáciu",
+  "App title": "Názov aplikácie",
+  "Title is required.": "Názov je povinný.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Presúvaním aplikácií zmeníte poradie. Klepnutím na ✕ ju odstránite.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Zatiaľ žiadne aplikácie — klepnutím na \"Pridať aplikáciu\" pridáte pomocou URL alebo QR kódu.",
 };
 export default c;

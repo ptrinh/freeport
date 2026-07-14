@@ -885,5 +885,10 @@ const c: Record<string, string> = {
   "File": "Fails",
   "wants to save a file to your device": "vēlas saglabāt failu jūsu ierīcē",
   "Loading…": "Notiek ielāde…",
+  "Add App": "Pievienot lietotni",
+  "App title": "Lietotnes nosaukums",
+  "Title is required.": "Nosaukums ir obligāts.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Velciet lietotnes, lai pārkārtotu. Pieskarieties ✕, lai noņemtu.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Vēl nav lietotņu — pieskarieties \"Pievienot lietotni\", lai pievienotu ar URL vai QR kodu.",
 };
 export default c;

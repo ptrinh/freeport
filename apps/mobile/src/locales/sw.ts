@@ -882,5 +882,10 @@ const c: Record<string, string> = {
   "File": "Faili",
   "wants to save a file to your device": "anataka kuhifadhi faili kwenye kifaa chako",
   "Loading…": "Inapakia…",
+  "Add App": "Ongeza programu",
+  "App title": "Kichwa cha programu",
+  "Title is required.": "Kichwa kinahitajika.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Buruta programu ili kupanga upya. Gusa ✕ ili kuondoa.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Bado hakuna programu — gusa \"Ongeza programu\" ili kuongeza kwa URL au msimbo wa QR.",
 };
 export default c;

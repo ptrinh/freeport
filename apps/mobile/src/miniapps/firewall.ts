@@ -68,6 +68,9 @@ export interface MiniAppRecord {
    *  Always inside `origin`; permissions are still keyed by origin alone. */
   url: string;
   name: string;
+  /** Tile icon (https URL, often a CDN — any origin is fine: it's only ever
+   *  rendered as an image, never executed). */
+  icon?: string;
   addedAt: number;
   perms: AppPermissions;
 }
@@ -133,6 +136,13 @@ export function normalizeLaunchUrl(input: string): string | null {
   return url.length <= 1024 ? url : origin;
 }
 
+/** Icon URLs are display-only but still get the same https-only discipline. */
+function sanitizeIcon(input: unknown): string | undefined {
+  if (typeof input !== 'string' || !input) return undefined;
+  const url = normalizeLaunchUrl(input);
+  return url ?? undefined;
+}
+
 /** Pre-registration check: hard validity + warnings the add-app UI must show. */
 export function evaluateAdd(input: string): { origin: string | null; warnings: string[] } {
   const origin = normalizeOrigin(input);
@@ -187,18 +197,36 @@ export class MiniAppFirewall {
 
   // ── App registry ──────────────────────────────────────────────────────────
 
-  registerApp(input: string, name: string, now: number): MiniAppRecord {
+  registerApp(input: string, name: string, now: number, icon?: string): MiniAppRecord {
     const origin = normalizeOrigin(input);
     if (!origin) throw new Error('invalid origin');
     if (this.blocklist.has(origin)) throw new Error('blocklisted');
     const existing = this.apps.get(origin);
-    if (existing) return existing;
+    if (existing) {
+      // Re-adding refreshes the display metadata but NEVER the grants.
+      existing.name = name || existing.name;
+      if (sanitizeIcon(icon)) existing.icon = sanitizeIcon(icon)!;
+      return existing;
+    }
     const rec: MiniAppRecord = {
-      origin, url: normalizeLaunchUrl(input) ?? origin, name, addedAt: now,
+      origin, url: normalizeLaunchUrl(input) ?? origin, name, icon: sanitizeIcon(icon), addedAt: now,
       perms: { pubkey: false, kinds: [], encryptPeers: [], decryptPeers: [], spendCapDaySats: 0, reads: [] },
     };
     this.apps.set(origin, rec);
     return rec;
+  }
+
+  /** Reorder the launcher grid: origins in the given order first (unknown ones
+   *  ignored), any apps not listed keep their relative order at the end. */
+  reorderApps(order: string[]): void {
+    const next = new Map<string, MiniAppRecord>();
+    for (const o of order) {
+      const origin = normalizeOrigin(o);
+      const rec = origin ? this.apps.get(origin) : undefined;
+      if (rec && !next.has(rec.origin)) next.set(rec.origin, rec);
+    }
+    for (const [o, rec] of this.apps) if (!next.has(o)) next.set(o, rec);
+    this.apps = next;
   }
 
   removeApp(origin: string): void {
@@ -444,6 +472,7 @@ export class MiniAppFirewall {
           origin,
           url: url && url.startsWith(origin) ? url : origin,
           name: String(a.name ?? '').slice(0, 100),
+          icon: sanitizeIcon(a.icon),
           addedAt: Number(a.addedAt) || 0,
           perms: {
             pubkey: !!a.perms?.pubkey,

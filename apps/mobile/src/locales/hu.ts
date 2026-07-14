@@ -885,5 +885,10 @@ const c: Record<string, string> = {
   "File": "Fájl",
   "wants to save a file to your device": "fájlt szeretne menteni az eszközödre",
   "Loading…": "Betöltés…",
+  "Add App": "Alkalmazás hozzáadása",
+  "App title": "Alkalmazás címe",
+  "Title is required.": "A cím megadása kötelező.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Húzza az alkalmazásokat az átrendezéshez. Koppintson a ✕ gombra az eltávolításhoz.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Még nincs alkalmazás — koppintson az \"Alkalmazás hozzáadása\" gombra URL vagy QR-kód általi hozzáadáshoz.",
 };
 export default c;

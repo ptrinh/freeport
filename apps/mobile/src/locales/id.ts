@@ -925,5 +925,10 @@ const c: Record<string, string> = {
   "File": "Berkas",
   "wants to save a file to your device": "ingin menyimpan berkas ke perangkat Anda",
   "Loading…": "Memuat…",
+  "Add App": "Tambah aplikasi",
+  "App title": "Judul aplikasi",
+  "Title is required.": "Judul wajib diisi.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Seret aplikasi untuk menata ulang. Ketuk ✕ untuk menghapus.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Belum ada aplikasi — ketuk \"Tambah aplikasi\" untuk menambahkan lewat URL atau kode QR.",
 };
 export default c;

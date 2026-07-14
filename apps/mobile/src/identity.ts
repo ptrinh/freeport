@@ -116,7 +116,7 @@ export function backupKind(text: string): 'encrypted' | 'plain' | 'unknown' {
 
 /** Extras bundled alongside the key in a backup file (profile + settings +
  *  address book + small local flags: account-created timestamp, rated-deal ids). */
-export interface BackupExtras { profile?: unknown; prefs?: unknown; addressBook?: unknown; created?: unknown; rated?: unknown }
+export interface BackupExtras { profile?: unknown; prefs?: unknown; addressBook?: unknown; created?: unknown; rated?: unknown; miniapps?: unknown }
 
 /**
  * Parse a backup file. Supports the JSON bundle (key + prefs + address book)
@@ -132,7 +132,7 @@ export async function parseBackupBundle(
     const o = JSON.parse(t);
     if (o && typeof o === 'object' && typeof o.key === 'string') {
       const sk = await restoreFromText(o.key, passphrase);
-      return { sk, profile: o.profile, prefs: o.prefs, addressBook: o.addressBook, created: o.created, rated: o.rated };
+      return { sk, profile: o.profile, prefs: o.prefs, addressBook: o.addressBook, created: o.created, rated: o.rated, miniapps: o.miniapps };
     }
   } catch {
     // not JSON → fall through to bare-key handling

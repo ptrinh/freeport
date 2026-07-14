@@ -72,9 +72,11 @@ matching server — relays are dumb pub/sub, all logic is client-side.
   your portable identity (NIP-07) and wallet (WebLN + Spark/stablecoin) —
   sandboxed behind a permission firewall where every sensitive action needs
   your approval ([architecture & threat model](docs/miniapps-security.md)).
-  Add any app by URL or QR; one [`<script>` tag](packages/miniapp-sdk) makes
-  a page work on web too. Try the
-  [demo shop](https://freeport.network/demo-app/).
+  A dedicated **Apps** tab hosts the launcher — a home-screen-style grid
+  (add any app by URL or QR, drag to rearrange), with the wallet as its first
+  tile; your apps and their grants travel with the account backup. One
+  [`<script>` tag](packages/miniapp-sdk) makes a page work on web too. Try
+  the [demo shop](https://freeport.network/demo-app/).
 - **On-device AI (experimental)**: describe what you need in any language
   and it drafts your post; incoming chat messages auto-translate. Runs
   entirely on your device (Apple Intelligence / Android ML Kit + Gemini

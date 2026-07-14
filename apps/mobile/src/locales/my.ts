@@ -882,5 +882,10 @@ const c: Record<string, string> = {
   "File": "ဖိုင်",
   "wants to save a file to your device": "သင့်စက်ပစ္စည်းတွင် ဖိုင်တစ်ခုသိမ်းလိုသည်",
   "Loading…": "ဖွင့်နေသည်…",
+  "Add App": "အက်ပ် ထည့်ရန်",
+  "App title": "အက်ပ် ခေါင်းစဉ်",
+  "Title is required.": "ခေါင်းစဉ် လိုအပ်သည်။",
+  "Drag apps to rearrange. Tap ✕ to remove.": "ပြန်စီရန် အက်ပ်များကို ဆွဲပါ။ ဖယ်ရှားရန် ✕ ကို တို့ပါ။",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "အက်ပ် မရှိသေးပါ — URL သို့မဟုတ် QR ကုဒ်ဖြင့် ထည့်ရန် \"အက်ပ် ထည့်ရန်\" ကို တို့ပါ။",
 };
 export default c;

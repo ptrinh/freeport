@@ -10,6 +10,7 @@ import { loadPrefs, savePrefs, type Prefs } from './prefs';
 import { loadProfile, saveProfile, type UserProfile } from './profile';
 import { loadAddressBook, replaceAddressBook, type AddressBook } from './addressbook';
 import { kvGet, kvSet } from './kv';
+import { exportFirewallState, importFirewallState } from './miniapps/store';
 import { isTauri } from './desktopNative';
 
 const FILE_NAME = 'freeport-backup.json';
@@ -26,16 +27,18 @@ async function buildBundle(sk: Uint8Array, passphrase: string): Promise<string> 
     addressBook: await loadAddressBook(),
     created: await kvGet(CREATED_KEY),
     rated: await kvGet(RATED_KEY),  // file backup has no size limit → keep ratings
+    miniapps: await exportFirewallState(), // Apps-tab registry + grants
   });
 }
 
 async function applyExtras(extras: BackupExtras): Promise<void> {
-  const { profile, prefs, addressBook, created, rated } = extras;
+  const { profile, prefs, addressBook, created, rated, miniapps } = extras;
   if (profile && typeof profile === 'object') await saveProfile(profile as UserProfile);
   if (prefs && typeof prefs === 'object') await savePrefs(prefs as Partial<Prefs>);
   if (addressBook && typeof addressBook === 'object') await replaceAddressBook(addressBook as AddressBook);
   if (typeof created === 'string' && created) await kvSet(CREATED_KEY, created);
   if (typeof rated === 'string' && rated) await kvSet(RATED_KEY, rated);
+  await importFirewallState(miniapps);
 }
 
 /** Save the backup bundle. Desktop (Tauri): native save dialog — the WebView's

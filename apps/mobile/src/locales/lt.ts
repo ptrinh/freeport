@@ -886,5 +886,10 @@ const c: Record<string, string> = {
   "File": "Failas",
   "wants to save a file to your device": "nori išsaugoti failą jūsų įrenginyje",
   "Loading…": "Įkeliama…",
+  "Add App": "Pridėti programėlę",
+  "App title": "Programėlės pavadinimas",
+  "Title is required.": "Pavadinimas privalomas.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Vilkite programėles, kad pertvarkytumėte. Palieskite ✕, kad pašalintumėte.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Programėlių dar nėra — palieskite \"Pridėti programėlę\", kad pridėtumėte pagal URL arba QR kodą.",
 };
 export default c;

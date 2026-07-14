@@ -925,5 +925,10 @@ const c: Record<string, string> = {
   "File": "文件",
   "wants to save a file to your device": "想要保存文件到你的设备",
   "Loading…": "加载中…",
+  "Add App": "添加应用",
+  "App title": "应用标题",
+  "Title is required.": "请填写标题。",
+  "Drag apps to rearrange. Tap ✕ to remove.": "拖动应用以重新排列。点按 ✕ 移除。",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "暂无应用 — 点按\"添加应用\"，通过网址或二维码添加。",
 };
 export default c;

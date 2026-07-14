@@ -1179,10 +1179,16 @@ function AppInner() {
   const visibleTabs: Tab[] = base.filter(
     (t) => (t !== 'browse' || showBrowse) && (t !== 'post' || showPost),
   );
+  // With BOTH features on, the wallet lives inside the Apps tab as a tile —
+  // no separate bottom-bar slot (the wallet SCREEN still opens via setTab).
+  const walletInApps = experimentalWallet && experimentalMiniApps;
   // Experimental wallet: its tab slots in directly left of Settings.
-  if (experimentalWallet) visibleTabs.splice(visibleTabs.indexOf('settings'), 0, 'wallet');
+  if (experimentalWallet && !walletInApps) visibleTabs.splice(visibleTabs.indexOf('settings'), 0, 'wallet');
   // Mini-apps: a dedicated "Apps" tab, also just left of Settings.
   if (experimentalMiniApps) visibleTabs.splice(visibleTabs.indexOf('settings'), 0, 'apps');
+  // Bottom-bar highlight: the wallet screen belongs to the Apps tab when the
+  // wallet lives there (it has no bar slot of its own in that mode).
+  const barTab: Tab = walletInApps && tab === 'wallet' ? 'apps' : tab;
   // Guided-tour steps per rideshare role (Customer/Provider get no tour). Each
   // step highlights a tab; a `wheel` step stays on Post and instead demos the
   // amount wheel. The passenger flow inserts a dedicated wheel/pricing step
@@ -1448,6 +1454,7 @@ function AppInner() {
           signerRef={signerRef}
           walletEnabled={experimentalWallet}
           walletNwcUrl={walletNwcUrl}
+          onOpenWallet={walletInApps ? () => setTab('wallet') : null}
           onScroll={onContentScroll}
         />
       )}
@@ -1727,7 +1734,7 @@ function AppInner() {
       )}
       <View style={[s.tabbar, { paddingBottom: insets.bottom }]}>
         {visibleTabs.map((tk) => (
-          <Pressable key={tk} onPress={() => (tk === 'messages' ? openMessages() : setTab(tk))} style={[s.tab, tab === tk && s.tabActive]}>
+          <Pressable key={tk} onPress={() => (tk === 'messages' ? openMessages() : setTab(tk))} style={[s.tab, barTab === tk && s.tabActive]}>
             <Animated.View style={{ alignSelf: 'stretch', alignItems: 'center', paddingVertical: anim.tabPad }}>
               <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 {tourTab === tk && (
@@ -1742,9 +1749,9 @@ function AppInner() {
                   />
                 )}
                 <Ionicons
-                  name={TAB_ICONS[tk][tab === tk ? 1 : 0]}
+                  name={TAB_ICONS[tk][barTab === tk ? 1 : 0]}
                   size={20}
-                  color={tab === tk ? palette.accent : palette.dim}
+                  color={barTab === tk ? palette.accent : palette.dim}
                 />
                 {tk === 'messages' && pendingCount > 0 && (
                   <View style={s.badge}><Text style={s.badgeText}>{pendingCount}</Text></View>
@@ -1754,7 +1761,7 @@ function AppInner() {
                 )}
               </View>
               <Animated.View style={{ height: anim.labelH, opacity: anim.labelOpacity, overflow: 'hidden', justifyContent: 'center' }}>
-                <Text style={[s.tabText, tab === tk && s.tabTextActive]}>{t(tk === 'post' && role === 'passenger' ? 'Request' : tk === 'browse' ? 'Browse' : tk === 'messages' ? 'Messages' : tk === 'settings' ? 'Settings' : tk === 'wallet' ? 'Wallet' : tk === 'apps' ? 'Apps' : 'Post')}</Text>
+                <Text style={[s.tabText, barTab === tk && s.tabTextActive]}>{t(tk === 'post' && role === 'passenger' ? 'Request' : tk === 'browse' ? 'Browse' : tk === 'messages' ? 'Messages' : tk === 'settings' ? 'Settings' : tk === 'wallet' ? 'Wallet' : tk === 'apps' ? 'Apps' : 'Post')}</Text>
               </Animated.View>
             </Animated.View>
           </Pressable>

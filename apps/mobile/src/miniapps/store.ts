@@ -24,3 +24,17 @@ export function persistFirewall(): void {
 export function resetFirewall(): void {
   instance = null;
 }
+
+/** The serialized registry for account export (null when nothing saved yet). */
+export async function exportFirewallState(): Promise<string | null> {
+  return kvGet(STORE_KEY);
+}
+
+/** Restore the registry from an account backup — never trusted verbatim:
+ *  round-trip through MiniAppFirewall.restore() so tampered origins, grants on
+ *  always-ask kinds, etc. are dropped exactly as they would be at load time. */
+export async function importFirewallState(miniapps: unknown): Promise<void> {
+  if (typeof miniapps !== 'string' || !miniapps) return;
+  await kvSet(STORE_KEY, MiniAppFirewall.restore(miniapps).serialize());
+  instance = null; // next load re-reads storage
+}

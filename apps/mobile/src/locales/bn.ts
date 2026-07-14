@@ -882,5 +882,10 @@ const c: Record<string, string> = {
   "File": "ফাইল",
   "wants to save a file to your device": "আপনার ডিভাইসে একটি ফাইল সংরক্ষণ করতে চায়",
   "Loading…": "লোড হচ্ছে…",
+  "Add App": "অ্যাপ যোগ করুন",
+  "App title": "অ্যাপের শিরোনাম",
+  "Title is required.": "শিরোনাম আবশ্যক।",
+  "Drag apps to rearrange. Tap ✕ to remove.": "সাজাতে অ্যাপ টেনে আনুন। সরাতে ✕ ট্যাপ করুন।",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "এখনও কোনো অ্যাপ নেই — URL বা QR কোড দিয়ে যোগ করতে \"অ্যাপ যোগ করুন\" ট্যাপ করুন।",
 };
 export default c;

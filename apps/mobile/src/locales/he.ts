@@ -885,5 +885,10 @@ const c: Record<string, string> = {
   "File": "קובץ",
   "wants to save a file to your device": "רוצה לשמור קובץ במכשיר שלך",
   "Loading…": "טוען…",
+  "Add App": "הוסף אפליקציה",
+  "App title": "כותרת האפליקציה",
+  "Title is required.": "כותרת נדרשת.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "גררו אפליקציות כדי לסדר מחדש. הקישו ✕ כדי להסיר.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "אין עדיין אפליקציות — הקישו \"הוסף אפליקציה\" כדי להוסיף לפי כתובת URL או קוד QR.",
 };
 export default c;

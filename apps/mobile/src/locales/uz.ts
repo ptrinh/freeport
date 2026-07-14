@@ -882,5 +882,10 @@ const c: Record<string, string> = {
   "File": "Fayl",
   "wants to save a file to your device": "qurilmangizga fayl saqlamoqchi",
   "Loading…": "Yuklanmoqda…",
+  "Add App": "Ilova qo'shish",
+  "App title": "Ilova sarlavhasi",
+  "Title is required.": "Sarlavha talab qilinadi.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Qayta tartiblash uchun ilovalarni suring. Olib tashlash uchun ✕ ni bosing.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Hozircha ilova yo'q — URL yoki QR kod orqali qo'shish uchun \"Ilova qo'shish\" ni bosing.",
 };
 export default c;

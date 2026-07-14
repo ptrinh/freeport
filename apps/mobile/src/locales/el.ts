@@ -885,5 +885,10 @@ const c: Record<string, string> = {
   "File": "Αρχείο",
   "wants to save a file to your device": "θέλει να αποθηκεύσει ένα αρχείο στη συσκευή σας",
   "Loading…": "Φόρτωση…",
+  "Add App": "Προσθήκη εφαρμογής",
+  "App title": "Τίτλος εφαρμογής",
+  "Title is required.": "Ο τίτλος είναι υποχρεωτικός.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Σύρετε τις εφαρμογές για αναδιάταξη. Πατήστε ✕ για αφαίρεση.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Δεν υπάρχουν εφαρμογές ακόμη — πατήστε \"Προσθήκη εφαρμογής\" για προσθήκη μέσω URL ή κωδικού QR.",
 };
 export default c;

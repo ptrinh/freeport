@@ -887,5 +887,10 @@ const c: Record<string, string> = {
   "File": "Plik",
   "wants to save a file to your device": "chce zapisać plik na Twoim urządzeniu",
   "Loading…": "Ładowanie…",
+  "Add App": "Dodaj aplikację",
+  "App title": "Tytuł aplikacji",
+  "Title is required.": "Tytuł jest wymagany.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Przeciągnij aplikacje, aby zmienić kolejność. Dotknij ✕, aby usunąć.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Brak aplikacji — dotknij \"Dodaj aplikację\", aby dodać za pomocą adresu URL lub kodu QR.",
 };
 export default c;

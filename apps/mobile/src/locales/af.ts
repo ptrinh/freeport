@@ -885,5 +885,10 @@ const c: Record<string, string> = {
   "File": "Lêer",
   "wants to save a file to your device": "wil 'n lêer op jou toestel stoor",
   "Loading…": "Laai tans…",
+  "Add App": "Voeg program by",
+  "App title": "Programtitel",
+  "Title is required.": "Titel is verpligtend.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Sleep programme om te herrangskik. Tik ✕ om te verwyder.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Nog geen programme nie — tik \"Voeg program by\" om een per URL of QR-kode by te voeg.",
 };
 export default c;

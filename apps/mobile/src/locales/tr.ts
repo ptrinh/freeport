@@ -928,5 +928,10 @@ const c: Record<string, string> = {
   "File": "Dosya",
   "wants to save a file to your device": "cihazınıza bir dosya kaydetmek istiyor",
   "Loading…": "Yükleniyor…",
+  "Add App": "Uygulama ekle",
+  "App title": "Uygulama başlığı",
+  "Title is required.": "Başlık gerekli.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Yeniden düzenlemek için uygulamaları sürükleyin. Kaldırmak için ✕ öğesine dokunun.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Henüz uygulama yok — URL veya QR koduyla eklemek için \"Uygulama ekle\" öğesine dokunun.",
 };
 export default c;

@@ -339,6 +339,41 @@ describe('persistence', () => {
     }
   });
 
+  it('round-trips launcher metadata (icon) and drops non-https icons', () => {
+    const f = new MiniAppFirewall();
+    f.registerApp(APP, 'Rides', T0, 'https://cdn.example/icon.png?v=2#frag');
+    expect(f.getApp(APP)!.icon).toBe('https://cdn.example/icon.png?v=2'); // fragment stripped
+    const f2 = MiniAppFirewall.restore(f.serialize());
+    expect(f2.getApp(APP)!.icon).toBe('https://cdn.example/icon.png?v=2');
+    // Hostile blob: icon swapped for a non-https scheme → dropped, app kept.
+    const blob = JSON.parse(f.serialize());
+    blob.apps[0].icon = 'javascript:alert(1)';
+    const f3 = MiniAppFirewall.restore(JSON.stringify(blob));
+    expect(f3.getApp(APP)!.icon).toBeUndefined();
+  });
+
+  it('re-adding an app refreshes name/icon but never resets grants', () => {
+    const f = fw();
+    f.grantPubkey(APP);
+    f.registerApp(APP, 'Rides v2', T0, 'https://cdn.example/new.png');
+    const app = f.getApp(APP)!;
+    expect(app.name).toBe('Rides v2');
+    expect(app.icon).toBe('https://cdn.example/new.png');
+    expect(app.perms.pubkey).toBe(true); // grants intact
+  });
+
+  it('reorderApps reorders the grid, ignores unknown origins, keeps stragglers', () => {
+    const f = fw();
+    f.registerApp('https://b.example', 'B', T0);
+    f.registerApp('https://c.example', 'C', T0);
+    f.reorderApps(['https://c.example', 'https://evil.example', APP]);
+    // B was not listed → keeps its relative position at the end.
+    expect(f.listApps().map((a) => a.origin)).toEqual(['https://c.example', APP, 'https://b.example']);
+    // Order survives persistence (it IS the grid layout).
+    const f2 = MiniAppFirewall.restore(f.serialize());
+    expect(f2.listApps().map((a) => a.origin)).toEqual(['https://c.example', APP, 'https://b.example']);
+  });
+
   it('does not resurrect spend for origins that lost their registration', () => {
     const f = fw();
     f.recordSpend(APP, 700, T0);

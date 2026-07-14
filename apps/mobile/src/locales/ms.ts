@@ -882,5 +882,10 @@ const c: Record<string, string> = {
   "File": "Fail",
   "wants to save a file to your device": "mahu menyimpan fail ke peranti anda",
   "Loading…": "Memuatkan…",
+  "Add App": "Tambah apl",
+  "App title": "Tajuk apl",
+  "Title is required.": "Tajuk diperlukan.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Seret apl untuk menyusun semula. Ketik ✕ untuk membuang.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Belum ada apl — ketik \"Tambah apl\" untuk menambah melalui URL atau kod QR.",
 };
 export default c;

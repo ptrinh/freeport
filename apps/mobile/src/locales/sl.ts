@@ -891,5 +891,10 @@ const c: Record<string, string> = {
   "File": "Datoteka",
   "wants to save a file to your device": "želi shraniti datoteko v vašo napravo",
   "Loading…": "Nalaganje…",
+  "Add App": "Dodaj aplikacijo",
+  "App title": "Naslov aplikacije",
+  "Title is required.": "Naslov je obvezen.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Povlecite aplikacije za prerazporeditev. Tapnite ✕ za odstranitev.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Še ni aplikacij — tapnite \"Dodaj aplikacijo\" za dodajanje prek URL-ja ali kode QR.",
 };
 export default c;

@@ -882,5 +882,10 @@ const c: Record<string, string> = {
   "File": "ფაილი",
   "wants to save a file to your device": "სურს ფაილის შენახვა თქვენს მოწყობილობაზე",
   "Loading…": "იტვირთება…",
+  "Add App": "აპის დამატება",
+  "App title": "აპის სათაური",
+  "Title is required.": "სათაური სავალდებულოა.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "გადაათრიეთ აპები გადასაწყობად. წასაშლელად შეეხეთ ✕-ს.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "აპები ჯერ არ არის — შეეხეთ \"აპის დამატება\"-ს, რომ დაამატოთ URL-ით ან QR კოდით.",
 };
 export default c;

@@ -885,5 +885,10 @@ const c: Record<string, string> = {
   "File": "Tiedosto",
   "wants to save a file to your device": "haluaa tallentaa tiedoston laitteellesi",
   "Loading…": "Ladataan…",
+  "Add App": "Lisää sovellus",
+  "App title": "Sovelluksen nimi",
+  "Title is required.": "Nimi vaaditaan.",
+  "Drag apps to rearrange. Tap ✕ to remove.": "Järjestä sovellukset uudelleen vetämällä. Poista napauttamalla ✕.",
+  "No apps yet — tap \"Add App\" to add one by URL or QR code.": "Ei vielä sovelluksia — lisää URL-osoitteella tai QR-koodilla napauttamalla \"Lisää sovellus\".",
 };
 export default c;
