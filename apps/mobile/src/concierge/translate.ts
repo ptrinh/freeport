@@ -25,7 +25,7 @@ let chain: Promise<unknown> = Promise.resolve();
 /** Chrome 138+ desktop ships on-device Translator + LanguageDetector APIs —
  *  purpose-built translation models (small per-pair packs), a better fit for
  *  chat than an LLM. Feature-detected; absent on mobile browsers/Safari. */
-function webTranslatorSupported(): boolean {
+export function webTranslatorSupported(): boolean {
   const g = globalThis as any;
   return typeof g.Translator?.create === 'function' && typeof g.LanguageDetector?.create === 'function';
 }

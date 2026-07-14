@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { t } from '../../i18n';
 import { Ionicons } from '@expo/vector-icons';
 import { s, palette } from '../../ui/theme';
-import { translateSupported } from '../../concierge/translate';
+import { translateSupported, webTranslatorSupported } from '../../concierge/translate';
 
 /**
  * Settings → Chat — only rendered while the Chat experiment is on. Both
@@ -86,7 +86,10 @@ function ChatSection({
             value={receipts}
             onChange={onReceiptsChange}
           />
-          {llmEnabled && translateSupported() && (
+          {/* Translator API (web) is a dedicated translation model, not an
+              LLM — it doesn't need the Local LLM AI master switch. The LLM
+              path (Apple FM) does. */}
+          {(webTranslatorSupported() || (llmEnabled && translateSupported())) && (
             <Toggle
               icon="language-outline"
               title={t('Translate messages')}
