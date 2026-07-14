@@ -35,11 +35,19 @@ origin):
 }
 ```
 
+Host your mini-app on **any https domain** — there is no Freeport-run registry
+or approval, and nothing is limited to `freeport.network`. Users add it by
+pasting your URL or scanning a QR. Requirements:
+
 - `name` (required, ≤60 chars) and `icon` (path or https URL) drive the
   launcher tile; `permissions` (optional) previews which bridge methods you
   intend to call in the add-app dialog.
-- Serve it with `Access-Control-Allow-Origin: *` so the WEB shell can read it
-  cross-origin (the native shell has no CORS).
+- **Web shell** (freeport.network in a browser): serve `freeport.json` with
+  `Access-Control-Allow-Origin: *` (so the shell can read it cross-origin) and
+  don't block framing — no `X-Frame-Options: DENY`, and if you set a CSP
+  `frame-ancestors` it must include `https://freeport.network`.
+- **Native shell** (mobile app): no CORS or framing constraints — just serve
+  `freeport.json`.
 - The manifest is **required**: a URL without a valid `freeport.json`
   cannot be added as a mini-app. It is still not a security boundary — the
   firewall judges every call regardless of what the manifest claims.
