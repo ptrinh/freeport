@@ -893,5 +893,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "새 메시지는 4주 후에 사라집니다",
   "Search": "검색",
   "Missed video call": "부재중 영상 통화",
+  "Share current location": "현재 위치 공유",
+  "Shared location": "공유된 위치",
+  "Could not get your location — check the location permission.": "위치를 가져올 수 없습니다 — 위치 권한을 확인하세요.",
 };
 export default c;

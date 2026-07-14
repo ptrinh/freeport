@@ -853,5 +853,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Nuwe boodskappe verdwyn na 4 weke",
   "Search": "Soek",
   "Missed video call": "Gemiste video-oproep",
+  "Share current location": "Deel huidige ligging",
+  "Shared location": "Gedeelde ligging",
+  "Could not get your location — check the location permission.": "Kon nie jou ligging kry nie — kontroleer die liggingtoestemming.",
 };
 export default c;

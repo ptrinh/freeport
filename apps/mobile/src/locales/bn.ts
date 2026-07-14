@@ -850,5 +850,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "নতুন বার্তা ৪ সপ্তাহ পর অদৃশ্য হয়ে যায়",
   "Search": "অনুসন্ধান",
   "Missed video call": "মিসড ভিডিও কল",
+  "Share current location": "বর্তমান অবস্থান শেয়ার করুন",
+  "Shared location": "শেয়ার করা অবস্থান",
+  "Could not get your location — check the location permission.": "আপনার অবস্থান পাওয়া যায়নি — অবস্থানের অনুমতি পরীক্ষা করুন।",
 };
 export default c;

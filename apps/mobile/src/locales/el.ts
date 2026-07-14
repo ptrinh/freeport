@@ -853,5 +853,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Τα νέα μηνύματα εξαφανίζονται μετά από 4 εβδομάδες",
   "Search": "Αναζήτηση",
   "Missed video call": "Αναπάντητη βιντεοκλήση",
+  "Share current location": "Κοινοποίηση τρέχουσας τοποθεσίας",
+  "Shared location": "Κοινοποιημένη τοποθεσία",
+  "Could not get your location — check the location permission.": "Δεν ήταν δυνατός ο εντοπισμός της τοποθεσίας σας — ελέγξτε την άδεια τοποθεσίας.",
 };
 export default c;

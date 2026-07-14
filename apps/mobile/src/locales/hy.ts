@@ -850,5 +850,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Նոր հաղորդագրությունները անհետանում են 4 շաբաթ հետո",
   "Search": "Որոնել",
   "Missed video call": "Բաց թողնված տեսազանգ",
+  "Share current location": "Կիսվել ընթացիկ տեղադրությամբ",
+  "Shared location": "Կիսված տեղադրություն",
+  "Could not get your location — check the location permission.": "Չհաջողվեց ստանալ ձեր տեղադրությունը — ստուգեք տեղադրության թույլտվությունը։",
 };
 export default c;

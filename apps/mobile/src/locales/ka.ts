@@ -850,5 +850,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "ახალი შეტყობინებები ქრება 4 კვირის შემდეგ",
   "Search": "ძებნა",
   "Missed video call": "გამოტოვებული ვიდეოზარი",
+  "Share current location": "მიმდინარე მდებარეობის გაზიარება",
+  "Shared location": "გაზიარებული მდებარეობა",
+  "Could not get your location — check the location permission.": "თქვენი მდებარეობის მიღება ვერ მოხერხდა — შეამოწმეთ მდებარეობის ნებართვა.",
 };
 export default c;

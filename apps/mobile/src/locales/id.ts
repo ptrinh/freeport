@@ -893,5 +893,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Pesan baru menghilang setelah 4 minggu",
   "Search": "Cari",
   "Missed video call": "Panggilan video tak terjawab",
+  "Share current location": "Bagikan lokasi saat ini",
+  "Shared location": "Lokasi yang dibagikan",
+  "Could not get your location — check the location permission.": "Tidak dapat memperoleh lokasi Anda — periksa izin lokasi.",
 };
 export default c;

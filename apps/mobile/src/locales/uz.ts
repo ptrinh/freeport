@@ -850,5 +850,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Yangi xabarlar 4 haftadan keyin yo'qoladi",
   "Search": "Qidirish",
   "Missed video call": "O‘tkazib yuborilgan video qo‘ng‘iroq",
+  "Share current location": "Joriy joylashuvni ulashish",
+  "Shared location": "Ulashilgan joylashuv",
+  "Could not get your location — check the location permission.": "Joylashuvingizni aniqlab bo‘lmadi — joylashuv ruxsatini tekshiring.",
 };
 export default c;

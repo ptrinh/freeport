@@ -893,5 +893,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Tin nhắn mới tự xóa sau 4 tuần",
   "Search": "Tìm kiếm",
   "Missed video call": "Cuộc gọi video nhỡ",
+  "Share current location": "Chia sẻ vị trí hiện tại",
+  "Shared location": "Vị trí đã chia sẻ",
+  "Could not get your location — check the location permission.": "Không thể lấy vị trí của bạn — hãy kiểm tra quyền truy cập vị trí.",
 };
 export default c;

@@ -896,5 +896,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "تختفي الرسائل الجديدة بعد 4 أسابيع",
   "Search": "بحث",
   "Missed video call": "مكالمة فيديو فائتة",
+  "Share current location": "مشاركة الموقع الحالي",
+  "Shared location": "موقع تمت مشاركته",
+  "Could not get your location — check the location permission.": "تعذّر تحديد موقعك — تحقّق من إذن الوصول إلى الموقع.",
 };
 export default c;

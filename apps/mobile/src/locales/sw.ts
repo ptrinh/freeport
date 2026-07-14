@@ -850,5 +850,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Ujumbe mpya hutoweka baada ya wiki 4",
   "Search": "Tafuta",
   "Missed video call": "Simu ya video uliyoikosa",
+  "Share current location": "Shiriki eneo la sasa",
+  "Shared location": "Eneo lililoshirikiwa",
+  "Could not get your location — check the location permission.": "Imeshindwa kupata eneo lako — angalia ruhusa ya eneo.",
 };
 export default c;

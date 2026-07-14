@@ -893,5 +893,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "新しいメッセージは4週間後に消えます",
   "Search": "検索",
   "Missed video call": "不在着信（ビデオ）",
+  "Share current location": "現在地を共有",
+  "Shared location": "共有された位置情報",
+  "Could not get your location — check the location permission.": "現在地を取得できませんでした — 位置情報の権限を確認してください。",
 };
 export default c;

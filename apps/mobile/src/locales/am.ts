@@ -850,5 +850,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "አዲስ መልዕክቶች ከ4 ሳምንታት በኋላ ይጠፋሉ",
   "Search": "ፈልግ",
   "Missed video call": "ያመለጠ የቪዲዮ ጥሪ",
+  "Share current location": "የአሁኑን አካባቢ አጋራ",
+  "Shared location": "የተጋራ አካባቢ",
+  "Could not get your location — check the location permission.": "አካባቢዎን ማግኘት አልተቻለም — የአካባቢ ፈቃዱን ያረጋግጡ።",
 };
 export default c;

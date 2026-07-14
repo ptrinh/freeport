@@ -896,5 +896,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Yeni mesajlar 4 hafta sonra kaybolur",
   "Search": "Ara",
   "Missed video call": "Cevapsız görüntülü arama",
+  "Share current location": "Mevcut konumu paylaş",
+  "Shared location": "Paylaşılan konum",
+  "Could not get your location — check the location permission.": "Konumunuz alınamadı — konum iznini kontrol edin.",
 };
 export default c;

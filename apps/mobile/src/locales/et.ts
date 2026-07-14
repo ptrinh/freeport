@@ -853,5 +853,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Uued sõnumid kaovad 4 nädala pärast",
   "Search": "Otsi",
   "Missed video call": "Vastamata videokõne",
+  "Share current location": "Jaga praegust asukohta",
+  "Shared location": "Jagatud asukoht",
+  "Could not get your location — check the location permission.": "Sinu asukohta ei õnnestunud tuvastada — kontrolli asukohaluba.",
 };
 export default c;

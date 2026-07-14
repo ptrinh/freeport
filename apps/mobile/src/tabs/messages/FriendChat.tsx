@@ -23,10 +23,11 @@ import { webBase } from '../../webBase';
 import { fmtClock } from '../../ui/format';
 import { s, palette } from '../../ui/theme';
 import { confirmAsync } from '../../ui/alerts';
-import { ChatCore, SAFE_ATTACH_EXTENSIONS, isAudioMsg, isImageMsg, isTripMsg, isDocMsg, docMsgName } from './Chat';
+import { ChatCore, SAFE_ATTACH_EXTENSIONS, isAudioMsg, isImageMsg, isTripMsg, isDocMsg, isLocationMsg, locationMsg, docMsgName } from './Chat';
 import { matchesKeywords } from '../../browseFilter';
 import { DraggableFab } from '../../ui/DraggableFab';
 import { uploadFile, UploadError } from '../../upload';
+import { getCurrentCoords } from '../../geo';
 
 /** Display name: their invite/accept name → kind:0 profile → npub prefix. */
 export function chatDisplayName(conv: Conversation, client: MobileClient | null): string {
@@ -61,6 +62,7 @@ function lastLine(conv: Conversation): string {
   const body = isAudioMsg(m.text) ? '🎙 ' + t('Voice memo')
     : isImageMsg(m.text) ? '📷 ' + t('Photo')
     : isTripMsg(m.text) ? '📍 ' + t('Live location')
+    : isLocationMsg(m.text) ? '📍 ' + t('Shared location')
     : isDocMsg(m.text) ? '📄 ' + docMsgName(m.text)
     : m.text;
   return prefix + (body.length > 60 ? body.slice(0, 57) + '…' : body);
@@ -238,6 +240,17 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
     }
   };
 
+  /** One-shot current position → a plain maps pin message. */
+  const shareLocation = async () => {
+    setMenuOpen(false);
+    const pos = await getCurrentCoords();
+    if (!pos) {
+      Alert.alert(t('Share current location'), t('Could not get your location — check the location permission.'));
+      return;
+    }
+    await client?.chatSend(conv.peer, locationMsg(pos.latitude, pos.longitude)).catch(() => {});
+  };
+
   const ttlLabel = conv.disappearTtl ? (TTL_LABELS[conv.disappearTtl] ?? '24h') : t('Off');
   const menuRow = (icon: React.ComponentProps<typeof Ionicons>['name'], label: string, onPress: () => void, danger = false) => (
     <Pressable
@@ -324,6 +337,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
               <Pressable style={s.sortSheet} onPress={() => {}}>
                 {menuRow('search-outline', t('Search'), () => { setMenuOpen(false); setSearchOpen(true); })}
                 {conv.state === 'active' && !blocked ? menuRow('add-circle-outline', t('Attach file'), attachFile) : null}
+                {conv.state === 'active' && !blocked ? menuRow('location-outline', t('Share current location'), shareLocation) : null}
                 {walletEnabled && onPayFriend && conv.theirPay && conv.state === 'active' && !blocked
                   ? menuRow('flash-outline', t('Send payment'), () => { setMenuOpen(false); onPayFriend(conv.peer, conv.theirPay!); })
                   : null}

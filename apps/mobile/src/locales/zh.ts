@@ -893,5 +893,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "新消息将在 4 周后消失",
   "Search": "搜索",
   "Missed video call": "未接视频通话",
+  "Share current location": "分享当前位置",
+  "Shared location": "已分享的位置",
+  "Could not get your location — check the location permission.": "无法获取你的位置 — 请检查位置权限。",
 };
 export default c;

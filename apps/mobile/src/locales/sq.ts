@@ -853,5 +853,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Mesazhet e reja zhduken pas 4 javësh",
   "Search": "Kërko",
   "Missed video call": "Telefonatë me video e humbur",
+  "Share current location": "Shpërnda vendndodhjen aktuale",
+  "Shared location": "Vendndodhje e shpërndarë",
+  "Could not get your location — check the location permission.": "Nuk u mor dot vendndodhja jote — kontrollo lejen e vendndodhjes.",
 };
 export default c;

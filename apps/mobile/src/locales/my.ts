@@ -850,5 +850,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "မက်ဆေ့ချ်အသစ်များ ၄ ပတ်အကြာတွင် ပျောက်ကွယ်သွားမည်",
   "Search": "ရှာဖွေရန်",
   "Missed video call": "လွတ်သွားသော ဗီဒီယိုခေါ်ဆိုမှု",
+  "Share current location": "လက်ရှိတည်နေရာကို မျှဝေပါ",
+  "Shared location": "မျှဝေထားသော တည်နေရာ",
+  "Could not get your location — check the location permission.": "သင့်တည်နေရာကို ရယူ၍မရပါ — တည်နေရာ ခွင့်ပြုချက်ကို စစ်ဆေးပါ။",
 };
 export default c;

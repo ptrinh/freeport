@@ -854,5 +854,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Naujos žinutės išnyksta po 4 savaičių",
   "Search": "Ieškoti",
   "Missed video call": "Praleistas vaizdo skambutis",
+  "Share current location": "Bendrinti dabartinę vietą",
+  "Shared location": "Bendrinama vieta",
+  "Could not get your location — check the location permission.": "Nepavyko nustatyti jūsų vietos — patikrinkite vietos leidimą.",
 };
 export default c;

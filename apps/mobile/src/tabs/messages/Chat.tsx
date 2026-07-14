@@ -49,6 +49,16 @@ export function isTripMsg(t: string): boolean {
   return /^https?:\/\/\S+#t=[A-Za-z0-9\-_]+/.test(t.trim());
 }
 
+/** A one-shot "current location" pin (a bare maps?q=lat,lng link). */
+export function isLocationMsg(t: string): boolean {
+  return /^https:\/\/(www\.)?google\.com\/maps\?q=-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(t.trim());
+}
+
+/** Build the message text for a shared current location. */
+export function locationMsg(lat: number, lng: number): string {
+  return `https://www.google.com/maps?q=${lat.toFixed(6)},${lng.toFixed(6)}`;
+}
+
 /**
  * File attachments — ALLOWLIST, not blocklist: only boring document/media
  * formats. Executables and anything a browser executes (js, html, svg —
@@ -202,7 +212,7 @@ const ChatBubble = React.memo(function ChatBubble({
   const callNotice = /^(📞|📹) /.test(text);
   // Translated inbound text: main line = translation, original small + dim
   // below (the familiar chat-app pattern). Media/trip links are never touched.
-  const plainText = !isAudioMsg(text) && !isImageMsg(text) && !isTripMsg(text) && !callNotice;
+  const plainText = !isAudioMsg(text) && !isImageMsg(text) && !isTripMsg(text) && !isLocationMsg(text) && !callNotice;
   const [translated, setTranslated] = useState<string | null>(null);
   useEffect(() => {
     setTranslated(null);
@@ -239,6 +249,11 @@ const ChatBubble = React.memo(function ChatBubble({
         : isImageMsg(text)
         ? <Pressable onPress={() => onZoom(text)}>
             <Image source={{ uri: text }} style={s.chatImage} resizeMode="cover" />
+          </Pressable>
+        : isLocationMsg(text)
+        ? <Pressable style={s.trackMsg} onPress={() => Linking.openURL(text.trim())}>
+            <Ionicons name="location" size={16} color={dir === 'out' ? '#f5f7fa' : palette.link} />
+            <Text style={[s.trackMsgText, dir === 'out' && s.chatTextOut]}>{t('Shared location')}</Text>
           </Pressable>
         : isTripMsg(text)
         ? <Pressable style={s.trackMsg} onPress={() => Linking.openURL(text.trim())}>

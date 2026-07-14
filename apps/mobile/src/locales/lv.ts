@@ -853,5 +853,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Jaunie ziņojumi pazūd pēc 4 nedēļām",
   "Search": "Meklēt",
   "Missed video call": "Neatbildēts videozvans",
+  "Share current location": "Kopīgot pašreizējo atrašanās vietu",
+  "Shared location": "Kopīgotā atrašanās vieta",
+  "Could not get your location — check the location permission.": "Neizdevās noteikt jūsu atrašanās vietu — pārbaudiet atrašanās vietas atļauju.",
 };
 export default c;

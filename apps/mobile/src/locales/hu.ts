@@ -853,5 +853,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Az új üzenetek 4 hét után eltűnnek",
   "Search": "Keresés",
   "Missed video call": "Nem fogadott videohívás",
+  "Share current location": "Jelenlegi hely megosztása",
+  "Shared location": "Megosztott hely",
+  "Could not get your location — check the location permission.": "Nem sikerült lekérni a helyzetedet — ellenőrizd a helyhozzáférési engedélyt.",
 };
 export default c;

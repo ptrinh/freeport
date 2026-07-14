@@ -856,5 +856,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Nové správy zmiznú po 4 týždňoch",
   "Search": "Hľadať",
   "Missed video call": "Zmeškaný videohovor",
+  "Share current location": "Zdieľať aktuálnu polohu",
+  "Shared location": "Zdieľaná poloha",
+  "Could not get your location — check the location permission.": "Nepodarilo sa zistiť vašu polohu — skontrolujte povolenie polohy.",
 };
 export default c;

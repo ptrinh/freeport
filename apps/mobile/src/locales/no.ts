@@ -853,5 +853,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Nye meldinger forsvinner etter 4 uker",
   "Search": "Søk",
   "Missed video call": "Tapt videoanrop",
+  "Share current location": "Del gjeldende posisjon",
+  "Shared location": "Delt posisjon",
+  "Could not get your location — check the location permission.": "Kunne ikke hente posisjonen din — sjekk posisjonstillatelsen.",
 };
 export default c;

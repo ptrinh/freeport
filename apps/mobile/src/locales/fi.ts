@@ -853,5 +853,8 @@ const c: Record<string, string> = {
   "New messages disappear after 4 weeks": "Uudet viestit katoavat 4 viikon kuluttua",
   "Search": "Haku",
   "Missed video call": "Vastaamaton videopuhelu",
+  "Share current location": "Jaa nykyinen sijainti",
+  "Shared location": "Jaettu sijainti",
+  "Could not get your location — check the location permission.": "Sijaintiasi ei saatu — tarkista sijaintilupa.",
 };
 export default c;
