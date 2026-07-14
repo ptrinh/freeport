@@ -24,19 +24,20 @@ upcoming feature **before it exists**: visible but disabled, marked "Coming
 soon"; when a feature ships via OTA the row becomes a live toggle.
 `ComingSoonRow` in `ExperimentalSection.tsx` stays for the next batch.
 
-## Feed image performance — `expo-image` (needs a binary release)
+## Feed image performance — `expo-image` (JS switch pending)
 
-**Goal:** replace `react-native` `<Image>` in the feed/avatars/chat thumbnails
-(`BrowseTab.tsx`, `MessagesTab.tsx`, chat) with `expo-image` for disk caching,
-`contentFit`, and `recyclingKey` — user-uploaded originals currently decode at
-full size inside virtualized lists (memory spikes + scroll hitching on
-image-heavy feeds; no cache policy on web).
+**Status (2026-07): native module PRE-LINKED in 1.6.1** (`expo-image@~3.0.11`,
+SDK-54 line, `expo install --check` clean). Per the ship-ahead policy the pod
+ships in the 1.6.1 binary; the pure-JS switch lands later via OTA to the 1.6.1
+runtime.
 
-**Why deferred:** `expo-image` is a NATIVE module. Adding it can't ship via OTA
-to the current runtime — it needs a new binary (bump `runtimeVersion`, link the
-pod, store submit) per the ship-ahead policy above. Bundle it into the next
-binary release, then switch the JS over. Pure-JS change once the module is
-linked; no API redesign. (Deferred from the 2026-07 perf/security pass.)
+**Remaining (pure JS):** replace `react-native` `<Image>` in the feed / avatars
+/ chat thumbnails (`BrowseTab.tsx`, `MessagesTab.tsx`, chat) with `expo-image`
+for disk caching, `contentFit`, and `recyclingKey` — user-uploaded originals
+currently decode at full size inside virtualized lists (memory spikes + scroll
+hitching on image-heavy feeds; no cache policy on web). Guard the import so
+older runtimes (≤1.6.0, no pod) fall back to `<Image>` — the same
+`requireOptionalNativeModule` pattern as `cameraModule.ts`/`passkey.ts`.
 
 ## Lock-screen live progress (Live Activity)
 
