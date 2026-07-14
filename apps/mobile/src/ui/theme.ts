@@ -169,7 +169,11 @@ function makeStyles(c: Palette) {
     navBtnText: { color: c.link, fontWeight: '700' },
     chatBubble: { maxWidth: '85%', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7, marginVertical: 3 },
     chatOut: { backgroundColor: c.accentBtn, alignSelf: 'flex-end' },
-    chatIn: { backgroundColor: c.chipBg, alignSelf: 'flex-start' },
+    // Card bg + border, NOT chipBg: light-mode chipBg (#e2e8f0) is nearly
+    // identical to appBg (#e5e8ec), making inbound bubbles invisible on the
+    // full-height chat surface (user report). Card contrasts on every
+    // surface in both themes.
+    chatIn: { backgroundColor: c.card, borderWidth: 1, borderColor: c.border, alignSelf: 'flex-start' },
     chatBubbleText: { fontSize: 14 },
     // Theme-aware per bubble: the "out" bubble is a dark-blue button in both
     // themes (light text); the "in" bubble is the chip background, so it must use
