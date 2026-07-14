@@ -77,16 +77,19 @@ function reportProbeFailure(cam: any): void {
   try {
     const req = (ExpoCore as any).requireOptionalNativeModule;
     const registry = (globalThis as any).expo?.modules;
+    // Diagnostics ride the MESSAGE: captureError's extras pass through an
+    // allowlist (sanitizeProps) that drops unknown keys — the first event
+    // arrived with context:null and told us nothing.
+    const diag = [
+      'req=' + (typeof req === 'function' ? String(!!req('ExpoCamera')) : 'missing'),
+      'registry=' + (registry ? String(!!registry.ExpoCamera) : 'none'),
+      'regCamKeys=' + (registry ? Object.keys(registry).filter((k) => /cam/i.test(k)).join('/') || '0' : '-'),
+      'import=' + (cam === 'import-hang' ? 'HANG' : cam === null ? 'null' : typeof cam),
+      'exports=' + (cam && typeof cam === 'object' ? Object.keys(cam).slice(0, 10).join('/') : '-'),
+    ].join(' ');
     // Deferred import keeps telemetry out of this module's init path.
     import('../../telemetry').then(({ captureError }) => {
-      captureError(new Error('scan probe failed'), {
-        hasRequireOptional: typeof req === 'function',
-        reqResult: typeof req === 'function' ? String(!!req('ExpoCamera')) : 'n/a',
-        registryHasCamera: String(!!registry?.ExpoCamera),
-        registryKeys: registry ? Object.keys(registry).filter((k) => /cam/i.test(k)).join(',') || '(none match /cam/)' : '(no registry)',
-        importReturned: cam === null ? 'null' : typeof cam,
-        camExports: cam ? Object.keys(cam).slice(0, 12).join(',') : '',
-      });
+      captureError(new Error('scan probe failed: ' + diag));
     }).catch(() => {});
   } catch { /* diagnostics must never break the wallet */ }
 }
