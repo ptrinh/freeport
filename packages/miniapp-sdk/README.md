@@ -31,4 +31,5 @@ Notes:
   `frame-ancestors` policy that excludes `https://freeport.network`.
 
 Example app: [`examples/demo-app`](../../examples/demo-app) — the eSIM Demo
-Shop published at https://freeport.network/demo-app/.
+Shop published at https://freeport.network/demo-app/. Full architecture &
+threat model: [`docs/miniapps-security.md`](../../docs/miniapps-security.md).

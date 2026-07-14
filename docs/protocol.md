@@ -12,7 +12,7 @@ A decentralized P2P marketplace protocol over [Nostr](https://github.com/nostr-p
 | Intent | A signed, public, expiring statement of what a user offers or requests. |
 | Payload schema | A versioned, vertical-specific JSON shape inside the intent, e.g. `rideshare/1`. The protocol is vertical-agnostic; only payloads are vertical-specific. |
 | Negotiation | A private, encrypted exchange between exactly two agents about one intent. |
-| Deal | A negotiation both sides accepted; concludes with contact exchange. Settlement is out of scope in v1. |
+| Deal | A negotiation both sides accepted; concludes with contact exchange. Settlement is wallet-to-wallet, never through an intermediary (§10). |
 
 Identity is a secp256k1 keypair (standard Nostr identity), generated silently on first launch. Key backup is a NIP-49 `ncryptsec` blob (passphrase-encrypted, safe to store with any provider).
 
@@ -22,9 +22,16 @@ Identity is a secp256k1 keypair (standard Nostr identity), generated silently on
 |---|---|---|---|
 | `32101` | `intent.offer` | addressable (NIP-01 30000–39999) | public |
 | `32102` | `intent.request` | addressable | public |
-| — | `negotiate.counter` | DM envelope | encrypted |
-| — | `negotiate.accept` | DM envelope | encrypted |
-| — | `negotiate.cancel` | DM envelope | encrypted |
+| `32103` | `karma` (peer rating after a deal) | addressable | public |
+| `32104` | `deal.receipt` (co-signed proof a deal happened) | addressable | public |
+| `32105` | `chat.invite` (invite-based 1:1 chat handshake) | addressable | public |
+| `30018` | `product` (NIP-15-style storefront listing) | addressable | public |
+| — | `negotiate.counter` / `accept` / `cancel` | DM envelope | encrypted |
+| — | `chat.*` (messages, reactions, receipts, calls signaling) | DM envelope | encrypted |
+| — | `escrow.request` / `invoice` / `release` (HODL-invoice escrow) | DM envelope | encrypted |
+
+Standard NIPs are used as-is where they fit: NIP-57 zaps (9734/9735), NIP-07
+signing (browser extension and the mini-app shell), NIP-49 key backup.
 
 Intents are **public** (default; chosen for discoverability — see §8). Negotiation messages are **never** standalone events: they are JSON envelopes carried inside encrypted DMs (§4.2).
 
@@ -96,7 +103,7 @@ Both parties derive the same id independently. One intent can have many concurre
 
 ### 4.2 Transport
 
-v1 uses **NIP-04** encrypted DMs (kind 4, `p`-tagged to the counterparty) whose plaintext is the JSON envelope below. NIP-04 leaks metadata (who talks to whom); the planned upgrade is **NIP-17 gift-wrapped DMs**, which is a pure transport swap — the envelope is unchanged. Receivers try to parse every DM addressed to them and ignore anything that isn't a valid envelope.
+v1 uses **NIP-04** encrypted DMs (kind 4, `p`-tagged to the counterparty) whose plaintext is the JSON envelope below. NIP-04 leaks metadata (who talks to whom); **NIP-17 gift wrap** is the fix and is a pure transport swap — the envelope is unchanged. Status: chat messages already ride NIP-17 between updated clients (dual-rail with NIP-04 fallback); migrating the negotiation envelopes the same way is planned (receive first, then send). Receivers try to parse every DM addressed to them and ignore anything that isn't a valid envelope.
 
 Envelope:
 
@@ -151,7 +158,7 @@ Rules:
 
 ### 4.4 Trust notes (v1 limits)
 
-Anyone can post intents and negotiate in bad faith; v1's only mitigations are the human gate, the round cap, contact-only-on-accept, and key-based identity continuity. Reputation/anti-sybil is explicitly deferred.
+Anyone can post intents and negotiate in bad faith; the structural mitigations are the human gate, the round cap, contact-only-on-accept, and key-based identity continuity. On top of those, a **reputation layer has shipped**: peer-rated karma (`32103`), co-signed deal receipts (`32104`, proof a deal actually happened), proven-deal counts, and web-of-trust weighting when scoring strangers. **Anti-sybil remains open** — creating fresh keys is free, so zero-history identities deserve caution; reputation only accrues, it doesn't gate.
 
 ## 5. Discovery
 
@@ -187,6 +194,21 @@ Publish and subscribe to a redundant set: 5–10 public relays plus self-hosted 
 - Payload schemas version independently (`rideshare/2` can coexist with `/1` on the same market).
 - Additive fields (e.g. `payment`) are non-breaking per §3.2.
 
-## 10. Reserved: settlement (later phase)
+## 10. Settlement (shipped, always self-custodial)
 
-`payment` will carry `{ "method": "lightning", "bolt11" | "offer": … , "amount_msat": … }` inside terms/accept. Nothing in v1 parses it; agents ignore it today, which is exactly the compatibility we need.
+Settlement arrived without a protocol version bump, exactly as the
+forward-compatibility rule intended:
+
+- **Direct payment**: one-tap Lightning pay on a confirmed deal (bolt11 /
+  lightning address / Spark address), wallet-to-wallet — the counterparty's
+  receive address travels over the encrypted DM channel.
+- **Trust-minimized escrow**: the `escrow.request/invoice/release` envelope
+  family over the same encrypted channel implements HODL-invoice conditional
+  payment — the buyer holds the preimage, the seller's wallet can only settle
+  once the buyer releases it on delivery, unfunded/unreleased invoices expire
+  back to the buyer. Deal-scoped, replay-safe, the preimage is verified
+  against the invoice's payment hash before any wallet call.
+- **Zaps** (NIP-57) provide public, verifiable tips on posts.
+
+No custodian exists anywhere in the flow; nothing settles through a Freeport
+service. Cash on delivery remains a perfectly valid settlement method.

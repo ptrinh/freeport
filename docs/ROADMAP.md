@@ -32,11 +32,12 @@ reach old binaries that lack the module.
   screen share needs nothing.
 
 **Coming-soon switches.** Settings → Experimental shows a row for each major
-upcoming feature (Chat, Calls, Mini-apps, Zaps) **before it exists**: visible
-but disabled, marked "Coming soon". Users see what's next; when a feature
-ships via OTA, the row becomes a live toggle (the pref pattern is already
-established — the Wallet toggle landed ahead of the wallet). Keep this list in
-sync with the sections below.
+upcoming feature **before it exists**: visible but disabled, marked "Coming
+soon"; when a feature ships via OTA the row becomes a live toggle. Everything
+that used this pattern has since shipped (Chat — since graduated out of
+Experimental entirely, Calls, Zaps, Wallet, Mini-apps); `ComingSoonRow` in
+`ExperimentalSection.tsx` stays for the next batch. Keep this list in sync
+with the sections below.
 
 ## Lock-screen live progress (Live Activity) — deferred until native build
 
@@ -254,52 +255,23 @@ dialogs render in the parent DOM with delayed-arm Allow buttons. Same
 firewall, same tests. Demo: examples/demo-app → freeport.network/demo-app.
 Remaining: a Nostr-published directory/blocklist, per-app spend-cap UI.
 
-Turn Freeport into a host that injects its **portable identity** and
-**self-custodial wallet** into third-party web apps — the WeChat/Zalo
-mini-program idea, done the Nostr way (no curated store, no operator).
+The idea: Freeport as an **identity + wallet provider for web apps** — the
+WeChat/Zalo mini-program concept done the Nostr way (no curated store, no
+operator; apps are added by URL/QR). Standard surfaces: NIP-07
+(`window.nostr`), WebLN (`window.webln`), plus the `window.freeport.paySpark`
+extension for Spark/stablecoin payments. The full permission model (kind
+allowlist, default-deny decrypt, spend caps, per-payment approval) lives in
+`apps/mobile/src/miniapps/firewall.ts` and its adversarial test suite —
+that code is the spec now. Architecture & threat model:
+[`docs/miniapps-security.md`](miniapps-security.md); integrator docs:
+`packages/miniapp-sdk/README.md`.
 
-**How.** A WebView shell exposes the two standard bridges so any web app "just
-works" against a Freeport user:
-- **NIP-07** (`window.nostr`: `getPublicKey`, `signEvent`, `nip04`/`nip44`) —
-  "sign in with your Freeport key". Portable, self-sovereign identity — better
-  than WeChat's siloed account.
-- **WebLN** (`window.webln`: `makeInvoice`, `sendPayment`) — the WeChat-Pay
-  analog, but self-custodial via the built-in wallet.
-Distribution is **decentralized**: apps are launched by URL / QR or listed in a
-Nostr-published directory (addressable events) — not a central app store.
-
-**Security is the hard part (non-negotiable).** A malicious mini-app must never
-exfiltrate the nsec or drain the wallet:
-- The raw key is never exposed; signing happens in the shell.
-- Every `signEvent` / `sendPayment` is gated behind an explicit approval dialog
-  (MetaMask/Alby-style), with per-app permissions and a spend cap.
-- Ties directly to the on-device / passkey key handling — get that right first.
-
-**Platform decision (from the design review — the original "web/PWA-first"
-was self-contradictory).** The injection trick only works NATIVELY:
-`react-native-webview`'s `injectedJavaScript` can plant `window.nostr`/
-`window.webln` into any origin, whereas on web a mini-app is a cross-origin
-iframe you cannot inject into — "any NIP-07 app just works" is false on web
-(it would need mini-apps to adopt a postMessage SDK, killing the pitch). So:
-**native-first** (WebView shell, launched by URL/QR only — no store UI, which
-is the defensible reading of Apple 4.7's HTML5 mini-app allowances), with a
-degraded postMessage-SDK mode on web later. `react-native-webview` is
-pre-linked since 1.6.0.
-
-**Permission model (concrete, not adjectives):**
-- `signEvent`: **kind allowlist** per app. A mini-app that signs kind 4 can
-  impersonate you in deal negotiations; one that signs 32101/32102 posts
-  listings as you. Default: only app-scoped kinds silently; every other kind
-  = per-event approval dialog.
-- `nip04/nip44 decrypt`: **default deny** — blanket grant would expose the
-  entire DM history (deals + friend chats). At most per-peer grants.
-- WebLN `sendPayment`: spend cap enforced in the SHELL's wallet bridge
-  (per-app + per-day, persisted in prefs) — never trust anything WebView-side.
-- The signer never crosses the bridge; only signed results do. The bridge
-  deserves its own adversarial test suite (like the invite-hijack tests).
-
-**Framing:** "Freeport as an identity + wallet provider for web apps", not "an
-app store". **Effort:** medium-high, security-dominated.
+**Remaining:**
+- Nostr-published app directory + community blocklist (addressable events;
+  the firewall already takes an injectable blocklist).
+- Per-app spend-cap UI (the firewall enforces caps; Settings has no editor yet).
+- Approval-dialog niceties: translate the sensitive-kind warning per kind,
+  show fiat next to sats.
 
 ## Conditional payments — HODL invoices (trust-minimized escrow)
 

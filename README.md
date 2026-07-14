@@ -53,17 +53,28 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 - **Reputation**: peer-rated karma, co-signed deal receipts, proven-deal
   counts, web-of-trust weighting. Sybil resistance stays open — treat
   zero-history identities with caution.
-- **Chat (experimental)**: invite-based 1:1 encrypted chat beyond deals —
-  QR/link invites, replies, emoji reactions, disappearing messages,
-  delivery/read receipts, in-chat Lightning payments. Between updated
-  clients it upgrades to NIP-17 gift wrap, so relays can't even see who
-  talks to whom.
+- **Chat**: invite-based 1:1 encrypted chat beyond deals — QR/link invites,
+  replies, emoji reactions, disappearing messages, delivery/read receipts,
+  voice messages, location sharing, in-chat search and Lightning payments.
+  Between updated clients it upgrades to NIP-17 gift wrap, so relays can't
+  even see who talks to whom.
 - **Calls (experimental)**: peer-to-peer audio/video calls in chat (WebRTC,
   end-to-end encrypted, signaling over encrypted DMs — no call server),
   with screen sharing on web. Optional TURN fallback.
 - **Zaps & Shops**: NIP-57 zap tipping on posts (verifiable receipts), and
   NIP-15 storefronts — durable seller listings with a conversational
   "chat with seller" checkout.
+- **Escrow without a custodian**: HODL-invoice conditional payments on
+  confirmed deals — the buyer holds the preimage, the seller can only settle
+  on release, unreleased funds auto-refund. The Lightning protocol enforces
+  the lock; nobody ever holds the money in between.
+- **Mini-apps (experimental)**: third-party web apps run inside Freeport with
+  your portable identity (NIP-07) and wallet (WebLN + Spark/stablecoin) —
+  sandboxed behind a permission firewall where every sensitive action needs
+  your approval ([architecture & threat model](docs/miniapps-security.md)).
+  Add any app by URL or QR; one [`<script>` tag](packages/miniapp-sdk) makes
+  a page work on web too. Try the
+  [demo shop](https://freeport.network/demo-app/).
 - **On-device AI (experimental)**: describe what you need in any language
   and it drafts your post; incoming chat messages auto-translate. Runs
   entirely on your device (Apple Intelligence / Android ML Kit + Gemini
@@ -74,8 +85,9 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 
 ## Non-goals (v1)
 
-Escrow/custody (payments are self-custodial wallet-to-wallet only), dispute
-resolution, vetting, anti-sybil — all deliberately deferred.
+Custody (payments stay self-custodial wallet-to-wallet; even escrow is
+trust-minimized HODL invoices, never a held balance), dispute resolution,
+vetting, anti-sybil — all deliberately deferred.
 
 ## Donate
 
