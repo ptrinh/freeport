@@ -24,6 +24,20 @@ upcoming feature **before it exists**: visible but disabled, marked "Coming
 soon"; when a feature ships via OTA the row becomes a live toggle.
 `ComingSoonRow` in `ExperimentalSection.tsx` stays for the next batch.
 
+## Feed image performance — `expo-image` (needs a binary release)
+
+**Goal:** replace `react-native` `<Image>` in the feed/avatars/chat thumbnails
+(`BrowseTab.tsx`, `MessagesTab.tsx`, chat) with `expo-image` for disk caching,
+`contentFit`, and `recyclingKey` — user-uploaded originals currently decode at
+full size inside virtualized lists (memory spikes + scroll hitching on
+image-heavy feeds; no cache policy on web).
+
+**Why deferred:** `expo-image` is a NATIVE module. Adding it can't ship via OTA
+to the current runtime — it needs a new binary (bump `runtimeVersion`, link the
+pod, store submit) per the ship-ahead policy above. Bundle it into the next
+binary release, then switch the JS over. Pure-JS change once the module is
+linked; no API redesign. (Deferred from the 2026-07 perf/security pass.)
+
 ## Lock-screen live progress (Live Activity)
 
 **Goal:** show deal/trip progress on the phone lock screen + Dynamic Island,
