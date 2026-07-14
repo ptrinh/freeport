@@ -52,44 +52,15 @@ export async function scanSupported(): Promise<boolean> {
   }
   // Race the import against a timeout: a module whose init error lands on the
   // GLOBAL handler leaves the import promise unsettled forever — the button
-  // would silently never appear and no diagnostic would fire.
+  // would silently never appear.
+  //
+  // (A per-launch GlitchTip probe used to live here for the missing-Scan
+  // mystery. SOLVED: expo-camera@57.x on SDK 54 never autolinked, so every
+  // binary through 1.5.2+21 genuinely lacks ExpoCamera — the probe's field
+  // data confirmed it. Pinned to ~17.0.10; the 1.6.0 binary ships it.)
   const cam = await Promise.race([
     importCamera(),
-    new Promise((resolve) => setTimeout(() => resolve('__timeout__'), 4000)),
+    new Promise((resolve) => setTimeout(() => resolve(null), 4000)),
   ]);
-  if (cam === '__timeout__') {
-    reportProbeFailure('import-hang');
-    return false;
-  }
-  const ok = !!(cam as any)?.CameraView;
-  if (!ok) reportProbeFailure(cam);
-  return ok;
-}
-
-/** One diagnostic per launch: a 1.5.2 store binary that verifiably ships
- *  ExpoCamera still hides Scan (user report) — capture WHICH probe layer
- *  failed so GlitchTip tells us instead of guessing. Remove once solved. */
-let probeReported = false;
-function reportProbeFailure(cam: any): void {
-  // 'import-hang' arrives as a string marker instead of a module object.
-  if (probeReported) return;
-  probeReported = true;
-  try {
-    const req = (ExpoCore as any).requireOptionalNativeModule;
-    const registry = (globalThis as any).expo?.modules;
-    // Diagnostics ride the MESSAGE: captureError's extras pass through an
-    // allowlist (sanitizeProps) that drops unknown keys — the first event
-    // arrived with context:null and told us nothing.
-    const diag = [
-      'req=' + (typeof req === 'function' ? String(!!req('ExpoCamera')) : 'missing'),
-      'registry=' + (registry ? String(!!registry.ExpoCamera) : 'none'),
-      'regCamKeys=' + (registry ? Object.keys(registry).filter((k) => /cam/i.test(k)).join('/') || '0' : '-'),
-      'import=' + (cam === 'import-hang' ? 'HANG' : cam === null ? 'null' : typeof cam),
-      'exports=' + (cam && typeof cam === 'object' ? Object.keys(cam).slice(0, 10).join('/') : '-'),
-    ].join(' ');
-    // Deferred import keeps telemetry out of this module's init path.
-    import('../../telemetry').then(({ captureError }) => {
-      captureError(new Error('scan probe failed: ' + diag));
-    }).catch(() => {});
-  } catch { /* diagnostics must never break the wallet */ }
+  return !!(cam as any)?.CameraView;
 }
