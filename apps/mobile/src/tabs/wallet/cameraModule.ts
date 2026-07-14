@@ -50,6 +50,43 @@ export async function scanSupported(): Promise<boolean> {
       return !!(navigator as any)?.mediaDevices?.getUserMedia && (window as any).isSecureContext === true;
     } catch { return false; }
   }
-  const cam = await importCamera();
-  return !!cam?.CameraView;
+  // Race the import against a timeout: a module whose init error lands on the
+  // GLOBAL handler leaves the import promise unsettled forever — the button
+  // would silently never appear and no diagnostic would fire.
+  const cam = await Promise.race([
+    importCamera(),
+    new Promise((resolve) => setTimeout(() => resolve('__timeout__'), 4000)),
+  ]);
+  if (cam === '__timeout__') {
+    reportProbeFailure('import-hang');
+    return false;
+  }
+  const ok = !!(cam as any)?.CameraView;
+  if (!ok) reportProbeFailure(cam);
+  return ok;
+}
+
+/** One diagnostic per launch: a 1.5.2 store binary that verifiably ships
+ *  ExpoCamera still hides Scan (user report) — capture WHICH probe layer
+ *  failed so GlitchTip tells us instead of guessing. Remove once solved. */
+let probeReported = false;
+function reportProbeFailure(cam: any): void {
+  // 'import-hang' arrives as a string marker instead of a module object.
+  if (probeReported) return;
+  probeReported = true;
+  try {
+    const req = (ExpoCore as any).requireOptionalNativeModule;
+    const registry = (globalThis as any).expo?.modules;
+    // Deferred import keeps telemetry out of this module's init path.
+    import('../../telemetry').then(({ captureError }) => {
+      captureError(new Error('scan probe failed'), {
+        hasRequireOptional: typeof req === 'function',
+        reqResult: typeof req === 'function' ? String(!!req('ExpoCamera')) : 'n/a',
+        registryHasCamera: String(!!registry?.ExpoCamera),
+        registryKeys: registry ? Object.keys(registry).filter((k) => /cam/i.test(k)).join(',') || '(none match /cam/)' : '(no registry)',
+        importReturned: cam === null ? 'null' : typeof cam,
+        camExports: cam ? Object.keys(cam).slice(0, 12).join(',') : '',
+      });
+    }).catch(() => {});
+  } catch { /* diagnostics must never break the wallet */ }
 }
