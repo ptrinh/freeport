@@ -108,9 +108,10 @@ import { conciergeAvailability } from './src/concierge/model';
 import { translateToggleVisible } from './src/concierge/translate';
 import { uiAlert } from './src/ui/alerts';
 import { SettingsTab } from './src/tabs/SettingsTab';
+import { AppsTab } from './src/tabs/AppsTab';
 import { Onboarding } from './src/tabs/Onboarding';
 
-type Tab = 'post' | 'messages' | 'browse' | 'wallet' | 'settings';
+type Tab = 'post' | 'messages' | 'browse' | 'wallet' | 'apps' | 'settings';
 
 // [inactive (outline), active (filled)] per tab
 const TAB_ICONS: Record<Tab, [IoniconName, IoniconName]> = {
@@ -118,6 +119,7 @@ const TAB_ICONS: Record<Tab, [IoniconName, IoniconName]> = {
   messages: ['chatbubbles-outline', 'chatbubbles'],
   browse: ['compass-outline', 'compass'],
   wallet: ['wallet-outline', 'wallet'],
+  apps: ['apps-outline', 'apps'],
   settings: ['settings-outline', 'settings'],
 };
 
@@ -1179,6 +1181,8 @@ function AppInner() {
   );
   // Experimental wallet: its tab slots in directly left of Settings.
   if (experimentalWallet) visibleTabs.splice(visibleTabs.indexOf('settings'), 0, 'wallet');
+  // Mini-apps: a dedicated "Apps" tab, also just left of Settings.
+  if (experimentalMiniApps) visibleTabs.splice(visibleTabs.indexOf('settings'), 0, 'apps');
   // Guided-tour steps per rideshare role (Customer/Provider get no tour). Each
   // step highlights a tab; a `wheel` step stays on Post and instead demos the
   // amount wheel. The passenger flow inserts a dedicated wheel/pricing step
@@ -1439,6 +1443,14 @@ function AppInner() {
           onScroll={onContentScroll}
         />
       )}
+      {tab === 'apps' && (
+        <AppsTab
+          signerRef={signerRef}
+          walletEnabled={experimentalWallet}
+          walletNwcUrl={walletNwcUrl}
+          onScroll={onContentScroll}
+        />
+      )}
       {tab === 'settings' && (
         <SettingsTab
           npub={npub}
@@ -1488,7 +1500,6 @@ function AppInner() {
             setExperimentalMiniApps(v);
             savePrefs({ experimentalMiniApps: v }).catch(() => {});
           }}
-          walletNwcUrl={walletNwcUrl}
           requiredLocOk={locOk}
           requiredNotifOk={notifSatisfied}
           onDismissNotif={dismissNotif}
@@ -1743,7 +1754,7 @@ function AppInner() {
                 )}
               </View>
               <Animated.View style={{ height: anim.labelH, opacity: anim.labelOpacity, overflow: 'hidden', justifyContent: 'center' }}>
-                <Text style={[s.tabText, tab === tk && s.tabTextActive]}>{t(tk === 'post' && role === 'passenger' ? 'Request' : tk === 'browse' ? 'Browse' : tk === 'messages' ? 'Messages' : tk === 'settings' ? 'Settings' : tk === 'wallet' ? 'Wallet' : 'Post')}</Text>
+                <Text style={[s.tabText, tab === tk && s.tabTextActive]}>{t(tk === 'post' && role === 'passenger' ? 'Request' : tk === 'browse' ? 'Browse' : tk === 'messages' ? 'Messages' : tk === 'settings' ? 'Settings' : tk === 'wallet' ? 'Wallet' : tk === 'apps' ? 'Apps' : 'Post')}</Text>
               </Animated.View>
             </Animated.View>
           </Pressable>

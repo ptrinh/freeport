@@ -99,6 +99,7 @@ security lives in WebView-land.
 | `webln.sendPayment` | ask | auto-allow only under the user-set per-app daily cap |
 | `freeport.paySpark` | ask EVERY time | never — caps don't apply |
 | `freeport.getBalance` / `getLocation` | ask | yes (per app) |
+| `freeport.saveFile` | ask EVERY time | never — one file per approval |
 | anything else | **deny** | — |
 
 **What the read methods deliberately do NOT include.** Only *private* signals
@@ -111,6 +112,16 @@ queryable). The app is expected to look those up itself; the `insurance-store`
 example shows exactly this split (`deriveReputationFromNpub()` for public data,
 `getBalance`/`getLocation` for private). Bridged reads return coarse summaries
 only — a sats total, a country/state/city — never raw events or coordinates.
+
+**Saving files.** `freeport.saveFile` lets an app hand a generated document
+(receipt, ticket, certificate) to the OS save/share sheet — necessary because
+a plain `<a download>` is blocked inside both the native WebView and the
+sandboxed web iframe. It always asks (never a standing grant), the approval
+shows the filename, params are validated (name ≤200 chars, a well-formed MIME
+type, base64 ≤3 MB), and the shell routes it through `expo-sharing` (native)
+or a parent-document blob download (web). The app never gets filesystem
+access — it proposes one file and the user's share sheet decides where it
+goes.
 
 Sensitive kinds (`ALWAYS_ASK_KINDS`): `0, 3, 4, 5, 1059, 30018, 30078,
 32101–32105`. The rationale is marketplace-specific: kind 4/1059 lets an app

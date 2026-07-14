@@ -882,5 +882,9 @@ const c: Record<string, string> = {
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Interneto programos, naudojančios jūsų Freeport tapatybę ir piniginę — mobiliojoje programėlėje.",
   "wants to read your wallet balance": "nori perskaityti jūsų piniginės likutį",
   "wants to read your location": "nori perskaityti jūsų vietą",
+  "Apps": "Programėlės",
+  "File": "Failas",
+  "wants to save a file to your device": "nori išsaugoti failą jūsų įrenginyje",
+  "Loading…": "Įkeliama…",
 };
 export default c;

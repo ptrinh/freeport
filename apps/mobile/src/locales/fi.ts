@@ -881,5 +881,9 @@ const c: Record<string, string> = {
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Verkkosovelluksia, jotka käyttävät Freeport-identiteettiäsi ja -lompakkoasi — mobiilisovelluksessa.",
   "wants to read your wallet balance": "haluaa lukea lompakkosi saldon",
   "wants to read your location": "haluaa lukea sijaintisi",
+  "Apps": "Sovellukset",
+  "File": "Tiedosto",
+  "wants to save a file to your device": "haluaa tallentaa tiedoston laitteellesi",
+  "Loading…": "Ladataan…",
 };
 export default c;

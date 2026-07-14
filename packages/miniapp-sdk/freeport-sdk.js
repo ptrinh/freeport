@@ -90,6 +90,10 @@
     },
     getBalance: function () { return rpc('freeport.getBalance'); },
     getLocation: function () { return rpc('freeport.getLocation'); },
+    saveFile: function (args) {
+      args = args || {};
+      return rpc('freeport.saveFile', { name: args.name, mimeType: args.mimeType, dataBase64: args.dataBase64 });
+    },
     isConnected: function () { return !!port; },
     shellOrigin: function () { return shellOrigin; }
   };

@@ -881,5 +881,9 @@ const c: Record<string, string> = {
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Веб-апликации што ги користат вашиот Freeport идентитет и паричник — на мобилната апликација.",
   "wants to read your wallet balance": "сака да го прочита салдото на вашиот паричник",
   "wants to read your location": "сака да ја прочита вашата локација",
+  "Apps": "Апликации",
+  "File": "Датотека",
+  "wants to save a file to your device": "сака да зачува датотека на вашиот уред",
+  "Loading…": "Се вчитува…",
 };
 export default c;

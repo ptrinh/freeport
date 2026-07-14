@@ -31,6 +31,8 @@ export interface ApprovalRequest {
   /** paySpark: the destination address and, for stablecoins, the token amount. */
   address?: string;
   token?: { ticker: string; amount: number };
+  /** saveFile: the filename the app wants to save. */
+  fileName?: string;
 }
 
 export interface ApprovalResult {
@@ -63,6 +65,8 @@ export interface BridgeDeps {
   wallet: BridgeWallet | null;
   /** Read-context provider; null disables the freeport.get* read methods. */
   context?: BridgeContext | null;
+  /** Hands a generated file to the OS save/share sheet; null disables saveFile. */
+  saveFile?: ((file: { name: string; mimeType: string; dataBase64: string }) => Promise<void>) | null;
   /** Called after any state change worth persisting (grants, spend). */
   persist: () => void;
   now?: () => number;
@@ -71,7 +75,10 @@ export interface BridgeDeps {
 interface RpcMessage { __fp: 1; id: string; method: string; params?: Record<string, unknown> }
 interface RpcResponse { id: string; ok: boolean; result?: unknown; error?: string }
 
-const MAX_MESSAGE_BYTES = 256 * 1024; // a signEvent content has to fit; anything bigger is abuse
+// Big enough to carry a small saveFile payload (a receipt/ticket/certificate,
+// capped at ~3MB base64 by the firewall) plus JSON overhead; anything larger
+// is abuse and dropped before parsing.
+const MAX_MESSAGE_BYTES = 4 * 1024 * 1024;
 const MAX_PENDING = 8;                // in-flight RPCs per bridge (dialogs are capped tighter by the firewall)
 
 /** One bridge instance per WebView session. The shell MUST call setOrigin()
@@ -145,7 +152,8 @@ export class MiniAppBridge {
         break;
       }
       case 'freeport.paySpark':
-        fwParams = p; // firewall validates address/sats/token shape itself
+      case 'freeport.saveFile':
+        fwParams = p; // firewall validates the shape itself
         break;
     }
 
@@ -170,6 +178,7 @@ export class MiniAppBridge {
           invoice: invoice || undefined,
           address: typeof p.address === 'string' ? p.address : undefined,
           token: p.token as { ticker: string; amount: number } | undefined,
+          fileName: typeof p.name === 'string' ? p.name : undefined,
         });
       } finally {
         firewall.closeAsk(this.origin);
@@ -207,6 +216,11 @@ export class MiniAppBridge {
         case 'freeport.getLocation':
           if (!context) return { id, ok: false, error: 'unavailable' };
           return { id, ok: true, result: await context.location() };
+        case 'freeport.saveFile': {
+          if (!this.deps.saveFile) return { id, ok: false, error: 'unavailable' };
+          await this.deps.saveFile({ name: String(p.name), mimeType: String(p.mimeType), dataBase64: String(p.dataBase64) });
+          return { id, ok: true, result: { saved: true } };
+        }
         case 'signEvent': {
           const ev: Event = await signer.signEvent(template!);
           return { id, ok: true, result: ev };
@@ -256,7 +270,8 @@ export class MiniAppBridge {
       }
     } catch (e) {
       // Generic error — wallet/signer internals (paths, balances) must not leak into the page.
-      return { id, ok: false, error: method.startsWith('webln.') ? 'payment failed' : 'operation failed' };
+      const isPay = method.startsWith('webln.') || method === 'freeport.paySpark';
+      return { id, ok: false, error: isPay ? 'payment failed' : 'operation failed' };
     }
   }
 

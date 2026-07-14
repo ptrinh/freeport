@@ -61,9 +61,9 @@ describe('message parsing (hostile input)', () => {
     expect(await bridge.handleMessage(raw)).toBeNull();
   });
 
-  it('oversized payloads are dropped before parsing', async () => {
+  it('oversized payloads (>4MB) are dropped before parsing', async () => {
     const { bridge } = makeBridge();
-    const raw = JSON.stringify({ __fp: 1, id: 'x', method: 'signEvent', params: { event: { kind: 1, content: 'z'.repeat(300_000) } } });
+    const raw = JSON.stringify({ __fp: 1, id: 'x', method: 'signEvent', params: { event: { kind: 1, content: 'z'.repeat(4_200_000) } } });
     expect(await bridge.handleMessage(raw)).toBeNull();
   });
 
@@ -312,6 +312,58 @@ describe('freeport read methods (private signals only)', () => {
 
   it('reputation is NOT bridged — it is derivable from the npub', () => {
     expect(BRIDGE_METHODS).not.toContain('freeport.getReputation');
+  });
+});
+
+describe('freeport.saveFile', () => {
+  function withSave() {
+    const b = makeBridge();
+    const saveFile = vi.fn(async () => {});
+    const bridge = new MiniAppBridge({
+      firewall: b.firewall, signer, wallet: b.wallet, saveFile,
+      persist: b.persist, approve: b.approve, now: () => T0 + 15_000,
+    }, APP + '/index.html');
+    return { ...b, bridge, saveFile };
+  }
+  const OK = { name: 'cert.pdf', mimeType: 'application/pdf', dataBase64: btoa('%PDF-1.4 hi') };
+
+  it('asks, shows the filename, then saves via the handler', async () => {
+    const { bridge, saveFile, approvals } = withSave();
+    const res = await call(bridge, 'freeport.saveFile', OK);
+    expect(res).toMatchObject({ ok: true, result: { saved: true } });
+    expect(approvals[0]).toMatchObject({ method: 'freeport.saveFile', reason: 'save-file', fileName: 'cert.pdf' });
+    expect(saveFile).toHaveBeenCalledWith({ name: 'cert.pdf', mimeType: 'application/pdf', dataBase64: OK.dataBase64 });
+  });
+
+  it.each([
+    ['no name', { mimeType: 'application/pdf', dataBase64: 'x' }],
+    ['no mime', { name: 'a', dataBase64: 'x' }],
+    ['bad mime', { name: 'a', mimeType: 'notamime', dataBase64: 'x' }],
+    ['no data', { name: 'a', mimeType: 'application/pdf' }],
+  ] as const)('rejects malformed params (%s) before asking', async (_label, params) => {
+    const { bridge, saveFile, approve } = withSave();
+    expect((await call(bridge, 'freeport.saveFile', params)).ok).toBe(false);
+    expect(approve).not.toHaveBeenCalled();
+    expect(saveFile).not.toHaveBeenCalled();
+  });
+
+  it('rejects oversized payloads (over the 3MB firewall cap)', async () => {
+    const { bridge, saveFile } = withSave();
+    const params = { name: 'a', mimeType: 'application/pdf', dataBase64: 'x'.repeat(3_000_001) };
+    expect((await call(bridge, 'freeport.saveFile', params)).ok).toBe(false);
+    expect(saveFile).not.toHaveBeenCalled();
+  });
+
+  it('no handler wired → unavailable', async () => {
+    const { bridge } = makeBridge({ approveResult: { ok: true } });
+    expect(await call(bridge, 'freeport.saveFile', OK)).toEqual({ id: 'r1', ok: false, error: 'unavailable' });
+  });
+
+  it('is never a standing grant — a second save asks again', async () => {
+    const { bridge, approve } = withSave();
+    await call(bridge, 'freeport.saveFile', OK);
+    await call(bridge, 'freeport.saveFile', OK, 'r2');
+    expect(approve).toHaveBeenCalledTimes(2);
   });
 });
 

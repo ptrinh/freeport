@@ -14,6 +14,8 @@
 import React, { useMemo, useRef, useState, useCallback } from 'react';
 import { Linking, Modal, Platform, Pressable, Text, View } from 'react-native';
 import { WebView } from 'react-native-webview';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
 import { Ionicons } from '@expo/vector-icons';
 import { s, palette } from '../ui/theme';
 import type { Signer } from '../signer';
@@ -60,6 +62,14 @@ export function MiniAppShell({
       signer,
       wallet: makeBridgeWallet(getWallet),
       context,
+      saveFile: async ({ name, mimeType, dataBase64 }) => {
+        // Sanitize the filename to a leaf name, then write to the cache dir and
+        // hand it to the OS share sheet (the user picks the destination).
+        const safe = name.replace(/[^\w.() -]/g, '_').slice(0, 100) || 'file';
+        const uri = FileSystem.cacheDirectory + safe;
+        await FileSystem.writeAsStringAsync(uri, dataBase64, { encoding: FileSystem.EncodingType.Base64 });
+        if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(uri, { mimeType, UTI: mimeType === 'application/pdf' ? 'com.adobe.pdf' : undefined });
+      },
       persist: persistFirewall,
       approve: (req) => {
         const turn = approvalChain.current.then(

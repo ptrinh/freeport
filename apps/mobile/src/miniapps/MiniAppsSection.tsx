@@ -29,11 +29,14 @@ function resolveDemoAlias(input: string): string {
 export function MiniAppsSection({
   firewall,
   onOpenApp,
+  defaultOpen = false,
 }: {
   firewall: MiniAppFirewall;
   onOpenApp: (app: MiniAppRecord) => void;
+  /** Start expanded (used when the section is the whole Apps tab). */
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [url, setUrl] = useState('');
   const [err, setErr] = useState('');
   const [scanOpen, setScanOpen] = useState(false);

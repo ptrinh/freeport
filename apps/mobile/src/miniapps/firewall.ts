@@ -26,6 +26,9 @@ export const BRIDGE_METHODS = [
   // deliberately NOT bridged — the app looks that up itself. Each asks once
   // and is grantable per-app.
   'freeport.getBalance', 'freeport.getLocation',
+  // Freeport extension: hand a generated file (receipt, ticket, certificate)
+  // to the OS save/share sheet. ALWAYS asks — never a standing grant.
+  'freeport.saveFile',
 ] as const;
 export type BridgeMethod = (typeof BRIDGE_METHODS)[number];
 
@@ -76,7 +79,7 @@ export type AskReason =
   | 'pubkey' | 'kind-unlisted' | 'kind-sensitive' | 'encrypt-peer' | 'decrypt-peer'
   | 'payment' | 'payment-over-cap' | 'payment-global-cap' | 'payment-unknown-amount'
   | 'payment-cooldown' | 'wallet-info'
-  | 'read-balance' | 'read-location';
+  | 'read-balance' | 'read-location' | 'save-file';
 
 export type Verdict =
   | { action: 'allow' }
@@ -345,6 +348,16 @@ export class MiniAppFirewall {
         if (g.sats + (sats as number) > this.globalSpendCapDaySats) return this.ask(origin, 'payment-global-cap');
         if (req.now - s.lastPayAt < PAY_COOLDOWN_MS) return this.ask(origin, 'payment-cooldown');
         return { action: 'allow' };
+      }
+
+      case 'freeport.saveFile': {
+        const name = p?.name, mime = p?.mimeType, data = p?.dataBase64;
+        if (typeof name !== 'string' || !name || name.length > 200
+          || typeof mime !== 'string' || !/^[\w.+-]+\/[\w.+-]+$/.test(mime)
+          || typeof data !== 'string' || !data || data.length > 3_000_000) {
+          return { action: 'deny', reason: 'bad-params' };
+        }
+        return this.ask(origin, 'save-file');
       }
 
       case 'freeport.getBalance':

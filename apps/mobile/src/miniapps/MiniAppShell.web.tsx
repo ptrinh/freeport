@@ -52,6 +52,17 @@ export function MiniAppShell({
     signer,
     wallet: makeBridgeWallet(getWallet),
     context,
+    saveFile: async ({ name, mimeType, dataBase64 }) => {
+      // Parent-document download (the iframe is sandboxed; the parent is not).
+      const bin = atob(dataBase64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([bytes], { type: mimeType }));
+      const a = document.createElement('a');
+      a.href = url; a.download = name.replace(/[^\w.() -]/g, '_').slice(0, 100) || 'file';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    },
     persist: persistFirewall,
     approve: (req) => {
       const turn = approvalChain.current.then(
@@ -101,8 +112,10 @@ export function MiniAppShell({
         {React.createElement('iframe', {
           ref: frameRef,
           src: app.url || app.origin,
-          // No popups, no top navigation, no modals — scripts + forms only.
-          sandbox: 'allow-scripts allow-same-origin allow-forms',
+          // No popups, no top navigation, no modals — scripts + forms +
+          // downloads only (downloads let a mini-app's own <a download> work;
+          // the bridge saveFile still routes through the parent regardless).
+          sandbox: 'allow-scripts allow-same-origin allow-forms allow-downloads',
           allow: '',
           referrerPolicy: 'no-referrer',
           style: { border: 0, flex: 1, width: '100%', height: '100%', backgroundColor: '#fff' },

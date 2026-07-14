@@ -924,5 +924,9 @@ const c: Record<string, string> = {
   "Web apps that use your Freeport identity & wallet — on the mobile app.": "Des apps web qui utilisent votre identité et votre portefeuille Freeport — dans l'app mobile.",
   "wants to read your wallet balance": "veut lire le solde de votre portefeuille",
   "wants to read your location": "veut lire votre position",
+  "Apps": "Applis",
+  "File": "Fichier",
+  "wants to save a file to your device": "veut enregistrer un fichier sur votre appareil",
+  "Loading…": "Chargement…",
 };
 export default c;

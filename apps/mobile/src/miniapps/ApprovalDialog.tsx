@@ -25,6 +25,7 @@ function askTitle(req: ApprovalRequest): string {
     case 'decrypt-peer': return t('wants to READ an encrypted message');
     case 'read-balance': return t('wants to read your wallet balance');
     case 'read-location': return t('wants to read your location');
+    case 'save-file': return t('wants to save a file to your device');
     default: return t('wants to send a payment');
   }
 }
@@ -54,6 +55,7 @@ export function ApprovalDialog({ req, onDone }: { req: ApprovalRequest; onDone: 
             <Text style={[s.mono, { maxHeight: 120 }]} numberOfLines={6}>{req.contentPreview}</Text>
           ) : null}
           {req.peer ? <Text style={s.dim} numberOfLines={1}>{t('Peer')}: {req.peer.slice(0, 12)}…{req.peer.slice(-6)}</Text> : null}
+          {req.fileName ? <Text style={s.dim} numberOfLines={1}>{t('File')}: {req.fileName}</Text> : null}
           {isPayment ? (
             <>
               <Text style={[s.toggleTitle, { fontSize: 22, marginTop: 6 }]}>
