@@ -166,7 +166,12 @@ territory can do:
   so a page that navigates to another origin instantly loses everything
   (tested: the origin-swap attack). Navigation to a foreign origin doesn't
   even load in the shell — it opens in the system browser, away from the
-  bridge.
+  bridge. Several launcher tiles may point at different PATHS of one origin
+  (e.g. the two demo shops under freeport.network) — they are separate tiles
+  but deliberately share ONE permission record: same-origin pages can
+  navigate to, embed, and read each other, so per-path grants would be a
+  false boundary (tested: restore() collapses any per-tile divergence a
+  tampered store tries to smuggle in).
 - **One incognito WebView per app** — app A cannot read app B's cookies or
   storage. `https` only; `file:`, `data:`, `javascript:` URLs never load;
   popups and multiple windows are disabled.

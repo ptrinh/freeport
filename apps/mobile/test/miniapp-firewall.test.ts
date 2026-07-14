@@ -129,9 +129,14 @@ describe('signEvent policy', () => {
   it('restore() strips sensitive kinds smuggled into a tampered store', () => {
     const f = fw();
     const blob = JSON.parse(f.serialize());
-    blob.apps[0].perms.kinds = [4, 32101, 30023]; // tampered persistence
+    blob.perms[APP].kinds = [4, 32101, 30023]; // tampered persistence (v2 shape)
     const f2 = MiniAppFirewall.restore(JSON.stringify(blob));
     expect(f2.getApp(APP)!.perms.kinds).toEqual([30023]);
+    // Legacy v1 blobs (perms inline on each app) get the same scrubbing.
+    const v1 = { v: 1, apps: [{ origin: APP, url: APP, name: 'Rides', addedAt: T0, perms: { pubkey: true, kinds: [4, 30023], encryptPeers: [], decryptPeers: [], spendCapDaySats: 0, reads: [] } }] };
+    const f3 = MiniAppFirewall.restore(JSON.stringify(v1));
+    expect(f3.getApp(APP)!.perms.kinds).toEqual([30023]);
+    expect(f3.getApp(APP)!.perms.pubkey).toBe(true);
   });
 
   it('rate limit: 11th signEvent inside a minute is denied, window slides', () => {
@@ -372,6 +377,46 @@ describe('persistence', () => {
     // Order survives persistence (it IS the grid layout).
     const f2 = MiniAppFirewall.restore(f.serialize());
     expect(f2.listApps().map((a) => a.origin)).toEqual(['https://c.example', APP, 'https://b.example']);
+  });
+
+  it('two apps on the same origin are separate tiles sharing one grant set', () => {
+    const f = new MiniAppFirewall();
+    const shop = f.registerApp('https://freeport.network/esim-store/', 'eSIM', T0);
+    const ins = f.registerApp('https://freeport.network/insurance-store/', 'Insurance', T0);
+    // Both tiles exist — the second add must NOT replace the first.
+    expect(f.listApps().map((a) => a.name)).toEqual(['eSIM', 'Insurance']);
+    // Same origin ⇒ one shared permission record (same-origin pages can't be
+    // isolated from each other, so per-tile grants would be a lie).
+    f.grantPubkey('https://freeport.network');
+    expect(shop.perms.pubkey).toBe(true);
+    expect(ins.perms.pubkey).toBe(true);
+    // Survives persistence: two tiles, still one perms object.
+    const f2 = MiniAppFirewall.restore(f.serialize());
+    const [a, b] = f2.listApps();
+    expect(f2.listApps().length).toBe(2);
+    expect(a.perms).toBe(b.perms);
+    expect(a.perms.pubkey).toBe(true);
+    // Removing ONE tile keeps the origin's grants for the sibling…
+    f2.removeApp(a.url);
+    expect(f2.listApps().length).toBe(1);
+    expect(f2.getApp('https://freeport.network')!.perms.pubkey).toBe(true);
+    // …removing the LAST tile drops the origin entirely.
+    f2.removeApp(b.url);
+    expect(f2.evaluate({ origin: 'https://freeport.network', method: 'getPublicKey', now: T0 }))
+      .toEqual({ action: 'deny', reason: 'unregistered' });
+  });
+
+  it('restore() refuses per-tile perms divergence within an origin (v2 tamper)', () => {
+    const f = new MiniAppFirewall();
+    f.registerApp('https://freeport.network/a/', 'A', T0);
+    f.registerApp('https://freeport.network/b/', 'B', T0);
+    const blob = JSON.parse(f.serialize());
+    // A tampered blob can only carry ONE perms record per origin (v2 shape),
+    // and both restored tiles must share whatever survives sanitizing.
+    blob.perms['https://freeport.network'] = { pubkey: true, kinds: [1], encryptPeers: [], decryptPeers: [], spendCapDaySats: 0, reads: [] };
+    const f2 = MiniAppFirewall.restore(JSON.stringify(blob));
+    const [a, b] = f2.listApps();
+    expect(a.perms).toBe(b.perms);
   });
 
   it('does not resurrect spend for origins that lost their registration', () => {

@@ -190,7 +190,7 @@ export function AppsTab({
     const [moved] = next.splice(index, 1);
     next.splice(target, 0, moved);
     setApps(next);
-    fw.reorderApps(next.map((a) => a.origin));
+    fw.reorderApps(next.map((a) => a.url));
     persistFirewall();
   };
 
@@ -247,19 +247,19 @@ export function AppsTab({
             {apps.map((app, i) => {
               const dragging = dragIdx === i;
               const body = tileBody(
-                <TileIcon icon={app.icon} name={app.name} seed={app.origin} />,
+                <TileIcon icon={app.icon} name={app.name} seed={app.url} />,
                 app.name,
               );
               if (!edit) {
                 return (
-                  <Pressable key={app.origin} style={tileStyle} onPress={() => setOpen(app)}>
+                  <Pressable key={app.url} style={tileStyle} onPress={() => setOpen(app)}>
                     {body}
                   </Pressable>
                 );
               }
               return (
                 <Animated.View
-                  key={app.origin}
+                  key={app.url}
                   style={[
                     tileStyle,
                     dragging && { transform: pan.getTranslateTransform(), zIndex: 10, elevation: 10, opacity: 0.85 },
@@ -268,7 +268,7 @@ export function AppsTab({
                   <View {...makePan(i).panHandlers}>{body}</View>
                   <Pressable
                     hitSlop={8}
-                    onPress={() => remove(app.origin)}
+                    onPress={() => remove(app.url)}
                     style={{ position: 'absolute', top: 0, right: '14%', width: 22, height: 22, borderRadius: 11, backgroundColor: palette.muted, alignItems: 'center', justifyContent: 'center', zIndex: 11 }}
                   >
                     <Ionicons name="close" size={14} color="#fff" />

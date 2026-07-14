@@ -62,10 +62,14 @@ export interface AppPermissions {
 }
 
 export interface MiniAppRecord {
-  /** Normalized https origin — the trust unit for everything. */
+  /** Normalized https origin — the trust unit for PERMISSIONS. Several tiles
+   *  may share it (e.g. two demos under freeport.network): same-origin pages
+   *  can't be securely isolated from each other, so they share ONE perms
+   *  object — a grant to one is a grant to all of them. */
   origin: string;
   /** Launch URL (may carry a path, e.g. https://freeport.network/esim-store/).
-   *  Always inside `origin`; permissions are still keyed by origin alone. */
+   *  Always inside `origin` — and the REGISTRY key, so same-origin apps at
+   *  different paths are separate launcher tiles. */
   url: string;
   name: string;
   /** Tile icon (https URL, often a CDN — any origin is fine: it's only ever
@@ -156,6 +160,18 @@ export function evaluateAdd(input: string): { origin: string | null; warnings: s
 interface SpendDay { day: string; sats: number; lastPayAt: number }
 
 interface Persisted {
+  v: 2;
+  /** Tiles in grid order (perms split out so same-origin tiles can't diverge). */
+  apps: Omit<MiniAppRecord, 'perms'>[];
+  /** One permission record per ORIGIN, shared by all its tiles. */
+  perms: Record<string, AppPermissions>;
+  spend: Record<string, SpendDay>;
+  globalSpend: SpendDay;
+  audit: AuditEntry[];
+}
+
+/** v1 blobs (pre same-origin tiles) carried perms inline on each app. */
+interface PersistedV1 {
   v: 1;
   apps: MiniAppRecord[];
   spend: Record<string, SpendDay>;
@@ -178,6 +194,8 @@ function rolled(s: SpendDay | undefined, now: number): SpendDay {
 export const DEFAULT_GLOBAL_SPEND_CAP_SATS = 100_000;
 
 export class MiniAppFirewall {
+  /** Keyed by launch URL (tile identity). Same-origin records share ONE perms
+   *  object by reference — grant once, granted for the origin. */
   private apps = new Map<string, MiniAppRecord>();
   private spend = new Map<string, SpendDay>();
   private globalSpend: SpendDay = emptySpend(0);
@@ -201,43 +219,70 @@ export class MiniAppFirewall {
     const origin = normalizeOrigin(input);
     if (!origin) throw new Error('invalid origin');
     if (this.blocklist.has(origin)) throw new Error('blocklisted');
-    const existing = this.apps.get(origin);
+    const url = normalizeLaunchUrl(input) ?? origin;
+    const existing = this.apps.get(url);
     if (existing) {
       // Re-adding refreshes the display metadata but NEVER the grants.
       existing.name = name || existing.name;
       if (sanitizeIcon(icon)) existing.icon = sanitizeIcon(icon)!;
       return existing;
     }
+    // A same-origin sibling already carries the origin's perms — share them.
+    const sibling = this.appByOrigin(origin);
     const rec: MiniAppRecord = {
-      origin, url: normalizeLaunchUrl(input) ?? origin, name, icon: sanitizeIcon(icon), addedAt: now,
-      perms: { pubkey: false, kinds: [], encryptPeers: [], decryptPeers: [], spendCapDaySats: 0, reads: [] },
+      origin, url, name, icon: sanitizeIcon(icon), addedAt: now,
+      perms: sibling?.perms
+        ?? { pubkey: false, kinds: [], encryptPeers: [], decryptPeers: [], spendCapDaySats: 0, reads: [] },
     };
-    this.apps.set(origin, rec);
+    this.apps.set(url, rec);
     return rec;
   }
 
-  /** Reorder the launcher grid: origins in the given order first (unknown ones
-   *  ignored), any apps not listed keep their relative order at the end. */
+  /** Reorder the launcher grid: launch URLs in the given order first (unknown
+   *  ones ignored), any apps not listed keep their relative order at the end. */
   reorderApps(order: string[]): void {
     const next = new Map<string, MiniAppRecord>();
-    for (const o of order) {
-      const origin = normalizeOrigin(o);
-      const rec = origin ? this.apps.get(origin) : undefined;
-      if (rec && !next.has(rec.origin)) next.set(rec.origin, rec);
+    for (const u of order) {
+      const url = normalizeLaunchUrl(u);
+      const rec = url ? this.apps.get(url) : undefined;
+      if (rec && !next.has(rec.url)) next.set(rec.url, rec);
     }
-    for (const [o, rec] of this.apps) if (!next.has(o)) next.set(o, rec);
+    for (const [u, rec] of this.apps) if (!next.has(u)) next.set(u, rec);
     this.apps = next;
   }
 
-  removeApp(origin: string): void {
-    this.apps.delete(origin);
-    this.spend.delete(origin);
-    this.signTimes.delete(origin);
-    this.invoiceTimes.delete(origin);
-    this.openAsks.delete(origin);
+  /** Remove a tile by launch URL (or every tile of a bare origin). When the
+   *  origin's LAST tile goes, its grants/spend/rate state go with it. */
+  removeApp(key: string): void {
+    const url = normalizeLaunchUrl(key);
+    if (url && this.apps.has(url)) {
+      this.apps.delete(url);
+    } else {
+      const origin = normalizeOrigin(key);
+      if (!origin) return;
+      for (const [u, a] of [...this.apps]) if (a.origin === origin) this.apps.delete(u);
+    }
+    const origin = normalizeOrigin(key);
+    if (origin && !this.appByOrigin(origin)) {
+      this.spend.delete(origin);
+      this.signTimes.delete(origin);
+      this.invoiceTimes.delete(origin);
+      this.openAsks.delete(origin);
+    }
   }
 
-  getApp(origin: string): MiniAppRecord | undefined { return this.apps.get(origin); }
+  /** Look up by launch URL, falling back to "any tile of this origin". */
+  getApp(key: string): MiniAppRecord | undefined {
+    const url = normalizeLaunchUrl(key);
+    return (url ? this.apps.get(url) : undefined)
+      ?? this.appByOrigin(normalizeOrigin(key) ?? key);
+  }
+
+  private appByOrigin(origin: string): MiniAppRecord | undefined {
+    for (const a of this.apps.values()) if (a.origin === origin) return a;
+    return undefined;
+  }
+
   listApps(): MiniAppRecord[] { return [...this.apps.values()]; }
 
   setBlocklist(origins: Iterable<string>): void {
@@ -307,7 +352,7 @@ export class MiniAppFirewall {
     const origin = normalizeOrigin(req.origin);
     if (!origin) return { action: 'deny', reason: 'unregistered' };
     if (this.blocklist.has(origin)) return { action: 'deny', reason: 'blocklisted' };
-    const app = this.apps.get(origin);
+    const app = this.appByOrigin(origin);
     if (!app) return { action: 'deny', reason: 'unregistered' };
     if (!BRIDGE_METHODS.includes(req.method as BridgeMethod)) {
       return { action: 'deny', reason: 'unknown-method' };
@@ -419,7 +464,7 @@ export class MiniAppFirewall {
   }
 
   private mustApp(origin: string): MiniAppRecord {
-    const app = this.apps.get(normalizeOrigin(origin) ?? origin);
+    const app = this.appByOrigin(normalizeOrigin(origin) ?? origin);
     if (!app) throw new Error('unregistered app');
     return app;
   }
@@ -446,9 +491,12 @@ export class MiniAppFirewall {
   // ── Persistence ───────────────────────────────────────────────────────────
 
   serialize(): string {
+    const perms: Record<string, AppPermissions> = {};
+    for (const a of this.apps.values()) perms[a.origin] = a.perms;
     const data: Persisted = {
-      v: 1,
-      apps: this.listApps(),
+      v: 2,
+      apps: this.listApps().map(({ perms: _p, ...tile }) => tile),
+      perms,
       spend: Object.fromEntries(this.spend),
       globalSpend: this.globalSpend,
       audit: this.audit,
@@ -460,32 +508,44 @@ export class MiniAppFirewall {
     const fw = new MiniAppFirewall(opts);
     if (!json) return fw;
     try {
-      const data = JSON.parse(json) as Persisted;
-      if (data?.v !== 1) return fw;
+      const data = JSON.parse(json) as Persisted | PersistedV1;
+      if (data?.v !== 1 && data?.v !== 2) return fw;
+      const sanitizePerms = (p: Partial<AppPermissions> | undefined): AppPermissions => ({
+        pubkey: !!p?.pubkey,
+        kinds: (p?.kinds ?? []).filter((k) => Number.isInteger(k) && !ALWAYS_ASK_KINDS.has(k)),
+        encryptPeers: (p?.encryptPeers ?? []).filter((x) => HEX64.test(x)),
+        decryptPeers: (p?.decryptPeers ?? []).filter((x) => HEX64.test(x)),
+        spendCapDaySats: Math.max(0, Number(p?.spendCapDaySats) || 0),
+        reads: (p?.reads ?? []).filter((m) => (READ_METHODS as readonly string[]).includes(m)),
+      });
+      // Same-origin tiles must come out sharing ONE perms object, whatever the
+      // blob claims — otherwise a tampered store could give one tile of an
+      // origin a fatter grant than its siblings.
+      const permsByOrigin = new Map<string, AppPermissions>();
       for (const a of data.apps ?? []) {
         const origin = normalizeOrigin(a.origin);
         if (!origin) continue;
         // The stored launch url must still live inside the origin (tampered
         // stores don't get to relocate an app).
-        const url = typeof a.url === 'string' ? normalizeLaunchUrl(a.url) : null;
-        fw.apps.set(origin, {
+        const stored = typeof a.url === 'string' ? normalizeLaunchUrl(a.url) : null;
+        const url = stored && stored.startsWith(origin) ? stored : origin;
+        if (fw.apps.has(url)) continue;
+        let perms = permsByOrigin.get(origin);
+        if (!perms) {
+          perms = sanitizePerms(data.v === 2 ? data.perms?.[origin] : (a as MiniAppRecord).perms);
+          permsByOrigin.set(origin, perms);
+        }
+        fw.apps.set(url, {
           origin,
-          url: url && url.startsWith(origin) ? url : origin,
+          url,
           name: String(a.name ?? '').slice(0, 100),
           icon: sanitizeIcon(a.icon),
           addedAt: Number(a.addedAt) || 0,
-          perms: {
-            pubkey: !!a.perms?.pubkey,
-            kinds: (a.perms?.kinds ?? []).filter((k) => Number.isInteger(k) && !ALWAYS_ASK_KINDS.has(k)),
-            encryptPeers: (a.perms?.encryptPeers ?? []).filter((x) => HEX64.test(x)),
-            decryptPeers: (a.perms?.decryptPeers ?? []).filter((x) => HEX64.test(x)),
-            spendCapDaySats: Math.max(0, Number(a.perms?.spendCapDaySats) || 0),
-            reads: (a.perms?.reads ?? []).filter((m) => (READ_METHODS as readonly string[]).includes(m)),
-          },
+          perms,
         });
       }
       for (const [o, s] of Object.entries(data.spend ?? {})) {
-        if (fw.apps.has(o)) fw.spend.set(o, { day: String(s.day), sats: Number(s.sats) || 0, lastPayAt: Number(s.lastPayAt) || 0 });
+        if (fw.appByOrigin(o)) fw.spend.set(o, { day: String(s.day), sats: Number(s.sats) || 0, lastPayAt: Number(s.lastPayAt) || 0 });
       }
       if (data.globalSpend) {
         fw.globalSpend = { day: String(data.globalSpend.day), sats: Number(data.globalSpend.sats) || 0, lastPayAt: Number(data.globalSpend.lastPayAt) || 0 };
