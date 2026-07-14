@@ -820,5 +820,6 @@ const c: Record<string, string> = {
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Vipengele vya AI kwenye kifaa (kuandika machapisho, kutafsiri mazungumzo). Hufanya kazi kabisa kwenye kifaa hiki — hakuna kinachotumwa popote.",
   "Device not supported": "Kifaa hakitumiki",
   "Requires \"Local LLM AI\" in Experimental settings.": "Inahitaji \"Local LLM AI\" katika mipangilio ya majaribio.",
+  "Online": "Mtandaoni",
 };
 export default c;

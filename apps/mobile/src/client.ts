@@ -1335,6 +1335,18 @@ export class MobileClient {
     this.onConversationUpdate?.(updated);
   }
 
+  /**
+   * Presence ping — a receipt-neutral ack (up_to 0 changes no tick state)
+   * carrying only last_seen. Sent while the user has this conversation OPEN,
+   * so the peer's header can show "Online". Gated on the reciprocal
+   * "Show last seen" toggle; never sent outside active conversations.
+   */
+  chatPresencePing(peer: string): void {
+    if (!this.chatPrefs.lastSeen) return;
+    if (this.conversations.get(peer)?.state !== 'active') return;
+    this.sendChatEnvelope(peer, makeChatAck('delivered', 0, Math.floor(Date.now() / 1000))).catch(() => {});
+  }
+
   /** Archive/unarchive a conversation (local only — the peer isn't told). */
   chatSetArchived(peer: string, archived: boolean): void {
     const conv = this.conversations.get(peer);

@@ -820,5 +820,6 @@ const c: Record<string, string> = {
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "ຄຸນສົມບັດ AI ໃນເຄື່ອງ (ຮ່າງໂພສ, ການແປແຊັດ). ເຮັດວຽກທັງໝົດຢູ່ໃນເຄື່ອງນີ້ — ບໍ່ມີຫຍັງຖືກສົ່ງໄປໃສທັງນັ້ນ.",
   "Device not supported": "ບໍ່ຮອງຮັບອຸປະກອນນີ້",
   "Requires \"Local LLM AI\" in Experimental settings.": "ຕ້ອງການ \"Local LLM AI\" ໃນການຕັ້ງຄ່າທົດລອງ.",
+  "Online": "ອອນລາຍ",
 };
 export default c;

@@ -863,5 +863,6 @@ const c: Record<string, string> = {
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "기기 내 AI 기능(게시물 초안 작성, 채팅 번역). 전적으로 이 기기에서 실행되며 — 어디로도 전송되지 않습니다.",
   "Device not supported": "지원되지 않는 기기",
   "Requires \"Local LLM AI\" in Experimental settings.": "실험적 설정에서 \"Local LLM AI\"가 필요합니다.",
+  "Online": "온라인",
 };
 export default c;

@@ -823,5 +823,6 @@ const c: Record<string, string> = {
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "AI функције на уређају (писање објава, превод ћаскања). Ради у потпуности на овом уређају — ништа се нигде не шаље.",
   "Device not supported": "Уређај није подржан",
   "Requires \"Local LLM AI\" in Experimental settings.": "Захтева \"Local LLM AI\" у експерименталним подешавањима.",
+  "Online": "На мрежи",
 };
 export default c;

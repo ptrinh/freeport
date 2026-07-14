@@ -863,5 +863,6 @@ const c: Record<string, string> = {
   "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "设备端 AI 功能（撰写帖子、聊天翻译）。完全在本设备上运行——不会向任何地方发送任何内容。",
   "Device not supported": "不支持此设备",
   "Requires \"Local LLM AI\" in Experimental settings.": "需要在实验性设置中启用\"Local LLM AI\"。",
+  "Online": "在线",
 };
 export default c;

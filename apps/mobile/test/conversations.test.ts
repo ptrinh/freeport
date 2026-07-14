@@ -152,3 +152,14 @@ describe('chat extras (reply / reactions / TTL / pay)', () => {
     expect(sweepExpired(conv, now + 11).messages).toHaveLength(0); // gone
   });
 });
+
+
+describe('presence ping (receipt-neutral ack)', () => {
+  it('up_to 0 carries last_seen without touching tick state', () => {
+    let conv: Conversation = { ...newConversation(PEER, 'active'), theirDeliveredTs: 100, theirReadTs: 90 };
+    const next = applyChatInbound(conv, makeChatAck('delivered', 0, 12345), PEER, 'pp1')!;
+    expect(next.theirLastSeen).toBe(12345);
+    expect(next.theirDeliveredTs).toBe(100); // untouched
+    expect(next.theirReadTs).toBe(90);       // untouched
+  });
+});

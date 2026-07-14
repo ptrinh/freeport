@@ -10,7 +10,7 @@
  *   - ChatFab: the floating + button that opens the InviteSheet.
  */
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Modal, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t, tn } from '../../i18n';
 import { MobileClient } from '../../client';
@@ -174,7 +174,19 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
     client?.markChatRead(conv.peer);
   }, [client, conv.peer, conv.messages.length]);
 
+  // Presence: ping on open + every 2 min while the thread stays open (gated
+  // on the "Show last seen" toggle inside the client), and tick every 30s so
+  // the peer's "Online" state can expire visually.
+  const [, presenceTick] = useState(0);
+  useEffect(() => {
+    client?.chatPresencePing(conv.peer);
+    const ping = setInterval(() => client?.chatPresencePing(conv.peer), 120_000);
+    const tick = setInterval(() => presenceTick((n) => n + 1), 30_000);
+    return () => { clearInterval(ping); clearInterval(tick); };
+  }, [client, conv.peer]);
+
   const lastSeen = conv.theirLastSeen;
+  const online = !!lastSeen && Date.now() / 1000 - lastSeen < 180;
   return (
     <Modal visible transparent={false} animationType="slide" onRequestClose={onClose}>
       <View style={[s.appShell, { flex: 1 }]}>
@@ -185,7 +197,12 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
           <Avatar uri={avatarUri(conv, client)} size={36} />
           <View style={{ flex: 1 }}>
             <Text style={s.cardTitle} numberOfLines={1}>{chatDisplayName(conv, client)}</Text>
-            {lastSeen ? (
+            {online ? (
+              <View style={[s.row, { gap: 4, alignItems: 'center' }]}>
+                <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: '#22c55e' }} />
+                <Text style={[s.dim, { fontSize: 11, color: '#22c55e' }]}>{t('Online')}</Text>
+              </View>
+            ) : lastSeen ? (
               <Text style={[s.dim, { fontSize: 11 }]}>{t('Last seen {time}', { time: fmtRowTime(lastSeen) })}</Text>
             ) : null}
           </View>
@@ -239,18 +256,23 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
             <Ionicons name={blocked ? 'ban' : 'ban-outline'} size={20} color={palette.danger} />
           </Pressable>
         </View>
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 12 }} keyboardShouldPersistTaps="handled">
+        {/* Full-height thread: messages scroll in their own area, the
+            composer stays pinned to the bottom, and the KeyboardAvoidingView
+            lifts it above the keyboard (user report: long chats pushed the
+            input off-screen; the keyboard covered it). */}
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           {blocked && (
-            <Text style={[s.dim, { marginBottom: 8 }]}>{t('You blocked this person — they cannot message you.')}</Text>
+            <Text style={[s.dim, { margin: 12, marginBottom: 0 }]}>{t('You blocked this person — they cannot message you.')}</Text>
           )}
           {conv.disappearTtl ? (
-            <Text style={[s.dim, { marginBottom: 8, textAlign: 'center' }]}>
+            <Text style={[s.dim, { marginTop: 8, textAlign: 'center' }]}>
               {'⏱ ' + (conv.disappearTtl >= 7 * 24 * 3600
                 ? t('New messages disappear after 7 days')
                 : t('New messages disappear after 24 hours'))}
             </Text>
           ) : null}
           <ChatCore
+            fullHeight
             messages={conv.messages}
             onSend={(txt, opts) => client?.chatSend(conv.peer, txt, opts) ?? Promise.resolve()}
             emptyHint={t('Say hello 👋')}
@@ -258,7 +280,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
             onReact={(id, emoji) => client?.chatReact(conv.peer, id, emoji).catch(() => {})}
             translateTo={translateTo}
           />
-        </ScrollView>
+        </KeyboardAvoidingView>
       </View>
     </Modal>
   );

@@ -8,6 +8,7 @@ import { Image, Modal, Platform, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../i18n';
 import { loadRTC, type RTC } from './webrtc';
+import { startRinging, stopRinging } from './ring';
 import { screenShareSupported, type CallState } from './manager';
 
 /** Cross-platform stream renderer: RTCView natively, a DOM <video> on web.
@@ -58,6 +59,13 @@ export function CallOverlay({ state, localStream, remoteStream, peerName, peerAv
 }) {
   const [rtc, setRtc] = useState<RTC | null>(null);
   useEffect(() => { loadRTC().then(setRtc).catch(() => {}); }, []);
+
+  // Gentle ring while an incoming call waits for an answer.
+  useEffect(() => {
+    if (state.phase === 'incoming') startRinging();
+    else stopRinging();
+    return () => { stopRinging(); };
+  }, [state.phase]);
 
   // In-call duration ticker.
   const [, tick] = useState(0);

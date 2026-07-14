@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -167,7 +167,7 @@ const REACT_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
  * chat (ChatThread, bound to a Negotiation) and the friend chat (bound to a
  * Conversation) — keep it free of either model.
  */
-export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title, onReact, translateTo }: {
+export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title, onReact, translateTo, fullHeight = false }: {
   messages: { dir: 'in' | 'out'; text: string; ts: number; id?: string; quote?: string; reactions?: { emoji: string; dir: 'in' | 'out' }[] }[];
   onSend: (text: string, opts?: { replyTo?: string; quote?: string }) => Promise<void>;
   /** Grab-style one-tap replies rendered above the input ("I am here ✅", …). */
@@ -181,6 +181,10 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
   onReact?: (targetId: string, emoji: string) => void;
   /** On-device auto-translate target language for inbound messages. */
   translateTo?: string;
+  /** Full-screen layout (friend chat): messages in their own flex-1 scroll
+   *  area pinned to the bottom, composer fixed at the screen's bottom edge —
+   *  long conversations must never push the input off-screen. */
+  fullHeight?: boolean;
 }) {
   const [text, setText] = useState('');
   // Long-press action row target + the message being replied to.
@@ -191,11 +195,13 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
   const [recording, setRecording] = useState(false);
   const [viewerUri, setViewerUri] = useState<string | null>(null);
   const [showAllMsgs, setShowAllMsgs] = useState(false);
+  const inputRef = useRef<TextInput>(null);
+  const scrollRef = useRef<ScrollView>(null);
   const msgs = messages;
-  // Keep the thread compact: show only the most recent few, with a tap to reveal
-  // the rest. Otherwise a long conversation pushes the input box far down the card.
+  // Deal-card mode keeps the thread compact (tap to reveal); full-screen mode
+  // shows everything — the list scrolls, the composer never moves.
   const CHAT_PREVIEW = 5;
-  const collapsedMsgs = !showAllMsgs && msgs.length > CHAT_PREVIEW;
+  const collapsedMsgs = !fullHeight && !showAllMsgs && msgs.length > CHAT_PREVIEW;
   const shownMsgs = collapsedMsgs ? msgs.slice(-CHAT_PREVIEW) : msgs;
 
   const toggleRecord = async () => {
@@ -231,7 +237,11 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
       setReplyingTo(null);
     } catch (e) {
       uiAlert(t('Could not send'), e instanceof Error ? e.message : undefined);
-    } finally { setSending(false); }
+    } finally {
+      setSending(false);
+      // Keep the cursor in the box so the next message needs no extra tap.
+      inputRef.current?.focus();
+    }
   };
 
   const attach = async () => {
@@ -247,9 +257,8 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
     } finally { setUploading(false); }
   };
 
-  return (
-    <View style={s.chatBox}>
-      {title ? <Text style={s.chatTitle}>{title}</Text> : null}
+  const messagesBlock = (
+    <>
       {msgs.length === 0 ? (
         <Text style={s.dim}>{emptyHint ?? t("Send a message to coordinate the pickup.")}</Text>
       ) : (
@@ -294,6 +303,11 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
           ))}
         </>
       )}
+    </>
+  );
+
+  const composer = (
+    <>
       {quickReplies && quickReplies.length > 0 && (
         <View style={[s.row, { marginTop: 8, gap: 6, flexWrap: 'wrap' }]}>
           {quickReplies.map((q) => (
@@ -324,6 +338,7 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
       ) : null}
       <View style={[s.row, { marginTop: 8 }]}>
         <TextInput
+          ref={inputRef}
           style={[s.input, { flex: 1 }]}
           value={text}
           onChangeText={setText}
@@ -331,6 +346,7 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
           placeholderTextColor={palette.placeholder}
           onSubmitEditing={send}
           returnKeyType="send"
+          blurOnSubmit={false}
         />
         <Pressable style={[s.chatAttach, uploading && { opacity: 0.6 }]} onPress={attach} disabled={uploading || recording} accessibilityRole="button" accessibilityLabel={t('Attach photo')}>
           {uploading ? <ActivityIndicator color="#93c5fd" /> : <Ionicons name="image" size={18} color="#93c5fd" />}
@@ -342,7 +358,11 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
           {sending ? <ActivityIndicator color="white" /> : <Ionicons name="send" size={18} color="white" />}
         </Pressable>
       </View>
-      <Modal visible={!!viewerUri} transparent animationType="fade" onRequestClose={() => setViewerUri(null)}>
+    </>
+  );
+
+  const viewer = (
+    <Modal visible={!!viewerUri} transparent animationType="fade" onRequestClose={() => setViewerUri(null)}>
         <View style={s.imgViewerBackdrop}>
           <ScrollView
             style={s.imgViewerScroll}
@@ -360,6 +380,33 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
           </Pressable>
         </View>
       </Modal>
+  );
+
+  if (fullHeight) {
+    return (
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          ref={scrollRef}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ padding: 12, flexGrow: 1, justifyContent: 'flex-end' }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
+        >
+          {messagesBlock}
+        </ScrollView>
+        <View style={{ paddingHorizontal: 12, paddingBottom: 10 }}>{composer}</View>
+        {viewer}
+      </View>
+    );
+  }
+
+  return (
+    <View style={s.chatBox}>
+      {title ? <Text style={s.chatTitle}>{title}</Text> : null}
+      {messagesBlock}
+      {composer}
+      {viewer}
     </View>
   );
 }
