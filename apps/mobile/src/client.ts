@@ -16,6 +16,7 @@ import { fetchReputation, type Reputation } from './reputation';
 import { buildTrustMap } from './wot';
 import { kvGet, kvSet, kvDelete } from './kv';
 import type { Signer } from './signer';
+import { sha256 } from '@noble/hashes/sha2.js';
 import { applyChatInbound, applyChatOutbound, newConversation, sweepExpired, type Conversation } from './conversations';
 import {
   DEFAULT_RELAYS,
@@ -48,6 +49,14 @@ import {
   parseCallEnvelope,
   callOfferFresh,
   CALL_OFFER,
+  parseEscrowEnvelope,
+  makeEscrowRequest,
+  makeEscrowInvoice,
+  makeEscrowRelease,
+  ESCROW_REQUEST,
+  ESCROW_INVOICE,
+  ESCROW_RELEASE,
+  type EscrowEnvelope,
   type CallEnvelope,
   type ChatEnvelope,
   applyInbound,
@@ -113,6 +122,26 @@ const CHAT_INVITE_KEY = 'freeport.chatInvite';
 const CHAT_INVITE_TTL_SECONDS = 7 * 24 * 3600;
 /** Coalesce delivered-acks per peer so a message burst sends ONE receipt. */
 const CHAT_ACK_DELAY_MS = 300;
+/** Persisted escrows — the buyer's PREIMAGE lives here; losing it means the
+ *  buyer can only wait for the expiry refund, so persist aggressively. */
+const ESCROW_STORE_KEY = 'freeport.escrows';
+/** Hold-invoice lifetime: unreleased funds auto-refund to the buyer after this. */
+const ESCROW_EXPIRY_SECONDS = 24 * 3600;
+
+/** One escrow per deal. The buyer's `preimage` is the money key — persisted. */
+export interface EscrowState {
+  nego: string;
+  peer: string;
+  role: 'buyer' | 'seller';
+  hash: string;
+  amountSats: number;
+  /** Buyer: minted locally. Seller: arrives with the release. */
+  preimage?: string;
+  invoice?: string;
+  status: 'requested' | 'invoiced' | 'released' | 'settled' | 'claim_failed';
+  updatedAt: number;
+  seenEventIds?: string[];
+}
 
 export class MobileClient {
   // enableReconnect: SimplePool transparently re-opens a dropped relay socket
@@ -191,6 +220,17 @@ export class MobileClient {
   private ackTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private ackMax = new Map<string, number>();
   private chatPersistTimer: ReturnType<typeof setTimeout> | null = null;
+  // ─── HODL escrow (deal-scoped conditional payments) ────────────────────────
+  readonly escrows = new Map<string, EscrowState>();
+  onEscrowUpdate?: (escrow: EscrowState) => void;
+  /** Wallet hooks for escrow, set by the app when the Wallet experiment is on
+   *  (Breez only — NWC has no HTLC surface). Lazily boots the wallet. */
+  getEscrowWallet?: () => Promise<{
+    createHoldInvoice(sats: number, description: string, paymentHashHex: string, expirySecs: number): Promise<string>;
+    claimHtlc(preimageHex: string): Promise<void>;
+  } | null>;
+  private escrowPersistTimer: ReturnType<typeof setTimeout> | null = null;
+
   /**
    * Live call signaling from a peer (see calls/manager.ts). Only fires for:
    * LIVE events (never the startup backfill — an old offer must not ring),
@@ -364,6 +404,7 @@ export class MobileClient {
     try { await kvDelete(DM_LAST_SEEN_KEY); } catch { /* best-effort */ }
     try { await kvDelete(CHAT_STORE_KEY); } catch { /* best-effort */ }
     try { await kvDelete(CHAT_INVITE_KEY); } catch { /* best-effort */ }
+    try { await kvDelete(ESCROW_STORE_KEY); } catch { /* best-effort */ }
   }
 
   async loadNegotiations(): Promise<void> {
@@ -374,6 +415,7 @@ export class MobileClient {
     await this.loadOutbox(); // undelivered DMs from the previous session retry first
     await this.loadPublished(); // restore own posts first so inbound accepts can match
     await this.loadConversations(); // friend chats (experimental Chat feature)
+    await this.loadEscrows(); // HODL escrows — the buyer's preimage lives here
     try {
       const raw = await kvGet(NEGO_STORE_KEY);
       if (!raw) return;
@@ -815,7 +857,124 @@ export class MobileClient {
     return () => { clearInterval(sweepTimer); dmSub.close(); wrapSub?.close(); };
   }
 
-  /** Route one decrypted plaintext through the three envelope families. */
+  private commitEscrow(escrow: EscrowState): void {
+    this.escrows.set(escrow.nego, escrow);
+    if (!this.escrowPersistTimer) {
+      this.escrowPersistTimer = setTimeout(() => {
+        this.escrowPersistTimer = null;
+        kvSet(ESCROW_STORE_KEY, JSON.stringify([...this.escrows.values()])).catch(() => {});
+      }, 250);
+    }
+    this.onEscrowUpdate?.(escrow);
+  }
+
+  async loadEscrows(): Promise<void> {
+    try {
+      const raw = await kvGet(ESCROW_STORE_KEY);
+      if (!raw) return;
+      for (const e of JSON.parse(raw) as EscrowState[]) {
+        if (!e?.nego) continue;
+        this.escrows.set(e.nego, e);
+        this.onEscrowUpdate?.(e);
+      }
+    } catch { /* corrupt/absent → start empty */ }
+  }
+
+  /**
+   * Buyer: start an escrow on a confirmed deal. Generates the preimage HERE
+   * (it never leaves this device until release), sends the hash + amount to
+   * the seller, who answers with a hold invoice.
+   */
+  async requestEscrow(negoId: string, amountSats: number): Promise<void> {
+    const nego = this.negotiations.get(negoId);
+    if (!nego || !nego.peer || amountSats <= 0) return;
+    if (this.escrows.has(negoId)) return; // one escrow per deal
+    const rnd = new Uint8Array(32);
+    globalThis.crypto.getRandomValues(rnd);
+    const preimage = [...rnd].map((b) => b.toString(16).padStart(2, '0')).join('');
+    const hash = [...sha256(rnd)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    const escrow: EscrowState = {
+      nego: negoId, peer: nego.peer, role: 'buyer', hash, preimage,
+      amountSats: Math.round(amountSats), status: 'requested', updatedAt: Math.floor(Date.now() / 1000),
+    };
+    this.commitEscrow(escrow);
+    await this.sendDM(nego.peer, JSON.stringify(makeEscrowRequest(negoId, hash, escrow.amountSats)));
+  }
+
+  /** Seller: accept the request — create the hold invoice and send it back. */
+  async acceptEscrow(negoId: string): Promise<void> {
+    const escrow = this.escrows.get(negoId);
+    if (!escrow || escrow.role !== 'seller' || escrow.status !== 'requested') return;
+    const wallet = await this.getEscrowWallet?.();
+    if (!wallet?.createHoldInvoice) throw new Error('wallet unavailable');
+    const invoice = await wallet.createHoldInvoice(escrow.amountSats, 'Freeport escrow', escrow.hash, ESCROW_EXPIRY_SECONDS);
+    this.commitEscrow({ ...escrow, invoice, status: 'invoiced', updatedAt: Math.floor(Date.now() / 1000) });
+    await this.sendDM(escrow.peer, JSON.stringify(makeEscrowInvoice(negoId, escrow.hash, invoice)));
+  }
+
+  /** Buyer: reveal the preimage on delivery — the seller can now settle. */
+  async releaseEscrow(negoId: string): Promise<void> {
+    const escrow = this.escrows.get(negoId);
+    if (!escrow || escrow.role !== 'buyer' || !escrow.preimage) return;
+    this.commitEscrow({ ...escrow, status: 'released', updatedAt: Math.floor(Date.now() / 1000) });
+    await this.sendDM(escrow.peer, JSON.stringify(makeEscrowRelease(negoId, escrow.hash, escrow.preimage)));
+  }
+
+  /** Seller: (re)try settling with the revealed preimage. */
+  async claimEscrow(negoId: string): Promise<void> {
+    const escrow = this.escrows.get(negoId);
+    if (!escrow || escrow.role !== 'seller' || !escrow.preimage) return;
+    try {
+      const wallet = await this.getEscrowWallet?.();
+      if (!wallet?.claimHtlc) throw new Error('wallet unavailable');
+      await wallet.claimHtlc(escrow.preimage);
+      this.commitEscrow({ ...escrow, status: 'settled', updatedAt: Math.floor(Date.now() / 1000) });
+    } catch {
+      this.commitEscrow({ ...escrow, status: 'claim_failed', updatedAt: Math.floor(Date.now() / 1000) });
+    }
+  }
+
+  /** Inbound escrow envelope — strict peer + hash checks, replay-safe. */
+  private processEscrowDM(env: EscrowEnvelope, from: string, eventId?: string): void {
+    const existing = this.escrows.get(env.nego);
+    if (existing) {
+      if (from !== existing.peer) return; // third party injecting into the escrow
+      if (eventId && existing.seenEventIds?.includes(eventId)) return;
+      if (env.hash !== existing.hash) return; // wrong lock
+    }
+    const seen = (e: EscrowState): EscrowState =>
+      eventId ? { ...e, seenEventIds: [...(existing?.seenEventIds ?? []).slice(-99), eventId] } : e;
+    const now = Math.floor(Date.now() / 1000);
+    if (env.type === ESCROW_REQUEST) {
+      if (existing) return; // duplicate request
+      const nego = this.negotiations.get(env.nego);
+      if (!nego || from !== nego.peer) return; // escrow only on OUR deals, from the counterparty
+      this.commitEscrow(seen({
+        nego: env.nego, peer: from, role: 'seller', hash: env.hash,
+        amountSats: Math.round(env.amount_sats!), status: 'requested', updatedAt: now,
+      }));
+      return;
+    }
+    if (!existing) return; // invoice/release without a request — drop
+    if (env.type === ESCROW_INVOICE) {
+      if (existing.role !== 'buyer' || existing.status !== 'requested') return;
+      this.commitEscrow(seen({ ...existing, invoice: env.invoice, status: 'invoiced', updatedAt: now }));
+      return;
+    }
+    if (env.type === ESCROW_RELEASE) {
+      if (existing.role !== 'seller') return;
+      // The preimage must actually open the lock — verify before touching the wallet.
+      const bytes = new Uint8Array(env.preimage!.match(/../g)!.map((h) => parseInt(h, 16)));
+      const check = [...sha256(bytes)].map((b) => b.toString(16).padStart(2, '0')).join('');
+      if (check !== existing.hash) return;
+      if (existing.status === 'settled') return; // replayed release after settling
+      this.commitEscrow(seen({ ...existing, preimage: env.preimage, status: 'released', updatedAt: now }));
+      // Settle automatically; claim_failed keeps a Retry button in the UI.
+      void this.claimEscrow(env.nego);
+    }
+  }
+
+  /** Route one decrypted plaintext through the four envelope families. */
   private routePlaintext(plain: string, from: string, createdAt: number, eventId?: string): void {
     const msg = parseNegotiationMessage(plain);
     if (msg) {
@@ -831,7 +990,12 @@ export class MobileClient {
       return;
     }
     const call = parseCallEnvelope(plain);
-    if (call) this.processCallDM(call, from, createdAt);
+    if (call) {
+      this.processCallDM(call, from, createdAt);
+      return;
+    }
+    const escrow = parseEscrowEnvelope(plain);
+    if (escrow) this.processEscrowDM(escrow, from, eventId);
   }
 
   /**

@@ -24,6 +24,7 @@ import { fmtClock } from '../../ui/format';
 import { s, palette } from '../../ui/theme';
 import { confirmAsync } from '../../ui/alerts';
 import { ChatCore, SAFE_ATTACH_EXTENSIONS, isAudioMsg, isImageMsg, isTripMsg, isDocMsg, docMsgName } from './Chat';
+import { matchesKeywords } from '../../browseFilter';
 import { uploadFile, UploadError } from '../../upload';
 
 /** Display name: their invite/accept name → kind:0 profile → npub prefix. */
@@ -64,7 +65,7 @@ function Avatar({ uri, size = 44 }: { uri: string; size?: number }) {
 
 // ─── Conversation list ───────────────────────────────────────────────────────
 
-export function FriendChatSection({ client, conversations, blockedPubkeys, onOpen, onAcceptInvite, chatEnabled = true }: {
+export function FriendChatSection({ client, conversations, blockedPubkeys, onOpen, onAcceptInvite, chatEnabled = true, archivedView = false, filterKeyword = '' }: {
   client: MobileClient | null;
   conversations: Conversation[];
   blockedPubkeys: Set<string>;
@@ -75,19 +76,28 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
   /** When the experiment is off, only PENDING requests render — the rest of
    *  the chat UI stays behind the toggle. */
   chatEnabled?: boolean;
+  /** Archived tab: show ONLY archived chats (no pending requests). */
+  archivedView?: boolean;
+  /** Comma-separated keyword filter (matches name + message text). */
+  filterKeyword?: string;
 }) {
-  const [showArchived, setShowArchived] = useState(false);
   // Blocked peers: hide their PENDING invites (spam), but keep an already-
   // active chat visible — the unblock action lives in its header.
+  const kw = filterKeyword.trim().toLowerCase();
+  const convText = (c: Conversation) =>
+    (chatDisplayName(c, client) + ' ' + c.messages.map((m) => m.text).join(' ')).toLowerCase();
   const visible = conversations.filter((c) =>
-    (c.state === 'active' || c.state === 'pending_out' || (c.state === 'pending_in' && !blockedPubkeys.has(c.peer))));
+    (c.state === 'active' || c.state === 'pending_out' || (c.state === 'pending_in' && !blockedPubkeys.has(c.peer)))
+    && (!kw || matchesKeywords(convText(c), kw)));
   if (visible.length === 0) return null;
-  const pending = visible.filter((c) => c.state === 'pending_in').sort((a, b) => b.updatedAt - a.updatedAt);
+  const pending = archivedView ? [] : visible.filter((c) => c.state === 'pending_in').sort((a, b) => b.updatedAt - a.updatedAt);
   // Experiment off: incoming requests must still be visible/answerable —
   // otherwise an invite arrives into a hidden UI (user report).
-  const live = chatEnabled ? visible.filter((c) => c.state !== 'pending_in' && !c.archived).sort((a, b) => b.updatedAt - a.updatedAt) : [];
-  const archived = chatEnabled ? visible.filter((c) => c.state !== 'pending_in' && c.archived).sort((a, b) => b.updatedAt - a.updatedAt) : [];
+  const live = chatEnabled
+    ? visible.filter((c) => c.state !== 'pending_in' && (archivedView ? c.archived : !c.archived)).sort((a, b) => b.updatedAt - a.updatedAt)
+    : [];
   if (!chatEnabled && pending.length === 0) return null;
+  if (archivedView && live.length === 0) return null;
 
   return (
     <View style={{ marginHorizontal: 12, marginTop: 8 }}>
@@ -135,30 +145,23 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
           </Pressable>
         );
       })}
-      {archived.length > 0 && (
-        <Pressable onPress={() => setShowArchived((v) => !v)} hitSlop={6} style={{ paddingVertical: 6 }}>
-          <Text style={s.link}>
-            {showArchived ? t('Hide archived chats') : tn(archived.length, 'Archived chats ({n})', 'Archived chats ({n})')}
-          </Text>
-        </Pressable>
-      )}
-      {showArchived && archived.map((c) => (
-        <Pressable key={c.peer} style={[s.card, { marginHorizontal: 0, opacity: 0.7, flexDirection: 'row', alignItems: 'center', gap: 10 }]} onPress={() => onOpen(c.peer)}>
-          <Avatar uri={avatarUri(c, client)} size={36} />
-          <View style={{ flex: 1 }}>
-            <Text style={s.cardTitle} numberOfLines={1}>{chatDisplayName(c, client)}</Text>
-            <Text style={s.dim} numberOfLines={1}>{lastLine(c)}</Text>
-          </View>
-        </Pressable>
-      ))}
     </View>
   );
 }
 
 // ─── Conversation screen ─────────────────────────────────────────────────────
 
-/** Disappearing-timer cycle: off → 24h → 7d → off. */
-const TTL_STEPS = [0, 24 * 3600, 7 * 24 * 3600];
+/** Disappearing-timer cycle: off → 5m → 1h → 24h → 7d → 4w → off. */
+const TTL_STEPS = [0, 5 * 60, 3600, 24 * 3600, 7 * 24 * 3600, 28 * 24 * 3600];
+const TTL_LABELS: Record<number, string> = { 0: '', [5 * 60]: '5m', [3600]: '1h', [24 * 3600]: '24h', [7 * 24 * 3600]: '7d', [28 * 24 * 3600]: '4w' };
+
+function disappearCaption(ttl: number): string {
+  if (ttl >= 28 * 24 * 3600) return t('New messages disappear after 4 weeks');
+  if (ttl >= 7 * 24 * 3600) return t('New messages disappear after 7 days');
+  if (ttl >= 24 * 3600) return t('New messages disappear after 24 hours');
+  if (ttl >= 3600) return t('New messages disappear after 1 hour');
+  return t('New messages disappear after 5 minutes');
+}
 
 export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlock, onClose, onStartCall, walletEnabled = false, onPayFriend, translateTo }: {
   client: MobileClient | null;
@@ -222,7 +225,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
     }
   };
 
-  const ttlLabel = conv.disappearTtl ? (conv.disappearTtl >= 7 * 24 * 3600 ? '7d' : '24h') : t('Off');
+  const ttlLabel = conv.disappearTtl ? (TTL_LABELS[conv.disappearTtl] ?? '24h') : t('Off');
   const menuRow = (icon: React.ComponentProps<typeof Ionicons>['name'], label: string, onPress: () => void, danger = false) => (
     <Pressable
       key={label}
@@ -324,9 +327,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
           )}
           {conv.disappearTtl ? (
             <Text style={[s.dim, { marginTop: 8, textAlign: 'center' }]}>
-              {'⏱ ' + (conv.disappearTtl >= 7 * 24 * 3600
-                ? t('New messages disappear after 7 days')
-                : t('New messages disappear after 24 hours'))}
+              {'⏱ ' + disappearCaption(conv.disappearTtl)}
             </Text>
           ) : null}
           <ChatCore

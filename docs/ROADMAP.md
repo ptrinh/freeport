@@ -281,15 +281,24 @@ app store". **Effort:** medium-high, security-dominated.
 
 ## Conditional payments — HODL invoices (trust-minimized escrow)
 
-**Status (2026-07): BLOCKED upstream.** Verified: the Breez Spark SDK (both the
-WASM and react-native builds, 0.18/0.19) exposes no hold-invoice API — there is
-nothing to build on today. Re-check on each SDK bump; if Breez/Spark never ship
-it, the fallback rail would be a second wallet backend that does (e.g. an LND
-REST endpoint the user brings), which is a much bigger lift.
+**Status (2026-07): v1 SHIPPED.** (An earlier note here claimed the SDK lacked
+the API — wrong: it's named `claimHtlcPayment` + `bolt11Invoice.paymentHash`,
+present in BOTH builds since 0.18/0.19, so it even ships to current binaries
+via OTA.) The buyer holds the preimage; the seller can only settle when the
+buyer releases it on delivery — the Lightning protocol enforces the lock, no
+custodian ever touches the money:
 
-The idea stands: escrow-like safety with no custodian. The buyer pays a **hold
-invoice** whose funds are locked, not settled, until the buyer releases on
-delivery — otherwise it expires and refunds automatically. No operator ever
-holds the money; the Lightning protocol enforces it. Pairs naturally with deal
-receipts and the `payment` flow that already exists.
+- `escrow.request/invoice/release` envelope family over the encrypted DM
+  channel, deal-scoped, replay-safe, preimage verified against the hash
+  before the wallet is ever touched
+- buyer: "Pay with escrow" on a confirmed deal → amount in sats → pays the
+  seller's hold invoice → "Release escrow" on delivery (confirm-guarded);
+  unreleased funds auto-refund after 24h (invoice expiry)
+- seller: "Create hold invoice" card → auto-claim on release; claim_failed
+  keeps a Retry button (e.g. buyer hadn't funded yet)
+- preimage persisted on the buyer device (losing it = wait for the refund)
+
+Remaining: fiat→sats prefill for the amount, funded-state detection on the
+seller side (SdkEvent.PaymentPending), surface the escrow state in the deal
+receipt/karma flow.
 

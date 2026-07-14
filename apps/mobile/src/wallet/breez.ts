@@ -265,6 +265,21 @@ export class BreezSparkProvider implements WalletProvider {
     } catch { return null; }
   }
 
+  /** HODL invoice: bolt11 on an EXTERNAL payment hash — the payment stays
+   *  unsettled (locked) until claimHtlc is called with the preimage, and
+   *  auto-refunds the payer once the invoice expires. */
+  async createHoldInvoice(sats: number, description: string, paymentHashHex: string, expirySecs: number): Promise<string> {
+    const r = await this.sdk.receivePayment({
+      paymentMethod: bolt11ReceiveMethod(this.M, sats, description, { paymentHash: paymentHashHex, expirySecs }),
+    });
+    if (!r?.paymentRequest) throw new Error('wallet returned no invoice');
+    return r.paymentRequest;
+  }
+
+  async claimHtlc(preimageHex: string): Promise<void> {
+    await this.sdk.claimHtlcPayment({ preimage: preimageHex });
+  }
+
   async registerLightningAddress(username: string): Promise<{ address: string; lnurl?: string }> {
     const info = await this.sdk.registerLightningAddress({ username, description: 'Freeport' });
     return { address: info.lightningAddress, lnurl: info.lnurl?.bech32 };

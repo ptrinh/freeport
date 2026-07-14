@@ -51,6 +51,57 @@ export function isRecording(): boolean {
 }
 
 /** Play an uploaded audio URL. Stops any previous playback first. */
+export interface VoicePlayback {
+  playing: boolean;
+  positionMillis: number;
+  durationMillis: number;
+  done?: boolean;
+}
+
+// ONE clip plays at a time (WhatsApp behavior): starting another stops the
+// previous and notifies its bubble so its UI resets.
+let currentUrl: string | null = null;
+let currentListener: ((st: VoicePlayback) => void) | null = null;
+
+/** Toggle play/pause for a clip; starting a different clip stops the last. */
+export async function toggleVoice(url: string, onStatus: (st: VoicePlayback) => void): Promise<void> {
+  if (currentUrl === url && sound) {
+    currentListener = onStatus; // rebind (bubble re-mounted)
+    const st: any = await sound.getStatusAsync();
+    if (st.isLoaded) {
+      if (st.isPlaying) await sound.pauseAsync();
+      else await sound.playAsync();
+      return;
+    }
+  }
+  // Different clip (or dead sound): stop the old one and tell its bubble.
+  if (sound) {
+    try { await sound.unloadAsync(); } catch { /* already gone */ }
+    currentListener?.({ playing: false, positionMillis: 0, durationMillis: 0, done: true });
+    sound = null;
+  }
+  const { sound: s } = await Audio.Sound.createAsync(
+    { uri: url },
+    { shouldPlay: true, progressUpdateIntervalMillis: 250 },
+  );
+  sound = s;
+  currentUrl = url;
+  currentListener = onStatus;
+  s.setOnPlaybackStatusUpdate((st: any) => {
+    if (!st.isLoaded) return;
+    currentListener?.({
+      playing: !!st.isPlaying,
+      positionMillis: st.positionMillis ?? 0,
+      durationMillis: st.durationMillis ?? 0,
+      done: !!st.didJustFinish,
+    });
+    if (st.didJustFinish) {
+      s.unloadAsync().catch(() => {});
+      if (sound === s) { sound = null; currentUrl = null; }
+    }
+  });
+}
+
 export async function playAudio(url: string): Promise<void> {
   try {
     if (sound) { await sound.unloadAsync(); sound = null; }

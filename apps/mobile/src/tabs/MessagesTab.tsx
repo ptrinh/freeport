@@ -31,7 +31,9 @@ import { ChatThread, CounterEditor, ReportModal, isTripMsg } from './messages/Ch
 import { KarmaRater, KarmaReceived } from './messages/Karma';
 import { LiveTripShare } from './messages/LiveTripShare';
 import { ChatFab, FriendChatModal, FriendChatSection, InviteSheet } from './messages/FriendChat';
+import { EscrowSection } from './messages/Escrow';
 import { type Conversation } from '../conversations';
+import { type EscrowState } from '../client';
 
 // Re-exported so App.tsx keeps importing these from './src/tabs/MessagesTab'.
 export { isImageMsg, isAudioMsg, isTripMsg } from './messages/Chat';
@@ -70,6 +72,8 @@ export function DealsTab({
   onPayFriend,
   chatTranslateTo,
   onAcceptChatInvite,
+  escrows = [],
+  onPayEscrowInvoice,
 }: {
   client: MobileClient | null;
   negos: Negotiation[];
@@ -118,6 +122,10 @@ export function DealsTab({
   chatTranslateTo?: string;
   /** Accepting an invite (also enables the Chat experiment when off). */
   onAcceptChatInvite?: (peer: string) => void;
+  /** HODL escrows (one per deal). */
+  escrows?: EscrowState[];
+  /** Pay a hold invoice via the wallet Send flow. */
+  onPayEscrowInvoice?: (invoice: string) => void;
 }) {
   // Friend chat: which conversation is open (peer pubkey) + the invite popup.
   const [openChatPeer, setOpenChatPeer] = useState<string | null>(null);
@@ -187,40 +195,59 @@ export function DealsTab({
   const negoText = (n: Negotiation) => (searchableText(n.intent, client) + ' ' + (n.theirContact ?? '')).toLowerCase();
   const sorted = [...negos]
     .filter((n) => {
+      // The keyword box lives at the Messages ROOT — it filters BOTH views
+      // (and the chat rows below), comma-separated like Browse.
+      if (completedKw && !matchesKeywords(negoText(n), completedKw)) return false;
       if (view !== 'completed') return !isDone(n);
       if (!isDone(n) || n.updatedAt < completedCutoff) return false;
-      if (completedKw && !matchesKeywords(negoText(n), completedKw)) return false;
       return true;
     })
     .sort((a, b) => b.updatedAt - a.updatedAt);
 
   const header = (
     <View>
+      {/* Search at the ROOT of Messages: filters chats + Active + Archived,
+          multiple comma-separated keywords (same semantics as Browse). */}
+      <View style={[s.searchInputWrap, { marginHorizontal: 12, marginTop: 8 }]}>
+        <Ionicons name="search" size={16} color={palette.dim} />
+        <TextInput
+          style={s.searchInput}
+          value={completedKeyword}
+          onChangeText={setCompletedKeyword}
+          placeholder={t("Filter by keyword")}
+          placeholderTextColor={palette.placeholder}
+          autoCapitalize="none"
+        />
+        {completedKeyword ? (
+          <Pressable onPress={() => setCompletedKeyword('')} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Clear search')}><Ionicons name="close-circle" size={16} color={palette.dim} /></Pressable>
+        ) : null}
+      </View>
       {/* Friend chats (experimental) — pending requests + WhatsApp-style rows.
           Rendered even when the experiment is OFF so an incoming request is
-          always answerable (it then shows ONLY pending requests). */}
-      {view === 'active' && (
-        <FriendChatSection
-          client={client}
-          conversations={conversations}
-          blockedPubkeys={blockedPubkeys}
-          onOpen={(peer) => setOpenChatPeer(peer)}
-          onAcceptInvite={onAcceptChatInvite}
-          chatEnabled={chatEnabled}
-        />
-      )}
+          always answerable (it then shows ONLY pending requests). Archived
+          chats live in the Archived tab. */}
+      <FriendChatSection
+        client={client}
+        conversations={conversations}
+        blockedPubkeys={blockedPubkeys}
+        onOpen={(peer) => setOpenChatPeer(peer)}
+        onAcceptInvite={onAcceptChatInvite}
+        chatEnabled={chatEnabled}
+        archivedView={view === 'completed'}
+        filterKeyword={completedKw}
+      />
       <View style={[s.segRow, { marginHorizontal: 12, marginTop: 8 }]}>
         {(['active', 'completed'] as const).map((v) => {
           const seg = (
             <Pressable onPress={() => setView(v)} style={[s.seg, view === v && s.segActive, { flex: 1 }]}>
               <Ionicons
-                name={v === 'active' ? 'pulse-outline' : 'checkmark-done-outline'}
+                name={v === 'active' ? 'pulse-outline' : 'archive-outline'}
                 size={15}
                 color={view === v ? palette.chipBlueText : palette.dim}
                 style={{ marginEnd: 6 }}
               />
               <Text style={[s.segText, view === v && s.segTextActive]}>
-                {v === 'active' ? t('Active') : t('Completed')}
+                {v === 'active' ? t('Active') : t('Archived')}
               </Text>
             </Pressable>
           );
@@ -251,22 +278,6 @@ export function DealsTab({
           onDismiss={() => onDismissExpired?.(e.d)}
         />
       ))}
-      {view === 'completed' && (
-        <View style={[s.searchInputWrap, { marginHorizontal: 12, marginTop: 8 }]}>
-          <Ionicons name="search" size={16} color={palette.dim} />
-          <TextInput
-            style={s.searchInput}
-            value={completedKeyword}
-            onChangeText={setCompletedKeyword}
-            placeholder={t("Filter by keyword")}
-            placeholderTextColor={palette.placeholder}
-            autoCapitalize="none"
-          />
-          {completedKeyword ? (
-            <Pressable onPress={() => setCompletedKeyword('')} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Clear search')}><Ionicons name="close-circle" size={16} color={palette.dim} /></Pressable>
-          ) : null}
-        </View>
-      )}
       {view === 'completed' && (
         <View style={[s.segRow, { marginHorizontal: 12, marginTop: 8 }]}>
           {COMPLETED_RANGES.map((d) => (
@@ -728,6 +739,23 @@ export function DealsTab({
                     </>
                   );
                 })()}
+
+                {/* HODL escrow — trust-minimized conditional payment on a
+                    mutually-confirmed deal (both sides need the wallet). */}
+                {item.state === 'confirmed' && !awaiting && walletEnabled && client && (
+                  <View style={{ marginTop: 8 }}>
+                    <EscrowSection
+                      escrow={escrows.find((e) => e.nego === item.id)}
+                      isBuyer={role === 'passenger'}
+                      paymentHint={item.terms?.payment}
+                      onRequest={(sats) => client.requestEscrow(item.id, sats)}
+                      onAccept={() => client.acceptEscrow(item.id)}
+                      onRelease={() => client.releaseEscrow(item.id)}
+                      onRetryClaim={() => client.claimEscrow(item.id)}
+                      onPayInvoice={(inv) => onPayEscrowInvoice?.(inv)}
+                    />
+                  </View>
+                )}
 
                 {/* Cancellation. Before the deal is mutually confirmed (we accepted
                     but they haven't acknowledged), it's not a real deal yet — allow an

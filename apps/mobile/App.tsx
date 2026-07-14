@@ -99,6 +99,7 @@ import { CallOverlay } from './src/calls/CallOverlay';
 import { callsSupported } from './src/calls/webrtc';
 import { defaultAvatarUrl as peerAvatarUrl } from './src/profile';
 import { unreadCount as convUnread, type Conversation } from './src/conversations';
+import { type EscrowState } from './src/client';
 import { ZapSheet } from './src/ui/ZapSheet';
 import { ConciergeSheet } from './src/concierge/ConciergeSheet';
 import { conciergeAvailability } from './src/concierge/model';
@@ -389,6 +390,8 @@ function AppInner() {
   const [zapTarget, setZapTarget] = useState<Intent | null>(null);
   /** Storefront products (NIP-15), keyed upstream by (pubkey, d). */
   const [products, setProducts] = useState<Product[]>([]);
+  /** HODL escrows (one per deal). */
+  const [escrows, setEscrows] = useState<EscrowState[]>([]);
   /** AI concierge (on-device Apple Foundation Models, iOS 26+). */
   const [conciergeOk, setConciergeOk] = useState(false);
   const [showConcierge, setShowConcierge] = useState(false);
@@ -734,6 +737,7 @@ function AppInner() {
       c.onConversationUpdate = () => setConversations([...c.conversations.values()]);
       c.onProduct = () => setProducts([...c.products.values()]);
       c.onProductRemoved = () => setProducts([...c.products.values()]);
+      c.onEscrowUpdate = () => setEscrows([...c.escrows.values()]);
       // Friend chat alerts: ding in the foreground, notify when backgrounded
       // (mirrors onIncomingMessage; the push server doesn't know about chat
       // DMs' content either way — envelopes are indistinguishable kind-4s).
@@ -1051,6 +1055,14 @@ function AppInner() {
     if (!client) return;
     client.getPayAddress = experimentalWallet
       ? async () => (await activeWalletProvider(walletNwcUrl))?.address() ?? null
+      : undefined;
+    // HODL escrow needs the Breez HTLC surface (NWC has none).
+    client.getEscrowWallet = experimentalWallet
+      ? async () => {
+          const p = await activeWalletProvider(walletNwcUrl);
+          if (!p?.createHoldInvoice || !p.claimHtlc) return null;
+          return { createHoldInvoice: p.createHoldInvoice.bind(p), claimHtlc: p.claimHtlc.bind(p) };
+        }
       : undefined;
   }, [client, experimentalWallet, walletNwcUrl]);
   // Receipts/last-seen toggles feed the client (it sends/omits acks accordingly).
@@ -1397,7 +1409,7 @@ function AppInner() {
         setTab('messages');
       }} />}
       {tab === 'post' && <PostTab draft={postDraft} onDraftConsumed={() => setPostDraft(null)} client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} onStartCall={chatCallsEnabled && callsSupported() ? (peer, video) => callManagerRef.current?.startCall(peer, video) : undefined} onPayFriend={(peer, payAddress) => { setWalletPrefill({ mode: 'send', dest: payAddress }); setTab('wallet'); }} onAcceptChatInvite={(peer) => {
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} onStartCall={chatCallsEnabled && callsSupported() ? (peer, video) => callManagerRef.current?.startCall(peer, video) : undefined} onPayFriend={(peer, payAddress) => { setWalletPrefill({ mode: 'send', dest: payAddress }); setTab('wallet'); }} escrows={escrows} onPayEscrowInvoice={(invoice) => { setWalletPrefill({ mode: 'send', dest: invoice, memo: 'Escrow' }); setTab('wallet'); }} onAcceptChatInvite={(peer) => {
         // Same consent model as opening an invite link: answering YES to a
         // chat request implies wanting the feature.
         if (!experimentalChat) { setExperimentalChat(true); savePrefs({ experimentalChat: true }).catch(() => {}); }
@@ -1576,7 +1588,7 @@ function AppInner() {
             setRole('');
             setProfile(empty);
             setNpub('');
-            resetIntents(); setNegos([]); setMyIntents([]); setConversations([]);
+            resetIntents(); setNegos([]); setMyIntents([]); setConversations([]); setEscrows([]);
             setClient(null);
             signerRef.current = null;
             setTab('post');

@@ -102,6 +102,10 @@ export interface WalletProvider {
   lightningAddress?(): Promise<{ address: string; lnurl?: string } | null>;
   /** Claim a username under the app's lightning-address domain. */
   registerLightningAddress?(username: string): Promise<{ address: string; lnurl?: string }>;
+  /** HODL escrow (Breez only): a bolt11 whose funds LOCK until claimed. */
+  createHoldInvoice?(sats: number, description: string, paymentHashHex: string, expirySecs: number): Promise<string>;
+  /** Settle a held payment with the buyer's revealed preimage. */
+  claimHtlc?(preimageHex: string): Promise<void>;
   /** True when the username is still free. */
   checkUsername?(username: string): Promise<boolean>;
   /** Tear down sockets/subscriptions. */

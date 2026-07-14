@@ -16,7 +16,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { type Negotiation, type ProposedTerms } from '@freeport/protocol';
 import { t } from '../../i18n';
 import { uploadImage, uploadFile, UploadError } from '../../upload';
-import { startRecording, stopRecording, playAudio } from '../../voice';
+import { startRecording, stopRecording, toggleVoice, type VoicePlayback } from '../../voice';
 import { defaultIntentTime, timeToWindow, parsePayment, fmtPayment } from '../../ui/format';
 import { currencyForMarket, type Currency } from '../../locations';
 import { s, palette } from '../../ui/theme';
@@ -76,21 +76,46 @@ export function docMsgName(t: string): string {
   }
 }
 
-/** A single voice-memo bubble with a tap-to-play button. */
+/** WhatsApp-style voice bubble: play/pause + waveform progress + time.
+ *  The waveform is decorative (deterministic pseudo-random bars seeded by
+ *  the URL) — decoding real amplitudes isn't worth a download per bubble. */
 function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
-  const [playing, setPlaying] = useState(false);
-  const play = async () => {
-    setPlaying(true);
-    try { await playAudio(url); } catch {} finally { setPlaying(false); }
+  const [st, setSt] = useState<VoicePlayback>({ playing: false, positionMillis: 0, durationMillis: 0 });
+  const bars = React.useMemo(() => {
+    let h = 0;
+    for (const ch of url) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return Array.from({ length: 27 }, (_, i) => 6 + ((h >> (i % 24)) * (i + 7)) % 15);
+  }, [url]);
+  const active = dir === 'out' ? '#f5f7fa' : palette.accent;
+  const dim = dir === 'out' ? 'rgba(245,247,250,0.45)' : palette.dim;
+  const progress = st.durationMillis > 0 ? st.positionMillis / st.durationMillis : 0;
+  const fmtMs = (ms: number) => {
+    const sec = Math.max(0, Math.round(ms / 1000));
+    return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   };
-  // Outgoing bubbles are accent-filled; the default text/accent colors are low
-  // contrast on them in light mode — use the light "out" color there.
-  const outColor = dir === 'out' ? '#f5f7fa' : undefined;
+  const timeLabel = st.playing || st.positionMillis > 0
+    ? fmtMs(st.positionMillis)
+    : st.durationMillis > 0 ? fmtMs(st.durationMillis) : '';
   return (
-    <Pressable style={s.voiceMsg} onPress={play}>
-      <Ionicons name={playing ? 'volume-high' : 'play'} size={18} color={outColor ?? palette.accent} />
-      <Text style={[s.voiceMsgText, dir === 'out' && s.chatTextOut]}>{t("Voice memo")}</Text>
-    </Pressable>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, minWidth: 190, paddingVertical: 2 }}>
+      <Pressable
+        hitSlop={10}
+        accessibilityRole="button" accessibilityLabel={t('Voice memo')}
+        onPress={() => {
+          toggleVoice(url, (next) =>
+            setSt(next.done ? { playing: false, positionMillis: 0, durationMillis: next.durationMillis } : next),
+          ).catch(() => setSt({ playing: false, positionMillis: 0, durationMillis: 0 }));
+        }}
+      >
+        <Ionicons name={st.playing ? 'pause' : 'play'} size={24} color={active} />
+      </Pressable>
+      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2, height: 24 }}>
+        {bars.map((h, i) => (
+          <View key={i} style={{ width: 2.5, borderRadius: 1.5, height: h, backgroundColor: (i + 1) / bars.length <= progress ? active : dim }} />
+        ))}
+      </View>
+      <Text style={{ fontSize: 11, color: dim, minWidth: 30, textAlign: 'right' }}>{timeLabel}</Text>
+    </View>
   );
 }
 

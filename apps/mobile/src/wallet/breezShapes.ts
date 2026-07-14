@@ -12,14 +12,15 @@
  * Scalar widths differ too: uniffi wants BigInt for u64/u128 fields.
  */
 
-export function bolt11ReceiveMethod(M: any | null, sats: number, description: string): any {
+export function bolt11ReceiveMethod(M: any | null, sats: number, description: string, opts?: { paymentHash?: string; expirySecs?: number }): any {
   const amount = Math.max(0, Math.round(sats));
-  if (!M) return { type: 'bolt11Invoice', description, amountSats: amount, expirySecs: 3600 };
+  const expirySecs = opts?.expirySecs ?? 3600;
+  if (!M) return { type: 'bolt11Invoice', description, amountSats: amount, expirySecs, ...(opts?.paymentHash ? { paymentHash: opts.paymentHash } : {}) };
   return new M.ReceivePaymentMethod.Bolt11Invoice({
     description,
     amountSats: BigInt(amount),
-    expirySecs: 3600,
-    paymentHash: undefined,
+    expirySecs,
+    paymentHash: opts?.paymentHash,
   });
 }
 
