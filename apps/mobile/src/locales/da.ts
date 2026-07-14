@@ -819,5 +819,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "Kunne ikke lave et udkast — prøv at omformulere.",
   "Translate messages": "Oversæt beskeder",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Indgående chatbeskeder oversættes på denne enhed — intet sendes nogen steder hen.",
+  "Local LLM AI": "Lokal LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "AI-funktioner på enheden (udkast til opslag, chatoversættelse). Kører udelukkende på denne enhed — der sendes intet nogen steder hen.",
 };
 export default c;

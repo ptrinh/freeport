@@ -366,6 +366,7 @@ function AppInner() {
   const [chatCallsEnabled, setChatCallsEnabled] = useState(false);
   const [chatCallsTurn, setChatCallsTurn] = useState(false);
   const [chatTranslate, setChatTranslate] = useState(false);
+  const [experimentalLlm, setExperimentalLlm] = useState(false);
   // Calls: one manager per client; prefs read through a ref so the manager's
   // event-time reads never see a stale closure.
   const callPrefsRef = useRef({ callsEnabled: false, turnEnabled: false });
@@ -567,6 +568,7 @@ function AppInner() {
       setChatCallsEnabled(p.chatCallsEnabled);
       setChatCallsTurn(p.chatCallsTurn);
       setChatTranslate(p.chatTranslate);
+      setExperimentalLlm(p.experimentalLlm);
       setWalletNwcUrl(p.walletNwcUrl);
       setWalletUnit(p.walletUnit === 'sats' ? 'local' : p.walletUnit); // header is fiat-only now
       setLocation(p.location);
@@ -1392,7 +1394,7 @@ function AppInner() {
         setTab('messages');
       }} />}
       {tab === 'post' && <PostTab draft={postDraft} onDraftConsumed={() => setPostDraft(null)} client={client} profile={profile} myIntents={myIntents} negos={negos} servicesEnabled={servicesEnabled} defaultCurrency={defaultCurrency} location={location} role={role} browseCategory={browseCategory} browseSubcategory={browseSubcategory} onScroll={onContentScroll} />}
-      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} onStartCall={chatCallsEnabled && callsSupported() ? (peer, video) => callManagerRef.current?.startCall(peer, video) : undefined} onPayFriend={(peer, payAddress) => { setWalletPrefill({ mode: 'send', dest: payAddress }); setTab('wallet'); }} chatTranslateTo={chatTranslate ? (language || systemLanguage()) : undefined} />}
+      {tab === 'messages' && <DealsTab client={client} negos={negos} setNegos={setNegos} profile={profile} onScroll={onContentScroll} view={messagesView} onViewChange={setMessagesView} expiredNotices={expiredNotices} onDismissExpired={dismissExpired} glowDealId={glowDealId} glowCompleted={curTourStep?.completed === true} role={role} country={location.country} walletEnabled={experimentalWallet} onRepost={(n) => { setPostDraft(repostDraft(n.intent)); setTab('post'); }} onPayDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'send', dest: n.theirPayAddress ?? '', hint: n.terms?.payment, fiatAmount: f?.amount, fiatCurrency: f?.currency }); setTab('wallet'); }} onReceiveDeal={(n) => { const f = dealFiat(n.terms?.payment, n.intent.content.market, location.country); setWalletPrefill({ mode: 'receive', fiatAmount: f?.amount, fiatCurrency: f?.currency, memo: 'Freeport deal' }); setTab('wallet'); }} sendLocationOnDeal={sendLocationOnDeal} customMessage={customMessage} blockedPubkeys={blocked} onToggleBlock={toggleBlock} chatEnabled={experimentalChat} conversations={conversations} chatReceiptsOn={chatReceipts} onStartCall={chatCallsEnabled && callsSupported() ? (peer, video) => callManagerRef.current?.startCall(peer, video) : undefined} onPayFriend={(peer, payAddress) => { setWalletPrefill({ mode: 'send', dest: payAddress }); setTab('wallet'); }} chatTranslateTo={experimentalLlm && chatTranslate ? (language || systemLanguage()) : undefined} />}
       {tab === 'wallet' && (
         <WalletTab
           unit={walletUnit}
@@ -1451,6 +1453,11 @@ function AppInner() {
           onChatTranslateChange={(v) => {
             setChatTranslate(v);
             savePrefs({ chatTranslate: v }).catch(() => {});
+          }}
+          experimentalLlm={experimentalLlm}
+          onExperimentalLlmChange={(v) => {
+            setExperimentalLlm(v);
+            savePrefs({ experimentalLlm: v }).catch(() => {});
           }}
           requiredLocOk={locOk}
           requiredNotifOk={notifSatisfied}
@@ -1646,7 +1653,7 @@ function AppInner() {
       )}
       {/* Concierge entry: a sparkle FAB on the Post tab, only when the
           on-device model is actually available (probe + Apple Intelligence). */}
-      {conciergeOk && tab === 'post' && (
+      {experimentalLlm && conciergeOk && tab === 'post' && (
         <Pressable
           onPress={() => setShowConcierge(true)}
           accessibilityRole="button"

@@ -816,5 +816,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "မူကြမ်းရေး၍ မရပါ — စကားလုံးပြောင်း၍ ပြန်ကြိုးစားပါ။",
   "Translate messages": "စာတိုများကို ဘာသာပြန်ရန်",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "ဝင်လာသော ချက်တင်စာတိုများကို ဤစက်ပစ္စည်းပေါ်တွင်သာ ဘာသာပြန်ပါသည် — မည်သည့်နေရာသို့မျှ ပို့မထားပါ။",
+  "Local LLM AI": "ဒေသတွင်း LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "စက်ပေါ်တွင်သာ လုပ်ဆောင်သည့် AI လုပ်ဆောင်ချက်များ (ပို့စ်ရေးဆွဲခြင်း၊ ချက်ဘာသာပြန်ခြင်း)။ ဤစက်ပေါ်တွင်သာ အပြည့်အဝ လုပ်ဆောင်သည် — မည်သည့်နေရာသို့မျှ ပေးပို့ခြင်းမရှိပါ။",
 };
 export default c;

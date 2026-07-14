@@ -70,6 +70,8 @@ function SettingsTab({
   onChatCallsTurnChange,
   chatTranslate,
   onChatTranslateChange,
+  experimentalLlm,
+  onExperimentalLlmChange,
   requiredLocOk,
   requiredNotifOk,
   onDismissNotif,
@@ -132,6 +134,8 @@ function SettingsTab({
   onChatCallsTurnChange: (v: boolean) => void;
   chatTranslate: boolean;
   onChatTranslateChange: (v: boolean) => void;
+  experimentalLlm: boolean;
+  onExperimentalLlmChange: (v: boolean) => void;
   requiredLocOk: boolean;
   requiredNotifOk: boolean;
   onDismissNotif: () => void;
@@ -921,6 +925,8 @@ function SettingsTab({
         onServicesEnabledChange={onServicesEnabledChange}
         chatEnabled={experimentalChat}
         onChatEnabledChange={onExperimentalChatChange}
+        llmEnabled={experimentalLlm}
+        onLlmEnabledChange={onExperimentalLlmChange}
       />
 
       {/* Chat settings — its own section, only while the experiment is on. */}
@@ -937,6 +943,7 @@ function SettingsTab({
           callsSupported={callsSupported()}
           translate={chatTranslate}
           onTranslateChange={onChatTranslateChange}
+          llmEnabled={experimentalLlm}
         />
       )}
 

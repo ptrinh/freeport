@@ -38,6 +38,8 @@ function ExperimentalSection({
   onServicesEnabledChange,
   chatEnabled,
   onChatEnabledChange,
+  llmEnabled,
+  onLlmEnabledChange,
 }: {
   walletEnabled: boolean;
   onWalletEnabledChange: (v: boolean) => void;
@@ -45,6 +47,8 @@ function ExperimentalSection({
   onServicesEnabledChange: (v: boolean) => void;
   chatEnabled: boolean;
   onChatEnabledChange: (v: boolean) => void;
+  llmEnabled: boolean;
+  onLlmEnabledChange: (v: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -108,10 +112,25 @@ function ExperimentalSection({
               <View style={[s.switchThumb, chatEnabled && s.switchThumbOn]} />
             </View>
           </Pressable>
+          <Pressable
+            accessibilityRole="switch"
+            accessibilityState={{ checked: llmEnabled }}
+            style={s.toggleRow}
+            onPress={() => onLlmEnabledChange(!llmEnabled)}
+          >
+            <Ionicons name="sparkles-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
+            <View style={{ flex: 1, marginEnd: 12 }}>
+              <Text style={s.toggleTitle}>{t('Local LLM AI')}</Text>
+              <Text style={s.dim}>{t('On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.')}</Text>
+            </View>
+            <View style={[s.switchTrack, llmEnabled && s.switchTrackOn]}>
+              <View style={[s.switchThumb, llmEnabled && s.switchThumbOn]} />
+            </View>
+          </Pressable>
           {/* Calls shipped — the toggle lives under Settings → Chat (with the
               TURN fallback + IP note), per the roadmap spec. */}
           <ComingSoonRow icon="apps-outline" title={t('Mini-apps')} desc={t('Web apps that use your Freeport identity & wallet — coming soon.')} />
-          <ComingSoonRow icon="flash-outline" title={t('Zaps')} desc={t('Tip sats to helpful posts and trusted sellers — coming soon.')} />
+          {/* Zaps shipped — the ⚡ chip lives on Browse cards (wallet on). */}
         </>
       )}
     </>

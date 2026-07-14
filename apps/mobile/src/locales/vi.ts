@@ -859,5 +859,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "Không thể soạn — hãy thử diễn đạt lại.",
   "Translate messages": "Dịch tin nhắn",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Tin nhắn trò chuyện đến được dịch ngay trên thiết bị này — không có gì được gửi đi đâu cả.",
+  "Local LLM AI": "LLM AI cục bộ",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Tính năng AI trên thiết bị (soạn bài đăng, dịch trò chuyện). Chạy hoàn toàn trên thiết bị này — không có gì được gửi đi đâu cả.",
 };
 export default c;

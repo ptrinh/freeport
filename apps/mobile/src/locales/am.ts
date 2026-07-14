@@ -816,5 +816,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "ያንን ማርቀቅ አልተቻለም — በሌላ አገላለጽ ይሞክሩ።",
   "Translate messages": "መልዕክቶችን ተርጉም",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "የሚገቡ የቻት መልዕክቶች በዚህ መሣሪያ ላይ ይተረጎማሉ — ምንም ነገር ወደ የትም አይላክም።",
+  "Local LLM AI": "የአካባቢ LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "በመሣሪያው ላይ የሚሠሩ AI ባህሪያት (ልጥፍ ማርቀቅ፣ የውይይት ትርጉም)። ሙሉ በሙሉ በዚህ መሣሪያ ላይ ይሠራል — ምንም ነገር ወደ የትም አይላክም።",
 };
 export default c;

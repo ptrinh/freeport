@@ -862,5 +862,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "Taslak oluşturulamadı — farklı ifade etmeyi deneyin.",
   "Translate messages": "Mesajları çevir",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Gelen sohbet mesajları bu cihazda çevrilir — hiçbir şey hiçbir yere gönderilmez.",
+  "Local LLM AI": "Yerel LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Cihaz üzerinde AI özellikleri (gönderi taslağı, sohbet çevirisi). Tamamen bu cihazda çalışır — hiçbir şey hiçbir yere gönderilmez.",
 };
 export default c;

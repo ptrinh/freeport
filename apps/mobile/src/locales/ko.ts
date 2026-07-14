@@ -859,5 +859,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "초안을 작성할 수 없습니다 — 다르게 표현해 보세요.",
   "Translate messages": "메시지 번역",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "수신되는 채팅 메시지는 이 기기에서 번역됩니다 — 어디로도 전송되지 않습니다.",
+  "Local LLM AI": "로컬 LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "기기 내 AI 기능(게시물 초안 작성, 채팅 번역). 전적으로 이 기기에서 실행되며 — 어디로도 전송되지 않습니다.",
 };
 export default c;

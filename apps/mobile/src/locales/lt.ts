@@ -820,5 +820,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "Nepavyko sukurti juodraščio — pabandykite performuluoti.",
   "Translate messages": "Versti žinutes",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Gaunamos pokalbių žinutės verčiamos šiame įrenginyje — niekur niekas nesiunčiama.",
+  "Local LLM AI": "Vietinis LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "AI funkcijos įrenginyje (skelbimų juodraščiai, pokalbių vertimas). Viskas vyksta tik šiame įrenginyje — niekur niekas nesiunčiama.",
 };
 export default c;

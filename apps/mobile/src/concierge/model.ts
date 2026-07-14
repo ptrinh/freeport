@@ -22,8 +22,14 @@ export type ConciergeAvailability =
   | 'model_not_ready' // still downloading
   | 'unsupported';   // wrong platform / old binary / ineligible hardware
 
-/** Cheap sync probe — safe anywhere; gates the ✨ button's existence. */
+/** Cheap sync probe — safe anywhere; gates the ✨ button's existence.
+ *  Web: Chrome's Prompt API (Gemini Nano, desktop Chrome/Edge) — feature-
+ *  detected; iOS: the Apple FM TurboModule. Android native waits for a
+ *  stable Gemini Nano surface. */
 export function conciergeModulePresent(): boolean {
+  if (Platform.OS === 'web') {
+    return typeof (globalThis as any).LanguageModel?.create === 'function';
+  }
   if (Platform.OS !== 'ios') return false;
   try {
     return TurboModuleRegistry.get('AppleLLMModule') != null;
@@ -34,6 +40,20 @@ export function conciergeModulePresent(): boolean {
 
 export async function conciergeAvailability(): Promise<ConciergeAvailability> {
   if (!conciergeModulePresent()) return 'unsupported';
+  if (Platform.OS === 'web') {
+    try {
+      // Conservative: 'downloadable' means a multi-GB pull on first create —
+      // only light the button up once the model is actually on disk.
+      switch (await (globalThis as any).LanguageModel.availability()) {
+        case 'available': return 'available';
+        case 'downloadable':
+        case 'downloading': return 'model_not_ready';
+        default: return 'unsupported';
+      }
+    } catch {
+      return 'unsupported';
+    }
+  }
   try {
     const m = await import('react-native-apple-llm');
     switch (await m.isFoundationModelsEnabled()) {
@@ -108,18 +128,46 @@ export function parseToDraft(p: ConciergeParse, ctx: ConciergeContext): RepostDr
   };
 }
 
+/** The same schema as JSON Schema, for Chrome's responseConstraint. */
+const WEB_DRAFT_SCHEMA = {
+  type: 'object',
+  properties: Object.fromEntries(
+    Object.entries(DRAFT_STRUCTURE).map(([k, v]) => [k, { type: v.type, ...(v.enum ? { enum: v.enum } : {}), description: v.description }]),
+  ),
+  required: ['kind'],
+};
+
+function conciergeInstructions(ctx: ConciergeContext): string {
+  return (
+    'You turn one user request into a structured marketplace intent draft. ' +
+    'The marketplace has rides (transport from A to B) and services (any other job, task or purchase). ' +
+    'Extract only what the user actually said — never invent places or prices. ' +
+    `Default currency when the user names a price without one: ${ctx.defaultCurrency}. ` +
+    'Understand any language; keep extracted place names exactly as written.'
+  );
+}
+
+async function draftIntentWeb(text: string, ctx: ConciergeContext): Promise<RepostDraft | null> {
+  const g = globalThis as any;
+  const session = await g.LanguageModel.create({
+    initialPrompts: [{ role: 'system', content: conciergeInstructions(ctx) }],
+  });
+  try {
+    const raw = await session.prompt(text.trim(), { responseConstraint: WEB_DRAFT_SCHEMA });
+    return parseToDraft(JSON.parse(raw) as ConciergeParse, ctx);
+  } catch {
+    return null;
+  } finally {
+    session.destroy?.();
+  }
+}
+
 /** Natural language → draft, entirely on-device. Null = model couldn't parse. */
 export async function draftIntent(text: string, ctx: ConciergeContext): Promise<RepostDraft | null> {
   if (!text.trim()) return null;
+  if (Platform.OS === 'web') return draftIntentWeb(text, ctx);
   const m = await import('react-native-apple-llm');
-  await m.configureSession({
-    instructions:
-      'You turn one user request into a structured marketplace intent draft. ' +
-      'The marketplace has rides (transport from A to B) and services (any other job, task or purchase). ' +
-      'Extract only what the user actually said — never invent places or prices. ' +
-      `Default currency when the user names a price without one: ${ctx.defaultCurrency}. ` +
-      'Understand any language; keep extracted place names exactly as written.',
-  });
+  await m.configureSession({ instructions: conciergeInstructions(ctx) });
   try {
     const out = await m.generateStructuredOutput({ structure: DRAFT_STRUCTURE, prompt: text.trim() });
     return parseToDraft((out ?? {}) as ConciergeParse, ctx);

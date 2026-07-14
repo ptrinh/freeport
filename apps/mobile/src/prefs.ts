@@ -86,6 +86,9 @@ export interface Prefs {
   /** Chat: auto-translate inbound messages ON-DEVICE into the UI language
    *  (Apple Foundation Models). Nothing leaves the phone. Off by default. */
   chatTranslate: boolean;
+  /** Experimental: master switch for ALL on-device AI features (concierge,
+   *  chat translate). Off by default; nothing AI-related renders without it. */
+  experimentalLlm: boolean;
 }
 
 const DEFAULTS: Prefs = {
@@ -118,6 +121,7 @@ const DEFAULTS: Prefs = {
   chatCallsEnabled: false,
   chatCallsTurn: false,
   chatTranslate: false,
+  experimentalLlm: false,
 };
 
 /** Public-instance hostnames we've renamed. Installs that saved one of these

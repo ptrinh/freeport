@@ -859,5 +859,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "无法起草 — 请换个说法再试。",
   "Translate messages": "翻译消息",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "收到的聊天消息会在本设备上翻译 — 不会向任何地方发送任何内容。",
+  "Local LLM AI": "本地 LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "设备端 AI 功能（撰写帖子、聊天翻译）。完全在本设备上运行——不会向任何地方发送任何内容。",
 };
 export default c;

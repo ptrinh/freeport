@@ -816,5 +816,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "Haikuwezekana kuandaa rasimu — jaribu kueleza kwa njia nyingine.",
   "Translate messages": "Tafsiri ujumbe",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Ujumbe unaoingia wa gumzo hutafsiriwa kwenye kifaa hiki — hakuna kinachotumwa popote.",
+  "Local LLM AI": "LLM AI ya Ndani",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Vipengele vya AI kwenye kifaa (kuandika machapisho, kutafsiri mazungumzo). Hufanya kazi kabisa kwenye kifaa hiki — hakuna kinachotumwa popote.",
 };
 export default c;

@@ -822,5 +822,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "Koncept se nepodařilo vytvořit — zkuste to přeformulovat.",
   "Translate messages": "Překládat zprávy",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Příchozí zprávy z chatu se překládají v tomto zařízení — nic se nikam neodesílá.",
+  "Local LLM AI": "Místní LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Funkce AI přímo v zařízení (koncepty příspěvků, překlad chatu). Běží výhradně v tomto zařízení — nikam se nic neodesílá.",
 };
 export default c;

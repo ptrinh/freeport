@@ -816,5 +816,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "Tidak dapat merangka itu — cuba ubah ayat.",
   "Translate messages": "Terjemah mesej",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Mesej sembang masuk diterjemahkan pada peranti ini — tiada apa-apa dihantar ke mana-mana.",
+  "Local LLM AI": "LLM AI Setempat",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Ciri AI pada peranti (draf siaran, terjemahan sembang). Berjalan sepenuhnya pada peranti ini — tiada apa-apa dihantar ke mana-mana.",
 };
 export default c;

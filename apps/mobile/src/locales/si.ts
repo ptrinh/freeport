@@ -816,5 +816,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "එය කෙටුම්පත් කළ නොහැකි විය — වෙනත් ලෙස පැවසීමට උත්සාහ කරන්න.",
   "Translate messages": "පණිවිඩ පරිවර්තනය කරන්න",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "පැමිණෙන කතාබස් පණිවිඩ මෙම උපාංගයේදීම පරිවර්තනය වේ — කිසිවක් කිසිම තැනකට යවනු නොලැබේ.",
+  "Local LLM AI": "දේශීය LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "උපාංගය තුළම ක්‍රියා කරන AI විශේෂාංග (පළ කිරීම් කෙටුම්පත් කිරීම, කතාබස් පරිවර්තනය). මුළුමනින්ම මෙම උපාංගය තුළ ක්‍රියා කරයි — කිසිවක් කිසිම තැනකට යවනු නොලැබේ.",
 };
 export default c;

@@ -22,6 +22,7 @@ function ChatSection({
   callsSupported = true,
   translate,
   onTranslateChange,
+  llmEnabled = false,
 }: {
   showLastSeen: boolean;
   onShowLastSeenChange: (v: boolean) => void;
@@ -35,6 +36,8 @@ function ChatSection({
   callsSupported?: boolean;
   translate: boolean;
   onTranslateChange: (v: boolean) => void;
+  /** Master switch (Settings → Experimental → Local LLM AI). */
+  llmEnabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const Toggle = ({ icon, title, desc, value, onChange }: {
@@ -83,7 +86,7 @@ function ChatSection({
             value={receipts}
             onChange={onReceiptsChange}
           />
-          {translateSupported() && (
+          {llmEnabled && translateSupported() && (
             <Toggle
               icon="language-outline"
               title={t('Translate messages')}

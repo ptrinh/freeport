@@ -862,5 +862,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "Impossible de rédiger — reformulez votre demande.",
   "Translate messages": "Traduire les messages",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Les messages de chat entrants sont traduits sur cet appareil — rien n'est envoyé nulle part.",
+  "Local LLM AI": "AI LLM locale",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Fonctionnalités AI sur l'appareil (rédaction d'annonces, traduction des discussions). Fonctionne entièrement sur cet appareil — rien n'est envoyé nulle part.",
 };
 export default c;

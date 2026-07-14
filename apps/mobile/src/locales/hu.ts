@@ -819,5 +819,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "Nem sikerült piszkozatot készíteni — próbálja átfogalmazni.",
   "Translate messages": "Üzenetek fordítása",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "A bejövő csevegőüzenetek fordítása ezen az eszközön történik — semmit nem küldünk el sehová.",
+  "Local LLM AI": "Helyi LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Eszközön futó AI-funkciók (bejegyzés vázlatolása, csevegés fordítása). Teljes egészében ezen az eszközön fut — semmi sem kerül elküldésre sehová.",
 };
 export default c;

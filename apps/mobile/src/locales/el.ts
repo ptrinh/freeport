@@ -819,5 +819,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "Δεν ήταν δυνατή η σύνταξη — δοκιμάστε να το διατυπώσετε αλλιώς.",
   "Translate messages": "Μετάφραση μηνυμάτων",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Τα εισερχόμενα μηνύματα συνομιλίας μεταφράζονται σε αυτή τη συσκευή — τίποτα δεν αποστέλλεται πουθενά.",
+  "Local LLM AI": "Τοπικό LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "Λειτουργίες AI στη συσκευή (σύνταξη δημοσιεύσεων, μετάφραση συνομιλίας). Εκτελούνται εξ ολοκλήρου σε αυτή τη συσκευή — τίποτα δεν αποστέλλεται πουθενά.",
 };
 export default c;

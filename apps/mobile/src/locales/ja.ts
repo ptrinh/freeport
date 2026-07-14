@@ -859,5 +859,7 @@ const c: Record<string, string> = {
   "Could not draft that — try rephrasing.": "下書きを作成できませんでした — 言い方を変えてお試しください。",
   "Translate messages": "メッセージを翻訳",
   "Incoming chat messages are translated on this device — nothing is sent anywhere.": "受信したチャットメッセージはこの端末で翻訳されます。どこにも送信されません。",
+  "Local LLM AI": "ローカル LLM AI",
+  "On-device AI features (post drafting, chat translation). Runs entirely on this device — nothing is sent anywhere.": "デバイス内で動作する AI 機能（投稿の下書き、チャットの翻訳）。すべてこのデバイス上で処理され、どこにも送信されません。",
 };
 export default c;
