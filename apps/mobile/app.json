@@ -14,7 +14,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "23",
+      "buildNumber": "24",
       "associatedDomains": [
         "webcredentials:freeport.network"
       ]
@@ -42,7 +42,7 @@
           "apiKey": "AIzaSyB70aRYEMJlBtl3LgvnBpGe6dkKuJhwJY4"
         }
       },
-      "versionCode": 25
+      "versionCode": 26
     },
     "web": {
       "bundler": "metro",
