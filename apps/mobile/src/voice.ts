@@ -89,10 +89,13 @@ export async function toggleVoice(url: string, onStatus: (st: VoicePlayback) => 
   currentListener = onStatus;
   s.setOnPlaybackStatusUpdate((st: any) => {
     if (!st.isLoaded) return;
+    // Web streams can report Infinity/undefined duration — normalize to 0 so
+    // the UI falls back to elapsed-time display instead of a dead bubble.
+    const dur = Number.isFinite(st.durationMillis) ? st.durationMillis : 0;
     currentListener?.({
       playing: !!st.isPlaying,
       positionMillis: st.positionMillis ?? 0,
-      durationMillis: st.durationMillis ?? 0,
+      durationMillis: dur,
       done: !!st.didJustFinish,
     });
     if (st.didJustFinish) {
@@ -100,6 +103,9 @@ export async function toggleVoice(url: string, onStatus: (st: VoicePlayback) => 
       if (sound === s) { sound = null; currentUrl = null; }
     }
   });
+  // Belt-and-braces: some expo-av web versions ignore shouldPlay in the
+  // initial status when created from an async chain.
+  await s.playAsync().catch(() => {});
 }
 
 export async function playAudio(url: string): Promise<void> {

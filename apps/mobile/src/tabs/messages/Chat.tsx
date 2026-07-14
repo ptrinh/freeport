@@ -84,11 +84,20 @@ function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
   const bars = React.useMemo(() => {
     let h = 0;
     for (const ch of url) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-    return Array.from({ length: 27 }, (_, i) => 6 + ((h >> (i % 24)) * (i + 7)) % 15);
+    // Unsigned per-bar hash — a signed shift here once produced NEGATIVE
+    // heights (stubby broken bars, user report).
+    return Array.from({ length: 30 }, (_, i) => {
+      const hh = (h ^ Math.imul(i + 1, 2654435761)) >>> 0;
+      return 8 + (hh % 17); // 8–24px
+    });
   }, [url]);
   const active = dir === 'out' ? '#f5f7fa' : palette.accent;
   const dim = dir === 'out' ? 'rgba(245,247,250,0.45)' : palette.dim;
-  const progress = st.durationMillis > 0 ? st.positionMillis / st.durationMillis : 0;
+  // Unknown duration (web streams): animate a 30s rolling window so playback
+  // is still visibly moving instead of a frozen bar.
+  const progress = st.durationMillis > 0
+    ? st.positionMillis / st.durationMillis
+    : st.playing ? ((st.positionMillis / 1000) % 30) / 30 : 0;
   const fmtMs = (ms: number) => {
     const sec = Math.max(0, Math.round(ms / 1000));
     return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
@@ -102,16 +111,20 @@ function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
         hitSlop={10}
         accessibilityRole="button" accessibilityLabel={t('Voice memo')}
         onPress={() => {
+          setSt((cur) => ({ ...cur, playing: !cur.playing })); // optimistic — instant feedback
           toggleVoice(url, (next) =>
             setSt(next.done ? { playing: false, positionMillis: 0, durationMillis: next.durationMillis } : next),
-          ).catch(() => setSt({ playing: false, positionMillis: 0, durationMillis: 0 }));
+          ).catch((e) => {
+            setSt({ playing: false, positionMillis: 0, durationMillis: 0 });
+            uiAlert(t('Voice memo'), e instanceof Error ? e.message : undefined);
+          });
         }}
       >
         <Ionicons name={st.playing ? 'pause' : 'play'} size={24} color={active} />
       </Pressable>
-      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2, height: 24 }}>
+      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2.5, height: 26 }}>
         {bars.map((h, i) => (
-          <View key={i} style={{ width: 2.5, borderRadius: 1.5, height: h, backgroundColor: (i + 1) / bars.length <= progress ? active : dim }} />
+          <View key={i} style={{ width: 3, borderRadius: 1.5, height: h, backgroundColor: (i + 1) / bars.length <= progress ? active : dim }} />
         ))}
       </View>
       <Text style={{ fontSize: 11, color: dim, minWidth: 30, textAlign: 'right' }}>{timeLabel}</Text>
