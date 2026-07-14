@@ -857,5 +857,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "예: \"오후 5시에 공항까지, 15,000원 이하\"",
   "Draft my post": "게시물 초안 작성",
   "Could not draft that — try rephrasing.": "초안을 작성할 수 없습니다 — 다르게 표현해 보세요.",
+  "Translate messages": "메시지 번역",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "수신되는 채팅 메시지는 이 기기에서 번역됩니다 — 어디로도 전송되지 않습니다.",
 };
 export default c;

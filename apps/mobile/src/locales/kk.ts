@@ -814,5 +814,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "мыс. «Кешкі 5-те әуежайға, 5000 ₸-ге дейін»",
   "Draft my post": "Хабарламамның жобасын жаса",
   "Could not draft that — try rephrasing.": "Жоба жасалмады — басқаша тұжырымдап көріңіз.",
+  "Translate messages": "Хабарламаларды аудару",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Кіріс чат хабарламалары осы құрылғыда аударылады — ешқайда ештеңе жіберілмейді.",
 };
 export default c;

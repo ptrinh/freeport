@@ -68,6 +68,7 @@ export function DealsTab({
   chatReceiptsOn = false,
   onStartCall,
   onPayFriend,
+  chatTranslateTo,
 }: {
   client: MobileClient | null;
   negos: Negotiation[];
@@ -112,6 +113,8 @@ export function DealsTab({
   onStartCall?: (peer: string, video: boolean) => void;
   /** In-chat payments (friend chat): open the wallet Send flow for a friend. */
   onPayFriend?: (peer: string, payAddress: string) => void;
+  /** On-device auto-translate target for inbound chat messages. */
+  chatTranslateTo?: string;
 }) {
   // Friend chat: which conversation is open (peer pubkey) + the invite popup.
   const [openChatPeer, setOpenChatPeer] = useState<string | null>(null);
@@ -291,6 +294,7 @@ export function DealsTab({
         onStartCall={onStartCall}
         walletEnabled={walletEnabled}
         onPayFriend={onPayFriend}
+        translateTo={chatTranslateTo}
       />
     )}
     {reportNego && (
@@ -802,7 +806,7 @@ export function DealsTab({
                   );
                 })() : null}
 
-                <ChatThread nego={item} onSend={(t) => client?.sendChat(item.id, t) ?? Promise.resolve()} quickReplies={quickReplies(customMessage)} />
+                <ChatThread nego={item} onSend={(t) => client?.sendChat(item.id, t) ?? Promise.resolve()} quickReplies={quickReplies(customMessage)} translateTo={chatTranslateTo} />
               </>
               );
             })()}

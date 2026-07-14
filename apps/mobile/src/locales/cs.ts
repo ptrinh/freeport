@@ -820,5 +820,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "např. \"Cesta na letiště v 17:00, do 300 Kč\"",
   "Draft my post": "Vytvořit koncept příspěvku",
   "Could not draft that — try rephrasing.": "Koncept se nepodařilo vytvořit — zkuste to přeformulovat.",
+  "Translate messages": "Překládat zprávy",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Příchozí zprávy z chatu se překládají v tomto zařízení — nic se nikam neodesílá.",
 };
 export default c;

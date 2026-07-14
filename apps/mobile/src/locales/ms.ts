@@ -814,5 +814,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "cth. \"Tumpang ke lapangan terbang jam 5 petang, bawah RM50\"",
   "Draft my post": "Rangka siaran saya",
   "Could not draft that — try rephrasing.": "Tidak dapat merangka itu — cuba ubah ayat.",
+  "Translate messages": "Terjemah mesej",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Mesej sembang masuk diterjemahkan pada peranti ini — tiada apa-apa dihantar ke mana-mana.",
 };
 export default c;

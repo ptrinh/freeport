@@ -817,5 +817,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "es. «Corsa all'aeroporto alle 17, meno di 12 €»",
   "Draft my post": "Crea la bozza del post",
   "Could not draft that — try rephrasing.": "Impossibile creare la bozza — prova a riformulare.",
+  "Translate messages": "Traduci i messaggi",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "I messaggi in arrivo vengono tradotti su questo dispositivo — nulla viene inviato altrove.",
 };
 export default c;

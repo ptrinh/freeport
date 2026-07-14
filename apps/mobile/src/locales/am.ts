@@ -814,5 +814,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "ለምሳሌ \"ከሰዓት በኋላ 5 ሰዓት ወደ አየር ማረፊያ፣ ከ500 ብር በታች\"",
   "Draft my post": "ልጥፌን አዘጋጅ",
   "Could not draft that — try rephrasing.": "ያንን ማርቀቅ አልተቻለም — በሌላ አገላለጽ ይሞክሩ።",
+  "Translate messages": "መልዕክቶችን ተርጉም",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "የሚገቡ የቻት መልዕክቶች በዚህ መሣሪያ ላይ ይተረጎማሉ — ምንም ነገር ወደ የትም አይላክም።",
 };
 export default c;

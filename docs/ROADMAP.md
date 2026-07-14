@@ -160,10 +160,15 @@ relay data. Roughly ordered by value-for-effort:
 - Intent type with per-hour pricing terms (car + driver for N hours). Template
   + UI only; negotiation flow unchanged.
 
-### In-chat auto-translate — medium, privacy-sensitive
-- 56 UI locales already exist; translating chat between two people needs a
-  translation engine. On-device model preferred; a cloud API must be explicit
-  opt-in per chat (it leaks message content to a third party — surface that).
+### In-chat auto-translate — SHIPPED (2026-07, on-device only)
+- Settings → Chat → "Translate messages": inbound messages in BOTH chat
+  surfaces (deal chat + friend chat) render the translation as the main line
+  with the original small and dim underneath. Runs on the same on-device
+  Apple Foundation Models layer as the concierge — no cloud path at all, so
+  the roadmap's leak warning is moot by construction. Serialized session use,
+  per-(message, language) cache, null-safe (any failure just shows the
+  original). Needs a 1.6.0+ binary on Apple-Intelligence hardware; Android
+  follows with the Gemini Nano provider.
 
 ### Non-goals (need a central operator)
 CUSTODIAL wallets/escrow (the self-custodial wallet has shipped — Breez Spark +

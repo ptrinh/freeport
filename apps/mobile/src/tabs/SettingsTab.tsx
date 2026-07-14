@@ -68,6 +68,8 @@ function SettingsTab({
   onChatCallsEnabledChange,
   chatCallsTurn,
   onChatCallsTurnChange,
+  chatTranslate,
+  onChatTranslateChange,
   requiredLocOk,
   requiredNotifOk,
   onDismissNotif,
@@ -128,6 +130,8 @@ function SettingsTab({
   onChatCallsEnabledChange: (v: boolean) => void;
   chatCallsTurn: boolean;
   onChatCallsTurnChange: (v: boolean) => void;
+  chatTranslate: boolean;
+  onChatTranslateChange: (v: boolean) => void;
   requiredLocOk: boolean;
   requiredNotifOk: boolean;
   onDismissNotif: () => void;
@@ -931,6 +935,8 @@ function SettingsTab({
           callsTurn={chatCallsTurn}
           onCallsTurnChange={onChatCallsTurnChange}
           callsSupported={callsSupported()}
+          translate={chatTranslate}
+          onTranslateChange={onChatTranslateChange}
         />
       )}
 

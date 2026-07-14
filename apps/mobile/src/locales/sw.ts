@@ -814,5 +814,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "mfano \"Safari ya kwenda uwanja wa ndege saa 11 jioni, chini ya KSh 1,200\"",
   "Draft my post": "Andaa rasimu ya chapisho langu",
   "Could not draft that — try rephrasing.": "Haikuwezekana kuandaa rasimu — jaribu kueleza kwa njia nyingine.",
+  "Translate messages": "Tafsiri ujumbe",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Ujumbe unaoingia wa gumzo hutafsiriwa kwenye kifaa hiki — hakuna kinachotumwa popote.",
 };
 export default c;

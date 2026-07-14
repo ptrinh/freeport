@@ -814,5 +814,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "যেমন \"বিকেল ৫টায় বিমানবন্দরে যাত্রা, ৳৫০০-এর কম\"",
   "Draft my post": "আমার পোস্ট খসড়া করুন",
   "Could not draft that — try rephrasing.": "সেটি খসড়া করা গেল না — অন্যভাবে বলে দেখুন।",
+  "Translate messages": "বার্তা অনুবাদ করুন",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "আসা চ্যাট বার্তাগুলো এই ডিভাইসেই অনুবাদ করা হয় — কোথাও কিছু পাঠানো হয় না।",
 };
 export default c;

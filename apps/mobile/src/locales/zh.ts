@@ -857,5 +857,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "例如“下午5点去机场，80元以内”",
   "Draft my post": "为我起草帖子",
   "Could not draft that — try rephrasing.": "无法起草 — 请换个说法再试。",
+  "Translate messages": "翻译消息",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "收到的聊天消息会在本设备上翻译 — 不会向任何地方发送任何内容。",
 };
 export default c;

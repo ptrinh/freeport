@@ -817,5 +817,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "t.ex. \"Skjuts till flygplatsen kl. 17, under 120 kr\"",
   "Draft my post": "Skapa utkast till mitt inlägg",
   "Could not draft that — try rephrasing.": "Kunde inte skapa utkast – försök formulera om.",
+  "Translate messages": "Översätt meddelanden",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Inkommande chattmeddelanden översätts på den här enheten – ingenting skickas någonstans.",
 };
 export default c;

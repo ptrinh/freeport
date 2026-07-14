@@ -860,5 +860,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "مثال \"رحلة إلى المطار الساعة 5 مساءً، بأقل من 50 ﷼\"",
   "Draft my post": "صُغ منشوري",
   "Could not draft that — try rephrasing.": "تعذّرت صياغة ذلك — حاول إعادة الصياغة.",
+  "Translate messages": "ترجمة الرسائل",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "تُترجَم رسائل المحادثة الواردة على هذا الجهاز — ولا يُرسَل أي شيء إلى أي مكان.",
 };
 export default c;

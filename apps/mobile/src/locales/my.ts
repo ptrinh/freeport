@@ -814,5 +814,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "ဥပမာ \"ညနေ ၅ နာရီတွင် လေဆိပ်သို့ ကားစီး၊ ၃၀၀၀ ကျပ်အောက်\"",
   "Draft my post": "ကျွန်ုပ်၏ ပို့စ်ကို မူကြမ်းရေးပါ",
   "Could not draft that — try rephrasing.": "မူကြမ်းရေး၍ မရပါ — စကားလုံးပြောင်း၍ ပြန်ကြိုးစားပါ။",
+  "Translate messages": "စာတိုများကို ဘာသာပြန်ရန်",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "ဝင်လာသော ချက်တင်စာတိုများကို ဤစက်ပစ္စည်းပေါ်တွင်သာ ဘာသာပြန်ပါသည် — မည်သည့်နေရာသို့မျှ ပို့မထားပါ။",
 };
 export default c;

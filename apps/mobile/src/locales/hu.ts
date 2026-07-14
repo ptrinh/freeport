@@ -817,5 +817,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "pl. „Fuvar a reptérre 17 órakor, 4000 Ft alatt\"",
   "Draft my post": "Bejegyzésem piszkozata",
   "Could not draft that — try rephrasing.": "Nem sikerült piszkozatot készíteni — próbálja átfogalmazni.",
+  "Translate messages": "Üzenetek fordítása",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "A bejövő csevegőüzenetek fordítása ezen az eszközön történik — semmit nem küldünk el sehová.",
 };
 export default c;

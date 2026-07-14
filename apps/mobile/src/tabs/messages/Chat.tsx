@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -22,6 +22,7 @@ import { currencyForMarket, type Currency } from '../../locations';
 import { s, palette } from '../../ui/theme';
 import { uiAlert } from '../../ui/alerts';
 import { Field, ReadonlyField, DurationField, TimeField, PaymentField } from '../../ui/fields';
+import { translateMessage } from '../../concierge/translate';
 
 /**
  * Header connectivity indicator: a solid colored core wrapped in a soft halo
@@ -76,6 +77,8 @@ const ChatBubble = React.memo(function ChatBubble({
   quote,
   reactions,
   onLongPress,
+  translateTo,
+  msgKey,
 }: {
   text: string;
   dir: 'in' | 'out';
@@ -88,7 +91,24 @@ const ChatBubble = React.memo(function ChatBubble({
   reactions?: { emoji: string; dir: 'in' | 'out' }[];
   /** Friend chat: opens the react/reply action row. */
   onLongPress?: () => void;
+  /** On-device auto-translate target for INBOUND text (null result = show as-is). */
+  translateTo?: string;
+  /** Stable id for the translation cache. */
+  msgKey?: string;
 }) {
+  // Translated inbound text: main line = translation, original small + dim
+  // below (the familiar chat-app pattern). Media/trip links are never touched.
+  const plainText = !isAudioMsg(text) && !isImageMsg(text) && !isTripMsg(text);
+  const [translated, setTranslated] = useState<string | null>(null);
+  useEffect(() => {
+    setTranslated(null);
+    if (!translateTo || dir !== 'in' || !plainText) return;
+    let cancelled = false;
+    translateMessage(text, msgKey ?? text.slice(0, 40), translateTo)
+      .then((tr) => { if (!cancelled) setTranslated(tr); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [text, translateTo, dir]);
   return (
     <Pressable onLongPress={onLongPress} delayLongPress={350} disabled={!onLongPress}>
     <View style={[s.chatBubble, dir === 'out' ? s.chatOut : s.chatIn]}>
@@ -111,6 +131,11 @@ const ChatBubble = React.memo(function ChatBubble({
             <Ionicons name="navigate" size={16} color={dir === 'out' ? '#f5f7fa' : palette.link} />
             <Text style={[s.trackMsgText, dir === 'out' && s.chatTextOut]}>{t('Track live location')}</Text>
           </Pressable>
+        : translated
+        ? <>
+            <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn]}>{translated}</Text>
+            <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn, { fontSize: 11, opacity: 0.55, marginTop: 3 }]}>{text}</Text>
+          </>
         : <Text style={[s.chatBubbleText, dir === 'out' ? s.chatTextOut : s.chatTextIn]}>{text}</Text>}
       {dir === 'out' && tick ? (
         <View style={{ alignSelf: 'flex-end', marginTop: 2 }}>
@@ -142,7 +167,7 @@ const REACT_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
  * chat (ChatThread, bound to a Negotiation) and the friend chat (bound to a
  * Conversation) — keep it free of either model.
  */
-export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title, onReact }: {
+export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title, onReact, translateTo }: {
   messages: { dir: 'in' | 'out'; text: string; ts: number; id?: string; quote?: string; reactions?: { emoji: string; dir: 'in' | 'out' }[] }[];
   onSend: (text: string, opts?: { replyTo?: string; quote?: string }) => Promise<void>;
   /** Grab-style one-tap replies rendered above the input ("I am here ✅", …). */
@@ -154,6 +179,8 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
   title?: string;
   /** Friend chat: enables long-press react + reply (targets need message ids). */
   onReact?: (targetId: string, emoji: string) => void;
+  /** On-device auto-translate target language for inbound messages. */
+  translateTo?: string;
 }) {
   const [text, setText] = useState('');
   // Long-press action row target + the message being replied to.
@@ -245,6 +272,8 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
                 tick={m.dir === 'out' ? tickFor?.(m.ts) : null}
                 quote={m.quote} reactions={m.reactions}
                 onLongPress={onReact && m.id ? () => setActionsFor(actionsFor === m.id ? null : m.id!) : undefined}
+                translateTo={translateTo}
+                msgKey={m.id ?? `${m.ts}-${m.dir}`}
               />
               {actionsFor === m.id && onReact && m.id ? (
                 <View style={[s.row, { gap: 6, alignSelf: m.dir === 'out' ? 'flex-end' : 'flex-start', marginBottom: 6, flexWrap: 'wrap' }]}>
@@ -336,12 +365,13 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
 }
 
 /** Free-text chat for a confirmed deal — the Negotiation-bound wrapper. */
-export function ChatThread({ nego, onSend, quickReplies }: {
+export function ChatThread({ nego, onSend, quickReplies, translateTo }: {
   nego: Negotiation;
   onSend: (text: string) => Promise<void>;
   quickReplies?: { label: string; text: string }[];
+  translateTo?: string;
 }) {
-  return <ChatCore title={t('Chat')} messages={nego.messages ?? []} onSend={onSend} quickReplies={quickReplies} />;
+  return <ChatCore title={t('Chat')} messages={nego.messages ?? []} onSend={onSend} quickReplies={quickReplies} translateTo={translateTo} />;
 }
 
 export function CounterEditor({

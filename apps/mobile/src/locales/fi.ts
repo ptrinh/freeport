@@ -817,5 +817,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "esim. ”Kyyti lentokentälle klo 17, alle 12 €”",
   "Draft my post": "Luonnostele ilmoitukseni",
   "Could not draft that — try rephrasing.": "Luonnostelu ei onnistunut — kokeile muotoilla uudelleen.",
+  "Translate messages": "Käännä viestit",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Saapuvat keskusteluviestit käännetään tällä laitteella — mitään ei lähetetä minnekään.",
 };
 export default c;

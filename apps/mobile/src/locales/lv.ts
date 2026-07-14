@@ -817,5 +817,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "piem. «Brauciens uz lidostu plkst. 17, līdz 12 €»",
   "Draft my post": "Izveidot ieraksta melnrakstu",
   "Could not draft that — try rephrasing.": "Neizdevās izveidot melnrakstu — mēģiniet pārformulēt.",
+  "Translate messages": "Tulkot ziņojumus",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Ienākošie tērzēšanas ziņojumi tiek tulkoti šajā ierīcē — nekas nekur netiek sūtīts.",
 };
 export default c;

@@ -83,6 +83,9 @@ export interface Prefs {
   /** Chat: relay calls through TURN when a direct connection fails. Off =
    *  direct-only (better IP privacy vs the relay; those calls just fail). */
   chatCallsTurn: boolean;
+  /** Chat: auto-translate inbound messages ON-DEVICE into the UI language
+   *  (Apple Foundation Models). Nothing leaves the phone. Off by default. */
+  chatTranslate: boolean;
 }
 
 const DEFAULTS: Prefs = {
@@ -114,6 +117,7 @@ const DEFAULTS: Prefs = {
   chatReceipts: false,
   chatCallsEnabled: false,
   chatCallsTurn: false,
+  chatTranslate: false,
 };
 
 /** Public-instance hostnames we've renamed. Installs that saved one of these

@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { t } from '../../i18n';
 import { Ionicons } from '@expo/vector-icons';
 import { s, palette } from '../../ui/theme';
+import { translateSupported } from '../../concierge/translate';
 
 /**
  * Settings → Chat — only rendered while the Chat experiment is on. Both
@@ -19,6 +20,8 @@ function ChatSection({
   callsTurn,
   onCallsTurnChange,
   callsSupported = true,
+  translate,
+  onTranslateChange,
 }: {
   showLastSeen: boolean;
   onShowLastSeenChange: (v: boolean) => void;
@@ -30,6 +33,8 @@ function ChatSection({
   onCallsTurnChange: (v: boolean) => void;
   /** False on binaries without the WebRTC module (pre-1.6.0) — row disabled. */
   callsSupported?: boolean;
+  translate: boolean;
+  onTranslateChange: (v: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
   const Toggle = ({ icon, title, desc, value, onChange }: {
@@ -78,6 +83,15 @@ function ChatSection({
             value={receipts}
             onChange={onReceiptsChange}
           />
+          {translateSupported() && (
+            <Toggle
+              icon="language-outline"
+              title={t('Translate messages')}
+              desc={t('Incoming chat messages are translated on this device — nothing is sent anywhere.')}
+              value={translate}
+              onChange={onTranslateChange}
+            />
+          )}
           {callsSupported ? (
             <>
               <Toggle

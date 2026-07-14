@@ -814,5 +814,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "ຕົວຢ່າງ: «ໄປສະໜາມບິນຕອນ 5 ໂມງແລງ, ບໍ່ເກີນ 100,000 ກີບ»",
   "Draft my post": "ຮ່າງໂພສຂອງຂ້ອຍ",
   "Could not draft that — try rephrasing.": "ບໍ່ສາມາດຮ່າງໄດ້ — ລອງໃຊ້ຄຳເວົ້າໃໝ່.",
+  "Translate messages": "ແປຂໍ້ຄວາມ",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "ຂໍ້ຄວາມແຊັດຂາເຂົ້າຖືກແປຢູ່ໃນອຸປະກອນນີ້ — ບໍ່ມີການສົ່ງໄປໃສທັງໝົດ.",
 };
 export default c;

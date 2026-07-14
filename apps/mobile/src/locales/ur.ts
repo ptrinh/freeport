@@ -817,5 +817,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "مثلاً \"شام 5 بجے ہوائی اڈے تک سفر، 500 روپے سے کم\"",
   "Draft my post": "میری پوسٹ کا مسودہ بنائیں",
   "Could not draft that — try rephrasing.": "مسودہ نہیں بن سکا — دوبارہ الفاظ بدل کر کوشش کریں۔",
+  "Translate messages": "پیغامات کا ترجمہ کریں",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "آنے والے چیٹ پیغامات کا ترجمہ اسی ڈیوائس پر ہوتا ہے — کچھ بھی کہیں نہیں بھیجا جاتا۔",
 };
 export default c;

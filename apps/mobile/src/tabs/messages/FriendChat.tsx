@@ -143,7 +143,7 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
 /** Disappearing-timer cycle: off → 24h → 7d → off. */
 const TTL_STEPS = [0, 24 * 3600, 7 * 24 * 3600];
 
-export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlock, onClose, onStartCall, walletEnabled = false, onPayFriend }: {
+export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlock, onClose, onStartCall, walletEnabled = false, onPayFriend, translateTo }: {
   client: MobileClient | null;
   conv: Conversation;
   /** Receipts toggle (Settings → Chat) — reciprocal: off = no ticks shown either. */
@@ -156,6 +156,8 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
   /** In-chat payments: ⚡ opens the wallet Send flow prefilled for this friend. */
   walletEnabled?: boolean;
   onPayFriend?: (peer: string, payAddress: string) => void;
+  /** On-device auto-translate target for inbound messages. */
+  translateTo?: string;
 }) {
   // Opening the thread reads it — advances the local mark and (receipts on)
   // tells the peer. Re-run as new messages arrive while the thread is open.
@@ -245,6 +247,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
             emptyHint={t('Say hello 👋')}
             tickFor={receiptsOn ? (ts) => tickFor(conv, ts) : undefined}
             onReact={(id, emoji) => client?.chatReact(conv.peer, id, emoji).catch(() => {})}
+            translateTo={translateTo}
           />
         </ScrollView>
       </View>

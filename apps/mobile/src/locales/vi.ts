@@ -857,5 +857,7 @@ const c: Record<string, string> = {
   "e.g. \"Ride to the airport at 5pm, under $12\"": "ví dụ \"Đi sân bay lúc 17h, dưới 250.000đ\"",
   "Draft my post": "Soạn bài đăng của tôi",
   "Could not draft that — try rephrasing.": "Không thể soạn — hãy thử diễn đạt lại.",
+  "Translate messages": "Dịch tin nhắn",
+  "Incoming chat messages are translated on this device — nothing is sent anywhere.": "Tin nhắn trò chuyện đến được dịch ngay trên thiết bị này — không có gì được gửi đi đâu cả.",
 };
 export default c;
