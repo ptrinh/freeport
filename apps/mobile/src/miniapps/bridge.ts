@@ -269,9 +269,17 @@ export class MiniAppBridge {
         }
       }
     } catch (e) {
-      // Generic error — wallet/signer internals (paths, balances) must not leak into the page.
+      // Wallet/signer internals (paths, balances, stack) must not leak. But for
+      // a user-initiated payment, a COARSE reason from an allowlist is safe and
+      // saves the user guessing why it failed.
       const isPay = method.startsWith('webln.') || method === 'freeport.paySpark';
-      return { id, ok: false, error: isPay ? 'payment failed' : 'operation failed' };
+      if (isPay) {
+        const msg = String((e as Error)?.message || '').toLowerCase();
+        if (/insufficient|not enough|balance too low/.test(msg)) return { id, ok: false, error: 'insufficient balance' };
+        if (/no .*balance|no exchange rate|no rate/.test(msg)) return { id, ok: false, error: msg.includes('rate') ? 'no exchange rate' : 'insufficient balance' };
+        return { id, ok: false, error: 'payment failed' };
+      }
+      return { id, ok: false, error: 'operation failed' };
     }
   }
 

@@ -405,6 +405,16 @@
   $('btn-pdf').onclick = function () { downloadPdf(false); };
   $('btn-pdf2').onclick = function () { downloadPdf(true); };
 
+  // Map the bridge's coarse payment-error codes to a human line.
+  function paymentError(e) {
+    var m = (e && e.message ? e.message : '').toLowerCase();
+    if (m.indexOf('insufficient') >= 0) return 'Insufficient funds in your Freeport wallet — top up and try again.';
+    if (m.indexOf('rate') >= 0) return 'Could not get an exchange rate to price this in sats. Try again shortly.';
+    if (m.indexOf('no wallet') >= 0 || m.indexOf('unavailable') >= 0) return 'No wallet is enabled. Turn on the Wallet in Settings → Experimental.';
+    if (m.indexOf('denied') >= 0) return 'Payment was declined.';
+    return 'Payment failed. Please try again.';
+  }
+
   // ── purchase ──────────────────────────────────────────────────────────────
   $('btn-purchase').onclick = function () {
     setErr('quote-err', '');
@@ -416,7 +426,7 @@
       })
       .catch(function (e) {
         btn.disabled = false; btn.textContent = 'Purchase';
-        setErr('quote-err', e && e.message ? e.message : 'Payment failed.');
+        setErr('quote-err', paymentError(e));
       });
   };
 

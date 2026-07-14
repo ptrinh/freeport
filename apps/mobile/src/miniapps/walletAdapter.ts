@@ -27,16 +27,25 @@ export function makeBridgeWallet(getWallet: (() => Promise<WalletProvider | null
         const want = opts.token.ticker.toUpperCase();
         const tok = (await w.tokenBalances().catch(() => []))
           .find((x) => x.ticker.toUpperCase() === want);
-        if (tok && w.payToken) return w.payToken(address, tok, opts.token.amount);
+        if (tok && w.payToken) {
+          // Enough of the stablecoin to cover the charge?
+          if (tok.amount < opts.token.amount) throw new Error('insufficient balance');
+          return w.payToken(address, tok, opts.token.amount);
+        }
         // Wallet holds no such stablecoin → pay the equivalent VALUE in sats
         // (treat the token amount as USD). Same destination, same worth — this
         // is what lets a sats-only wallet complete a USDT-denominated charge.
         const btcUsd = await w.fiatRate('USD').catch(() => null);
-        if (!btcUsd || btcUsd <= 0) throw new Error('no ' + want + ' balance');
+        if (!btcUsd || btcUsd <= 0) throw new Error('no exchange rate');
         const sats = Math.max(1, Math.round((opts.token.amount / btcUsd) * 100_000_000));
+        const bal = await w.balance().catch(() => ({ sats: 0 }));
+        if ((bal.sats || 0) < sats) throw new Error('insufficient balance');
         return w.pay(address, sats);
       }
-      return w.pay(address, opts.sats);
+      const need = opts.sats || 0;
+      const bal = await w.balance().catch(() => ({ sats: 0 }));
+      if ((bal.sats || 0) < need) throw new Error('insufficient balance');
+      return w.pay(address, need);
     },
   };
 }
