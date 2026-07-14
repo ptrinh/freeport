@@ -8,14 +8,15 @@
  * Restore: document picker → read → parse bundle (or legacy bare key) →
  * restore key + re-apply settings/address book.
  *
- * NOTE: settings and the address book are stored in plaintext in the bundle
- * (only the key is encrypted). They are low-sensitivity, but a passphrase does
- * not protect them — keep the file somewhere you trust.
+ * NOTE: with a passphrase the WHOLE bundle is encrypted (key + settings +
+ * address book + wallet-connect credential + phone). Without one, everything
+ * is plaintext — the user opted out of protection; keep the file somewhere
+ * you trust.
  */
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
-import { backupFileContent, parseBackupBundle, type BackupExtras } from './identity';
+import { backupFileContent, parseBackupBundle, finalizeBackupBundle, type BackupExtras } from './identity';
 import { loadPrefs, savePrefs, type Prefs } from './prefs';
 import { loadProfile, saveProfile, type UserProfile } from './profile';
 import { loadAddressBook, replaceAddressBook, type AddressBook } from './addressbook';
@@ -32,20 +33,20 @@ async function loadFlags(): Promise<{ created: string | null; rated: string | nu
   return { created: await kvGet(CREATED_KEY), rated: await kvGet(RATED_KEY) };
 }
 
-/** Bundle the key with profile + device settings + address book + local flags. */
+/** Bundle the key with profile + device settings + address book + local flags.
+ *  With a passphrase the WHOLE bundle is encrypted (so the NWC credential and
+ *  phone number are protected too), so the inner key is a bare nsec. */
 async function buildBundle(sk: Uint8Array, passphrase: string): Promise<string> {
   const flags = await loadFlags();
-  return JSON.stringify({
-    v: 1,
-    app: 'freeport',
-    key: backupFileContent(sk, passphrase),
+  return finalizeBackupBundle({
+    key: backupFileContent(sk, ''), // bare nsec; finalizeBackupBundle encrypts the body
     profile: await loadProfile(),  // incl. full phone (local-only) + display name
-    prefs: await loadPrefs(),      // incl. location, role, theme, …
+    prefs: await loadPrefs(),      // incl. location, role, theme, NWC credential …
     addressBook: await loadAddressBook(),
     created: flags.created,
     rated: flags.rated,
     miniapps: await exportFirewallState(), // Apps-tab registry + grants
-  });
+  }, passphrase);
 }
 
 /** Apply the extras (profile + settings + address book + local flags) from a bundle. */

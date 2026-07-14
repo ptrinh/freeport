@@ -2,10 +2,11 @@
  * Web backup. Backup = download a JSON bundle (key + settings + address book)
  * via a Blob link. Restore = a hidden <input type="file"> the user picks from.
  *
- * NOTE: settings + address book are plaintext in the bundle (only the key is
- * encrypted by a passphrase). Keep the file somewhere you trust.
+ * NOTE: with a passphrase the WHOLE bundle is encrypted (key + settings +
+ * address book + wallet-connect credential + phone). Without one it's all
+ * plaintext — keep the file somewhere you trust.
  */
-import { backupFileContent, parseBackupBundle, type BackupExtras } from './identity';
+import { backupFileContent, parseBackupBundle, finalizeBackupBundle, type BackupExtras } from './identity';
 import { loadPrefs, savePrefs, type Prefs } from './prefs';
 import { loadProfile, saveProfile, type UserProfile } from './profile';
 import { loadAddressBook, replaceAddressBook, type AddressBook } from './addressbook';
@@ -18,17 +19,17 @@ const CREATED_KEY = 'freeport.created';
 const RATED_KEY = 'freeport.rated';
 
 async function buildBundle(sk: Uint8Array, passphrase: string): Promise<string> {
-  return JSON.stringify({
-    v: 1,
-    app: 'freeport',
-    key: backupFileContent(sk, passphrase),
+  // With a passphrase the whole bundle is encrypted (protects the NWC
+  // credential + phone), so the inner key is a bare nsec.
+  return finalizeBackupBundle({
+    key: backupFileContent(sk, ''),
     profile: await loadProfile(),  // incl. full phone (local-only) + display name
-    prefs: await loadPrefs(),      // incl. location, role, theme, …
+    prefs: await loadPrefs(),      // incl. location, role, theme, NWC credential …
     addressBook: await loadAddressBook(),
     created: await kvGet(CREATED_KEY),
     rated: await kvGet(RATED_KEY),  // file backup has no size limit → keep ratings
     miniapps: await exportFirewallState(), // Apps-tab registry + grants
-  });
+  }, passphrase);
 }
 
 async function applyExtras(extras: BackupExtras): Promise<void> {

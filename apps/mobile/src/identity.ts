@@ -8,6 +8,7 @@ import { kvGet, kvSet, kvDelete } from './kv';
 import { generateSecretKey, getPublicKey } from 'nostr-tools/pure';
 import * as nip19 from 'nostr-tools/nip19';
 import * as nip49 from 'nostr-tools/nip49';
+import { encrypt as nip44Encrypt, decrypt as nip44Decrypt } from 'nostr-tools/nip44';
 
 const KEY = 'freeport.nsec';
 
@@ -119,6 +120,26 @@ export function backupKind(text: string): 'encrypted' | 'plain' | 'unknown' {
 export interface BackupExtras { profile?: unknown; prefs?: unknown; addressBook?: unknown; created?: unknown; rated?: unknown; miniapps?: unknown }
 
 /**
+ * Assemble the final backup file text from an inner bundle object.
+ *
+ * WITHOUT a passphrase → the plaintext v1 bundle (`key` is a bare nsec; the
+ * user opted out of protection). WITH a passphrase → a v2 envelope that
+ * encrypts the ENTIRE bundle, so the passphrase protects the wallet-connect
+ * (NWC) credential and phone number in `prefs`/`profile`, not just the key.
+ * The inner `key` is a bare nsec because the whole body is already encrypted.
+ *
+ * v2 mechanics: a random 32-byte data key is wrapped with the passphrase via
+ * NIP-49 (scrypt) and used as the NIP-44 key for the body — reusing audited
+ * primitives, with NIP-49's per-backup salt.
+ */
+export function finalizeBackupBundle(inner: Record<string, unknown>, passphrase: string): string {
+  const body = JSON.stringify({ v: 1, app: 'freeport', ...inner });
+  if (!passphrase) return body;
+  const dk = generateSecretKey();
+  return JSON.stringify({ v: 2, app: 'freeport', wrap: nip49.encrypt(dk, passphrase), enc: nip44Encrypt(body, dk) });
+}
+
+/**
  * Parse a backup file. Supports the JSON bundle (key + prefs + address book)
  * and the legacy bare nsec/ncryptsec. Writes the restored key to storage and
  * returns the key plus any extras for the caller to apply.
@@ -128,14 +149,26 @@ export async function parseBackupBundle(
   passphrase: string,
 ): Promise<{ sk: Uint8Array } & BackupExtras> {
   const t = text.trim();
-  try {
-    const o = JSON.parse(t);
-    if (o && typeof o === 'object' && typeof o.key === 'string') {
-      const sk = await restoreFromText(o.key, passphrase);
-      return { sk, profile: o.profile, prefs: o.prefs, addressBook: o.addressBook, created: o.created, rated: o.rated, miniapps: o.miniapps };
-    }
-  } catch {
-    // not JSON → fall through to bare-key handling
+  let o: any;
+  try { o = JSON.parse(t); } catch { /* not JSON → bare key below */ }
+
+  // v2: the whole bundle is encrypted under the passphrase — unwrap first. A
+  // failure here (wrong passphrase, tampered file) MUST throw, never fall
+  // through to the bare-key path (which would give a misleading error).
+  if (o && typeof o === 'object' && o.v === 2 && typeof o.enc === 'string' && typeof o.wrap === 'string') {
+    if (!passphrase) throw new Error('This backup is encrypted — enter its passphrase.');
+    let dk: Uint8Array;
+    try { dk = nip49.decrypt(o.wrap, passphrase); }
+    catch { throw new Error('Wrong passphrase for this backup.'); }
+    try { o = JSON.parse(nip44Decrypt(o.enc, dk)); }
+    catch { throw new Error('This backup is corrupt or was tampered with.'); }
+  }
+
+  if (o && typeof o === 'object' && typeof o.key === 'string') {
+    // A v2 inner key is already plaintext (the body was encrypted); a v1 key
+    // may itself be an ncryptsec needing the same passphrase.
+    const sk = await restoreFromText(o.key, passphrase);
+    return { sk, profile: o.profile, prefs: o.prefs, addressBook: o.addressBook, created: o.created, rated: o.rated, miniapps: o.miniapps };
   }
   return { sk: await restoreFromText(t, passphrase) };
 }
@@ -149,7 +182,10 @@ export function bundleNeedsPassphrase(text: string): boolean {
   const t = text.trim();
   try {
     const o = JSON.parse(t);
-    if (o && typeof o === 'object' && typeof o.key === 'string') return backupKind(o.key) === 'encrypted';
+    if (o && typeof o === 'object') {
+      if (o.v === 2 && typeof o.enc === 'string') return true; // whole bundle encrypted
+      if (typeof o.key === 'string') return backupKind(o.key) === 'encrypted';
+    }
   } catch { /* not JSON → bare key */ }
   return backupKind(t) === 'encrypted';
 }
