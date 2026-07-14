@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "Haijathibitishwa",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Ukurasa huu haujatumia kipengele chochote cha Freeport — huenda si programu ndogo.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Hakuna manifesto ya freeport.json iliyopatikana — tovuti hii haiwezi kuongezwa kama programu ndogo.",
+  "Remove {name}?": "Uondoe {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Hii inafuta programu na ruhusa ulizoipa. Unaweza kuiongeza tena baadaye.",
+  "{name}, {n} new": "{name}, {n} mpya",
+  "Voice memo failed": "Kutuma memo ya sauti kumeshindwa",
+  "Cannot record": "Haiwezi kurekodi",
+  "Microphone unavailable.": "Maikrofoni haipatikani.",
+  "Upload failed": "Kupakia kumeshindwa",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Programu hii imepangishwa kwenye kikoa cha Freeport chenyewe na haiwezi kufanya kazi kwa usalama kwenye programu ya wavuti. Ifungue kwenye programu ya simu, au tumia toleo lililopangishwa mahali pengine.",
+  "Can't run this app in the web app": "Haiwezi kuendesha programu hii kwenye programu ya wavuti",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Imepangishwa kwenye kikoa cha Freeport chenyewe, ambacho sandbox ya wavuti haiwezi kukitenga. Badala yake, ifungue kwenye programu ya simu ya Freeport.",
 };
 export default c;

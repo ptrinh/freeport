@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "अपुष्ट",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "यस पृष्ठले कुनै पनि Freeport सुविधा प्रयोग गरेको छैन — यो मिनी-एप नहुन सक्छ।",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "कुनै freeport.json म्यानिफेस्ट फेला परेन — यो साइटलाई मिनी-एपको रूपमा थप्न सकिँदैन।",
+  "Remove {name}?": "{name} हटाउने?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "यसले एप र तपाईंले यसलाई दिनुभएका अनुमतिहरू मेटाउँछ। तपाईं यसलाई पछि फेरि थप्न सक्नुहुन्छ।",
+  "{name}, {n} new": "{name}, {n} नयाँ",
+  "Voice memo failed": "आवाज मेमो असफल भयो",
+  "Cannot record": "रेकर्ड गर्न सकिँदैन",
+  "Microphone unavailable.": "माइक्रोफोन उपलब्ध छैन।",
+  "Upload failed": "अपलोड असफल भयो",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "यो एप Freeport कै आफ्नै डोमेनमा होस्ट गरिएको छ र वेब एपमा सुरक्षित रूपमा चल्न सक्दैन। यसलाई मोबाइल एपमा खोल्नुहोस्, वा अन्यत्र होस्ट गरिएको संस्करण प्रयोग गर्नुहोस्।",
+  "Can't run this app in the web app": "यो एपलाई वेब एपमा चलाउन सकिँदैन",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "यो Freeport कै आफ्नै डोमेनमा होस्ट गरिएको छ, जसलाई वेब स्यान्डबक्सले अलग राख्न सक्दैन। बरु यसलाई Freeport मोबाइल एपमा खोल्नुहोस्।",
 };
 export default c;

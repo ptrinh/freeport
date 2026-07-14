@@ -896,5 +896,15 @@ const c: Record<string, string> = {
   "Unverified": "I paverifikuar",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Kjo faqe nuk përdori asnjë veçori të Freeport — mund të mos jetë një mini-aplikacion.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Nuk u gjet asnjë manifest freeport.json — kjo faqe nuk mund të shtohet si mini-aplikacion.",
+  "Remove {name}?": "Të hiqet {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Kjo fshin aplikacionin dhe lejet që i dhe. Mund ta shtosh sërish më vonë.",
+  "{name}, {n} new": "{name}, {n} të reja",
+  "Voice memo failed": "Dërgimi i memos zanore dështoi",
+  "Cannot record": "S'mund të regjistrohet",
+  "Microphone unavailable.": "Mikrofoni s'është i disponueshëm.",
+  "Upload failed": "Ngarkimi dështoi",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Ky aplikacion strehohet në domenin e vetë Freeport dhe s'mund të funksionojë në mënyrë të sigurt në aplikacionin web. Hape në aplikacionin celular, ose përdor një version të strehuar diku tjetër.",
+  "Can't run this app in the web app": "Ky aplikacion s'mund të funksionojë në aplikacionin web",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Strehohet në domenin e vetë Freeport, të cilin sandbox-i i web-it s'mund ta izolojë. Hape në vend të kësaj në aplikacionin celular të Freeport.",
 };
 export default c;

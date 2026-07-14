@@ -896,5 +896,15 @@ const c: Record<string, string> = {
   "Unverified": "Niet geverifieerd",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Deze pagina heeft geen Freeport-functies gebruikt — het is mogelijk geen mini-app.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Geen freeport.json-manifest gevonden — deze website kan niet als mini-app worden toegevoegd.",
+  "Remove {name}?": "{name} verwijderen?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Hiermee verwijder je de app en de rechten die je hebt gegeven. Je kunt hem later opnieuw toevoegen.",
+  "{name}, {n} new": "{name}, {n} nieuw",
+  "Voice memo failed": "Spraakmemo mislukt",
+  "Cannot record": "Kan niet opnemen",
+  "Microphone unavailable.": "Microfoon niet beschikbaar.",
+  "Upload failed": "Uploaden mislukt",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Deze app wordt gehost op het eigen domein van Freeport en kan niet veilig in de web-app draaien. Open hem in de mobiele app of gebruik een versie die elders wordt gehost.",
+  "Can't run this app in the web app": "Kan deze app niet in de web-app draaien",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Hij wordt gehost op het eigen domein van Freeport, dat de web-sandbox niet kan isoleren. Open hem in plaats daarvan in de mobiele Freeport-app.",
 };
 export default c;

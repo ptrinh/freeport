@@ -936,5 +936,15 @@ const c: Record<string, string> = {
   "Unverified": "未検証",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "このページはFreeportの機能を一度も使用していません — ミニアプリではない可能性があります。",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json のマニフェストが見つかりません — このサイトはミニアプリとして追加できません。",
+  "Remove {name}?": "{name} を削除しますか？",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "アプリと、付与した権限を削除します。あとで再び追加できます。",
+  "{name}, {n} new": "{name}、{n} 件の新着",
+  "Voice memo failed": "ボイスメモを送信できませんでした",
+  "Cannot record": "録音できません",
+  "Microphone unavailable.": "マイクを利用できません。",
+  "Upload failed": "アップロードできませんでした",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "このアプリは Freeport 自身のドメインでホストされているため、ウェブアプリ内で安全に実行できません。モバイルアプリで開くか、別の場所でホストされているバージョンを使用してください。",
+  "Can't run this app in the web app": "このアプリはウェブアプリ内で実行できません",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Freeport 自身のドメインでホストされており、ウェブのサンドボックスでは分離できません。代わりに Freeport モバイルアプリで開いてください。",
 };
 export default c;

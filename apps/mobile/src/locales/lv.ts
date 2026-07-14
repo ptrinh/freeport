@@ -896,5 +896,15 @@ const c: Record<string, string> = {
   "Unverified": "Nav pārbaudīts",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Šī lapa neizmantoja nevienu Freeport funkciju — tā, iespējams, nav mini lietotne.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifests nav atrasts — šo vietni nevar pievienot kā mini lietotni.",
+  "Remove {name}?": "Noņemt {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Tādējādi tiek dzēsta lietotne un atļaujas, ko tai piešķīrāt. Vēlāk to var pievienot atkārtoti.",
+  "{name}, {n} new": "{name}, {n} jauni",
+  "Voice memo failed": "Neizdevās nosūtīt balss ziņu",
+  "Cannot record": "Nevar ierakstīt",
+  "Microphone unavailable.": "Mikrofons nav pieejams.",
+  "Upload failed": "Augšupielāde neizdevās",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Šī lietotne tiek mitināta paša Freeport domēnā, un to nevar droši palaist tīmekļa lietotnē. Atveriet to mobilajā lietotnē vai izmantojiet citur mitinātu versiju.",
+  "Can't run this app in the web app": "Šo lietotni nevar palaist tīmekļa lietotnē",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Tā tiek mitināta paša Freeport domēnā, ko tīmekļa smilškaste nevar izolēt. Tā vietā atveriet to Freeport mobilajā lietotnē.",
 };
 export default c;

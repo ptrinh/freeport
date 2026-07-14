@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "အတည်မပြုရသေး",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "ဤစာမျက်နှာသည် Freeport လုပ်ဆောင်ချက်များကို အသုံးမပြုခဲ့ပါ — ၎င်းသည် မီနီအက်ပ်မဟုတ်နိုင်ပါ။",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifest မတွေ့ပါ — ဤဝဘ်ဆိုက်ကို မီနီအက်ပ်အဖြစ် ထည့်၍မရပါ။",
+  "Remove {name}?": "{name} ကို ဖယ်ရှားမလား?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "ဤသည်က အက်ပ်နှင့် သင်ပေးထားသော ခွင့်ပြုချက်များကို ဖျက်ပါမည်။ နောက်မှ ပြန်ထည့်နိုင်ပါသည်။",
+  "{name}, {n} new": "{name}၊ အသစ် {n} ခု",
+  "Voice memo failed": "အသံမှတ်စု ပို့၍မရပါ။",
+  "Cannot record": "အသံ ဖမ်းယူ၍မရပါ။",
+  "Microphone unavailable.": "မိုက်ခရိုဖုန်း မရနိုင်ပါ။",
+  "Upload failed": "အပ်လုဒ်တင်၍မရပါ။",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "ဤအက်ပ်ကို Freeport ၏ ကိုယ်ပိုင်ဒိုမိန်းပေါ်တွင် လက်ခံထားသဖြင့် ဝဘ်အက်ပ်ထဲတွင် လုံခြုံစွာ လည်ပတ်၍မရပါ။ ၎င်းကို မိုဘိုင်းအက်ပ်တွင် ဖွင့်ပါ၊ သို့မဟုတ် အခြားနေရာတွင် လက်ခံထားသော ဗားရှင်းကို အသုံးပြုပါ။",
+  "Can't run this app in the web app": "ဤအက်ပ်ကို ဝဘ်အက်ပ်ထဲတွင် လည်ပတ်၍မရပါ။",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "၎င်းကို Freeport ၏ ကိုယ်ပိုင်ဒိုမိန်းပေါ်တွင် လက်ခံထားပြီး ဝဘ်ဆန်းဘောက်စ်က ၎င်းကို သီးခြားခွဲ၍မရပါ။ ယင်းအစား Freeport မိုဘိုင်းအက်ပ်တွင် ဖွင့်ပါ။",
 };
 export default c;

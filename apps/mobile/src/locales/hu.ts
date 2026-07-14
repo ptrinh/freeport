@@ -896,5 +896,15 @@ const c: Record<string, string> = {
   "Unverified": "Nem ellenőrzött",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Ez az oldal nem használt Freeport-funkciókat — lehet, hogy nem mini-app.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Nem található freeport.json manifeszt — ez a webhely nem adható hozzá mini-appként.",
+  "Remove {name}?": "{name} eltávolítása?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Ez törli az alkalmazást és a neki adott engedélyeket. Később újra hozzáadhatod.",
+  "{name}, {n} new": "{name}, {n} új",
+  "Voice memo failed": "A hangüzenet küldése nem sikerült",
+  "Cannot record": "Nem lehet rögzíteni",
+  "Microphone unavailable.": "A mikrofon nem érhető el.",
+  "Upload failed": "A feltöltés nem sikerült",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Ez az alkalmazás a Freeport saját domainjén van tárolva, és nem futtatható biztonságosan a webalkalmazásban. Nyisd meg a mobilalkalmazásban, vagy használj máshol tárolt verziót.",
+  "Can't run this app in the web app": "Ez az alkalmazás nem futtatható a webalkalmazásban",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "A Freeport saját domainjén van tárolva, amelyet a web homokozója nem tud elkülöníteni. Nyisd meg helyette a Freeport mobilalkalmazásban.",
 };
 export default c;

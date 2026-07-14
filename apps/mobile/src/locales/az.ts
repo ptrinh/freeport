@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "Təsdiqlənməyib",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Bu səhifə heç bir Freeport funksiyasından istifadə etmədi — mini-tətbiq olmaya bilər.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifesti tapılmadı — bu sayt mini-tətbiq kimi əlavə edilə bilməz.",
+  "Remove {name}?": "{name} silinsin?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Bu, tətbiqi və ona verdiyiniz icazələri silir. Sonra yenidən əlavə edə bilərsiniz.",
+  "{name}, {n} new": "{name}, {n} yeni",
+  "Voice memo failed": "Səsli qeyd göndərilmədi",
+  "Cannot record": "Yazmaq mümkün deyil",
+  "Microphone unavailable.": "Mikrofon əlçatan deyil.",
+  "Upload failed": "Yükləmə alınmadı",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Bu tətbiq Freeport-un öz domenində yerləşdirilib və veb tətbiqdə təhlükəsiz işləyə bilmir. Onu mobil tətbiqdə açın və ya başqa yerdə yerləşdirilən versiyasından istifadə edin.",
+  "Can't run this app in the web app": "Bu tətbiqi veb tətbiqdə işlətmək mümkün deyil",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "O, Freeport-un öz domenində yerləşdirilib və veb sandbox onu təcrid edə bilmir. Bunun əvəzinə Freeport mobil tətbiqində açın.",
 };
 export default c;

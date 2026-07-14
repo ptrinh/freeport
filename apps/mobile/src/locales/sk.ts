@@ -899,5 +899,15 @@ const c: Record<string, string> = {
   "Unverified": "Neoverené",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Táto stránka nepoužila žiadne funkcie Freeport — nemusí ísť o miniaplikáciu.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Manifest freeport.json sa nenašiel — túto stránku nemožno pridať ako miniaplikáciu.",
+  "Remove {name}?": "Odstrániť {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Týmto sa odstráni aplikácia aj oprávnenia, ktoré ste jej udelili. Neskôr ju môžete pridať znova.",
+  "{name}, {n} new": "{name}, {n} nových",
+  "Voice memo failed": "Hlasovú správu sa nepodarilo odoslať",
+  "Cannot record": "Nedá sa nahrávať",
+  "Microphone unavailable.": "Mikrofón nie je k dispozícii.",
+  "Upload failed": "Nahranie zlyhalo",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Táto aplikácia je hostovaná na vlastnej doméne Freeportu a nemôže bezpečne bežať vo webovej aplikácii. Otvorte ju v mobilnej aplikácii alebo použite verziu hostovanú inde.",
+  "Can't run this app in the web app": "Túto aplikáciu nemožno spustiť vo webovej aplikácii",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Je hostovaná na vlastnej doméne Freeportu, ktorú webový sandbox nedokáže izolovať. Otvorte ju radšej v mobilnej aplikácii Freeport.",
 };
 export default c;

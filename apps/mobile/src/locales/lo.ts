@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "ຍັງບໍ່ໄດ້ຢືນຢັນ",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "ໜ້ານີ້ບໍ່ໄດ້ໃຊ້ຄຸນສົມບັດ Freeport ໃດໆ — ມັນອາດບໍ່ແມ່ນມິນິແອັບ",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "ບໍ່ພົບ manifest freeport.json — ບໍ່ສາມາດເພີ່ມເວັບໄຊນີ້ເປັນມິນິແອັບໄດ້",
+  "Remove {name}?": "ນຳ {name} ອອກບໍ?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "ນີ້ຈະລຶບແອັບ ແລະ ສິດທີ່ທ່ານໄດ້ໃຫ້ໄວ້ ທ່ານສາມາດເພີ່ມກັບຄືນໄດ້ພາຍຫຼັງ",
+  "{name}, {n} new": "{name}, ໃໝ່ {n} ລາຍການ",
+  "Voice memo failed": "ສົ່ງບັນທຶກສຽງບໍ່ສຳເລັດ",
+  "Cannot record": "ບໍ່ສາມາດບັນທຶກສຽງໄດ້",
+  "Microphone unavailable.": "ໄມໂຄຣໂຟນບໍ່ພ້ອມໃຊ້ງານ",
+  "Upload failed": "ອັບໂຫຼດບໍ່ສຳເລັດ",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "ແອັບນີ້ຖືກໂຮສຢູ່ໃນໂດເມນຂອງ Freeport ເອງ ຈຶ່ງເຮັດວຽກຢ່າງປອດໄພໃນເວັບແອັບບໍ່ໄດ້ ເປີດມັນໃນແອັບມືຖື ຫຼື ໃຊ້ເວີຊັນທີ່ໂຮສຢູ່ບ່ອນອື່ນ",
+  "Can't run this app in the web app": "ບໍ່ສາມາດເປີດໃຊ້ແອັບນີ້ໃນເວັບແອັບໄດ້",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "ມັນຖືກໂຮສຢູ່ໃນໂດເມນຂອງ Freeport ເອງ ເຊິ່ງແຊນບັອກຂອງເວັບບໍ່ສາມາດແຍກໄດ້ ໃຫ້ເປີດໃນແອັບມືຖື Freeport ແທນ",
 };
 export default c;

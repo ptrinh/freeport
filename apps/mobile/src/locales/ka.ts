@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "დაუდასტურებელი",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "ამ გვერდს არ გამოუყენებია Freeport-ის არცერთი ფუნქცია — შესაძლოა ის მინი-აპი არ იყოს.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json მანიფესტი ვერ მოიძებნა — ამ საიტის მინი-აპად დამატება შეუძლებელია.",
+  "Remove {name}?": "წავშალო {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "ეს წაშლის აპსა და ნებართვებს, რომლებიც მას მიანიჭეთ. მოგვიანებით ხელახლა შეგიძლიათ დაამატოთ.",
+  "{name}, {n} new": "{name}, {n} ახალი",
+  "Voice memo failed": "ხმოვანი შეტყობინების გაგზავნა ვერ მოხერხდა",
+  "Cannot record": "ჩაწერა ვერ ხერხდება",
+  "Microphone unavailable.": "მიკროფონი მიუწვდომელია.",
+  "Upload failed": "ატვირთვა ვერ მოხერხდა",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "ეს აპი განთავსებულია Freeport-ის საკუთარ დომენზე და ვერ იმუშავებს უსაფრთხოდ ვებ-აპში. გახსენით იგი მობილურ აპში, ან გამოიყენეთ სხვაგან განთავსებული ვერსია.",
+  "Can't run this app in the web app": "ამ აპის გაშვება ვებ-აპში ვერ ხერხდება",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "ის განთავსებულია Freeport-ის საკუთარ დომენზე, რომელსაც ვების sandbox ვერ იზოლირებს. სამაგიეროდ გახსენით იგი Freeport-ის მობილურ აპში.",
 };
 export default c;

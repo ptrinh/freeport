@@ -896,5 +896,15 @@ const c: Record<string, string> = {
   "Unverified": "Vahvistamaton",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Tämä sivu ei käyttänyt mitään Freeportin ominaisuuksia — se ei ehkä ole minisovellus.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json-manifestia ei löytynyt — tätä sivustoa ei voi lisätä minisovelluksena.",
+  "Remove {name}?": "Poistetaanko {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Tämä poistaa sovelluksen ja sille myöntämäsi käyttöoikeudet. Voit lisätä sen myöhemmin uudelleen.",
+  "{name}, {n} new": "{name}, {n} uutta",
+  "Voice memo failed": "Ääniviesti epäonnistui",
+  "Cannot record": "Tallennus ei onnistu",
+  "Microphone unavailable.": "Mikrofoni ei ole käytettävissä.",
+  "Upload failed": "Lataus epäonnistui",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Tämä sovellus on isännöity Freeportin omalla verkkotunnuksella, eikä sitä voi suorittaa turvallisesti verkkosovelluksessa. Avaa se mobiilisovelluksessa tai käytä muualla isännöityä versiota.",
+  "Can't run this app in the web app": "Tätä sovellusta ei voi suorittaa verkkosovelluksessa",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Se on isännöity Freeportin omalla verkkotunnuksella, jota verkon hiekkalaatikko ei voi eristää. Avaa se sen sijaan Freeportin mobiilisovelluksessa.",
 };
 export default c;

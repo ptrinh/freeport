@@ -936,5 +936,15 @@ const c: Record<string, string> = {
   "Unverified": "미확인",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "이 페이지는 Freeport 기능을 사용하지 않았습니다 — 미니앱이 아닐 수 있습니다.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json 매니페스트를 찾을 수 없음 — 이 사이트는 미니앱으로 추가할 수 없습니다.",
+  "Remove {name}?": "{name}을(를) 제거하시겠어요?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "앱과 앱에 부여한 권한이 삭제됩니다. 나중에 다시 추가할 수 있습니다.",
+  "{name}, {n} new": "{name}, 새 항목 {n}개",
+  "Voice memo failed": "음성 메모 전송 실패",
+  "Cannot record": "녹음할 수 없음",
+  "Microphone unavailable.": "마이크를 사용할 수 없습니다.",
+  "Upload failed": "업로드 실패",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "이 앱은 Freeport 자체 도메인에서 호스팅되어 웹 앱에서 안전하게 실행할 수 없습니다. 모바일 앱에서 열거나 다른 곳에 호스팅된 버전을 사용하세요.",
+  "Can't run this app in the web app": "이 앱은 웹 앱에서 실행할 수 없습니다",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Freeport 자체 도메인에서 호스팅되어 웹 샌드박스가 격리할 수 없습니다. 대신 Freeport 모바일 앱에서 열어 주세요.",
 };
 export default c;

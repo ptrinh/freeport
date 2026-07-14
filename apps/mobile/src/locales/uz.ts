@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "Tasdiqlanmagan",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Bu sahifa hech qanday Freeport funksiyasidan foydalanmadi — u mini-ilova bo'lmasligi mumkin.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifesti topilmadi — bu saytni mini-ilova sifatida qo'shib bo'lmaydi.",
+  "Remove {name}?": "{name} olib tashlansinmi?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Bu ilovani va unga bergan ruxsatlaringizni oʻchiradi. Keyinroq uni qayta qoʻshishingiz mumkin.",
+  "{name}, {n} new": "{name}, {n} ta yangi",
+  "Voice memo failed": "Ovozli xabar yuborilmadi",
+  "Cannot record": "Yozib boʻlmadi",
+  "Microphone unavailable.": "Mikrofon mavjud emas.",
+  "Upload failed": "Yuklash amalga oshmadi",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Bu ilova Freeport’ning oʻz domenida joylashtirilgan va veb-ilovada xavfsiz ishlay olmaydi. Uni mobil ilovada oching yoki boshqa joyda joylashtirilgan versiyasidan foydalaning.",
+  "Can't run this app in the web app": "Bu ilovani veb-ilovada ishga tushirib boʻlmaydi",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "U Freeport’ning oʻz domenida joylashtirilgan, veb sandbox esa uni yakkalab boʻlmaydi. Uning oʻrniga Freeport mobil ilovasida oching.",
 };
 export default c;

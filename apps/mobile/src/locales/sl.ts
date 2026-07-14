@@ -902,5 +902,15 @@ const c: Record<string, string> = {
   "Unverified": "Nepreverjeno",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Ta stran ni uporabila nobene funkcije Freeport — morda ni mini aplikacija.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Manifesta freeport.json ni bilo mogoče najti — te spletne strani ni mogoče dodati kot mini aplikacijo.",
+  "Remove {name}?": "Odstrani {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "S tem se izbriše aplikacija in dovoljenja, ki ste ji jih dodelili. Pozneje jo lahko znova dodate.",
+  "{name}, {n} new": "{name}, {n} novih",
+  "Voice memo failed": "Glasovnega sporočila ni bilo mogoče poslati",
+  "Cannot record": "Snemanje ni mogoče",
+  "Microphone unavailable.": "Mikrofon ni na voljo.",
+  "Upload failed": "Nalaganje ni uspelo",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Ta aplikacija gostuje na Freeportovi lastni domeni in ne more varno delovati v spletni aplikaciji. Odprite jo v mobilni aplikaciji ali uporabite različico, ki gostuje drugje.",
+  "Can't run this app in the web app": "Te aplikacije ni mogoče zagnati v spletni aplikaciji",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Gostuje na Freeportovi lastni domeni, ki je spletni peskovnik ne more izolirati. Namesto tega jo odprite v mobilni aplikaciji Freeport.",
 };
 export default c;

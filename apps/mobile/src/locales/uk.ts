@@ -902,5 +902,15 @@ const c: Record<string, string> = {
   "Unverified": "Не підтверджено",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Ця сторінка не використовувала жодних функцій Freeport — можливо, це не мінізастосунок.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Маніфест freeport.json не знайдено — цей сайт не можна додати як мінізастосунок.",
+  "Remove {name}?": "Видалити {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Це видалить застосунок і надані йому дозволи. Пізніше ви зможете додати його знову.",
+  "{name}, {n} new": "{name}, {n} нових",
+  "Voice memo failed": "Не вдалося надіслати голосове повідомлення",
+  "Cannot record": "Не вдається записати",
+  "Microphone unavailable.": "Мікрофон недоступний.",
+  "Upload failed": "Не вдалося завантажити",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Цей застосунок розміщено на власному домені Freeport і він не може безпечно працювати у веб-застосунку. Відкрийте його в мобільному застосунку або скористайтеся версією, розміщеною деінде.",
+  "Can't run this app in the web app": "Не вдається запустити цей застосунок у веб-застосунку",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Його розміщено на власному домені Freeport, який веб-пісочниця не може ізолювати. Замість цього відкрийте його в мобільному застосунку Freeport.",
 };
 export default c;

@@ -896,5 +896,15 @@ const c: Record<string, string> = {
   "Unverified": "Neverificat",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Această pagină nu a folosit nicio funcție Freeport — este posibil să nu fie o mini-aplicație.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Nu a fost găsit niciun manifest freeport.json — acest site nu poate fi adăugat ca mini-aplicație.",
+  "Remove {name}?": "Elimini {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Aceasta șterge aplicația și permisiunile pe care i le-ai acordat. O poți adăuga din nou mai târziu.",
+  "{name}, {n} new": "{name}, {n} noi",
+  "Voice memo failed": "Trimiterea mesajului vocal a eșuat",
+  "Cannot record": "Nu se poate înregistra",
+  "Microphone unavailable.": "Microfon indisponibil.",
+  "Upload failed": "Încărcarea a eșuat",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Această aplicație este găzduită pe domeniul propriu al Freeport și nu poate rula în siguranță în aplicația web. Deschide-o în aplicația mobilă sau folosește o versiune găzduită în altă parte.",
+  "Can't run this app in the web app": "Această aplicație nu poate rula în aplicația web",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Este găzduită pe domeniul propriu al Freeport, pe care sandboxul web nu îl poate izola. Deschide-o în schimb în aplicația mobilă Freeport.",
 };
 export default c;

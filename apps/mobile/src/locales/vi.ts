@@ -936,5 +936,15 @@ const c: Record<string, string> = {
   "Unverified": "Chưa xác minh",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Trang này chưa dùng bất kỳ tính năng Freeport nào — có thể đây không phải ứng dụng mini.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Không tìm thấy manifest freeport.json — không thể thêm trang web này làm ứng dụng mini.",
+  "Remove {name}?": "Gỡ {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Thao tác này xóa ứng dụng và các quyền bạn đã cấp cho nó. Bạn có thể thêm lại sau.",
+  "{name}, {n} new": "{name}, {n} mới",
+  "Voice memo failed": "Gửi ghi âm thất bại",
+  "Cannot record": "Không thể ghi âm",
+  "Microphone unavailable.": "Micrô không khả dụng.",
+  "Upload failed": "Tải lên thất bại",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Ứng dụng này được lưu trữ trên tên miền riêng của Freeport và không thể chạy an toàn trong ứng dụng web. Hãy mở nó trong ứng dụng di động, hoặc dùng một phiên bản được lưu trữ ở nơi khác.",
+  "Can't run this app in the web app": "Không thể chạy ứng dụng này trong ứng dụng web",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Nó được lưu trữ trên tên miền riêng của Freeport, mà hộp cát web không thể cô lập. Thay vào đó, hãy mở nó trong ứng dụng di động Freeport.",
 };
 export default c;

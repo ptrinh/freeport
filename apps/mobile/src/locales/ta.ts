@@ -896,5 +896,15 @@ const c: Record<string, string> = {
   "Unverified": "சரிபார்க்கப்படவில்லை",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "இந்தப் பக்கம் எந்த Freeport அம்சத்தையும் பயன்படுத்தவில்லை — இது மினி ஆப் அல்லாமல் இருக்கலாம்.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifest எதுவும் கண்டறியப்படவில்லை — இந்த இணையதளத்தை மினி ஆப்பாகச் சேர்க்க முடியாது.",
+  "Remove {name}?": "{name} ஐ நீக்கவா?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "இது ஆப்பையும் நீங்கள் அதற்கு வழங்கிய அனுமதிகளையும் நீக்குகிறது. பின்னர் அதை மீண்டும் சேர்க்கலாம்.",
+  "{name}, {n} new": "{name}, {n} புதியவை",
+  "Voice memo failed": "குரல் குறிப்பு தோல்வியடைந்தது",
+  "Cannot record": "பதிவு செய்ய முடியாது",
+  "Microphone unavailable.": "மைக்ரோஃபோன் கிடைக்கவில்லை.",
+  "Upload failed": "பதிவேற்றம் தோல்வியடைந்தது",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "இந்த ஆப் Freeport-இன் சொந்த டொமைனில் ஹோஸ்ட் செய்யப்பட்டுள்ளது, மேலும் இது வெப் ஆப்பில் பாதுகாப்பாக இயங்க முடியாது. இதை மொபைல் ஆப்பில் திறக்கவும், அல்லது வேறு எங்காவது ஹோஸ்ட் செய்யப்பட்ட பதிப்பைப் பயன்படுத்தவும்.",
+  "Can't run this app in the web app": "இந்த ஆப்பை வெப் ஆப்பில் இயக்க முடியாது",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "இது Freeport-இன் சொந்த டொமைனில் ஹோஸ்ட் செய்யப்பட்டுள்ளது, இதை வெப் சாண்ட்பாக்ஸால் தனிமைப்படுத்த முடியாது. இதற்குப் பதிலாக இதை Freeport மொபைல் ஆப்பில் திறக்கவும்.",
 };
 export default c;

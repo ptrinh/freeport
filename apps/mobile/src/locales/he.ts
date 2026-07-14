@@ -896,5 +896,15 @@ const c: Record<string, string> = {
   "Unverified": "לא מאומת",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "דף זה לא השתמש באף תכונה של Freeport — ייתכן שאינו מיני-אפליקציה.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "לא נמצא מניפסט freeport.json — לא ניתן להוסיף אתר זה כמיני-אפליקציה.",
+  "Remove {name}?": "להסיר את {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "פעולה זו מוחקת את האפליקציה ואת ההרשאות שהענקת לה. אפשר להוסיף אותה שוב מאוחר יותר.",
+  "{name}, {n} new": "{name}, {n} חדשות",
+  "Voice memo failed": "שליחת ההודעה הקולית נכשלה",
+  "Cannot record": "לא ניתן להקליט",
+  "Microphone unavailable.": "המיקרופון אינו זמין.",
+  "Upload failed": "ההעלאה נכשלה",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "האפליקציה הזו מתארחת בדומיין הייעודי של Freeport ואינה יכולה לפעול בבטחה באפליקציית הווב. פתח אותה באפליקציה לנייד, או השתמש בגרסה המתארחת במקום אחר.",
+  "Can't run this app in the web app": "לא ניתן להריץ את האפליקציה הזו באפליקציית הווב",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "היא מתארחת בדומיין הייעודי של Freeport, שארגז החול של הווב אינו יכול לבודד. פתח אותה במקום זאת באפליקציית Freeport לנייד.",
 };
 export default c;

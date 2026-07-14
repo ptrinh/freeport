@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "Չհաստատված",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Այս էջը չի օգտագործել Freeport-ի որևէ գործառույթ — այն կարող է մինի-հավելված չլինել։",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json մանիֆեստ չգտնվեց — այս կայքը հնարավոր չէ ավելացնել որպես մինի-հավելված։",
+  "Remove {name}?": "Հեռացնել {name}-ը?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Սա ջնջում է հավելվածը և ձեր տրամադրած թույլտվությունները։ Կարող եք այն ավելացնել կրկին ավելի ուշ։",
+  "{name}, {n} new": "{name}, {n} նոր",
+  "Voice memo failed": "Ձայնային հաղորդագրությունը ձախողվեց",
+  "Cannot record": "Հնարավոր չէ ձայնագրել",
+  "Microphone unavailable.": "Խոսափողն անհասանելի է։",
+  "Upload failed": "Վերբեռնումը ձախողվեց",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Այս հավելվածը տեղակայված է Freeport-ի սեփական տիրույթում և չի կարող ապահով աշխատել վեբ հավելվածում։ Բացեք այն բջջային հավելվածում, կամ օգտագործեք այլ տեղում տեղակայված տարբերակ։",
+  "Can't run this app in the web app": "Այս հավելվածը հնարավոր չէ գործարկել վեբ հավելվածում",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Այն տեղակայված է Freeport-ի սեփական տիրույթում, որը վեբ ավազատուփը չի կարող մեկուսացնել։ Փոխարենը բացեք այն Freeport բջջային հավելվածում։",
 };
 export default c;

@@ -896,5 +896,15 @@ const c: Record<string, string> = {
   "Unverified": "Overifierad",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Den här sidan har inte använt några Freeport-funktioner — det kanske inte är en miniapp.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Inget freeport.json-manifest hittades — den här webbplatsen kan inte läggas till som en miniapp.",
+  "Remove {name}?": "Ta bort {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Det här tar bort appen och de behörigheter du gav den. Du kan lägga till den igen senare.",
+  "{name}, {n} new": "{name}, {n} nya",
+  "Voice memo failed": "Röstmemo misslyckades",
+  "Cannot record": "Kan inte spela in",
+  "Microphone unavailable.": "Mikrofonen är inte tillgänglig.",
+  "Upload failed": "Uppladdningen misslyckades",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Den här appen finns på Freeports egen domän och kan inte köras säkert i webbappen. Öppna den i mobilappen, eller använd en version som finns någon annanstans.",
+  "Can't run this app in the web app": "Kan inte köra den här appen i webbappen",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Den finns på Freeports egen domän, som webbsandlådan inte kan isolera. Öppna den i Freeport-mobilappen i stället.",
 };
 export default c;

@@ -936,5 +936,15 @@ const c: Record<string, string> = {
   "Unverified": "未验证",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "此页面未使用任何 Freeport 功能 — 它可能不是小程序。",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "未找到 freeport.json 清单 — 无法将此网站添加为小程序。",
+  "Remove {name}?": "移除 {name}？",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "这将删除该应用及你授予它的权限。你之后可以再次添加。",
+  "{name}, {n} new": "{name}，{n} 条新",
+  "Voice memo failed": "语音备忘发送失败",
+  "Cannot record": "无法录音",
+  "Microphone unavailable.": "麦克风不可用。",
+  "Upload failed": "上传失败",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "此应用托管在 Freeport 自己的域名上，无法在网页应用中安全运行。请在移动应用中打开，或使用托管在其他位置的版本。",
+  "Can't run this app in the web app": "无法在网页应用中运行此应用",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "它托管在 Freeport 自己的域名上，网页沙盒无法将其隔离。请改在 Freeport 移动应用中打开。",
 };
 export default c;

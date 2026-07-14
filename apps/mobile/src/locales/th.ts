@@ -936,5 +936,15 @@ const c: Record<string, string> = {
   "Unverified": "ยังไม่ยืนยัน",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "หน้านี้ไม่ได้ใช้ฟีเจอร์ Freeport ใด ๆ — อาจไม่ใช่มินิแอป",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "ไม่พบ manifest freeport.json — ไม่สามารถเพิ่มไซต์นี้เป็นมินิแอปได้",
+  "Remove {name}?": "นำ {name} ออกไหม?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "การทำเช่นนี้จะลบแอปและสิทธิ์ที่คุณให้ไว้ คุณสามารถเพิ่มกลับได้ภายหลัง",
+  "{name}, {n} new": "{name}, ใหม่ {n} รายการ",
+  "Voice memo failed": "ส่งบันทึกเสียงไม่สำเร็จ",
+  "Cannot record": "ไม่สามารถบันทึกเสียงได้",
+  "Microphone unavailable.": "ไมโครโฟนไม่พร้อมใช้งาน",
+  "Upload failed": "อัปโหลดไม่สำเร็จ",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "แอปนี้โฮสต์อยู่บนโดเมนของ Freeport เอง จึงทำงานอย่างปลอดภัยในเว็บแอปไม่ได้ เปิดในแอปมือถือ หรือใช้เวอร์ชันที่โฮสต์ที่อื่น",
+  "Can't run this app in the web app": "เรียกใช้แอปนี้ในเว็บแอปไม่ได้",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "แอปนี้โฮสต์อยู่บนโดเมนของ Freeport เอง ซึ่งแซนด์บ็อกซ์ของเว็บแยกออกไม่ได้ ให้เปิดในแอปมือถือ Freeport แทน",
 };
 export default c;

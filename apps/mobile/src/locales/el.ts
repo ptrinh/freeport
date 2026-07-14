@@ -896,5 +896,15 @@ const c: Record<string, string> = {
   "Unverified": "Μη επαληθευμένο",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Αυτή η σελίδα δεν χρησιμοποίησε καμία λειτουργία του Freeport — μπορεί να μην είναι μίνι εφαρμογή.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Δεν βρέθηκε δήλωση freeport.json — αυτός ο ιστότοπος δεν μπορεί να προστεθεί ως μίνι εφαρμογή.",
+  "Remove {name}?": "Αφαίρεση του {name};",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Αυτό διαγράφει την εφαρμογή και τα δικαιώματα που της παραχωρήσατε. Μπορείτε να την προσθέσετε ξανά αργότερα.",
+  "{name}, {n} new": "{name}, {n} νέα",
+  "Voice memo failed": "Η αποστολή ηχητικού μηνύματος απέτυχε",
+  "Cannot record": "Δεν είναι δυνατή η εγγραφή",
+  "Microphone unavailable.": "Το μικρόφωνο δεν είναι διαθέσιμο.",
+  "Upload failed": "Η μεταφόρτωση απέτυχε",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Αυτή η εφαρμογή φιλοξενείται στον ίδιο τον τομέα του Freeport και δεν μπορεί να εκτελεστεί με ασφάλεια στην εφαρμογή web. Ανοίξτε την στην εφαρμογή για κινητά ή χρησιμοποιήστε μια έκδοση που φιλοξενείται αλλού.",
+  "Can't run this app in the web app": "Δεν είναι δυνατή η εκτέλεση αυτής της εφαρμογής στην εφαρμογή web",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Φιλοξενείται στον ίδιο τον τομέα του Freeport, τον οποίο το sandbox του web δεν μπορεί να απομονώσει. Ανοίξτε την αντ' αυτού στην εφαρμογή Freeport για κινητά.",
 };
 export default c;

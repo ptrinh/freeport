@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "ያልተረጋገጠ",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "ይህ ገጽ ምንም የFreeport ባህሪያት አልተጠቀመም — ሚኒ መተግበሪያ ላይሆን ይችላል።",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "የfreeport.json ማኒፌስት አልተገኘም — ይህ ጣቢያ እንደ ሚኒ መተግበሪያ ሊታከል አይችልም።",
+  "Remove {name}?": "{name}ን አስወግድ?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "ይህ መተግበሪያውንና የሰጠኸውን ፈቃዶች ይሰርዛል። በኋላ እንደገና ልታክለው ትችላለህ።",
+  "{name}, {n} new": "{name}፣ {n} አዲስ",
+  "Voice memo failed": "የድምፅ ማስታወሻ መላክ አልተሳካም",
+  "Cannot record": "መቅዳት አልተቻለም",
+  "Microphone unavailable.": "ማይክሮፎን አይገኝም።",
+  "Upload failed": "መስቀል አልተሳካም",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "ይህ መተግበሪያ በFreeport የራሱ ጎራ ላይ ተስተናግዷል፣ በድር መተግበሪያ ውስጥ በአስተማማኝ ሁኔታ መስራት አይችልም። በሞባይል መተግበሪያ ክፈተው፣ ወይም ሌላ ቦታ የተስተናገደ ስሪት ተጠቀም።",
+  "Can't run this app in the web app": "ይህን መተግበሪያ በድር መተግበሪያ ውስጥ ማስኬድ አይቻልም",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "በFreeport የራሱ ጎራ ላይ ተስተናግዷል፣ ይህም የድር sandbox ሊለየው አይችልም። በምትኩ በFreeport ሞባይል መተግበሪያ ክፈተው።",
 };
 export default c;

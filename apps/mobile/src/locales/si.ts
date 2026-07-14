@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "සත්‍යාපනය නොකළ",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "මෙම පිටුව කිසිදු Freeport විශේෂාංගයක් භාවිත කර නැත — එය කුඩා යෙදුමක් නොවිය හැක.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifest එකක් හමු නොවීය — මෙම අඩවිය කුඩා යෙදුමක් ලෙස එක් කළ නොහැක.",
+  "Remove {name}?": "{name} ඉවත් කරන්නද?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "මෙය යෙදුම සහ ඔබ එයට ලබා දුන් අවසර මකා දමයි. ඔබට එය පසුව නැවත එක් කළ හැක.",
+  "{name}, {n} new": "{name}, නව {n}",
+  "Voice memo failed": "හඬ සටහන අසාර්ථකයි",
+  "Cannot record": "පටිගත කළ නොහැක",
+  "Microphone unavailable.": "මයික්‍රොෆෝන ලබා ගත නොහැක.",
+  "Upload failed": "උඩුගත කිරීම අසාර්ථකයි",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "මෙම යෙදුම Freeport හි නිජ වසමෙහි සත්කාරකත්වය දක්වා ඇති අතර වෙබ් යෙදුමෙහි ආරක්ෂිතව ධාවනය කළ නොහැක. එය ජංගම යෙදුමෙහි විවෘත කරන්න, නැතහොත් වෙනත් තැනක සත්කාරකත්වය දක්වන ලද අනුවාදයක් භාවිතා කරන්න.",
+  "Can't run this app in the web app": "මෙම යෙදුම වෙබ් යෙදුමෙහි ධාවනය කළ නොහැක",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "එය Freeport හි නිජ වසමෙහි සත්කාරකත්වය දක්වා ඇති අතර, එය වෙබ් සෑන්ඩ්බොක්සයට හුදෙකලා කළ නොහැක. ඒ වෙනුවට එය Freeport ජංගම යෙදුමෙහි විවෘත කරන්න.",
 };
 export default c;

@@ -893,5 +893,15 @@ const c: Record<string, string> = {
   "Unverified": "Hindi na-verify",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Hindi gumamit ang page na ito ng anumang feature ng Freeport — maaaring hindi ito mini-app.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "Walang nakitang freeport.json manifest — hindi maidaragdag ang site na ito bilang mini-app.",
+  "Remove {name}?": "Alisin ang {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Buburahin nito ang app at ang mga pahintulot na ibinigay mo rito. Maaari mo itong idagdag muli mamaya.",
+  "{name}, {n} new": "{name}, {n} bago",
+  "Voice memo failed": "Hindi naipadala ang voice memo",
+  "Cannot record": "Hindi makapag-record",
+  "Microphone unavailable.": "Hindi available ang mikropono.",
+  "Upload failed": "Nabigo ang pag-upload",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Naka-host ang app na ito sa sariling domain ng Freeport kaya hindi ito ligtas na tumakbo sa web app. Buksan ito sa mobile app, o gumamit ng bersyong naka-host sa ibang lugar.",
+  "Can't run this app in the web app": "Hindi matakbo ang app na ito sa web app",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Naka-host ito sa sariling domain ng Freeport, na hindi kayang i-isolate ng web sandbox. Buksan na lang ito sa Freeport mobile app.",
 };
 export default c;

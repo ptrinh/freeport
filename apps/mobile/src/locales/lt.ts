@@ -897,5 +897,15 @@ const c: Record<string, string> = {
   "Unverified": "Nepatvirtinta",
   "This page hasn't used any Freeport features — it may not be a mini-app.": "Šis puslapis nenaudojo jokių Freeport funkcijų — tai gali būti ne mini programėlė.",
   "No freeport.json manifest found — this site can't be added as a mini-app.": "freeport.json manifestas nerastas — šios svetainės negalima pridėti kaip mini programėlės.",
+  "Remove {name}?": "Pašalinti {name}?",
+  "This deletes the app and the permissions you granted it. You can add it again later.": "Taip ištrinsite programėlę ir jai suteiktus leidimus. Vėliau galėsite ją pridėti dar kartą.",
+  "{name}, {n} new": "{name}, {n} nauji",
+  "Voice memo failed": "Nepavyko išsiųsti balso žinutės",
+  "Cannot record": "Nepavyksta įrašyti",
+  "Microphone unavailable.": "Mikrofonas nepasiekiamas.",
+  "Upload failed": "Nepavyko įkelti",
+  "This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere.": "Ši programa talpinama paties Freeport domene ir negali saugiai veikti interneto programoje. Atidarykite ją mobiliojoje programėlėje arba naudokite kitur talpinamą versiją.",
+  "Can't run this app in the web app": "Šios programos negalima paleisti interneto programoje",
+  "It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.": "Ji talpinama paties Freeport domene, kurio interneto smėlio dėžė negali izoliuoti. Vietoj to atidarykite ją Freeport mobiliojoje programėlėje.",
 };
 export default c;
