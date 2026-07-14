@@ -202,6 +202,16 @@ the mechanism while keeping the identical firewall:
 - **Sandboxed iframe**: `sandbox="allow-scripts allow-same-origin
   allow-forms"` — no popups, no top-navigation (the mini-app can't redirect
   the Freeport tab), no modals.
+- **Mini-apps must be a DIFFERENT origin from the web shell.** `allow-same-origin`
+  keeps the frame on its real origin (needed so the targetOrigin-pinned port is
+  deliverable), but it means a frame served from the SHELL's own origin would be
+  same-origin with the parent — the sandbox wall would not apply, and the app
+  could read the shell's `localStorage` (the key). So first-party apps are
+  served from a distinct origin (`apps.freeport.network`, not
+  `freeport.network`), and the web shell **refuses to add or launch any app
+  whose origin equals `location.origin`** (`sameOriginAsShell`), showing an
+  error instead of the frame. Native (WebView, per-app isolated storage) is
+  unaffected and has no such origin to collide with.
 - **MessageChannel handshake, targetOrigin pinned.** On every iframe load the
   shell mints a fresh `MessageChannel` and posts one port to the frame with
   `targetOrigin` set to the registered origin. A frame sitting on any other

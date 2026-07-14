@@ -21,6 +21,23 @@
  */
 import { BRIDGE_METHODS } from './firewall';
 
+/**
+ * On WEB, a mini-app must NOT be same-origin with the Freeport shell. The web
+ * shell isolates apps with a cross-origin iframe + the browser's same-origin
+ * policy; a same-origin app escapes that entirely and can read the shell's
+ * localStorage (the nsec). We simply refuse to run same-origin apps rather
+ * than pretend to sandbox them.
+ *
+ * Detected via the shell's own origin (`location.origin`), which only exists
+ * on web — on native (WebView with isolated storage) there is no such origin,
+ * so this returns false and the guard is a no-op.
+ */
+export function sameOriginAsShell(appUrl: string): boolean {
+  const shell = globalThis.location?.origin;
+  if (!shell || !/^https?:\/\//.test(shell)) return false;
+  try { return new URL(appUrl).origin === shell; } catch { return false; }
+}
+
 export interface AppMeta {
   title: string | null;
   icon: string | null;

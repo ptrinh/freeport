@@ -15,7 +15,7 @@ import { s, palette } from '../ui/theme';
 import type { Signer } from '../signer';
 import { evaluateAdd, type MiniAppFirewall, type MiniAppRecord } from '../miniapps/firewall';
 import { loadFirewall, persistFirewall } from '../miniapps/store';
-import { fetchAppMeta } from '../miniapps/metadata';
+import { fetchAppMeta, sameOriginAsShell } from '../miniapps/metadata';
 import { makeBridgeContext } from '../miniapps/context';
 import { activeWalletProvider } from '../wallet';
 import { ScanSheet } from './wallet/ScanSheet';
@@ -28,13 +28,21 @@ const COLS = 3;
 const CELL_H = 108;
 const ICON_SIZE = 56;
 
+/** First-party mini-apps are served from a DISTINCT origin from the web shell
+ *  (freeport.network) so the web sandbox's same-origin policy actually isolates
+ *  them — see sameOriginAsShell / docs/miniapps-security.md. */
+const MINIAPP_HOST = 'https://apps.freeport.network';
+
 /** Convenience: the example apps' GitHub source links resolve to their
  *  published homes, so pasting either the repo URL or the web URL works. */
 function resolveDemoAlias(input: string): string {
   const m = /^https:\/\/github\.com\/ptrinh\/freeport(?:\/tree\/[^/]+)?\/examples\/([a-z0-9-]+)\/?$/i.exec(input);
-  if (m) return `https://freeport.network/${m[1]}/`;
+  if (m) return `${MINIAPP_HOST}/${m[1]}/`;
   // Bare repo root → the original eSIM demo shop.
-  if (/^https:\/\/github\.com\/ptrinh\/freeport\/?$/i.test(input)) return 'https://freeport.network/esim-store/';
+  if (/^https:\/\/github\.com\/ptrinh\/freeport\/?$/i.test(input)) return `${MINIAPP_HOST}/esim-store/`;
+  // The old same-origin demo homes → their new isolated origin.
+  const old = /^https:\/\/freeport\.network\/(esim-store|insurance-store)\/?$/i.exec(input);
+  if (old) return `${MINIAPP_HOST}/${old[1]}/`;
   return input;
 }
 
@@ -139,6 +147,11 @@ export function AppsTab({
       // Lookalike-domain phishing is the top way users get tricked into
       // granting a hostile app — refuse rather than warn.
       setErr(t('This address uses disguised characters (punycode) — refusing to add it.'));
+      return;
+    }
+    if (sameOriginAsShell(input)) {
+      // On web, a same-origin app isn't sandboxable — it could read your key.
+      setErr(t("This app is hosted on Freeport's own domain and can't run safely in the web app. Open it in the mobile app, or use a version hosted elsewhere."));
       return;
     }
     setBusy(true);

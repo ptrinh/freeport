@@ -18,6 +18,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '../i18n';
 import { s, palette } from '../ui/theme';
 import type { Signer } from '../signer';
 import type { MiniAppFirewall, MiniAppRecord } from './firewall';
@@ -26,6 +27,7 @@ import { persistFirewall } from './store';
 import { makeBridgeWallet } from './walletAdapter';
 import { ApprovalDialog } from './ApprovalDialog';
 import { NotMiniAppNotice, UnverifiedChip, HELLO, useVerifiedProbe } from './shellNotices';
+import { sameOriginAsShell } from './metadata';
 import type { WalletProvider } from '../wallet';
 
 export function MiniAppShell({
@@ -120,7 +122,18 @@ export function MiniAppShell({
           </Pressable>
         </View>
         {verified ? null : <NotMiniAppNotice alive={alive} />}
-        {React.createElement('iframe', {
+        {sameOriginAsShell(app.url || app.origin) ? (
+          // A same-origin app can't be isolated by the sandbox iframe (it would
+          // share this document's storage, incl. the key). Refuse to load it
+          // rather than expose the key — even for a previously-added app.
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 10 }}>
+            <Ionicons name="shield-half-outline" size={40} color={palette.text2} />
+            <Text style={[s.toggleTitle, { textAlign: 'center' }]}>{t("Can't run this app in the web app")}</Text>
+            <Text style={[s.dim, { textAlign: 'center' }]}>
+              {t("It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.")}
+            </Text>
+          </View>
+        ) : React.createElement('iframe', {
           ref: frameRef,
           src: app.url || app.origin,
           // No popups, no top navigation, no modals — scripts + forms +

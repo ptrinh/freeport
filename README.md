@@ -79,11 +79,11 @@ matching server — relays are dumb pub/sub, all logic is client-side.
   Mini-app examples:
   - [`examples/esim-store`](examples/esim-store) — eSIM shop with
     Spark/stablecoin checkout, live at
-    [freeport.network/esim-store](https://freeport.network/esim-store/)
+    [apps.freeport.network/esim-store](https://apps.freeport.network/esim-store/)
   - [`examples/insurance-store`](examples/insurance-store) — travel insurance
     quotes underwritten from npub-derived reputation, with a downloadable PDF
     certificate, live at
-    [freeport.network/insurance-store](https://freeport.network/insurance-store/)
+    [apps.freeport.network/insurance-store](https://apps.freeport.network/insurance-store/)
 - **On-device AI (experimental)**: describe what you need in any language
   and it drafts your post; incoming chat messages auto-translate. Runs
   entirely on your device (Apple Intelligence / Android ML Kit + Gemini

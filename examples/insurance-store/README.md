@@ -2,10 +2,10 @@
 
 A single-file demo mini-app showing a richer bridge flow than the eSIM shop:
 identity + private reads + underwriting + a downloadable certificate + payment.
-Published at **https://freeport.network/insurance-store/**.
+Published at **https://apps.freeport.network/insurance-store/**.
 
 Try it: Freeport app → Settings → Experimental → enable **Mini-apps** → add
-`freeport.network/insurance-store` (the repo's GitHub URL works too).
+`apps.freeport.network/insurance-store` (the repo's GitHub URL works too).
 
 Flow:
 

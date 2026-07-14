@@ -4,7 +4,7 @@
  * proven otherwise.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { fetchAppMeta, manifestUrl } from '../src/miniapps/metadata';
+import { fetchAppMeta, manifestUrl, sameOriginAsShell } from '../src/miniapps/metadata';
 
 const APP = 'https://shop.example/store/';
 
@@ -19,6 +19,21 @@ function mockFetch(routes: Record<string, string | number>) {
 }
 
 afterEach(() => vi.unstubAllGlobals());
+
+describe('sameOriginAsShell', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('no shell origin (native / node) → always false', () => {
+    expect(sameOriginAsShell('https://apps.freeport.network/esim-store/')).toBe(false);
+  });
+
+  it('on web, flags an app served from the shell origin', () => {
+    vi.stubGlobal('location', { origin: 'https://freeport.network' });
+    expect(sameOriginAsShell('https://freeport.network/esim-store/')).toBe(true);
+    expect(sameOriginAsShell('https://apps.freeport.network/esim-store/')).toBe(false);
+    expect(sameOriginAsShell('not a url')).toBe(false);
+  });
+});
 
 describe('manifestUrl', () => {
   it('resolves next to the app page, per-app not per-origin', () => {
