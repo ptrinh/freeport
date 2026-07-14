@@ -821,5 +821,8 @@ const c: Record<string, string> = {
   "Device not supported": "Qurilma qoʻllab-quvvatlanmaydi",
   "Requires \"Local LLM AI\" in Experimental settings.": "Tajriba sozlamalarida \"Local LLM AI\" talab qilinadi.",
   "Online": "Onlayn",
+  "Attach file": "Fayl biriktirish",
+  "This file type is not allowed for safety reasons.": "Bu fayl turi xavfsizlik sabablari tufayli ruxsat etilmagan.",
+  "Menu": "Menyu",
 };
 export default c;

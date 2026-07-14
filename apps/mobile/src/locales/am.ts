@@ -821,5 +821,8 @@ const c: Record<string, string> = {
   "Device not supported": "መሣሪያ አይደገፍም",
   "Requires \"Local LLM AI\" in Experimental settings.": "በሙከራ ቅንብሮች ውስጥ \"Local LLM AI\" ያስፈልጋል።",
   "Online": "ላይን ላይ",
+  "Attach file": "ፋይል አያይዝ",
+  "This file type is not allowed for safety reasons.": "ይህ የፋይል ዓይነት ለደህንነት ሲባል አይፈቀድም።",
+  "Menu": "ምናሌ",
 };
 export default c;

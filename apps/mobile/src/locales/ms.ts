@@ -821,5 +821,8 @@ const c: Record<string, string> = {
   "Device not supported": "Peranti tidak disokong",
   "Requires \"Local LLM AI\" in Experimental settings.": "Memerlukan \"Local LLM AI\" dalam tetapan Eksperimental.",
   "Online": "Dalam talian",
+  "Attach file": "Lampirkan fail",
+  "This file type is not allowed for safety reasons.": "Jenis fail ini tidak dibenarkan atas sebab keselamatan.",
+  "Menu": "Menu",
 };
 export default c;

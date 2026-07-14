@@ -867,5 +867,8 @@ const c: Record<string, string> = {
   "Device not supported": "Cihaz desteklenmiyor",
   "Requires \"Local LLM AI\" in Experimental settings.": "Deneysel ayarlarda \"Local LLM AI\" gerektirir.",
   "Online": "Çevrimiçi",
+  "Attach file": "Dosya ekle",
+  "This file type is not allowed for safety reasons.": "Bu dosya türüne güvenlik nedeniyle izin verilmiyor.",
+  "Menu": "Menü",
 };
 export default c;

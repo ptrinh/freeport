@@ -48,6 +48,34 @@ export function isTripMsg(t: string): boolean {
   return /^https?:\/\/\S+#t=[A-Za-z0-9\-_]+/.test(t.trim());
 }
 
+/**
+ * File attachments — ALLOWLIST, not blocklist: only boring document/media
+ * formats. Executables and anything a browser executes (js, html, svg —
+ * XSS vectors) are excluded by omission, so a malicious peer can't ship a
+ * payload that renders as an innocent "file" chip.
+ */
+export const SAFE_ATTACH_EXTENSIONS = [
+  'pdf', 'txt', 'csv', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip',
+  'jpg', 'jpeg', 'png', 'gif', 'webp', 'mp3', 'm4a', 'wav', 'ogg', 'mp4', 'webm',
+];
+const DOC_EXTENSIONS = ['pdf', 'txt', 'csv', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip'];
+
+/** A document URL (non-media safe type) renders as a file chip. */
+export function isDocMsg(t: string): boolean {
+  if (!/^https?:\/\//i.test(t)) return false;
+  const ext = t.trim().split('?')[0].split('.').pop()?.toLowerCase() ?? '';
+  return DOC_EXTENSIONS.includes(ext);
+}
+
+/** Filename to show on a file chip (last path segment, decoded). */
+export function docMsgName(t: string): string {
+  try {
+    return decodeURIComponent(t.trim().split('?')[0].split('/').pop() ?? '') || t.trim();
+  } catch {
+    return t.trim();
+  }
+}
+
 /** A single voice-memo bubble with a tap-to-play button. */
 function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
   const [playing, setPlaying] = useState(false);
@@ -130,6 +158,11 @@ const ChatBubble = React.memo(function ChatBubble({
                 stays legible on both sides. */}
             <Ionicons name="navigate" size={16} color={dir === 'out' ? '#f5f7fa' : palette.link} />
             <Text style={[s.trackMsgText, dir === 'out' && s.chatTextOut]}>{t('Track live location')}</Text>
+          </Pressable>
+        : isDocMsg(text)
+        ? <Pressable style={s.trackMsg} onPress={() => Linking.openURL(text.trim())}>
+            <Ionicons name="document-outline" size={16} color={dir === 'out' ? '#f5f7fa' : palette.link} />
+            <Text style={[s.trackMsgText, dir === 'out' && s.chatTextOut]} numberOfLines={1}>{docMsgName(text)}</Text>
           </Pressable>
         : translated
         ? <>

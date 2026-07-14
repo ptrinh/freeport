@@ -824,5 +824,8 @@ const c: Record<string, string> = {
   "Device not supported": "Az eszköz nem támogatott",
   "Requires \"Local LLM AI\" in Experimental settings.": "A \"Local LLM AI\" szükséges a Kísérleti beállításokban.",
   "Online": "Online",
+  "Attach file": "Fájl csatolása",
+  "This file type is not allowed for safety reasons.": "Ez a fájltípus biztonsági okokból nem engedélyezett.",
+  "Menu": "Menü",
 };
 export default c;

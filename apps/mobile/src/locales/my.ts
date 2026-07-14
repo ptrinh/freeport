@@ -821,5 +821,8 @@ const c: Record<string, string> = {
   "Device not supported": "စက်ပစ္စည်း ပံ့ပိုးမှုမရှိပါ",
   "Requires \"Local LLM AI\" in Experimental settings.": "စမ်းသပ်ဆက်တင်များတွင် \"Local LLM AI\" လိုအပ်သည်။",
   "Online": "အွန်လိုင်း",
+  "Attach file": "ဖိုင်ပူးတွဲရန်",
+  "This file type is not allowed for safety reasons.": "လုံခြုံရေးအကြောင်းပြချက်ကြောင့် ဤဖိုင်အမျိုးအစားကို ခွင့်မပြုပါ။",
+  "Menu": "မီနူး",
 };
 export default c;

@@ -867,5 +867,8 @@ const c: Record<string, string> = {
   "Device not supported": "Appareil non pris en charge",
   "Requires \"Local LLM AI\" in Experimental settings.": "Nécessite \"Local LLM AI\" dans les paramètres expérimentaux.",
   "Online": "En ligne",
+  "Attach file": "Joindre un fichier",
+  "This file type is not allowed for safety reasons.": "Ce type de fichier n'est pas autorisé pour des raisons de sécurité.",
+  "Menu": "Menu",
 };
 export default c;

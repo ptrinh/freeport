@@ -10,7 +10,8 @@
  *   - ChatFab: the floating + button that opens the InviteSheet.
  */
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { t, tn } from '../../i18n';
 import { MobileClient } from '../../client';
@@ -22,7 +23,8 @@ import { webBase } from '../../webBase';
 import { fmtClock } from '../../ui/format';
 import { s, palette } from '../../ui/theme';
 import { confirmAsync } from '../../ui/alerts';
-import { ChatCore } from './Chat';
+import { ChatCore, SAFE_ATTACH_EXTENSIONS } from './Chat';
+import { uploadFile, UploadError } from '../../upload';
 
 /** Display name: their invite/accept name → kind:0 profile → npub prefix. */
 export function chatDisplayName(conv: Conversation, client: MobileClient | null): string {
@@ -187,43 +189,66 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
 
   const lastSeen = conv.theirLastSeen;
   const online = !!lastSeen && Date.now() / 1000 - lastSeen < 180;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [attaching, setAttaching] = useState(false);
+
+  /** File attachments: allowlisted extensions only (see SAFE_ATTACH_EXTENSIONS
+   *  — no js/html/svg/executables), uploaded like voice memos, sent as a URL
+   *  message that renders as a file chip. */
+  const attachFile = async () => {
+    setMenuOpen(false);
+    const res = await DocumentPicker.getDocumentAsync({ copyToCacheDirectory: true });
+    if (res.canceled || !res.assets?.[0]) return;
+    const a = res.assets[0];
+    const ext = (a.name?.split('.').pop() ?? '').toLowerCase();
+    if (!SAFE_ATTACH_EXTENSIONS.includes(ext)) {
+      Alert.alert(t('Attach file'), t('This file type is not allowed for safety reasons.'));
+      return;
+    }
+    setAttaching(true);
+    try {
+      const url = await uploadFile((a as any).file ?? a.uri, a.name ?? `file.${ext}`, a.mimeType ?? 'application/octet-stream');
+      await client?.chatSend(conv.peer, url);
+    } catch (e) {
+      Alert.alert('Upload failed', e instanceof UploadError ? e.message : 'Try again.');
+    } finally {
+      setAttaching(false);
+    }
+  };
+
+  const ttlLabel = conv.disappearTtl ? (conv.disappearTtl >= 7 * 24 * 3600 ? '7d' : '24h') : t('Off');
+  const menuRow = (icon: React.ComponentProps<typeof Ionicons>['name'], label: string, onPress: () => void, danger = false) => (
+    <Pressable
+      key={label}
+      style={[s.row, { paddingVertical: 12, gap: 12, alignItems: 'center' }]}
+      onPress={onPress}
+      accessibilityRole="button" accessibilityLabel={label}
+    >
+      <Ionicons name={icon} size={20} color={danger ? palette.danger : palette.text2} />
+      <Text style={{ color: danger ? palette.danger : palette.text, fontSize: 15 }}>{label}</Text>
+    </Pressable>
+  );
   return (
     <Modal visible transparent={false} animationType="slide" onRequestClose={onClose}>
       <View style={[s.appShell, { flex: 1 }]}>
-        <View style={[s.row, { padding: 12, gap: 10, borderBottomWidth: 1, borderBottomColor: palette.border, alignItems: 'center' }]}>
+        {/* Compact header: name + tight presence line, ONLY call/video icons
+            inline, everything else behind the burger menu (user request). */}
+        <View style={[s.row, { paddingHorizontal: 12, paddingVertical: 7, gap: 8, borderBottomWidth: 1, borderBottomColor: palette.border, alignItems: 'center' }]}>
           <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Back')}>
             <Ionicons name="arrow-back" size={22} color={palette.text} />
           </Pressable>
-          <Avatar uri={avatarUri(conv, client)} size={36} />
+          <Avatar uri={avatarUri(conv, client)} size={32} />
           <View style={{ flex: 1 }}>
             <Text style={s.cardTitle} numberOfLines={1}>{chatDisplayName(conv, client)}</Text>
             {online ? (
-              <View style={[s.row, { gap: 4, alignItems: 'center' }]}>
-                <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: '#22c55e' }} />
-                <Text style={[s.dim, { fontSize: 11, color: '#22c55e' }]}>{t('Online')}</Text>
+              <View style={[s.row, { gap: 3, alignItems: 'center', marginTop: 1 }]}>
+                <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: '#22c55e' }} />
+                <Text style={{ fontSize: 10, color: '#22c55e' }}>{t('Online')}</Text>
               </View>
             ) : lastSeen ? (
-              <Text style={[s.dim, { fontSize: 11 }]}>{t('Last seen {time}', { time: fmtRowTime(lastSeen) })}</Text>
+              <Text style={[s.dim, { fontSize: 10, marginTop: 1 }]}>{t('Last seen {time}', { time: fmtRowTime(lastSeen) })}</Text>
             ) : null}
           </View>
-          {walletEnabled && onPayFriend && conv.theirPay && conv.state === 'active' && !blocked ? (
-            <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Send payment')} onPress={() => onPayFriend(conv.peer, conv.theirPay!)}>
-              <Ionicons name="flash-outline" size={20} color={palette.text2} />
-            </Pressable>
-          ) : null}
-          {conv.state === 'active' ? (
-            <Pressable
-              hitSlop={8}
-              accessibilityRole="button" accessibilityLabel={t('Disappearing messages')}
-              onPress={() => {
-                const cur = TTL_STEPS.indexOf(conv.disappearTtl ?? 0);
-                const next = TTL_STEPS[(cur + 1) % TTL_STEPS.length];
-                client?.chatSetTtl(conv.peer, next).catch(() => {});
-              }}
-            >
-              <Ionicons name={conv.disappearTtl ? 'timer' : 'timer-outline'} size={20} color={conv.disappearTtl ? palette.accent : palette.text2} />
-            </Pressable>
-          ) : null}
           {onStartCall && conv.state === 'active' && !blocked ? (
             <>
               <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Voice call')} onPress={() => onStartCall(conv.peer, false)}>
@@ -234,28 +259,48 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
               </Pressable>
             </>
           ) : null}
-          <Pressable
-            hitSlop={8}
-            accessibilityRole="button" accessibilityLabel={conv.archived ? t('Unarchive chat') : t('Archive chat')}
-            onPress={() => { client?.chatSetArchived(conv.peer, !conv.archived); onClose(); }}
-          >
-            <Ionicons name={conv.archived ? 'archive' : 'archive-outline'} size={20} color={palette.text2} />
-          </Pressable>
-          <Pressable
-            hitSlop={8}
-            accessibilityRole="button" accessibilityLabel={blocked ? t('Unblock') : t('Block this person')}
-            onPress={async () => {
-              if (!blocked) {
-                const ok = await confirmAsync(t('Block this person?'), t('You will not receive any more messages from them.'), t('Block'));
-                if (!ok) return;
-              }
-              onToggleBlock(conv.peer);
-              if (!blocked) onClose();
-            }}
-          >
-            <Ionicons name={blocked ? 'ban' : 'ban-outline'} size={20} color={palette.danger} />
+          <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Menu')} onPress={() => setMenuOpen(true)}>
+            <Ionicons name="ellipsis-vertical" size={20} color={palette.text2} />
           </Pressable>
         </View>
+        {attaching ? (
+          <View style={[s.row, { justifyContent: 'center', paddingVertical: 6, gap: 8 }]}>
+            <ActivityIndicator color={palette.accent} />
+            <Text style={s.dim}>{t('Attach file')}…</Text>
+          </View>
+        ) : null}
+        {menuOpen && (
+          <Modal visible transparent animationType="fade" onRequestClose={() => setMenuOpen(false)}>
+            <Pressable style={s.sortBackdrop} onPress={() => setMenuOpen(false)}>
+              <Pressable style={s.sortSheet} onPress={() => {}}>
+                {conv.state === 'active' && !blocked ? menuRow('add-circle-outline', t('Attach file'), attachFile) : null}
+                {walletEnabled && onPayFriend && conv.theirPay && conv.state === 'active' && !blocked
+                  ? menuRow('flash-outline', t('Send payment'), () => { setMenuOpen(false); onPayFriend(conv.peer, conv.theirPay!); })
+                  : null}
+                {conv.state === 'active'
+                  ? menuRow('timer-outline', `${t('Disappearing messages')}: ${ttlLabel}`, () => {
+                      const cur = TTL_STEPS.indexOf(conv.disappearTtl ?? 0);
+                      client?.chatSetTtl(conv.peer, TTL_STEPS[(cur + 1) % TTL_STEPS.length]).catch(() => {});
+                    })
+                  : null}
+                {menuRow(conv.archived ? 'archive' : 'archive-outline', conv.archived ? t('Unarchive chat') : t('Archive chat'), () => {
+                  setMenuOpen(false);
+                  client?.chatSetArchived(conv.peer, !conv.archived);
+                  onClose();
+                })}
+                {menuRow(blocked ? 'ban' : 'ban-outline', blocked ? t('Unblock') : t('Block this person'), async () => {
+                  setMenuOpen(false);
+                  if (!blocked) {
+                    const ok = await confirmAsync(t('Block this person?'), t('You will not receive any more messages from them.'), t('Block'));
+                    if (!ok) return;
+                  }
+                  onToggleBlock(conv.peer);
+                  if (!blocked) onClose();
+                }, !blocked)}
+              </Pressable>
+            </Pressable>
+          </Modal>
+        )}
         {/* Full-height thread: messages scroll in their own area, the
             composer stays pinned to the bottom, and the KeyboardAvoidingView
             lifts it above the keyboard (user report: long chats pushed the

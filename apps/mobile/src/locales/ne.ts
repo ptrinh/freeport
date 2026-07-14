@@ -821,5 +821,8 @@ const c: Record<string, string> = {
   "Device not supported": "यन्त्र समर्थित छैन",
   "Requires \"Local LLM AI\" in Experimental settings.": "प्रयोगात्मक सेटिङमा \"Local LLM AI\" आवश्यक छ।",
   "Online": "अनलाइन",
+  "Attach file": "फाइल संलग्न गर्नुहोस्",
+  "This file type is not allowed for safety reasons.": "सुरक्षाका कारणले यो फाइल प्रकारलाई अनुमति छैन।",
+  "Menu": "मेनु",
 };
 export default c;

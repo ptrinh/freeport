@@ -824,5 +824,8 @@ const c: Record<string, string> = {
   "Device not supported": "Dispozitiv neacceptat",
   "Requires \"Local LLM AI\" in Experimental settings.": "Necesită \"Local LLM AI\" în setările experimentale.",
   "Online": "Online",
+  "Attach file": "Atașează fișier",
+  "This file type is not allowed for safety reasons.": "Acest tip de fișier nu este permis din motive de securitate.",
+  "Menu": "Meniu",
 };
 export default c;

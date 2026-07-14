@@ -824,5 +824,8 @@ const c: Record<string, string> = {
   "Device not supported": "Pajisja nuk mbështetet",
   "Requires \"Local LLM AI\" in Experimental settings.": "Kërkon \"Local LLM AI\" te cilësimet eksperimentale.",
   "Online": "Në linjë",
+  "Attach file": "Bashkëngjit skedar",
+  "This file type is not allowed for safety reasons.": "Ky lloj skedari nuk lejohet për arsye sigurie.",
+  "Menu": "Menyja",
 };
 export default c;

@@ -824,5 +824,8 @@ const c: Record<string, string> = {
   "Device not supported": "Laitetta ei tueta",
   "Requires \"Local LLM AI\" in Experimental settings.": "Vaatii \"Local LLM AI\" -asetuksen kokeellisissa asetuksissa.",
   "Online": "Paikalla",
+  "Attach file": "Liitä tiedosto",
+  "This file type is not allowed for safety reasons.": "Tätä tiedostotyyppiä ei sallita turvallisuussyistä.",
+  "Menu": "Valikko",
 };
 export default c;

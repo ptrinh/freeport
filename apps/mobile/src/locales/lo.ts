@@ -821,5 +821,8 @@ const c: Record<string, string> = {
   "Device not supported": "ບໍ່ຮອງຮັບອຸປະກອນນີ້",
   "Requires \"Local LLM AI\" in Experimental settings.": "ຕ້ອງການ \"Local LLM AI\" ໃນການຕັ້ງຄ່າທົດລອງ.",
   "Online": "ອອນລາຍ",
+  "Attach file": "ແນບໄຟລ໌",
+  "This file type is not allowed for safety reasons.": "ບໍ່ອະນຸຍາດໄຟລ໌ປະເພດນີ້ ດ້ວຍເຫດຜົນດ້ານຄວາມປອດໄພ.",
+  "Menu": "ເມນູ",
 };
 export default c;

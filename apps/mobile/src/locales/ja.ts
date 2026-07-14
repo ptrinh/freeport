@@ -864,5 +864,8 @@ const c: Record<string, string> = {
   "Device not supported": "このデバイスはサポートされていません",
   "Requires \"Local LLM AI\" in Experimental settings.": "「実験的」設定で \"Local LLM AI\" を有効にする必要があります。",
   "Online": "オンライン",
+  "Attach file": "ファイルを添付",
+  "This file type is not allowed for safety reasons.": "この種類のファイルは安全上の理由で許可されていません。",
+  "Menu": "メニュー",
 };
 export default c;

@@ -824,5 +824,8 @@ const c: Record<string, string> = {
   "Device not supported": "Ierīce netiek atbalstīta",
   "Requires \"Local LLM AI\" in Experimental settings.": "Nepieciešams \"Local LLM AI\" eksperimentālajos iestatījumos.",
   "Online": "Tiešsaistē",
+  "Attach file": "Pievienot failu",
+  "This file type is not allowed for safety reasons.": "Šis faila tips nav atļauts drošības apsvērumu dēļ.",
+  "Menu": "Izvēlne",
 };
 export default c;

@@ -827,5 +827,8 @@ const c: Record<string, string> = {
   "Device not supported": "Zariadenie nie je podporované",
   "Requires \"Local LLM AI\" in Experimental settings.": "Vyžaduje \"Local LLM AI\" v experimentálnych nastaveniach.",
   "Online": "Online",
+  "Attach file": "Priložiť súbor",
+  "This file type is not allowed for safety reasons.": "Tento typ súboru nie je z bezpečnostných dôvodov povolený.",
+  "Menu": "Menu",
 };
 export default c;

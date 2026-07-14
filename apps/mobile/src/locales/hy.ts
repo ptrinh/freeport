@@ -821,5 +821,8 @@ const c: Record<string, string> = {
   "Device not supported": "Սարքը չի աջակցվում",
   "Requires \"Local LLM AI\" in Experimental settings.": "Պահանջում է \"Local LLM AI\" Փորձնական կարգավորումներում։",
   "Online": "Առցանց",
+  "Attach file": "Կցել ֆայլ",
+  "This file type is not allowed for safety reasons.": "Այս ֆայլի տեսակը թույլատրված չէ անվտանգության նկատառումներով։",
+  "Menu": "Ընտրացանկ",
 };
 export default c;

@@ -824,5 +824,8 @@ const c: Record<string, string> = {
   "Device not supported": "Seade pole toetatud",
   "Requires \"Local LLM AI\" in Experimental settings.": "Nõuab valikut \"Local LLM AI\" jaotises Katselised seaded.",
   "Online": "Võrgus",
+  "Attach file": "Lisa fail",
+  "This file type is not allowed for safety reasons.": "See failitüüp ei ole turvakaalutlustel lubatud.",
+  "Menu": "Menüü",
 };
 export default c;

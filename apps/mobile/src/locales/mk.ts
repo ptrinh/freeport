@@ -824,5 +824,8 @@ const c: Record<string, string> = {
   "Device not supported": "Уредот не е поддржан",
   "Requires \"Local LLM AI\" in Experimental settings.": "Потребно е \"Local LLM AI\" во Експерименталните поставки.",
   "Online": "Онлајн",
+  "Attach file": "Прикачи датотека",
+  "This file type is not allowed for safety reasons.": "Овој тип на датотека не е дозволен од безбедносни причини.",
+  "Menu": "Мени",
 };
 export default c;

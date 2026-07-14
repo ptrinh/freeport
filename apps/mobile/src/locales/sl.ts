@@ -830,5 +830,8 @@ const c: Record<string, string> = {
   "Device not supported": "Naprava ni podprta",
   "Requires \"Local LLM AI\" in Experimental settings.": "Zahteva \"Local LLM AI\" v eksperimentalnih nastavitvah.",
   "Online": "Na spletu",
+  "Attach file": "Pripni datoteko",
+  "This file type is not allowed for safety reasons.": "Ta vrsta datoteke iz varnostnih razlogov ni dovoljena.",
+  "Menu": "Meni",
 };
 export default c;

@@ -821,5 +821,8 @@ const c: Record<string, string> = {
   "Device not supported": "Kifaa hakitumiki",
   "Requires \"Local LLM AI\" in Experimental settings.": "Inahitaji \"Local LLM AI\" katika mipangilio ya majaribio.",
   "Online": "Mtandaoni",
+  "Attach file": "Ambatisha faili",
+  "This file type is not allowed for safety reasons.": "Aina hii ya faili hairuhusiwi kwa sababu za usalama.",
+  "Menu": "Menyu",
 };
 export default c;
