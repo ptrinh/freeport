@@ -25,7 +25,7 @@ import { MINIAPP_SHIM } from './shim';
 import { persistFirewall } from './store';
 import { makeBridgeWallet } from './walletAdapter';
 import { ApprovalDialog } from './ApprovalDialog';
-import { NotMiniAppNotice, UnverifiedChip, HELLO } from './shellNotices';
+import { NotMiniAppNotice, UnverifiedChip, HELLO, useVerifiedProbe } from './shellNotices';
 import type { WalletProvider } from '../wallet';
 
 function sameOrigin(url: string, origin: string): boolean {
@@ -84,6 +84,9 @@ export function MiniAppShell({
 
   // Liveness: flips when the shim reports the page touched the mini-app API.
   const [alive, setAlive] = useState(false);
+  // Re-probe the manifest on open so a late-added manifest clears Unverified;
+  // a verified app never needs the liveness banner.
+  const verified = useVerifiedProbe(app, firewall);
   const onMessage = useCallback(async (e: { nativeEvent: { data: string } }) => {
     if (e.nativeEvent.data === HELLO) { setAlive(true); return; }
     setAlive(true); // any real bridge traffic counts too
@@ -100,12 +103,12 @@ export function MiniAppShell({
             <Text style={s.toggleTitle} numberOfLines={1}>{app.name || app.origin}</Text>
             <Text style={[s.dim, { marginTop: 0 }]} numberOfLines={1}>{app.origin.replace('https://', '')}</Text>
           </View>
-          {app.verified ? null : <UnverifiedChip />}
+          {verified ? null : <UnverifiedChip />}
           <Pressable onPress={onClose} hitSlop={10}>
             <Ionicons name="close" size={24} color={palette.text} />
           </Pressable>
         </View>
-        <NotMiniAppNotice alive={alive} />
+        {verified ? null : <NotMiniAppNotice alive={alive} />}
         <WebView
           ref={webRef}
           source={{ uri: app.url || app.origin }}

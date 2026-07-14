@@ -11,6 +11,9 @@ import { Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../i18n';
 import { s } from '../ui/theme';
+import { fetchAppMeta } from './metadata';
+import { persistFirewall } from './store';
+import type { MiniAppFirewall, MiniAppRecord } from './firewall';
 
 export const HELLO = '__fp_hello';
 
@@ -41,14 +44,42 @@ export function NotMiniAppNotice({ alive }: { alive: boolean }) {
   }, []);
   if (alive || !due || dismissed) return null;
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: 'rgba(245,158,11,.14)', borderBottomWidth: 1, borderBottomColor: 'rgba(245,158,11,.4)' }}>
-      <Ionicons name="alert-circle-outline" size={16} color="#f59e0b" />
-      <Text style={[s.dim, { color: '#f59e0b', flex: 1 }]}>
-        {t("This page hasn't used any Freeport features — it may not be a mini-app.")}
-      </Text>
-      <Pressable hitSlop={8} onPress={() => setDismissed(true)}>
-        <Ionicons name="close" size={16} color="#f59e0b" />
-      </Pressable>
+    <View style={{ backgroundColor: 'rgba(245,158,11,.14)', borderBottomWidth: 1, borderBottomColor: 'rgba(245,158,11,.4)' }}>
+      {/* Cap the row on wide screens (desktop web) so the text isn't stretched
+          edge-to-edge with the dismiss button stranded far to the right. */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, width: '100%', maxWidth: 760, alignSelf: 'center' }}>
+        <Ionicons name="alert-circle-outline" size={16} color="#f59e0b" />
+        <Text style={[s.dim, { color: '#f59e0b', flex: 1 }]}>
+          {t("This page hasn't used any Freeport features — it may not be a mini-app.")}
+        </Text>
+        <Pressable hitSlop={8} onPress={() => setDismissed(true)}>
+          <Ionicons name="close" size={16} color="#f59e0b" />
+        </Pressable>
+      </View>
     </View>
   );
+}
+
+/**
+ * Re-probe an app's manifest on launch and upgrade its `verified` flag if a
+ * valid freeport.json is now present (apps added before manifests existed, or
+ * before the app shipped one, would otherwise stay Unverified forever).
+ * Returns the current verified state for the header chip + liveness gating.
+ */
+export function useVerifiedProbe(app: MiniAppRecord, firewall: MiniAppFirewall): boolean {
+  const [verified, setVerified] = useState(!!app.verified);
+  useEffect(() => {
+    if (app.verified) { setVerified(true); return; }
+    let live = true;
+    void fetchAppMeta(app.url || app.origin).then((meta) => {
+      if (!live || !meta.verified) return;
+      try {
+        firewall.registerApp(app.url || app.origin, app.name, app.addedAt, app.icon, true);
+        persistFirewall();
+      } catch { /* blocklisted etc. — leave unverified */ }
+      setVerified(true);
+    }).catch(() => {});
+    return () => { live = false; };
+  }, [app.origin, app.url, app.verified]);
+  return verified;
 }

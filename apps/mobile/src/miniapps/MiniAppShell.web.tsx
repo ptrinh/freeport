@@ -25,7 +25,7 @@ import { MiniAppBridge, type ApprovalRequest, type ApprovalResult, type BridgeCo
 import { persistFirewall } from './store';
 import { makeBridgeWallet } from './walletAdapter';
 import { ApprovalDialog } from './ApprovalDialog';
-import { NotMiniAppNotice, UnverifiedChip, HELLO } from './shellNotices';
+import { NotMiniAppNotice, UnverifiedChip, HELLO, useVerifiedProbe } from './shellNotices';
 import type { WalletProvider } from '../wallet';
 
 export function MiniAppShell({
@@ -49,6 +49,10 @@ export function MiniAppShell({
   const approvalChain = useRef<Promise<unknown>>(Promise.resolve());
   // Liveness: flips when the SDK acks the handshake (or any bridge traffic).
   const [alive, setAlive] = useState(false);
+  // Re-probe the manifest on open so an app that shipped one after being added
+  // stops showing Unverified. A verified (manifest-declared) app is a mini-app
+  // by definition, so it never needs the liveness heuristic banner.
+  const verified = useVerifiedProbe(app, firewall);
 
   const bridge = useMemo(() => new MiniAppBridge({
     firewall,
@@ -110,12 +114,12 @@ export function MiniAppShell({
             <Text style={s.toggleTitle} numberOfLines={1}>{app.name || app.origin}</Text>
             <Text style={[s.dim, { marginTop: 0 }]} numberOfLines={1}>{app.origin.replace('https://', '')}</Text>
           </View>
-          {app.verified ? null : <UnverifiedChip />}
+          {verified ? null : <UnverifiedChip />}
           <Pressable onPress={onClose} hitSlop={10}>
             <Ionicons name="close" size={24} color={palette.text} />
           </Pressable>
         </View>
-        <NotMiniAppNotice alive={alive} />
+        {verified ? null : <NotMiniAppNotice alive={alive} />}
         {React.createElement('iframe', {
           ref: frameRef,
           src: app.url || app.origin,
