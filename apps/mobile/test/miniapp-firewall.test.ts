@@ -430,6 +430,27 @@ describe('persistence', () => {
     expect(a.perms).toBe(b.perms);
   });
 
+  it('restore snaps a suffix-origin launch URL back to the origin (path boundary)', () => {
+    const f = new MiniAppFirewall();
+    f.registerApp('https://good.example/app/', 'Good', T0);
+    const blob = JSON.parse(f.serialize());
+    blob.apps[0].url = 'https://good.example.evil.com/x'; // suffix, not a subpath
+    const f2 = MiniAppFirewall.restore(JSON.stringify(blob));
+    expect(f2.listApps()[0].url).toBe('https://good.example'); // snapped back
+  });
+
+  it('restore clamps a negative spend that would defeat the daily cap', () => {
+    const f = fw();
+    f.setSpendCap(APP, 1000);
+    f.recordSpend(APP, 400, T0);
+    const blob = JSON.parse(f.serialize());
+    blob.spend[APP].sats = -1_000_000; // tampered: pretend hugely-negative spend
+    const f2 = MiniAppFirewall.restore(JSON.stringify(blob));
+    expect(f2.spentToday(APP, T0)).toBe(0); // clamped, not negative
+    // A payment that would exceed the cap still has to ask (cap intact).
+    expect(f2.evaluate({ origin: APP, method: 'webln.sendPayment', params: { amountSats: 1001 }, now: T0 + 60_000 }).action).toBe('ask');
+  });
+
   it('does not resurrect spend for origins that lost their registration', () => {
     const f = fw();
     f.recordSpend(APP, 700, T0);

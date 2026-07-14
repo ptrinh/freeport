@@ -14,10 +14,27 @@ import { loadVapid, configureWebPush } from './vapid.js';
 import { SubStore } from './store.js';
 import { Watcher } from './watcher.js';
 
+// A push endpoint must belong to a real browser push service. Without this the
+// server would POST VAPID-signed payloads to any attacker-supplied URL (e.g.
+// http://169.254.169.254/… cloud metadata) — a blind-SSRF primitive.
+const PUSH_HOSTS = [
+  'fcm.googleapis.com', 'android.googleapis.com',           // Chrome / FCM
+  '.push.services.mozilla.com',                             // Firefox
+  '.notify.windows.com',                                    // Edge / WNS
+  'web.push.apple.com', '.push.apple.com',                  // Safari
+];
+function isPushEndpoint(u: string): boolean {
+  let url: URL;
+  try { url = new URL(u); } catch { return false; }
+  if (url.protocol !== 'https:') return false;
+  const h = url.hostname.toLowerCase();
+  return PUSH_HOSTS.some((p) => (p.startsWith('.') ? h.endsWith(p) : h === p));
+}
+
 const subSchema = z.object({
   // Web Push transport (browser/PWA)…
   subscription: z.object({
-    endpoint: z.string().url(),
+    endpoint: z.string().url().refine(isPushEndpoint, 'endpoint must be a known web-push service host'),
     keys: z.object({ p256dh: z.string(), auth: z.string() }),
   }).optional(),
   // …or native transport (Expo push token, iOS/Android app). Exactly one.

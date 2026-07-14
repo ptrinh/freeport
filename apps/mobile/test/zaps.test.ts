@@ -64,6 +64,24 @@ describe('zapInvoice', () => {
     expect(await zapInvoice(signer, { lud16: 'alice@example.com', toPubkey: RECEIVER, amountSat: 0.5, relays: [] })).toBeNull();
     expect(await resolveLnurlPay('not-an-address')).toBeNull();
   });
+
+  it('rejects an invoice that bills more than requested (malicious LNURL)', async () => {
+    stubFetch({
+      'https://example.com/.well-known/lnurlp/alice': LNURLP,
+      'https://pay.example/cb': { pr: 'lnbc10u1p0xyzabc' }, // 1000 sat — we asked 250
+    });
+    const res = await zapInvoice(signer, { lud16: 'alice@example.com', toPubkey: RECEIVER, amountSat: 250, relays: ['wss://r'] });
+    expect(res).toBeNull();
+  });
+
+  it('accepts an invoice whose amount matches the request', async () => {
+    stubFetch({
+      'https://example.com/.well-known/lnurlp/alice': LNURLP,
+      'https://pay.example/cb': { pr: 'lnbc2500n1p0xyzabc' }, // 250 sat
+    });
+    const res = await zapInvoice(signer, { lud16: 'alice@example.com', toPubkey: RECEIVER, amountSat: 250, relays: ['wss://r'] });
+    expect(res?.pr).toBe('lnbc2500n1p0xyzabc');
+  });
 });
 
 describe('zap receipts', () => {

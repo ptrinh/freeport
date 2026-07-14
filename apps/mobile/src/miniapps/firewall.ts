@@ -550,8 +550,11 @@ export class MiniAppFirewall {
         if (!origin) continue;
         // The stored launch url must still live inside the origin (tampered
         // stores don't get to relocate an app).
+        // Must live INSIDE the origin — with a path boundary, so a tampered
+        // `https://good.example` can't smuggle `https://good.example.evil.com`
+        // past a bare prefix match.
         const stored = typeof a.url === 'string' ? normalizeLaunchUrl(a.url) : null;
-        const url = stored && stored.startsWith(origin) ? stored : origin;
+        const url = stored && (stored === origin || stored.startsWith(origin + '/')) ? stored : origin;
         if (fw.apps.has(url)) continue;
         let perms = permsByOrigin.get(origin);
         if (!perms) {
@@ -568,12 +571,19 @@ export class MiniAppFirewall {
           perms,
         });
       }
+      // Clamp restored spend: a tampered store must not set sats NEGATIVE,
+      // which would leave headroom under the daily cap forever (auto-approve
+      // unlimited payments). A large/future lastPayAt only makes the cooldown
+      // stricter, so it needs no clamp beyond non-negative.
+      const clampSpend = (s: SpendDay): SpendDay => ({
+        day: String(s.day),
+        sats: Math.max(0, Number(s.sats) || 0),
+        lastPayAt: Math.max(0, Number(s.lastPayAt) || 0),
+      });
       for (const [o, s] of Object.entries(data.spend ?? {})) {
-        if (fw.appByOrigin(o)) fw.spend.set(o, { day: String(s.day), sats: Number(s.sats) || 0, lastPayAt: Number(s.lastPayAt) || 0 });
+        if (fw.appByOrigin(o)) fw.spend.set(o, clampSpend(s));
       }
-      if (data.globalSpend) {
-        fw.globalSpend = { day: String(data.globalSpend.day), sats: Number(data.globalSpend.sats) || 0, lastPayAt: Number(data.globalSpend.lastPayAt) || 0 };
-      }
+      if (data.globalSpend) fw.globalSpend = clampSpend(data.globalSpend);
       if (Array.isArray(data.audit)) fw.audit = data.audit.slice(-AUDIT_CAP);
     } catch { /* corrupt store → start clean */ }
     return fw;

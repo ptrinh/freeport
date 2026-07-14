@@ -7,6 +7,7 @@
  */
 import type { Event } from 'nostr-tools/pure';
 import type { Signer } from './signer';
+import { bolt11Sats } from './wallet/bolt11';
 
 export interface LnurlPayInfo {
   callback: string;
@@ -62,7 +63,13 @@ export async function zapInvoice(
     const sep = info.callback.includes('?') ? '&' : '?';
     const r = await fetch(`${info.callback}${sep}amount=${msats}${nostrParam}`);
     const j = await r.json();
-    return typeof j?.pr === 'string' && j.pr ? { pr: j.pr, zap } : null;
+    if (typeof j?.pr !== 'string' || !j.pr) return null;
+    // Verify the invoice bills what we asked for — a malicious/compromised
+    // LNURL endpoint must not hand back an inflated invoice (parity with
+    // wallet/lnurl.ts). ±1 sat slack for rounding.
+    const got = bolt11Sats(j.pr);
+    if (got != null && Math.abs(got - opts.amountSat) > 1) return null;
+    return { pr: j.pr, zap };
   } catch {
     return null;
   }

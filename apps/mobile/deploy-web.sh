@@ -92,6 +92,12 @@ ALINKS
 # The offline single-file build fetches the wallet wasm from here (file://
 # has a null origin) — allow it and let clients cache the 11MB blob.
 cat > dist/_headers <<'HDRS'
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self'
+  Permissions-Policy: browsing-topics=()
 /breez_sdk_spark_wasm_bg.wasm
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=86400

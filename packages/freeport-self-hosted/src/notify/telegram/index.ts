@@ -99,7 +99,14 @@ export async function mountTelegram(
     res.json({ code, url: `https://t.me/${me.username}?start=${code}`, expiresIn: 600 });
   });
   app.get('/telegram/status', limiter, (req, res) => {
+    // NOTE: this confirms "pubkey X has Telegram linked" to any caller — a
+    // low-sensitivity presence oracle (whether a pseudonymous identity uses
+    // the optional bridge). Rate-limited. Fully closing it needs an
+    // authenticated caller (e.g. a NIP-98 signed request proving pubkey
+    // ownership); deferred as disproportionate for a boolean. Reject
+    // malformed pubkeys so it's at least not a general probe surface.
     const pubkey = String(req.query.pubkey ?? '').toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(pubkey)) { res.status(400).json({ error: 'valid pubkey (64-hex) required' }); return; }
     const linked = notifier.store.all().some((r) => r.telegramChatId && r.pubkey === pubkey);
     res.json({ linked });
   });

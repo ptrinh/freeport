@@ -56,6 +56,10 @@ let registeredNpub = '';
 let registeredClient: DebugClient | null = null;
 let getIntents: (() => unknown[]) | null = null;
 
+/** Storage keys whose VALUES are secret and must never be dumped/listed by the
+ *  debug API (they're still wiped by the clear path, which uses profileKeys). */
+const SECRET_KEYS = new Set(['freeport.nsec']);
+
 /** Logical localStorage keys for the active profile (prefix stripped). */
 function profileKeys(): string[] {
   const ls = globalThis.localStorage;
@@ -99,10 +103,14 @@ function makeApi(): FreeportDebug {
     relays() { return registeredClient?.connectedRelayCount?.() ?? 0; },
     negotiations() { return registeredClient?.negotiations ? [...registeredClient.negotiations.values()] : []; },
     intents() { return getIntents?.() ?? []; },
-    keys() { return profileKeys(); },
+    keys() { return profileKeys().filter((k) => !SECRET_KEYS.has(k)); },
     dump() {
+      // Never surface the secret key here. Same-origin script could read it
+      // from storage anyway, but a one-liner `freeport.dump()` is a perfect
+      // instrument for a "paste this in your console" self-XSS scam — don't
+      // hand it out.
       const out: Record<string, unknown> = {};
-      for (const k of profileKeys()) out[k] = readKey(k);
+      for (const k of profileKeys()) if (!SECRET_KEYS.has(k)) out[k] = readKey(k);
       return out;
     },
     state() {
@@ -112,7 +120,7 @@ function makeApi(): FreeportDebug {
         relays: this.relays(),
         intentsInFeed: this.intents().length,
         negotiations: this.negotiations().length,
-        storedKeys: profileKeys(),
+        storedKeys: profileKeys().filter((k) => !SECRET_KEYS.has(k)),
       };
     },
     switchTo(n) { navTo(n, false); },
