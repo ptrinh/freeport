@@ -900,5 +900,6 @@ const c: Record<string, string> = {
   "New messages disappear after 5 minutes": "Новые сообщения исчезают через 5 минут",
   "New messages disappear after 1 hour": "Новые сообщения исчезают через 1 час",
   "New messages disappear after 4 weeks": "Новые сообщения исчезают через 4 недели",
+  "Search": "Поиск",
 };
 export default c;

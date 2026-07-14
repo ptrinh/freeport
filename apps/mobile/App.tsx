@@ -101,6 +101,7 @@ import { defaultAvatarUrl as peerAvatarUrl } from './src/profile';
 import { unreadCount as convUnread, type Conversation } from './src/conversations';
 import { type EscrowState } from './src/client';
 import { ZapSheet } from './src/ui/ZapSheet';
+import { DraggableFab } from './src/ui/DraggableFab';
 import { ConciergeSheet } from './src/concierge/ConciergeSheet';
 import { conciergeAvailability } from './src/concierge/model';
 import { translateToggleVisible } from './src/concierge/translate';
@@ -1675,19 +1676,19 @@ function AppInner() {
       {/* Concierge entry: a sparkle FAB on the Post tab, only when the
           on-device model is actually available (probe + Apple Intelligence). */}
       {experimentalLlm && conciergeOk && tab === 'post' && (
-        <Pressable
+        <DraggableFab
+          storageKey="concierge"
           onPress={() => setShowConcierge(true)}
-          accessibilityRole="button"
           accessibilityLabel={t('Describe what you need')}
+          anchor={{ end: 18, bottom: insets.bottom + 76 }}
           style={{
-            position: 'absolute', end: 18, bottom: insets.bottom + 76,
             width: 50, height: 50, borderRadius: 25,
             backgroundColor: palette.accent, alignItems: 'center', justifyContent: 'center',
             shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 5, elevation: 6,
           }}
         >
           <Ionicons name="sparkles" size={24} color="white" />
-        </Pressable>
+        </DraggableFab>
       )}
       {resolvedInvite && (
         <InviteResolvedSheet

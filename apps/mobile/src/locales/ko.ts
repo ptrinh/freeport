@@ -891,5 +891,6 @@ const c: Record<string, string> = {
   "New messages disappear after 5 minutes": "새 메시지는 5분 후에 사라집니다",
   "New messages disappear after 1 hour": "새 메시지는 1시간 후에 사라집니다",
   "New messages disappear after 4 weeks": "새 메시지는 4주 후에 사라집니다",
+  "Search": "검색",
 };
 export default c;

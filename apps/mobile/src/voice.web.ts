@@ -63,3 +63,55 @@ export async function playAudio(url: string): Promise<void> {
   audioEl = new Audio(url);
   await audioEl.play();
 }
+
+export interface VoicePlayback {
+  playing: boolean;
+  positionMillis: number;
+  durationMillis: number;
+  done?: boolean;
+}
+
+// One clip at a time (WhatsApp behavior). NOTE: this file REPLACES voice.ts
+// on web — every export the bubbles import must exist here too (a missing
+// toggleVoice here once made the play button a silent no-op on web).
+let currentUrl: string | null = null;
+let currentListener: ((st: VoicePlayback) => void) | null = null;
+
+function emit(el: HTMLAudioElement, done = false): void {
+  // Chrome reports Infinity duration for streamed MediaRecorder output.
+  const dur = Number.isFinite(el.duration) ? el.duration * 1000 : 0;
+  currentListener?.({ playing: !el.paused && !el.ended, positionMillis: el.currentTime * 1000, durationMillis: dur, done });
+}
+
+/** Toggle play/pause; starting a different clip stops the previous one. */
+export async function toggleVoice(url: string, onStatus: (st: VoicePlayback) => void): Promise<void> {
+  if (currentUrl === url && audioEl) {
+    currentListener = onStatus; // rebind (bubble re-mounted)
+    if (audioEl.paused) await audioEl.play();
+    else audioEl.pause();
+    emit(audioEl);
+    return;
+  }
+  if (audioEl) {
+    audioEl.pause();
+    currentListener?.({ playing: false, positionMillis: 0, durationMillis: 0, done: true });
+    audioEl = null;
+  }
+  const el = new Audio(url);
+  audioEl = el;
+  currentUrl = url;
+  currentListener = onStatus;
+  el.addEventListener('timeupdate', () => emit(el));
+  el.addEventListener('pause', () => emit(el));
+  el.addEventListener('play', () => emit(el));
+  el.addEventListener('ended', () => {
+    emit(el, true);
+    if (audioEl === el) { audioEl = null; currentUrl = null; }
+  });
+  el.addEventListener('error', () => {
+    currentListener?.({ playing: false, positionMillis: 0, durationMillis: 0, done: true });
+    if (audioEl === el) { audioEl = null; currentUrl = null; }
+  });
+  await el.play();
+  emit(el);
+}

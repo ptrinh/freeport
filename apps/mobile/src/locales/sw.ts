@@ -848,5 +848,6 @@ const c: Record<string, string> = {
   "New messages disappear after 5 minutes": "Ujumbe mpya hutoweka baada ya dakika 5",
   "New messages disappear after 1 hour": "Ujumbe mpya hutoweka baada ya saa 1",
   "New messages disappear after 4 weeks": "Ujumbe mpya hutoweka baada ya wiki 4",
+  "Search": "Tafuta",
 };
 export default c;

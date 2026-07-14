@@ -10,7 +10,7 @@
  *   - ChatFab: the floating + button that opens the InviteSheet.
  */
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Share, Text, TextInput, View } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { t, tn } from '../../i18n';
@@ -25,6 +25,7 @@ import { s, palette } from '../../ui/theme';
 import { confirmAsync } from '../../ui/alerts';
 import { ChatCore, SAFE_ATTACH_EXTENSIONS, isAudioMsg, isImageMsg, isTripMsg, isDocMsg, docMsgName } from './Chat';
 import { matchesKeywords } from '../../browseFilter';
+import { DraggableFab } from '../../ui/DraggableFab';
 import { uploadFile, UploadError } from '../../upload';
 
 /** Display name: their invite/accept name → kind:0 profile → npub prefix. */
@@ -200,6 +201,8 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
   const online = !!lastSeen && Date.now() / 1000 - lastSeen < 180;
   const [menuOpen, setMenuOpen] = useState(false);
   const [attaching, setAttaching] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   /** File attachments: allowlisted extensions only (see SAFE_ATTACH_EXTENSIONS
    *  — no js/html/svg/executables), uploaded like voice memos, sent as a URL
@@ -279,6 +282,23 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
             </Pressable>
           </View>
         </View>
+        {searchOpen ? (
+          <View style={[s.row, { paddingHorizontal: 12, paddingVertical: 6, gap: 8, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: palette.border }]}>
+            <Ionicons name="search" size={16} color={palette.dim} />
+            <TextInput
+              style={[s.input, { flex: 1, paddingVertical: 6 }]}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoFocus
+              placeholder={t('Search')}
+              placeholderTextColor={palette.placeholder}
+              autoCapitalize="none"
+            />
+            <Pressable hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Close')} onPress={() => { setSearchOpen(false); setSearchQuery(''); }}>
+              <Ionicons name="close" size={18} color={palette.text2} />
+            </Pressable>
+          </View>
+        ) : null}
         {attaching ? (
           <View style={[s.row, { justifyContent: 'center', paddingVertical: 6, gap: 8 }]}>
             <ActivityIndicator color={palette.accent} />
@@ -289,6 +309,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
           <Modal visible transparent animationType="fade" onRequestClose={() => setMenuOpen(false)}>
             <Pressable style={s.sortBackdrop} onPress={() => setMenuOpen(false)}>
               <Pressable style={s.sortSheet} onPress={() => {}}>
+                {menuRow('search-outline', t('Search'), () => { setMenuOpen(false); setSearchOpen(true); })}
                 {conv.state === 'active' && !blocked ? menuRow('add-circle-outline', t('Attach file'), attachFile) : null}
                 {walletEnabled && onPayFriend && conv.theirPay && conv.state === 'active' && !blocked
                   ? menuRow('flash-outline', t('Send payment'), () => { setMenuOpen(false); onPayFriend(conv.peer, conv.theirPay!); })
@@ -338,6 +359,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
             tickFor={receiptsOn ? (ts) => tickFor(conv, ts) : undefined}
             onReact={(id, emoji) => client?.chatReact(conv.peer, id, emoji).catch(() => {})}
             translateTo={translateTo}
+            filterQuery={searchOpen ? searchQuery : ''}
           />
         </KeyboardAvoidingView>
         </View>
@@ -431,19 +453,18 @@ export function InviteSheet({ client, myName, onClose }: {
  *  tab's content area, so it can never cover the bottom menu). */
 export function ChatFab({ onPress }: { onPress: () => void }) {
   return (
-    <Pressable
+    <DraggableFab
+      storageKey="chat-add"
       onPress={onPress}
-      accessibilityRole="button"
       accessibilityLabel={t('Add a friend')}
       style={{
-        position: 'absolute', end: 18, bottom: 18,
         width: 54, height: 54, borderRadius: 27,
         backgroundColor: palette.accent, alignItems: 'center', justifyContent: 'center',
         shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 5, elevation: 6,
       }}
     >
       <Ionicons name="add" size={30} color="white" />
-    </Pressable>
+    </DraggableFab>
   );
 }
 

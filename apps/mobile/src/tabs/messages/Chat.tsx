@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { type Negotiation, type ProposedTerms } from '@freeport/protocol';
 import { t } from '../../i18n';
+import { matchesKeywords } from '../../browseFilter';
 import { uploadImage, uploadFile, UploadError } from '../../upload';
 import { startRecording, stopRecording, toggleVoice, type VoicePlayback } from '../../voice';
 import { defaultIntentTime, timeToWindow, parsePayment, fmtPayment } from '../../ui/format';
@@ -238,7 +239,7 @@ const REACT_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
  * chat (ChatThread, bound to a Negotiation) and the friend chat (bound to a
  * Conversation) — keep it free of either model.
  */
-export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title, onReact, translateTo, fullHeight = false }: {
+export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, title, onReact, translateTo, fullHeight = false, filterQuery = '' }: {
   messages: { dir: 'in' | 'out'; text: string; ts: number; id?: string; quote?: string; reactions?: { emoji: string; dir: 'in' | 'out' }[] }[];
   onSend: (text: string, opts?: { replyTo?: string; quote?: string }) => Promise<void>;
   /** Grab-style one-tap replies rendered above the input ("I am here ✅", …). */
@@ -256,6 +257,9 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
    *  area pinned to the bottom, composer fixed at the screen's bottom edge —
    *  long conversations must never push the input off-screen. */
   fullHeight?: boolean;
+  /** In-chat search (WhatsApp-style): non-empty → show only matching messages
+   *  (comma-separated keywords, same syntax as Browse). */
+  filterQuery?: string;
 }) {
   const [text, setText] = useState('');
   // Long-press action row target + the message being replied to.
@@ -268,7 +272,8 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
   const [showAllMsgs, setShowAllMsgs] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const scrollRef = useRef<ScrollView>(null);
-  const msgs = messages;
+  const fq = filterQuery.trim();
+  const msgs = fq ? messages.filter((m) => matchesKeywords(m.text, fq)) : messages;
   // Deal-card mode keeps the thread compact (tap to reveal); full-screen mode
   // shows everything — the list scrolls, the composer never moves.
   const CHAT_PREVIEW = 5;

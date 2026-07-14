@@ -848,5 +848,6 @@ const c: Record<string, string> = {
   "New messages disappear after 5 minutes": "Жаңа хабарлар 5 минуттан кейін жоғалады",
   "New messages disappear after 1 hour": "Жаңа хабарлар 1 сағаттан кейін жоғалады",
   "New messages disappear after 4 weeks": "Жаңа хабарлар 4 аптадан кейін жоғалады",
+  "Search": "Іздеу",
 };
 export default c;
