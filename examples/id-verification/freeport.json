@@ -1,0 +1,6 @@
+{
+  "name": "ID Verification Service",
+  "icon": "icon.png",
+  "description": "Demo mini-app: human-verified ID/licence over a scheduled video call, paid in USDT, issuing a public certificate link bound to your npub.",
+  "permissions": ["getPublicKey", "freeport.paySpark"]
+}

@@ -15,7 +15,10 @@ Try it: Freeport app → **Apps** tab → **Add App** → scan the QR below (or 
 Flow:
 
 1. **Pick a policy** — single trip, 24h, 7d, 1 month, 1 year. Base prices are
-   internal; the user only ever sees the risk-adjusted premium.
+   internal; the user only ever sees the risk-adjusted premium. **Single trip
+   is free** so the whole flow is testable without funds; its certificate is
+   stamped with the exact activation time (local + timezone + ISO) alongside
+   the npub — together they pin the cover to the holder's single next ride.
 2. **Applicant form** — legal name, ID number, date of birth (→ age). The demo
    auto-fills it.
 3. **Freeport signals** — the app pulls:
@@ -34,8 +37,9 @@ Flow:
    **Certificate of Insurance** renders and downloads as a PDF (built inline,
    no libraries).
 5. **Purchase** — `window.freeport.paySpark({token: {ticker: 'USDT', amount}})`
-   pays the premium to a donation Spark address; on success the certificate is
-   marked paid and downloadable.
+   pays the premium to a donation Spark address (skipped entirely when the
+   premium is 0, so no wallet or payment permission is needed); on success the
+   certificate is marked paid — with the paid-at timestamp — and downloadable.
 
 Everything is fake: no policy is underwritten, reputation is stubbed, and the
 payment goes to a demo address. The page is fully self-contained (bech32 npub

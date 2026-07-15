@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ID Verification Service</title>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<!-- Freeport web-shell SDK: exposes window.nostr/webln/freeport when embedded
+     in the Freeport web shell. Inside the native shell the shim is injected
+     and this script exits immediately. -->
+<script src="https://freeport.network/sdk.js"></script>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { max-width: 100%; overflow-x: hidden; }
+  body { margin: 0; background: #06080c; color: #e8edf2; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-wrap: anywhere; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 20px 16px 56px; }
+  header { display: flex; align-items: center; gap: 12px; padding: 8px 0 16px; }
+  .logo { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg,#6366f1,#0ea5e9); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  h1 { font-size: 20px; margin: 0; }
+  .sub { color: #8b97a6; font-size: 12px; margin-top: 2px; }
+  h2 { font-size: 16px; margin: 22px 0 8px; }
+  .banner { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 12px 14px; font-size: 13px; color: #c9d5e0; line-height: 1.5; }
+  .banner.warn { border-color: #7c2d12; color: #fdba74; }
+  .prods { display: grid; gap: 10px; }
+  .prod { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 14px; }
+  .prod .n { font-weight: 700; }
+  .prod .d { color: #8b97a6; font-size: 12px; margin-top: 2px; }
+  .prod .p { color: #7dd3fc; font-size: 13px; font-weight: 700; margin-top: 4px; }
+  button { background: #6366f1; color: #eef2ff; border: 0; border-radius: 10px; padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  button.ghost { background: transparent; border: 1px solid #6366f1; color: #a5b4fc; }
+  button:disabled { opacity: .5; cursor: default; }
+  label { display: block; font-size: 12px; color: #8b97a6; margin: 10px 0 4px; }
+  input { width: 100%; background: #0a0d12; color: #e8edf2; border: 1px solid #1f2937; border-radius: 8px; padding: 10px; font-size: 15px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .muted { color: #5c6675; font-size: 11px; margin-top: 8px; line-height: 1.5; }
+  .err { color: #f87171; font-size: 13px; margin-top: 10px; min-height: 1em; }
+  .actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .hidden { display: none; }
+  footer { margin-top: 28px; color: #4b5a6e; font-size: 11px; line-height: 1.6; text-align: center; }
+  a { color: #a5b4fc; }
+  /* photo upload */
+  .drop { border: 1.5px dashed #334155; border-radius: 12px; padding: 14px; text-align: center; color: #8b97a6; font-size: 13px; cursor: pointer; margin-top: 4px; }
+  .drop img { max-width: 100%; max-height: 180px; border-radius: 8px; display: block; margin: 0 auto; }
+  /* slot picker */
+  .days { display: flex; gap: 8px; margin: 8px 0; }
+  .day { flex: 1; text-align: center; background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 8px 4px; font-size: 12px; cursor: pointer; }
+  .day.sel { border-color: #6366f1; background: #171a33; color: #c7d2fe; }
+  .slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .slot { text-align: center; background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 9px 2px; font-size: 13px; cursor: pointer; font-variant-numeric: tabular-nums; }
+  .slot.sel { border-color: #6366f1; background: #171a33; color: #c7d2fe; font-weight: 700; }
+  /* order summary card */
+  .order { background: #fff; color: #0b1a2b; border-radius: 12px; padding: 20px; margin-top: 12px; }
+  .order h3 { margin: 0 0 2px; font-size: 17px; }
+  .order .co-sub { color: #5b6b7b; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+  .order table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+  .order td { padding: 6px 0; border-bottom: 1px solid #e5eaf0; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
+  .order td:first-child { color: #5b6b7b; width: 38%; padding-right: 10px; }
+  .order .fee { font-size: 24px; font-weight: 800; color: #4338ca; }
+  .order .thumb { max-height: 90px; border-radius: 6px; }
+  /* cert link */
+  .certlink { background: #06121f; border: 1px solid #0e3a4f; border-radius: 12px; padding: 16px; margin-top: 12px; text-align: center; }
+  .certlink .url { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 15px; color: #7dd3fc; word-break: break-all; }
+  .badge { display: inline-block; background: #052e1b; border: 1px solid #14532d; color: #4ade80; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 3px 10px; margin-bottom: 8px; letter-spacing: .04em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">🪪</div>
+    <div>
+      <h1>ID Verification Service</h1>
+      <div class="sub">A Freeport mini-app demo — not a real verifier</div>
+    </div>
+  </header>
+
+  <div id="bridge-note" class="banner warn hidden">
+    This is a <b>Freeport mini-app</b>. Open it inside Freeport (Settings →
+    Experimental → Mini-apps, add <b>apps.freeport.network/id-verification</b>)
+    to verify your identity against your npub.
+  </div>
+
+  <div id="intro" class="banner">
+    Human-verified identity for your Freeport profile. Submit your document,
+    book a short video call, pay in USDT — after the call an agent issues a
+    public certificate link tied to your <b>npub</b> that you can put on your
+    profile. Demo only: the form auto-fills, no call happens, and payment goes
+    to a donation address.
+  </div>
+
+  <!-- STEP 1: products -->
+  <div id="step-products">
+    <h2>Choose verification</h2>
+    <div class="prods" id="prods"></div>
+  </div>
+
+  <!-- STEP 2: applicant form -->
+  <div id="step-form" class="hidden">
+    <h2>Your details</h2>
+    <div class="banner" style="margin-bottom:12px">Selected: <b id="sel-name"></b> — <b id="sel-price"></b></div>
+    <label>Legal name (as on document)</label>
+    <input id="f-name" autocomplete="off">
+    <div class="grid2">
+      <div><label id="f-id-label">ID number</label><input id="f-id" autocomplete="off"></div>
+      <div><label>Date of birth</label><input id="f-dob" type="date"></div>
+    </div>
+    <label id="f-photo-label">Photo of your ID</label>
+    <div class="drop" id="drop">Tap to upload a clear photo of the document</div>
+    <input type="file" id="f-photo" accept="image/*" class="hidden">
+    <div class="muted">Your <b>npub</b> (<span id="s-npub">—</span>) is attached to the
+    application so the certificate can be bound to your Freeport identity. The
+    photo stays in this demo page — nothing is uploaded anywhere.</div>
+    <div class="actions">
+      <button id="btn-to-slots">Choose call time</button>
+      <button class="ghost" id="btn-back">Back</button>
+      <button class="ghost" id="btn-sample">Use sample photo</button>
+    </div>
+    <div class="err" id="form-err"></div>
+  </div>
+
+  <!-- STEP 3: schedule video call -->
+  <div id="step-slots" class="hidden">
+    <h2>Book your video call</h2>
+    <div class="banner">A verification agent checks your document and likeness
+    on a short (~5 min) video call. Times are shown in your local timezone.</div>
+    <div class="days" id="days"></div>
+    <div class="slots" id="slots"></div>
+    <div class="actions">
+      <button id="btn-to-confirm" disabled>Review order</button>
+      <button class="ghost" id="btn-back2">Back</button>
+    </div>
+    <div class="err" id="slot-err"></div>
+  </div>
+
+  <!-- STEP 4: order confirmation + pay -->
+  <div id="step-confirm" class="hidden">
+    <h2>Order confirmation</h2>
+    <div id="order"></div>
+    <div class="actions">
+      <button id="btn-pay">Pay &amp; schedule call</button>
+      <button class="ghost" id="btn-back3">Back</button>
+    </div>
+    <div class="err" id="pay-err"></div>
+  </div>
+
+  <!-- STEP 5: scheduled / verified -->
+  <div id="step-done" class="hidden">
+    <h2>✓ Call scheduled</h2>
+    <div class="banner">Payment received. Your video call is booked for
+    <b id="done-slot"></b>. Join from the link the agent DMs to your npub.
+    After a successful call your certificate goes live.</div>
+    <div class="actions">
+      <button id="btn-simulate" class="ghost">Demo: simulate verified call</button>
+    </div>
+    <div id="cert-wrap" class="hidden">
+      <div class="certlink">
+        <div class="badge">✓ IDENTITY VERIFIED</div>
+        <div class="url" id="cert-url"></div>
+        <div class="muted">Anyone opening this link sees your verified legal
+        name bound to your npub. Add it to your Freeport profile as a
+        <b>profile link</b> so counterparties can check it before a deal.</div>
+        <div class="actions" style="justify-content:center">
+          <button id="btn-copy">Copy link</button>
+          <button class="ghost" id="btn-restart">Start over</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Demo only — no verification is performed and the fee goes to a Freeport
+    donation address. Source:
+    <a href="https://github.com/ptrinh/freeport/tree/main/examples/id-verification">github.com/ptrinh/freeport</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var DONATION = 'spark1pgss8767mv3pe7cuakkux5fgemra9u0f707ymc8gpdame6xvlg0qeh5c20sg0h';
+
+  var PRODUCTS = [
+    { id: 'id',      name: 'Validate ID',      desc: 'Government ID / passport, checked on a live video call', price: 0, doc: 'ID number',      photo: 'Photo of your ID' },
+    { id: 'licence', name: 'Validate licence', desc: 'Driving licence, checked on a live video call',          price: 1, doc: 'Licence number', photo: 'Photo of your licence' },
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { product: null, npub: '', pubkeyHex: '', photo: null, day: null, slot: null, order: null };
+
+  var inShell = !!(window.nostr && window.freeport);
+  if (!inShell) $('bridge-note').classList.remove('hidden');
+
+  function show(step) {
+    ['products', 'form', 'slots', 'confirm', 'done'].forEach(function (s) {
+      $('step-' + s).classList.toggle('hidden', s !== step);
+    });
+  }
+  function setErr(id, m) { $(id).textContent = m || ''; }
+
+  // ── bech32 npub encoder (BIP-173) — npub is derivable from the hex pubkey,
+  //    so we compute it here rather than asking the bridge for it. ───────────
+  var CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+  function polymod(v) { var b = 1; for (var i = 0; i < v.length; i++) { var t = b >> 25; b = ((b & 0x1ffffff) << 5) ^ v[i]; for (var j = 0; j < 5; j++) b ^= ((t >> j) & 1) ? [0x3b6a57b2,0x26508e6d,0x1ea119fa,0x3d4233dd,0x2a1462b3][j] : 0; } return b; }
+  function hrpExpand(h) { var o = [], i; for (i = 0; i < h.length; i++) o.push(h.charCodeAt(i) >> 5); o.push(0); for (i = 0; i < h.length; i++) o.push(h.charCodeAt(i) & 31); return o; }
+  function checksum(h, d) { var v = hrpExpand(h).concat(d).concat([0,0,0,0,0,0]); var m = polymod(v) ^ 1; var o = []; for (var i = 0; i < 6; i++) o.push((m >> 5 * (5 - i)) & 31); return o; }
+  function convert(data) { var acc = 0, bits = 0, out = []; for (var i = 0; i < data.length; i++) { acc = (acc << 8) | data[i]; bits += 8; while (bits >= 5) { bits -= 5; out.push((acc >> bits) & 31); } } if (bits > 0) out.push((acc << (5 - bits)) & 31); return out; }
+  function npubEncode(hex) {
+    var bytes = []; for (var i = 0; i < hex.length; i += 2) bytes.push(parseInt(hex.substr(i, 2), 16));
+    var data = convert(bytes); var chk = checksum('npub', data); var s = 'npub1';
+    data.concat(chk).forEach(function (d) { s += CHARSET.charAt(d); });
+    return s;
+  }
+  function shortNpub(np) { return np ? np.slice(0, 10) + '…' + np.slice(-6) : '—'; }
+  function h32(s) { var h = 2166136261 >>> 0; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h; }
+
+  // ── demo auto-fill ────────────────────────────────────────────────────────
+  var NAMES = ['Alex Tan', 'Maria Santos', 'Chen Wei', 'Priya Nair', 'Jonas Berg', 'Fatima Zahra'];
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function randomFill() {
+    $('f-name').value = pick(NAMES);
+    $('f-id').value = (state.product.id === 'licence' ? 'DL' : 'ID') + Math.floor(1e7 + Math.random() * 9e7);
+    var y = 1965 + Math.floor(Math.random() * 40);
+    $('f-dob').value = y + '-' + pad(1 + Math.floor(Math.random() * 12)) + '-' + pad(1 + Math.floor(Math.random() * 28));
+  }
+
+  // Specimen document image drawn on a canvas, so the demo works without a
+  // real photo and nothing sensitive ever leaves the page.
+  function samplePhoto() {
+    var c = document.createElement('canvas'); c.width = 640; c.height = 400;
+    var g = c.getContext('2d');
+    var grad = g.createLinearGradient(0, 0, 640, 400);
+    grad.addColorStop(0, '#dbeafe'); grad.addColorStop(1, '#ede9fe');
+    g.fillStyle = grad; g.fillRect(0, 0, 640, 400);
+    g.fillStyle = '#1e293b'; g.font = 'bold 28px sans-serif';
+    g.fillText(state.product.id === 'licence' ? 'DRIVING LICENCE' : 'NATIONAL ID CARD', 30, 50);
+    g.font = '13px sans-serif'; g.fillText('SPECIMEN — demo document, not valid', 30, 75);
+    g.fillStyle = '#94a3b8'; g.fillRect(30, 100, 150, 190);
+    g.fillStyle = '#e2e8f0'; g.beginPath(); g.arc(105, 165, 45, 0, 7); g.fill();
+    g.beginPath(); g.arc(105, 290, 75, Math.PI, 2 * Math.PI); g.fill();
+    g.fillStyle = '#1e293b'; g.font = '20px sans-serif';
+    g.fillText('Name:  ' + ($('f-name').value || '—'), 210, 140);
+    g.fillText('No:    ' + ($('f-id').value || '—'), 210, 180);
+    g.fillText('DOB:   ' + ($('f-dob').value || '—'), 210, 220);
+    return c.toDataURL('image/png');
+  }
+  function setPhoto(dataUrl) {
+    state.photo = dataUrl;
+    $('drop').innerHTML = '';
+    var img = document.createElement('img'); img.src = dataUrl;
+    $('drop').appendChild(img);
+  }
+
+  function priceText(p) { return p.price > 0 ? p.price + ' USDT' : 'Free'; }
+
+  // ── render products ───────────────────────────────────────────────────────
+  PRODUCTS.forEach(function (p) {
+    var el = document.createElement('div');
+    el.className = 'prod';
+    el.innerHTML = '<div><div class="n">' + p.name + '</div><div class="d">' + p.desc + '</div><div class="p">' + priceText(p) + '</div></div>';
+    var b = document.createElement('button'); b.textContent = 'Select';
+    b.onclick = function () { startForm(p); };
+    if (!inShell) b.disabled = true;
+    el.appendChild(b); $('prods').appendChild(el);
+  });
+
+  function startForm(p) {
+    state.product = p; state.photo = null; state.day = null; state.slot = null;
+    $('sel-name').textContent = p.name;
+    $('sel-price').textContent = priceText(p);
+    $('f-id-label').textContent = p.doc;
+    $('f-photo-label').textContent = p.photo;
+    $('drop').textContent = 'Tap to upload a clear photo of the document';
+    randomFill();
+    setErr('form-err', '');
+    show('form');
+    // Identity → npub, attached to the application.
+    $('s-npub').textContent = '…';
+    window.nostr.getPublicKey().then(function (hex) {
+      state.pubkeyHex = String(hex || '');
+      state.npub = state.pubkeyHex ? npubEncode(state.pubkeyHex) : '';
+      $('s-npub').textContent = shortNpub(state.npub);
+    }).catch(function (e) { setErr('form-err', (e && e.message) || 'Sign-in denied.'); });
+  }
+
+  // photo upload
+  $('drop').onclick = function () { $('f-photo').click(); };
+  $('f-photo').onchange = function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function () { setPhoto(r.result); };
+    r.readAsDataURL(f);
+  };
+  $('btn-sample').onclick = function () { setPhoto(samplePhoto()); };
+
+  $('btn-back').onclick = function () { show('products'); };
+  $('btn-to-slots').onclick = function () {
+    setErr('form-err', '');
+    var name = $('f-name').value.trim(), idno = $('f-id').value.trim(), dob = $('f-dob').value;
+    if (!name || !idno || !dob) { setErr('form-err', 'Please complete all fields.'); return; }
+    if (!state.photo) { setErr('form-err', 'Please add a photo of the document (or use the sample).'); return; }
+    if (!state.npub) { setErr('form-err', 'Still reading your npub — approve the sign-in request.'); return; }
+    state.form = { name: name, idno: idno, dob: dob };
+    renderSlots();
+    show('slots');
+  };
+
+  // ── slot picker: next 3 days × 4 times ───────────────────────────────────
+  var SLOT_TIMES = ['09:00', '11:30', '15:00', '19:30'];
+  function dayLabel(d) {
+    return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  }
+  function renderSlots() {
+    state.day = null; state.slot = null;
+    $('btn-to-confirm').disabled = true;
+    var days = $('days'); days.innerHTML = '';
+    for (var i = 1; i <= 3; i++) {
+      (function (i) {
+        var d = new Date(); d.setDate(d.getDate() + i);
+        var el = document.createElement('div');
+        el.className = 'day'; el.textContent = dayLabel(d);
+        el.onclick = function () {
+          state.day = d;
+          Array.prototype.forEach.call(days.children, function (c) { c.classList.remove('sel'); });
+          el.classList.add('sel');
+          renderTimes();
+        };
+        days.appendChild(el);
+      })(i);
+    }
+    $('slots').innerHTML = '<div class="muted" style="grid-column:1/-1">Pick a day first.</div>';
+  }
+  function renderTimes() {
+    state.slot = null; $('btn-to-confirm').disabled = true;
+    var slots = $('slots'); slots.innerHTML = '';
+    SLOT_TIMES.forEach(function (t) {
+      var el = document.createElement('div');
+      el.className = 'slot'; el.textContent = t;
+      el.onclick = function () {
+        state.slot = t;
+        Array.prototype.forEach.call(slots.children, function (c) { c.classList.remove('sel'); });
+        el.classList.add('sel');
+        $('btn-to-confirm').disabled = false;
+      };
+      slots.appendChild(el);
+    });
+  }
+  function slotText() {
+    return state.day ? dayLabel(state.day) + ', ' + state.slot : '—';
+  }
+
+  $('btn-back2').onclick = function () { show('form'); };
+  $('btn-to-confirm').onclick = function () {
+    if (!state.day || !state.slot) { setErr('slot-err', 'Pick a day and a time.'); return; }
+    renderOrder();
+    show('confirm');
+  };
+
+  // ── order confirmation ───────────────────────────────────────────────────
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function row(k, v) { return '<tr><td>' + k + '</td><td>' + v + '</td></tr>'; }
+  function renderOrder() {
+    var f = state.form, p = state.product;
+    var orderNo = 'IDV-' + (h32(state.pubkeyHex + f.idno + f.dob) >>> 0).toString(16).toUpperCase().slice(0, 8);
+    state.order = { no: orderNo };
+    $('btn-pay').textContent = payLabel();
+    $('order').innerHTML = '<div class="order">' +
+      '<div class="co-sub">Order confirmation' + (p.price > 0 ? ' — unpaid' : '') + '</div>' +
+      '<h3>ID Verification Service</h3>' +
+      '<table>' +
+      row('Order number', esc(orderNo)) +
+      row('Service', esc(p.name)) +
+      row('Legal name', esc(f.name)) +
+      row(esc(p.doc), esc(f.idno)) +
+      row('Date of birth', esc(f.dob)) +
+      row('npub', esc(state.npub)) +
+      row('Document', '<img class="thumb" src="' + state.photo + '">') +
+      row('Video call', esc(slotText()) + ' (local time)') +
+      '</table>' +
+      '<div style="margin-top:14px"><span class="fee">' + priceText(p) + '</span>' +
+      ' <span style="color:#5b6b7b;font-size:12px">verification fee</span></div>' +
+      '<div style="color:#5b6b7b;font-size:10px;margin-top:12px">Demo only — no verification is performed.</div>' +
+      '</div>';
+  }
+
+  // Map the bridge's coarse payment-error codes to a human line.
+  function paymentError(e) {
+    var m = (e && e.message ? e.message : '').toLowerCase();
+    if (m.indexOf('insufficient') >= 0) return 'Insufficient funds in your Freeport wallet — top up and try again.';
+    if (m.indexOf('rate') >= 0) return 'Could not get an exchange rate to price this in sats. Try again shortly.';
+    if (m.indexOf('no wallet') >= 0 || m.indexOf('unavailable') >= 0) return 'No wallet is enabled. Turn on the Wallet in Settings → Experimental.';
+    if (m.indexOf('denied') >= 0) return 'Payment was declined.';
+    return 'Payment failed. Please try again.';
+  }
+
+  function payLabel() { return state.product.price > 0 ? 'Pay & schedule call' : 'Schedule call'; }
+  $('btn-back3').onclick = function () { show('slots'); };
+  $('btn-pay').onclick = function () {
+    setErr('pay-err', '');
+    var btn = $('btn-pay'); btn.disabled = true;
+    btn.textContent = state.product.price > 0 ? 'Paying…' : 'Scheduling…';
+    // Free service: nothing to pay — schedule straight away.
+    var paid = state.product.price > 0
+      ? window.freeport.paySpark({ address: DONATION, token: { ticker: 'USDT', amount: state.product.price } })
+      : Promise.resolve();
+    paid
+      .then(function () {
+        btn.disabled = false; btn.textContent = payLabel();
+        $('done-slot').textContent = slotText();
+        $('cert-wrap').classList.add('hidden');
+        $('btn-simulate').classList.remove('hidden');
+        show('done');
+      })
+      .catch(function (e) {
+        btn.disabled = false; btn.textContent = payLabel();
+        setErr('pay-err', paymentError(e));
+      });
+  };
+
+  // ── certificate link (issued after the call; demo simulates it) ──────────
+  // Deterministic 6-char code from npub + document no, like a real issuer's
+  // short reference — same identity + document always gets the same code.
+  function certCode() {
+    var B36 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var h = h32(state.pubkeyHex + '|' + state.form.idno) >>> 0, s = '';
+    for (var i = 0; i < 6; i++) { s += B36.charAt(h % 36); h = Math.floor(h / 36); }
+    return s;
+  }
+  $('btn-simulate').onclick = function () {
+    $('cert-url').textContent = 'https://idcert.com/freeport/' + certCode();
+    $('cert-wrap').classList.remove('hidden');
+    this.classList.add('hidden');
+  };
+  $('btn-copy').onclick = function () {
+    var url = $('cert-url').textContent, btn = this;
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+      .then(function () { btn.textContent = 'Copied ✓'; setTimeout(function () { btn.textContent = 'Copy link'; }, 1500); })
+      .catch(function () { btn.textContent = url; });
+  };
+  $('btn-restart').onclick = function () { show('products'); };
+
+  show('products');
+})();
+</script>
+</body>
+</html>

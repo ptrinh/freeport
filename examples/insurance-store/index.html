@@ -125,7 +125,8 @@
   <!-- STEP 4: paid -->
   <div id="step-done" class="hidden">
     <h2>✓ Insured</h2>
-    <div class="banner">Payment received. Your Certificate of Insurance is ready.</div>
+    <div class="banner" id="done-banner">Payment received. Your Certificate of Insurance is ready.</div>
+    <div id="cert-done"></div>
     <div class="actions">
       <button id="btn-pdf2">Download Certificate (PDF)</button>
       <button class="ghost" id="btn-restart2">Buy another</button>
@@ -149,7 +150,7 @@
   // Base premiums in USDT (NOT shown to the user — the displayed price is the
   // base scaled by the computed risk coefficient).
   var PRODUCTS = [
-    { id: 'single', name: 'Single trip insurance', desc: 'One journey, door to door', base: 1 },
+    { id: 'single', name: 'Single trip insurance', desc: 'One journey, door to door — free, covers your single next ride', base: 0 },
     { id: '24h',    name: '24 hours insurance',    desc: 'Any travel within 24 hours', base: 2 },
     { id: '7d',     name: '7 days insurance',      desc: 'One week of coverage', base: 5 },
     { id: '1m',     name: '1 month insurance',     desc: '30 days of coverage', base: 10 },
@@ -259,6 +260,15 @@
     return days + ' d';
   }
   function fmtRegion(r) { return r && (r.city || r.country) ? [r.city, r.state, r.country].filter(Boolean).join(', ') : 'Unknown'; }
+  function priceText(amount) { return amount === 0 ? 'Free' : amount + ' USDT'; }
+  // Exact payment moment with timezone — with the npub, this is what lets the
+  // insurer pin the cover to the holder's single next ride.
+  function fmtPaidAt(d) {
+    var tz = 'UTC';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch (e) {}
+    var local = d.toLocaleString(undefined, { timeZoneName: 'short' });
+    return local + ' — ' + tz + ' (' + d.toISOString() + ')';
+  }
 
   // ── render ──────────────────────────────────────────────────────────────
   PRODUCTS.forEach(function (p) {
@@ -320,6 +330,7 @@
       policyNo: policyNo, issued: new Date().toISOString().slice(0, 10),
     };
     renderCert();
+    $('btn-purchase').textContent = premium === 0 ? 'Activate free cover' : 'Purchase';
     show('quote');
   };
 
@@ -337,9 +348,15 @@
       row('npub', state.npub) +
       row('Risk coefficient', q.coeff.toFixed(2) + '×') +
       row('Issued', q.issued) +
+      (p.id === 'single'
+        ? row('Coverage', paid
+            ? 'One single ride — the next trip starting after the paid-at time below'
+            : 'One single ride — your next trip after payment')
+        : '') +
+      (paid && q.paidAtText ? row('Paid at', q.paidAtText) : '') +
       row('Status', paid ? 'ACTIVE' : 'Quotation (unpaid)') +
       '</table>' +
-      '<div style="margin-top:14px"><span class="prem">' + q.premium + ' USDT</span>' +
+      '<div style="margin-top:14px"><span class="prem">' + priceText(q.premium) + '</span>' +
       ' <span style="color:#5b6b7b;font-size:12px">premium</span></div>' +
       '<div style="color:#5b6b7b;font-size:10px;margin-top:12px">Specimen document — demo only, no cover is provided.</div>' +
       '</div>';
@@ -362,12 +379,16 @@
       ['npub:            ' + state.npub, 8],
       ['Risk coefficient:' + q.coeff.toFixed(2) + 'x', 12],
       ['Issued:          ' + q.issued, 12],
+    ];
+    if (p.id === 'single') lines.push(['Coverage:        one single ride - the next trip ' + (paid ? 'after the paid-at time' : 'after payment'), 9]);
+    if (paid && q.paidAtText) lines.push(['Paid at:         ' + q.paidAtText, 9]);
+    lines = lines.concat([
       ['Status:          ' + (paid ? 'ACTIVE' : 'Quotation (unpaid)'), 12],
       ['', 6],
-      ['Premium:         ' + q.premium + ' USDT', 16],
+      ['Premium:         ' + priceText(q.premium), 16],
       ['', 10],
       ['Specimen document - demo only, no cover is provided.', 9],
-    ];
+    ]);
     function esc(s) { return s.replace(/([\\()])/g, '\\$1'); }
     var y = 780, body = 'BT\n';
     lines.forEach(function (l) { body += '/F1 ' + l[1] + ' Tf\n1 0 0 1 60 ' + y + ' Tm\n(' + esc(l[0]) + ') Tj\n'; y -= (l[1] + 8); });
@@ -420,14 +441,26 @@
   // ── purchase ──────────────────────────────────────────────────────────────
   $('btn-purchase').onclick = function () {
     setErr('quote-err', '');
-    var btn = $('btn-purchase'); btn.disabled = true; btn.textContent = 'Paying…';
-    window.freeport.paySpark({ address: DONATION, token: { ticker: 'USDT', amount: state.quote.premium } })
+    var free = state.quote.premium === 0;
+    var btn = $('btn-purchase'); btn.disabled = true; btn.textContent = free ? 'Activating…' : 'Paying…';
+    // Free cover skips the wallet entirely so the full flow is testable
+    // without funds or the payment permission.
+    var pay = free
+      ? Promise.resolve()
+      : window.freeport.paySpark({ address: DONATION, token: { ticker: 'USDT', amount: state.quote.premium } });
+    pay
       .then(function () {
+        state.quote.paidAt = new Date();
+        state.quote.paidAtText = fmtPaidAt(state.quote.paidAt);
         $('cert').innerHTML = '';
+        $('done-banner').textContent = free
+          ? 'Cover activated. Your Certificate of Insurance is ready.'
+          : 'Payment received. Your Certificate of Insurance is ready.';
+        $('cert-done').innerHTML = certHtml(true);
         show('done');
       })
       .catch(function (e) {
-        btn.disabled = false; btn.textContent = 'Purchase';
+        btn.disabled = false; btn.textContent = free ? 'Activate free cover' : 'Purchase';
         setErr('quote-err', paymentError(e));
       });
   };
