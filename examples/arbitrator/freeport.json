@@ -1,0 +1,6 @@
+{
+  "name": "Arbitrator",
+  "icon": "icon.png",
+  "description": "Demo mini-app: escrow dispute arbitration for Freeport P2P trades — encrypted evidence in a signed kind-32105 dispute, a kind-32106 verdict, and a 2%-capped-at-20-USDT fee. Reputation is karma on the arbitrator's npub.",
+  "permissions": ["getPublicKey", "signEvent", "nip44.encrypt", "nip44.decrypt", "freeport.paySpark"]
+}

@@ -123,6 +123,8 @@ cat >> dist/_headers <<'HDRS'
   Access-Control-Allow-Origin: *
 /id-verification/freeport.json
   Access-Control-Allow-Origin: *
+/arbitrator/freeport.json
+  Access-Control-Allow-Origin: *
 HDRS
 
 # Use our own PNG favicon. Expo's generated /favicon.ico ignores web.favicon
@@ -255,10 +257,11 @@ echo "▸ Deploying to Cloudflare Pages…"
 # Mini-app demo shop — a plain static page served next to the SPA. The app's
 # add-flow also maps the repo's GitHub URL to this path.
 echo "▸ Adding mini-app demos + SDK (/sdk.js)…"
-mkdir -p dist/esim-store dist/insurance-store dist/id-verification
+mkdir -p dist/esim-store dist/insurance-store dist/id-verification dist/arbitrator
 cp ../../examples/esim-store/{index.html,icon.png,freeport.json,qr.png} dist/esim-store/
 cp ../../examples/insurance-store/{index.html,icon.png,freeport.json,qr.png} dist/insurance-store/
 cp ../../examples/id-verification/{index.html,icon.png,freeport.json,qr.png} dist/id-verification/
+cp ../../examples/arbitrator/{index.html,icon.png,freeport.json,qr.png} dist/arbitrator/
 cp ../../packages/miniapp-sdk/freeport-sdk.js dist/sdk.js
 
 npx wrangler pages deploy dist --project-name freeport --branch main --commit-dirty=true

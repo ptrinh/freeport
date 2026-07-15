@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Arbitrator</title>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<!-- Freeport web-shell SDK: exposes window.nostr/webln/freeport when embedded
+     in the Freeport web shell. Inside the native shell the shim is injected
+     and this script exits immediately. -->
+<script src="https://freeport.network/sdk.js"></script>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { max-width: 100%; overflow-x: hidden; }
+  body { margin: 0; background: #06080c; color: #e8edf2; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-wrap: anywhere; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 20px 16px 56px; }
+  header { display: flex; align-items: center; gap: 12px; padding: 8px 0 16px; }
+  .logo { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg,#f59e0b,#b45309); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  h1 { font-size: 20px; margin: 0; }
+  .sub { color: #8b97a6; font-size: 12px; margin-top: 2px; }
+  h2 { font-size: 16px; margin: 22px 0 8px; }
+  .banner { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 12px 14px; font-size: 13px; color: #c9d5e0; line-height: 1.5; }
+  .banner.warn { border-color: #7c2d12; color: #fdba74; }
+  .banner.gold { border-color: #78561b; color: #fcd34d; background: #17130a; }
+  /* tab bar */
+  .tabs { display: flex; gap: 6px; margin: 4px 0 6px; }
+  .tab { flex: 1; text-align: center; background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 9px 4px; font-size: 12.5px; font-weight: 700; color: #8b97a6; cursor: pointer; }
+  .tab.sel { border-color: #f59e0b; background: #17130a; color: #fcd34d; }
+  button { background: #f59e0b; color: #241703; border: 0; border-radius: 10px; padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  button.ghost { background: transparent; border: 1px solid #f59e0b; color: #fbbf24; }
+  button.danger { background: #ef4444; color: #2a0707; }
+  button.ok { background: #22c55e; color: #052012; }
+  button:disabled { opacity: .5; cursor: default; }
+  label { display: block; font-size: 12px; color: #8b97a6; margin: 10px 0 4px; }
+  input, textarea, select { width: 100%; background: #0a0d12; color: #e8edf2; border: 1px solid #1f2937; border-radius: 8px; padding: 10px; font-size: 15px; font-family: inherit; }
+  textarea { min-height: 84px; resize: vertical; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .muted { color: #5c6675; font-size: 11px; margin-top: 8px; line-height: 1.5; }
+  .err { color: #f87171; font-size: 13px; margin-top: 10px; min-height: 1em; }
+  .ok-msg { color: #4ade80; font-size: 13px; margin-top: 10px; }
+  .actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .hidden { display: none; }
+  footer { margin-top: 28px; color: #4b5a6e; font-size: 11px; line-height: 1.6; text-align: center; }
+  a { color: #fbbf24; }
+  .drop { border: 1.5px dashed #334155; border-radius: 12px; padding: 14px; text-align: center; color: #8b97a6; font-size: 13px; cursor: pointer; margin-top: 4px; }
+  .drop img { max-width: 100%; max-height: 160px; border-radius: 8px; display: block; margin: 0 auto; }
+  /* specimen contract / receipt card */
+  .doc { position: relative; background: #fff; color: #0b1a2b; border-radius: 12px; padding: 20px; margin-top: 12px; overflow: hidden; }
+  .doc h3 { margin: 0 0 2px; font-size: 17px; }
+  .doc .co-sub { color: #5b6b7b; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+  .doc table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+  .doc td { padding: 6px 0; border-bottom: 1px solid #e5eaf0; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
+  .doc td:first-child { color: #5b6b7b; width: 40%; padding-right: 10px; }
+  .doc .big { font-size: 22px; font-weight: 800; color: #b45309; }
+  .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-24deg); font-size: 40px; font-weight: 900; color: rgba(180,83,9,.10); letter-spacing: 4px; pointer-events: none; white-space: nowrap; }
+  /* json / code block */
+  pre { background: #0a0d12; border: 1px solid #1f2937; border-radius: 10px; padding: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; line-height: 1.45; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+  .badge { display: inline-block; background: #17130a; border: 1px solid #78561b; color: #fcd34d; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 3px 10px; margin: 2px 0 6px; letter-spacing: .04em; }
+  .case { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 14px; margin-top: 10px; }
+  .case .cid { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: #7dd3fc; }
+  .side { background: #0a0d12; border: 1px solid #1f2937; border-radius: 10px; padding: 10px; margin-top: 8px; font-size: 13px; }
+  .side .who { font-weight: 700; color: #fbbf24; font-size: 12px; }
+  .side img { max-width: 100%; max-height: 140px; border-radius: 6px; margin-top: 6px; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; }
+  .pill.buyer { background: #082f2a; color: #34d399; }
+  .pill.seller { background: #1e1b4b; color: #a5b4fc; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">⚖️</div>
+    <div>
+      <h1>Arbitrator</h1>
+      <div class="sub">A Freeport mini-app demo — dispute resolution for P2P escrow</div>
+    </div>
+  </header>
+
+  <div id="bridge-note" class="banner warn hidden">
+    This is a <b>Freeport mini-app</b>. Open it inside Freeport (Settings →
+    Experimental → Mini-apps, add <b>apps.freeport.network/arbitrator</b>) to
+    draft escrows, open disputes and issue verdicts against your npub.
+  </div>
+
+  <div id="intro" class="banner">
+    An arbitrator is a Nostr identity (<b>npub</b>) offering escrow dispute
+    resolution for Freeport trades. Happy path — buyer and seller both signal
+    completion — the arbitrator earns <b>nothing</b>. On a dispute the arbitrator
+    decides and earns <b>2% of the trade, capped at 20 USDT</b>. The arbitrator's
+    npub accumulates normal Freeport <b>karma</b>: this page is just UI, the
+    reputation attaches to the operator's pubkey.
+  </div>
+
+  <div class="tabs">
+    <div class="tab" id="tab-escrow" data-tab="escrow">1 · Create escrow</div>
+    <div class="tab" id="tab-dispute" data-tab="dispute">2 · Open dispute</div>
+    <div class="tab" id="tab-dash" data-tab="dash">3 · Dashboard</div>
+  </div>
+
+  <!-- ══════════════ TAB 1: CREATE ESCROW ══════════════ -->
+  <section id="pane-escrow">
+    <div class="banner gold" style="margin-bottom:8px">
+      <b>Specimen escrow — no real funds are held.</b> WebLN / Spark can't do a
+      real 2-of-3 multisig, so escrow here is modelled as
+      "<i>the arbitrator holds the hold-invoice preimage</i>": happy path both
+      parties signal completion → auto-release; dispute → the arbitrator settles
+      to the seller or refunds the buyer. This tab only mints a demo contract.
+    </div>
+    <label>Buyer npub (you)</label>
+    <input id="e-buyer" class="mono" autocomplete="off" placeholder="npub1…">
+    <label>Seller npub</label>
+    <input id="e-seller" class="mono" autocomplete="off" placeholder="npub1…">
+    <label>Arbitrator npub (third party)</label>
+    <input id="e-arb" class="mono" autocomplete="off" placeholder="npub1…">
+    <label>Trade amount (USDT)</label>
+    <input id="e-amount" type="number" min="0" step="0.01" value="250">
+    <div class="actions">
+      <button id="e-create">Draft specimen escrow</button>
+      <button class="ghost" id="e-sample">Fill sample counterparties</button>
+    </div>
+    <div class="muted">Your npub is prefilled from
+      <span class="mono">window.nostr.getPublicKey()</span>. The dispute fee shown
+      is 2% of the trade capped at 20 USDT — what the arbitrator would earn if
+      this deal went sour.</div>
+    <div class="err" id="e-err"></div>
+    <div id="e-out"></div>
+  </section>
+
+  <!-- ══════════════ TAB 2: OPEN DISPUTE ══════════════ -->
+  <section id="pane-dispute" class="hidden">
+    <div class="banner" style="margin-bottom:8px">
+      Stake the fee, attach encrypted evidence, and publish a signed
+      <b>kind&nbsp;32105</b> dispute event tagging the buyer, seller and
+      arbitrator. What's <b>real</b> here: the Nostr event, its signature, and
+      the evidence encryption. What's <b>mocked</b>: the escrow itself.
+    </div>
+    <label>Transaction event id</label>
+    <input id="d-tx" class="mono" autocomplete="off" placeholder="64-hex tx id (use the one from tab 1)">
+    <div class="muted" id="d-txhint">No escrow drafted yet — draft one in tab 1, or paste a 64-hex id.</div>
+    <label>Your role in this trade</label>
+    <select id="d-role">
+      <option value="buyer">Buyer — I want a refund</option>
+      <option value="seller">Seller — I want release to me</option>
+    </select>
+    <label>Evidence (what happened?)</label>
+    <textarea id="d-text" placeholder="Describe the dispute. Screenshots, tracking numbers, chat quotes…"></textarea>
+    <label>Optional evidence image</label>
+    <div class="drop" id="d-drop">Tap to attach an image (stays in this page; encrypted before it goes into the event)</div>
+    <input type="file" id="d-file" accept="image/*" class="hidden">
+    <div class="actions">
+      <button class="ghost" id="d-sample-img">Generate specimen evidence</button>
+    </div>
+    <div class="muted">Evidence is encrypted with a random AES-GCM key; that key
+      is then wrapped for the buyer, seller <i>and</i> arbitrator (NIP-44 via the
+      bridge when available) so all three can re-open the case file — not only
+      the arbitrator.</div>
+    <div class="actions">
+      <button id="d-build">Encrypt, sign &amp; compose dispute</button>
+    </div>
+    <div class="err" id="d-err"></div>
+    <div id="d-out"></div>
+  </section>
+
+  <!-- ══════════════ TAB 3: ARBITRATOR DASHBOARD ══════════════ -->
+  <section id="pane-dash" class="hidden">
+    <div class="banner gold" style="margin-bottom:8px">
+      Your verdicts are rated by both parties — your npub's <b>karma is your
+      license</b>. A biased arbitrator bleeds karma and stops getting picked.
+    </div>
+    <div class="banner" style="margin-bottom:8px">
+      Case files listed here are the disputes opened <b>this session</b>. A real
+      arbitrator scans the relays for kind&nbsp;32105 events p-tagging their npub
+      and decrypts each with their own key; that needs the operator's key, so the
+      demo shows the in-session cases instead.
+    </div>
+    <div id="dash-list"></div>
+  </section>
+
+  <footer>
+    Demo only — no funds are escrowed and any fee goes to a Freeport donation
+    address. Source:
+    <a href="https://github.com/ptrinh/freeport/tree/main/examples/arbitrator">github.com/ptrinh/freeport</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var DONATION = 'spark1pgss8767mv3pe7cuakkux5fgemra9u0f707ymc8gpdame6xvlg0qeh5c20sg0h';
+  var FEE_RATE = 0.02, FEE_CAP = 20;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var state = {
+    pubkeyHex: '', npub: '',
+    contract: null,          // last drafted escrow
+    cases: [],               // disputes opened this session (with plaintext evidence for the dashboard)
+    disputeImg: null,        // pending evidence image dataURL
+  };
+
+  var inShell = !!(window.nostr && window.freeport);
+  if (!inShell) $('bridge-note').classList.remove('hidden');
+  var hasNip44 = !!(window.nostr && window.nostr.nip44 && window.nostr.nip44.encrypt);
+
+  function setErr(id, m) { var e = $(id); if (e) e.textContent = m || ''; }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  // ── bech32 (BIP-173) encode + decode for npub ⇄ 32-byte hex ────────────────
+  var CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+  function polymod(v) { var b = 1; for (var i = 0; i < v.length; i++) { var t = b >> 25; b = ((b & 0x1ffffff) << 5) ^ v[i]; for (var j = 0; j < 5; j++) b ^= ((t >> j) & 1) ? [0x3b6a57b2,0x26508e6d,0x1ea119fa,0x3d4233dd,0x2a1462b3][j] : 0; } return b; }
+  function hrpExpand(h) { var o = [], i; for (i = 0; i < h.length; i++) o.push(h.charCodeAt(i) >> 5); o.push(0); for (i = 0; i < h.length; i++) o.push(h.charCodeAt(i) & 31); return o; }
+  function checksum(h, d) { var v = hrpExpand(h).concat(d).concat([0,0,0,0,0,0]); var m = polymod(v) ^ 1; var o = []; for (var i = 0; i < 6; i++) o.push((m >> 5 * (5 - i)) & 31); return o; }
+  function to5(data) { var acc = 0, bits = 0, out = []; for (var i = 0; i < data.length; i++) { acc = (acc << 8) | data[i]; bits += 8; while (bits >= 5) { bits -= 5; out.push((acc >> bits) & 31); } } if (bits > 0) out.push((acc << (5 - bits)) & 31); return out; }
+  function from5(data) { var acc = 0, bits = 0, out = []; for (var i = 0; i < data.length; i++) { acc = (acc << 5) | data[i]; bits += 5; if (bits >= 8) { bits -= 8; out.push((acc >> bits) & 0xff); } } return out; }
+  function npubEncode(hex) {
+    var bytes = []; for (var i = 0; i < hex.length; i += 2) bytes.push(parseInt(hex.substr(i, 2), 16));
+    var data = to5(bytes); var chk = checksum('npub', data); var s = 'npub1';
+    data.concat(chk).forEach(function (d) { s += CHARSET.charAt(d); });
+    return s;
+  }
+  // Returns 64-hex pubkey or '' if the input is not a valid npub.
+  function npubDecode(np) {
+    if (typeof np !== 'string') return '';
+    np = np.trim().toLowerCase();
+    if (np.indexOf('npub1') !== 0) return '';
+    var data = [];
+    for (var i = 5; i < np.length; i++) { var idx = CHARSET.indexOf(np.charAt(i)); if (idx < 0) return ''; data.push(idx); }
+    if (data.length < 6) return '';
+    var payload = data.slice(0, -6);
+    // verify checksum
+    var v = hrpExpand('npub').concat(payload).concat(data.slice(-6));
+    if (polymod(v) !== 1) return '';
+    var bytes = from5(payload);
+    if (bytes.length !== 32) return '';
+    var hex = ''; bytes.forEach(function (b) { hex += (b < 16 ? '0' : '') + b.toString(16); });
+    return hex;
+  }
+  function shortNpub(np) { return np ? np.slice(0, 10) + '…' + np.slice(-6) : '—'; }
+  function shortHex(h) { return h ? h.slice(0, 8) + '…' + h.slice(-6) : '—'; }
+
+  // ── deterministic hashing (FNV-1a → 64-hex tx id) ─────────────────────────
+  function h32(s) { var h = 2166136261 >>> 0; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h; }
+  function hex8(n) { return ('0000000' + (n >>> 0).toString(16)).slice(-8); }
+  function fakeTxId(seed) {
+    var s = '';
+    for (var i = 0; i < 8; i++) s += hex8(h32('fp-escrow|' + i + '|' + seed));
+    return s; // 64 hex chars — shaped like a real Nostr event id
+  }
+
+  function computeFee(amount) {
+    var a = Number(amount);
+    if (!isFinite(a) || a <= 0) return 0;
+    return Math.min(FEE_CAP, Math.round(a * FEE_RATE * 100) / 100);
+  }
+  function usdt(n) { return (Math.round(n * 100) / 100) + ' USDT'; }
+
+  // ── base64 for byte arrays ────────────────────────────────────────────────
+  function b64enc(bytes) { var s = ''; for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return btoa(s); }
+
+  // ── tab navigation ────────────────────────────────────────────────────────
+  function showTab(name) {
+    ['escrow', 'dispute', 'dash'].forEach(function (t) {
+      $('pane-' + t).classList.toggle('hidden', t !== name);
+      $('tab-' + t).classList.toggle('sel', t === name);
+    });
+    if (name === 'dash') renderDash();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (el) {
+    el.onclick = function () { showTab(el.getAttribute('data-tab')); };
+  });
+
+  // ── identity: prefill buyer npub ──────────────────────────────────────────
+  function loadIdentity() {
+    if (!inShell) return;
+    window.nostr.getPublicKey().then(function (hex) {
+      state.pubkeyHex = String(hex || '');
+      state.npub = state.pubkeyHex ? npubEncode(state.pubkeyHex) : '';
+      if (!$('e-buyer').value) $('e-buyer').value = state.npub;
+    }).catch(function () { /* user declined — leave blank */ });
+  }
+
+  // ══════════════ TAB 1: CREATE ESCROW ══════════════
+  // Sample counterparties MUST be real secp256k1 x-only pubkeys: NIP-44 key
+  // wrapping runs ECDH against them native-side and throws on a non-curve point,
+  // so we can't use random/hashed bytes here — these are well-known public keys.
+  var SAMPLE = {
+    buyer: '3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d',
+    seller: '32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245',
+    arbitrator: '82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2',
+  };
+  function sampleHex(role) { return SAMPLE[role] || SAMPLE.arbitrator; }
+  $('e-sample').onclick = function () {
+    $('e-seller').value = npubEncode(SAMPLE.seller);
+    $('e-arb').value = npubEncode(SAMPLE.arbitrator);
+    if (!$('e-buyer').value) $('e-buyer').value = state.npub || npubEncode(SAMPLE.buyer);
+  };
+
+  $('e-create').onclick = function () {
+    setErr('e-err', '');
+    var buyerHex = npubDecode($('e-buyer').value);
+    var sellerHex = npubDecode($('e-seller').value);
+    var arbHex = npubDecode($('e-arb').value);
+    var amount = Number($('e-amount').value);
+    if (!buyerHex) { setErr('e-err', 'Buyer npub is invalid.'); return; }
+    if (!sellerHex) { setErr('e-err', 'Seller npub is invalid.'); return; }
+    if (!arbHex) { setErr('e-err', 'Arbitrator npub is invalid.'); return; }
+    if (!isFinite(amount) || amount <= 0) { setErr('e-err', 'Enter a trade amount above 0.'); return; }
+    var txId = fakeTxId(buyerHex + '|' + sellerHex + '|' + arbHex + '|' + amount);
+    var fee = computeFee(amount);
+    state.contract = {
+      txId: txId, buyer: buyerHex, seller: sellerHex, arbitrator: arbHex,
+      amount: amount, fee: fee, created: new Date().toISOString().slice(0, 10),
+    };
+    // Prime tab 2.
+    $('d-tx').value = txId;
+    $('d-txhint').textContent = 'Loaded the escrow drafted in tab 1.';
+    renderContract();
+  };
+
+  function renderContract() {
+    var c = state.contract;
+    $('e-out').innerHTML =
+      '<div class="doc"><div class="watermark">SPECIMEN</div>' +
+      '<div class="co-sub">Escrow contract — specimen, no funds held</div>' +
+      '<h3>Freeport P2P Escrow</h3>' +
+      '<table>' +
+      row('Transaction id', '<span class="mono">' + esc(c.txId) + '</span>') +
+      row('Buyer', esc(shortNpub(npubEncode(c.buyer)))) +
+      row('Seller', esc(shortNpub(npubEncode(c.seller)))) +
+      row('Arbitrator', esc(shortNpub(npubEncode(c.arbitrator)))) +
+      row('Trade amount', '<b>' + esc(usdt(c.amount)) + '</b>') +
+      row('Dispute fee (2%, cap 20)', esc(usdt(c.fee))) +
+      row('Model', 'Arbitrator holds the hold-invoice preimage') +
+      row('Drafted', esc(c.created)) +
+      '</table>' +
+      '<div style="margin-top:12px;color:#5b6b7b;font-size:11px">Happy path: buyer &amp; seller both signal completion → auto-release, arbitrator earns 0. Dispute: arbitrator settles to seller or refunds buyer and earns the fee above.</div>' +
+      '</div>' +
+      '<div class="actions"><button class="ghost" id="e-goto">Open a dispute on this trade →</button></div>';
+    $('e-goto').onclick = function () { showTab('dispute'); };
+  }
+  function row(k, v) { return '<tr><td>' + esc(k) + '</td><td>' + v + '</td></tr>'; }
+
+  // ══════════════ TAB 2: OPEN DISPUTE ══════════════
+  $('d-drop').onclick = function () { $('d-file').click(); };
+  $('d-file').onchange = function () {
+    var f = this.files && this.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () { setDisputeImg(r.result); };
+    r.readAsDataURL(f);
+  };
+  $('d-sample-img').onclick = function () { setDisputeImg(specimenEvidence()); };
+  function setDisputeImg(dataUrl) {
+    state.disputeImg = dataUrl;
+    $('d-drop').innerHTML = '';
+    var img = document.createElement('img'); img.src = dataUrl;
+    $('d-drop').appendChild(img);
+  }
+  // A specimen "chat screenshot", drawn on a canvas so the demo needs no real file.
+  function specimenEvidence() {
+    var c = document.createElement('canvas'); c.width = 520; c.height = 300;
+    var g = c.getContext('2d');
+    g.fillStyle = '#0f172a'; g.fillRect(0, 0, 520, 300);
+    g.fillStyle = '#1e293b'; g.fillRect(0, 0, 520, 40);
+    g.fillStyle = '#e2e8f0'; g.font = 'bold 15px sans-serif';
+    g.fillText('Deal chat — SPECIMEN evidence', 16, 26);
+    var msgs = [
+      ['left', 'Item never arrived, tracking dead 6 days'],
+      ['right', 'Shipped on time, here is the receipt'],
+      ['left', 'Receipt is for a different address'],
+      ['right', 'Courier confirmed delivery to you'],
+    ];
+    var y = 60;
+    msgs.forEach(function (m) {
+      var right = m[0] === 'right';
+      g.fillStyle = right ? '#2563eb' : '#334155';
+      var w = 300, x = right ? 520 - w - 16 : 16;
+      g.fillRect(x, y, w, 44);
+      g.fillStyle = '#f1f5f9'; g.font = '13px sans-serif';
+      g.fillText(m[1].slice(0, 40), x + 12, y + 27);
+      y += 56;
+    });
+    return c.toDataURL('image/png');
+  }
+
+  // AES-GCM encrypt the evidence, wrap the key for each recipient.
+  function encryptEvidence(payloadObj, recipientsHex) {
+    return crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt'])
+      .then(function (key) {
+        var iv = crypto.getRandomValues(new Uint8Array(12));
+        var pt = new TextEncoder().encode(JSON.stringify(payloadObj));
+        return Promise.all([
+          crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, pt),
+          crypto.subtle.exportKey('raw', key),
+        ]).then(function (r) {
+          var ct = new Uint8Array(r[0]);
+          var keyB64 = b64enc(new Uint8Array(r[1]));
+          var envelope = { v: 1, alg: 'A256GCM', iv: b64enc(iv), ct: b64enc(ct), wrap: hasNip44 ? 'nip44' : 'demo', keys: [] };
+          // Wrap the symmetric key for each of the 3 pubkeys, sequentially
+          // (each NIP-44 wrap raises a bridge approval dialog).
+          var chain = Promise.resolve();
+          recipientsHex.forEach(function (rec) {
+            chain = chain.then(function () {
+              if (hasNip44) {
+                return window.nostr.nip44.encrypt(rec.hex, keyB64).then(function (wrapped) {
+                  envelope.keys.push({ p: rec.hex, role: rec.role, k: wrapped });
+                });
+              }
+              // Demo-only fallback: no NIP-44 in the SDK → the key is NOT
+              // actually wrapped. Clearly flagged so nobody mistakes it for real.
+              envelope.keys.push({ p: rec.hex, role: rec.role, k: keyB64, demo: true });
+              return null;
+            });
+          });
+          return chain.then(function () { return envelope; });
+        });
+      });
+  }
+
+  $('d-build').onclick = function () {
+    setErr('d-err', '');
+    if (!inShell) { setErr('d-err', 'Open inside Freeport to sign the dispute event.'); return; }
+    var txId = ($('d-tx').value || '').trim().toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(txId)) { setErr('d-err', 'Transaction id must be 64 hex characters.'); return; }
+    var role = $('d-role').value;
+    var text = $('d-text').value.trim();
+    if (!text && !state.disputeImg) { setErr('d-err', 'Add a description or an evidence image.'); return; }
+
+    // Resolve the three parties. Prefer the drafted contract; otherwise the
+    // opener is the current user and the other two are unknown → demo defaults.
+    var c = state.contract && state.contract.txId === txId ? state.contract : null;
+    var buyerHex, sellerHex, arbHex;
+    if (c) { buyerHex = c.buyer; sellerHex = c.seller; arbHex = c.arbitrator; }
+    else {
+      // Fallback for a pasted tx id with no local contract: put the current
+      // user in their chosen role, fill the rest with deterministic demo pubkeys.
+      var me = state.pubkeyHex || sampleHex('buyer');
+      buyerHex = role === 'buyer' ? me : sampleHex('seller');
+      sellerHex = role === 'seller' ? me : sampleHex('seller');
+      arbHex = sampleHex('arbitrator');
+    }
+    var opener = role === 'buyer' ? buyerHex : sellerHex;
+
+    var btn = $('d-build'); btn.disabled = true; btn.textContent = 'Encrypting…';
+    var payload = { role: role, text: text, image: state.disputeImg || null, at: new Date().toISOString() };
+    var recipients = [
+      { hex: arbHex, role: 'arbitrator' },
+      { hex: buyerHex, role: 'buyer' },
+      { hex: sellerHex, role: 'seller' },
+    ];
+    encryptEvidence(payload, recipients).then(function (envelope) {
+      btn.textContent = 'Requesting signature…';
+      // kind 32105 (addressable). d = the target tx id, so each new dispute is
+      // its own event (a fixed d would make disputes overwrite one another).
+      var tmpl = {
+        kind: 32105,
+        content: JSON.stringify(envelope),
+        tags: [
+          ['d', txId],
+          ['e', txId, '', 'reply'],
+          ['p', arbHex, '', 'arbitrator'],
+          ['p', buyerHex, '', 'buyer'],
+          ['p', sellerHex, '', 'seller'],
+        ],
+      };
+      return window.nostr.signEvent(tmpl);
+    }).then(function (signed) {
+      var fee = computeFee(c ? c.amount : 0);
+      // Record the case for the dashboard (plaintext kept in-session only).
+      state.cases.push({
+        txId: txId, role: role, opener: opener,
+        buyer: buyerHex, seller: sellerHex, arbitrator: arbHex,
+        text: text, image: state.disputeImg || null,
+        event: signed, fee: fee, verdict: null,
+      });
+      renderDisputeResult(signed, fee);
+      // reset the compose image
+      state.disputeImg = null;
+      $('d-drop').innerHTML = 'Tap to attach an image (stays in this page; encrypted before it goes into the event)';
+      btn.disabled = false; btn.textContent = 'Encrypt, sign & compose dispute';
+    }).catch(function (err) {
+      btn.disabled = false; btn.textContent = 'Encrypt, sign & compose dispute';
+      setErr('d-err', (err && err.message) || 'Could not sign the dispute event.');
+    });
+  };
+
+  function renderDisputeResult(signed, fee) {
+    var json = JSON.stringify(signed, null, 2);
+    var wrapNote = hasNip44
+      ? 'Evidence key wrapped for all 3 parties via NIP-44 (window.nostr.nip44.encrypt).'
+      : 'NIP-44 not exposed by this SDK — the evidence key is embedded UNWRAPPED (demo-only).';
+    $('d-out').innerHTML =
+      '<div class="badge">✓ kind 32105 signed</div>' +
+      '<div class="muted">' + esc(wrapNote) + ' A real deployment publishes this ' +
+      'over its own <span class="mono">wss://</span> relay connection; the SDK ' +
+      'exposes no publish RPC, so the demo shows the signed event for you to copy.</div>' +
+      '<pre id="d-json">' + esc(json) + '</pre>' +
+      '<div class="actions">' +
+      '<button id="d-copy">Copy signed event</button>' +
+      (fee > 0 ? '<button class="ok" id="d-stake">Stake fee (' + esc(usdt(fee)) + ')</button>'
+               : '<button class="ghost" id="d-nostake" disabled>Fee is 0 — nothing to stake</button>') +
+      '<button class="ghost" id="d-goto-dash">Go to dashboard →</button>' +
+      '</div>' +
+      '<div class="muted">The dispute <b>opener</b> stakes the fee up front — anti-spam and neutral. In a real deployment the winner is reimbursed from the loser\'s share; the demo just states this.</div>' +
+      '<div class="err" id="d-stake-err"></div>' +
+      '<div class="ok-msg" id="d-stake-ok"></div>';
+    $('d-copy').onclick = function () {
+      var btn = this;
+      (navigator.clipboard ? navigator.clipboard.writeText(JSON.stringify(signed)) : Promise.reject())
+        .then(function () { btn.textContent = 'Copied ✓'; setTimeout(function () { btn.textContent = 'Copy signed event'; }, 1500); })
+        .catch(function () {});
+    };
+    $('d-goto-dash').onclick = function () { showTab('dash'); };
+    var stakeBtn = $('d-stake');
+    if (stakeBtn) stakeBtn.onclick = function () {
+      setErr('d-stake-err', '');
+      var b = this; b.disabled = true; b.textContent = 'Paying…';
+      window.freeport.paySpark({ address: DONATION, token: { ticker: 'USDT', amount: fee } })
+        .then(function () { b.textContent = 'Fee staked ✓'; $('d-stake-ok').textContent = 'Fee escrowed with the arbitrator (demo — sent to donation address).'; })
+        .catch(function (e) { b.disabled = false; b.textContent = 'Stake fee (' + usdt(fee) + ')'; setErr('d-stake-err', paymentError(e)); });
+    };
+  }
+
+  function paymentError(e) {
+    var m = (e && e.message ? e.message : '').toLowerCase();
+    if (m.indexOf('insufficient') >= 0) return 'Insufficient funds in your Freeport wallet — top up and try again.';
+    if (m.indexOf('rate') >= 0) return 'Could not get an exchange rate to price this in sats. Try again shortly.';
+    if (m.indexOf('no wallet') >= 0 || m.indexOf('unavailable') >= 0) return 'No wallet is enabled. Turn on the Wallet in Settings → Experimental.';
+    if (m.indexOf('denied') >= 0) return 'Payment was declined.';
+    return 'Payment failed. Please try again.';
+  }
+
+  // ══════════════ TAB 3: ARBITRATOR DASHBOARD ══════════════
+  function renderDash() {
+    var list = $('dash-list');
+    if (!state.cases.length) {
+      list.innerHTML = '<div class="banner">No case files yet. Open a dispute in tab 2 and it appears here.</div>';
+      return;
+    }
+    // Group cases by tx id so both sides of the same trade sit together.
+    var byTx = {};
+    state.cases.forEach(function (cs, i) { (byTx[cs.txId] = byTx[cs.txId] || []).push(i); });
+    var html = '';
+    Object.keys(byTx).forEach(function (txId) {
+      var idxs = byTx[txId];
+      var any = state.cases[idxs[0]];
+      html += '<div class="case">' +
+        '<div class="cid">tx ' + esc(shortHex(txId)) + '</div>' +
+        '<div class="muted">Arbitrator: ' + esc(shortHex(any.arbitrator)) + ' · fee ' + esc(usdt(any.fee)) + '</div>';
+      idxs.forEach(function (i) {
+        var cs = state.cases[i];
+        html += '<div class="side"><div class="who"><span class="pill ' + cs.role + '">' + esc(cs.role.toUpperCase()) + '</span> ' + esc(shortHex(cs.opener)) + '</div>' +
+          (cs.text ? '<div style="margin-top:6px">' + esc(cs.text) + '</div>' : '<div class="muted" style="margin-top:6px">(no text)</div>') +
+          (cs.image ? '<img src="' + esc(cs.image) + '" alt="evidence">' : '') +
+          '</div>';
+      });
+      // Verdict controls act on the trade (uses the first case's parties/event).
+      if (any.verdict) {
+        html += '<div class="ok-msg">Verdict: RELEASE TO ' + esc(any.verdict.winner.toUpperCase()) + ' · kind 32106 signed.</div>' +
+          '<div id="receipt-' + esc(txId) + '"></div>';
+      } else {
+        html += '<div class="actions">' +
+          '<button class="ok" data-verdict="buyer" data-tx="' + esc(txId) + '">Release to buyer (refund)</button>' +
+          '<button data-verdict="seller" data-tx="' + esc(txId) + '">Release to seller</button>' +
+          '</div><div class="err" id="verr-' + esc(txId) + '"></div>';
+      }
+      html += '<div class="muted">Deciding produces a signed <span class="mono">kind 32106</span> verdict event (e-tagging the dispute) and a mock payout receipt.</div>';
+      html += '</div>';
+    });
+    list.innerHTML = html;
+    Array.prototype.forEach.call(list.querySelectorAll('button[data-verdict]'), function (b) {
+      b.onclick = function () { decideVerdict(b.getAttribute('data-tx'), b.getAttribute('data-verdict')); };
+    });
+  }
+
+  function decideVerdict(txId, winner) {
+    var cs = null;
+    for (var i = 0; i < state.cases.length; i++) if (state.cases[i].txId === txId) { cs = state.cases[i]; break; }
+    if (!cs) return;
+    if (!inShell) { setErr('verr-' + txId, 'Open inside Freeport to sign the verdict.'); return; }
+    var disputeId = cs.event && cs.event.id ? cs.event.id : '';
+    var payoutTo = winner === 'buyer' ? cs.buyer : cs.seller;
+    var tmpl = {
+      kind: 32106,
+      content: JSON.stringify({ decision: 'release', winner: winner, payoutTo: payoutTo, fee: cs.fee, note: 'Specimen verdict — no funds moved.' }),
+      tags: [
+        ['d', txId],
+        ['e', txId, '', 'root'],
+      ].concat(disputeId ? [['e', disputeId, '', 'reply']] : [])
+       .concat([
+        ['p', cs.arbitrator, '', 'arbitrator'],
+        ['p', cs.buyer, '', 'buyer'],
+        ['p', cs.seller, '', 'seller'],
+      ]),
+    };
+    window.nostr.signEvent(tmpl).then(function (signed) {
+      cs.verdict = { winner: winner, event: signed };
+      // Mark all cases for this tx as decided (one verdict per trade).
+      state.cases.forEach(function (o) { if (o.txId === txId && !o.verdict) o.verdict = cs.verdict; });
+      renderDash();
+      var receipt = $('receipt-' + txId);
+      if (receipt) receipt.innerHTML = payoutReceipt(cs, winner, signed);
+    }).catch(function (e) {
+      setErr('verr-' + txId, (e && e.message) || 'Could not sign the verdict.');
+    });
+  }
+
+  function payoutReceipt(cs, winner, signed) {
+    var payoutTo = winner === 'buyer' ? cs.buyer : cs.seller;
+    return '<div class="doc"><div class="watermark">SPECIMEN</div>' +
+      '<div class="co-sub">Payout receipt — specimen, no funds moved</div>' +
+      '<h3>Arbitration verdict</h3>' +
+      '<table>' +
+      row('Transaction', '<span class="mono">' + esc(shortHex(cs.txId)) + '</span>') +
+      row('Decision', 'Release to ' + esc(winner)) +
+      row('Paid to', esc(shortHex(payoutTo))) +
+      row('Arbitrator fee', '<b>' + esc(usdt(cs.fee)) + '</b>') +
+      row('Verdict event', '<span class="mono">' + esc(shortHex(signed.id || '')) + '</span> (kind 32106)') +
+      '</table>' +
+      '<div style="margin-top:12px;color:#5b6b7b;font-size:11px">Both parties now rate this verdict; the ratings become karma on the arbitrator\'s npub.</div>' +
+      '</div>';
+  }
+
+  // ── boot ──────────────────────────────────────────────────────────────────
+  showTab('escrow');
+  loadIdentity();
+})();
+</script>
+</body>
+</html>
