@@ -29,9 +29,14 @@ Ship via OTA once translated — no binary needed. Run the Opus locale agents
 - [ ] `"Mini-apps need a newer version of the app"` — mini-app fallback title
       (shown only on a binary without the react-native-webview pod).
 - [ ] `"Update Freeport from your app store to open mini-apps."` — its body.
+- [ ] `"Not available in the offline copy — use the installed app or the web app."`
+      — disabled mini-apps toggle note in the offline (file://) build.
+- [ ] `"Mini-apps need the installed app or the web app"` — offline mini-app notice title.
+- [ ] `"The single-file offline copy can't run mini-apps."` — its body.
 
-_Both come from the `react-native-webview` guard (`src/miniapps/MiniAppShell.tsx`).
-Low urgency: the fallback only appears on pre-1.6.0 binaries opening a mini-app._
+_First two: the `react-native-webview` guard (`src/miniapps/MiniAppShell.tsx`).
+Last three: the offline (file://) mini-app degrade (`ExperimentalSection.tsx`,
+`MiniAppShell.web.tsx`). All low urgency — narrow fallback surfaces._
 
 ## Verify before promoting 1.7.0 to public
 

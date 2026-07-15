@@ -29,6 +29,7 @@ import { makeBridgeWallet } from './walletAdapter';
 import { ApprovalDialog } from './ApprovalDialog';
 import { NotMiniAppNotice, UnverifiedChip, HELLO, useVerifiedProbe } from './shellNotices';
 import { sameOriginAsShell } from './metadata';
+import { isOfflineFile } from '../platform';
 import type { WalletProvider } from '../wallet';
 
 export function MiniAppShell({
@@ -124,7 +125,19 @@ export function MiniAppShell({
           </Pressable>
         </View>
         {verified ? null : <NotMiniAppNotice alive={alive} />}
-        {sameOriginAsShell(app.url || app.origin) ? (
+        {isOfflineFile() ? (
+          // The single-file offline copy runs from file:// (parent origin is
+          // `null`), which no mini-app host lists in its CSP frame-ancestors —
+          // the frame would just render a dead "refused to connect". Degrade to
+          // a friendly notice; mini-apps need the installed or hosted web app.
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 10 }}>
+            <Ionicons name="cloud-offline-outline" size={40} color={palette.text2} />
+            <Text style={[s.toggleTitle, { textAlign: 'center' }]}>{t('Mini-apps need the installed app or the web app')}</Text>
+            <Text style={[s.dim, { textAlign: 'center' }]}>
+              {t("The single-file offline copy can't run mini-apps.")}
+            </Text>
+          </View>
+        ) : sameOriginAsShell(app.url || app.origin) ? (
           // A same-origin app can't be isolated by the sandbox iframe (it would
           // share this document's storage, incl. the key). Refuse to load it
           // rather than expose the key — even for a previously-added app.

@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { t } from '../../i18n';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { s, palette } from '../../ui/theme';
+import { isOfflineFile } from '../../platform';
 
 /**
  * Experimental features — early, opt-in, OFF by default. Each toggle only
@@ -134,21 +135,36 @@ function ExperimentalSection({
           )}
           {/* Calls shipped — the toggle lives under Settings → Chat (with the
               TURN fallback + IP note), per the roadmap spec. */}
-          <Pressable
-            accessibilityRole="switch"
-            accessibilityState={{ checked: miniAppsEnabled }}
-            style={s.toggleRow}
-            onPress={() => onMiniAppsEnabledChange(!miniAppsEnabled)}
-          >
-            <Ionicons name="apps-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
-            <View style={{ flex: 1, marginEnd: 12 }}>
-              <Text style={s.toggleTitle}>{t('Mini-apps')}</Text>
-              <Text style={s.dim}>{t('Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.')}</Text>
+          {/* Mini-apps frame off-origin https hosts whose CSP frame-ancestors
+              never lists file://'s null origin, so they can't run in the
+              single-file offline copy. Show the row disabled there instead of
+              letting it flip on to a feature that would only break. */}
+          {isOfflineFile() ? (
+            <View accessibilityRole="switch" accessibilityState={{ checked: false, disabled: true }} style={[s.toggleRow, { opacity: 0.45 }]}>
+              <Ionicons name="apps-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
+              <View style={{ flex: 1, marginEnd: 12 }}>
+                <Text style={s.toggleTitle}>{t('Mini-apps')}</Text>
+                <Text style={s.dim}>{t('Not available in the offline copy — use the installed app or the web app.')}</Text>
+              </View>
+              <View style={s.switchTrack}><View style={s.switchThumb} /></View>
             </View>
-            <View style={[s.switchTrack, miniAppsEnabled && s.switchTrackOn]}>
-              <View style={[s.switchThumb, miniAppsEnabled && s.switchThumbOn]} />
-            </View>
-          </Pressable>
+          ) : (
+            <Pressable
+              accessibilityRole="switch"
+              accessibilityState={{ checked: miniAppsEnabled }}
+              style={s.toggleRow}
+              onPress={() => onMiniAppsEnabledChange(!miniAppsEnabled)}
+            >
+              <Ionicons name="apps-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />
+              <View style={{ flex: 1, marginEnd: 12 }}>
+                <Text style={s.toggleTitle}>{t('Mini-apps')}</Text>
+                <Text style={s.dim}>{t('Web apps that use your Freeport identity & wallet. Sandboxed — every sensitive action needs your approval.')}</Text>
+              </View>
+              <View style={[s.switchTrack, miniAppsEnabled && s.switchTrackOn]}>
+                <View style={[s.switchThumb, miniAppsEnabled && s.switchThumbOn]} />
+              </View>
+            </Pressable>
+          )}
           {/* Zaps shipped — the ⚡ chip lives on Browse cards (wallet on). */}
         </>
       )}
