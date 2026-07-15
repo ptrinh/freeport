@@ -67,6 +67,7 @@ echo "▸ Writing _redirects + inline www→apex redirect…"
 cat > dist/_redirects <<'REDIR'
 https://www.freeport.network/* https://freeport.network/:splat 301
 /demo-app/* /esim-store/:splat 301
+/i/* /index.html 200
 REDIR
 sed -i '' 's#<head>#<head><script>if(location.hostname==="www.freeport.network")location.replace("https://freeport.network"+location.pathname+location.search+location.hash);</script>#' dist/index.html
 
@@ -76,7 +77,7 @@ sed -i '' 's#<head>#<head><script>if(location.hostname==="www.freeport.network")
 echo "▸ Writing passkey well-known files…"
 mkdir -p dist/.well-known
 cat > dist/.well-known/apple-app-site-association <<'AASA'
-{ "webcredentials": { "apps": ["84T567KMYD.uk.trinh.freeport"] } }
+{ "applinks": { "apps": [], "details": [ { "appID": "84T567KMYD.uk.trinh.freeport", "paths": ["/i/*"] } ] }, "webcredentials": { "apps": ["84T567KMYD.uk.trinh.freeport"] } }
 AASA
 cat > dist/.well-known/assetlinks.json <<'ALINKS'
 [{

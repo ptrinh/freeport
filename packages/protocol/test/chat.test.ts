@@ -51,7 +51,11 @@ describe('invite code commitment', () => {
     const { code } = mintInviteCode(PK_A);
     expect(parseInviteLink(`https://freeport.network/#invite=${code}`)).toBe(code);
     expect(parseInviteLink(`#invite=${code}`)).toBe(code);
+    // Path form (Universal Links / App Links), incl. a native custom-scheme URL.
+    expect(parseInviteLink(`https://freeport.network/i/${code}`)).toBe(code);
+    expect(parseInviteLink(`freeport://freeport.network/i/${code}`)).toBe(code);
     expect(parseInviteLink('#t=abcdef')).toBeNull();
+    expect(parseInviteLink('https://freeport.network/introduction')).toBeNull();
     expect(parseInviteLink('')).toBeNull();
   });
 });

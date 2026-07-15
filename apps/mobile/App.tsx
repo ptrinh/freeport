@@ -382,9 +382,10 @@ function AppInner() {
   const [callStreams, setCallStreams] = useState<{ local: any; remote: any }>({ local: null, remote: null });
   const callManagerRef = useRef<CallManager | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  // An opened #invite=<code> link, waiting for the client to resolve it.
+  // An opened invite link (/i/<code> path or legacy #invite= hash), waiting for
+  // the client to resolve it.
   const [pendingInviteCode, setPendingInviteCode] = useState<string | null>(() =>
-    Platform.OS === 'web' && typeof window !== 'undefined' ? parseInviteLink(window.location.hash) : null,
+    Platform.OS === 'web' && typeof window !== 'undefined' ? parseInviteLink(window.location.href) : null,
   );
   const [resolvedInvite, setResolvedInvite] = useState<{ pubkey: string; name?: string } | null>(null);
   const [walletNwcUrl, setWalletNwcUrl] = useState('');
@@ -1118,7 +1119,7 @@ function AppInner() {
   useEffect(() => {
     if (Platform.OS === 'web') {
       if (typeof window === 'undefined') return;
-      const onHash = () => { const code = parseInviteLink(window.location.hash); if (code) setPendingInviteCode(code); };
+      const onHash = () => { const code = parseInviteLink(window.location.href); if (code) setPendingInviteCode(code); };
       window.addEventListener('hashchange', onHash);
       return () => window.removeEventListener('hashchange', onHash);
     }
@@ -1135,9 +1136,14 @@ function AppInner() {
     client.resolveChatInvite(pendingInviteCode).then((r) => {
       if (cancelled) return;
       setPendingInviteCode(null);
-      // Consume the fragment so a reload doesn't re-open the sheet.
-      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location.hash.includes('invite=')) {
-        try { window.history.replaceState(null, '', window.location.pathname + window.location.search); } catch { /* best-effort */ }
+      // Consume the invite from the URL so a reload doesn't re-open the sheet —
+      // clear the legacy #invite= fragment and/or the /i/<code> path.
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        const onInvitePath = /\/i\/[a-z2-7]{6,16}\b/.test(window.location.pathname);
+        if (window.location.hash.includes('invite=') || onInvitePath) {
+          const path = onInvitePath ? '/' : window.location.pathname;
+          try { window.history.replaceState(null, '', path + window.location.search); } catch { /* best-effort */ }
+        }
       }
       if (r) setResolvedInvite(r);
       else uiAlert(t('Invite not found'), t('This invite link has expired or was revoked.'));

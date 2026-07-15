@@ -5,7 +5,7 @@
  *     the Messages tab when the Chat experiment is on.
  *   - FriendChatModal: the conversation screen (reuses ChatCore) with
  *     archive + block actions and last-seen in the header.
- *   - InviteSheet: your shareable QR + link (#invite=<code>) with copy/share
+ *   - InviteSheet: your shareable QR + link (/i/<code>) with copy/share
  *     and a "Generate new invite link" rotation.
  *   - ChatFab: the floating + button that opens the InviteSheet.
  */
@@ -23,6 +23,7 @@ import { webBase } from '../../webBase';
 import { fmtClock } from '../../ui/format';
 import { s, palette } from '../../ui/theme';
 import { confirmAsync } from '../../ui/alerts';
+import { copyText, clipboardAvailable } from '../../ui/clipboard';
 import { ChatCore, SAFE_ATTACH_EXTENSIONS, isAudioMsg, isImageMsg, isTripMsg, isDocMsg, isLocationMsg, locationMsg, docMsgName } from './Chat';
 import { matchesKeywords } from '../../browseFilter';
 import { DraggableFab } from '../../ui/DraggableFab';
@@ -416,25 +417,23 @@ export function InviteSheet({ client, myName, onClose }: {
     return () => { cancelled = true; };
   }, [client]);
 
-  const link = code ? `${webBase()}/#invite=${code}` : '';
-  // Native has no clipboard module in the binary (see AboutSection), so the
-  // native action is a real Share, not a copy — the button is labelled to match.
-  const nativeShare = Platform.OS !== 'web';
+  // Path form (…/i/<code>) so an installed native app can deep-link it via
+  // Universal Links / App Links; it still opens the web app when there's no app.
+  const link = code ? `${webBase()}/i/${code}` : '';
+  // Do we have a real clipboard (web, or a binary that pre-linked expo-clipboard)?
+  // Until we know, assume yes on web / no on native so the label starts honest.
+  const [canCopy, setCanCopy] = useState(Platform.OS === 'web');
+  useEffect(() => { clipboardAvailable().then(setCanCopy).catch(() => {}); }, []);
   const copy = async () => {
     if (!link) return;
-    if (!nativeShare) {
-      try {
-        await (navigator as any)?.clipboard?.writeText(link);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch { /* clipboard denied */ }
-      return;
-    }
-    // The OS share sheet must NOT be presented while this <Modal> is on screen:
-    // on iOS that wedges touch handling and the whole app stops responding
-    // (user report). Dismiss the sheet first, then share once it's gone.
-    onClose();
-    setTimeout(() => { Share.share({ message: link }).catch(() => {}); }, 350);
+    const wrote = await copyText(link, () => {
+      // No clipboard module → OS share sheet. It must NOT be presented while
+      // this <Modal> is on screen: on iOS that wedges touch handling and the
+      // whole app freezes (user report). Dismiss first, then share.
+      onClose();
+      setTimeout(() => { Share.share({ message: link }).catch(() => {}); }, 350);
+    });
+    if (wrote) { setCopied(true); setTimeout(() => setCopied(false), 2000); }
   };
   const rotate = async () => {
     if (!client || busy) return;
@@ -466,8 +465,8 @@ export function InviteSheet({ client, myName, onClose }: {
               <View style={[s.btnRow, { marginTop: 12 }]}>
                 <Pressable style={[s.btnAccept, { flex: 1 }]} onPress={copy}>
                   <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
-                    <Ionicons name={nativeShare ? 'share-outline' : 'copy-outline'} size={14} color="white" />
-                    <Text style={s.btnText}>{copied ? t('Copied') : nativeShare ? t('Share link') : t('Copy link')}</Text>
+                    <Ionicons name={canCopy ? 'copy-outline' : 'share-outline'} size={14} color="white" />
+                    <Text style={s.btnText}>{copied ? t('Copied') : canCopy ? t('Copy link') : t('Share link')}</Text>
                   </View>
                 </Pressable>
                 <Pressable style={[s.btnGhost, { flex: 1 }]} onPress={rotate} disabled={busy}>

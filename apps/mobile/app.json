@@ -7,6 +7,7 @@
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "scheme": "freeport",
     "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "uk.trinh.freeport",
@@ -16,13 +17,24 @@
       },
       "buildNumber": "24",
       "associatedDomains": [
-        "webcredentials:freeport.network"
+        "webcredentials:freeport.network",
+        "applinks:freeport.network"
       ]
     },
     "android": {
       "package": "uk.trinh.freeport",
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            { "scheme": "https", "host": "freeport.network", "pathPrefix": "/i/" }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ],
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",

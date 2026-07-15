@@ -68,10 +68,20 @@ export function verifyInviteCode(code: string, pubkeyHex: string, nonceHex: stri
   return inviteCodeFor(pubkeyHex, nonceHex) === code;
 }
 
-/** Extract an invite code from a share link's fragment ("…#invite=<code>"). */
+/**
+ * Extract an invite code from a share link. Accepts the path form
+ * ("…/i/<code>", which iOS Universal Links / Android App Links can match) and
+ * the legacy fragment form ("…#invite=<code>", still used on web and in links
+ * already shared before the path form existed).
+ */
 export function parseInviteLink(urlOrHash: string): string | null {
-  const m = /#invite=([a-z2-7]{6,16})\b/.exec(urlOrHash || '');
+  const m = /(?:#invite=|\/i\/)([a-z2-7]{6,16})\b/.exec(urlOrHash || '');
   return m ? m[1] : null;
+}
+
+/** Build a shareable invite link in the path form the native apps can deep-link. */
+export function inviteLink(base: string, code: string): string {
+  return `${base.replace(/\/$/, '')}/i/${code}`;
 }
 
 // ─── Chat envelopes ──────────────────────────────────────────────────────────
