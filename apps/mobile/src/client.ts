@@ -10,21 +10,30 @@ import { getConversationKey as nip44ConvKey, decrypt as nip44Decrypt } from 'nos
 import { getPow } from 'nostr-tools/nip13';
 import { minePowAsync } from './pow';
 import { screenIntent, screenIntentContent } from './moderation';
-import { publishProfile, maskPhone, type UserProfile } from './profile';
+import { publishProfile, maskPhone, httpsLinkOrNull, type UserProfile } from './profile';
 import { publishKarma, type KarmaScore } from './karma';
 import { publishReceipt } from './receipts';
 import { fetchReputation, type Reputation } from './reputation';
 import { buildTrustMap } from './wot';
 import { kvGet, kvSet, kvDelete } from './kv';
+import { query } from './query';
 import { kvCacheGet, kvCacheSet, kvCacheDelete } from './kvCache';
 import type { Signer } from './signer';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { applyChatInbound, applyChatOutbound, newConversation, sweepExpired, type Conversation } from './conversations';
 import {
   DEFAULT_RELAYS,
+  SCHEMA_VERSION,
   KIND_INTENT_OFFER,
   KIND_INTENT_REQUEST,
   KIND_CHAT_INVITE,
+  KIND_KARMA,
+  KIND_GROUP_INVITE,
+  KIND_GROUP_JOIN,
+  makeGroupJoinContent,
+  parseGroupJoin,
+  type GroupInvite,
+  type GroupDescriptor,
   CHAT_INVITE,
   CHAT_ACCEPT,
   CHAT_REJECT,
@@ -160,6 +169,12 @@ export class MobileClient {
   readonly profiles = new Map<string, { name?: string; picture?: string; about?: string; phone?: string; vehicleModel?: string; plate?: string; lud16?: string; link?: string }>();
   /** Cache of fetched reputations keyed by pubkey. */
   readonly reputations = new Map<string, Reputation>();
+  /** Cache of a peer's VERIFIED group-join attestations, keyed by pubkey.
+   *  Powers the "Same group" badge (matched against myGroupGids). */
+  readonly peerGroups = new Map<string, GroupInvite[]>();
+  /** Group ids the LOCAL user has joined — set by App from the prefs store.
+   *  Kept here so card/profile rendering can match without prop-drilling. */
+  myGroupGids = new Set<string>();
   /** Recently seen market intents (others'), for client-side price suggestions. */
   readonly marketIntents = new Map<string, Intent>();
   /** Storefront products keyed by `${pubkey}|${d}` (latest addressable wins). */
@@ -501,6 +516,9 @@ export class MobileClient {
           this.onIntent?.(intent);
           this.fetchProfile(intent.pubkey);
           this.fetchReputation(intent.pubkey);
+          // Only look for a shared-group signal once the viewer belongs to any
+          // group — otherwise there's nothing to match against.
+          if (this.myGroupGids.size > 0) this.fetchPeerGroups(intent.pubkey);
           if (++this.intentsSincePrune >= PRUNE_EVERY_INTENTS) this.pruneSessionCaches();
         },
       },
@@ -543,7 +561,7 @@ export class MobileClient {
       if (!seen) { seen = new Set(); this.authorListings.set(intent.pubkey, seen); }
       seen.add(intent.d);
     }
-    for (const cache of [this.profiles, this.reputations, this.profileTs] as Map<string, unknown>[]) {
+    for (const cache of [this.profiles, this.reputations, this.profileTs, this.peerGroups] as Map<string, unknown>[]) {
       for (const k of cache.keys()) {
         if (cache.size <= MAX_PEER_CACHE) break;
         cache.delete(k);
@@ -577,7 +595,7 @@ export class MobileClient {
             try {
               const meta = JSON.parse(ev.content);
               this.profileTs.set(ev.pubkey, ev.created_at);
-              this.profiles.set(ev.pubkey, { name: meta.name, picture: meta.picture, about: meta.about, phone: meta.phone, vehicleModel: meta.vehicle_model, plate: meta.plate, lud16: meta.lud16, link: meta.link });
+              this.profiles.set(ev.pubkey, { name: meta.name, picture: meta.picture, about: meta.about, phone: meta.phone, vehicleModel: meta.vehicle_model, plate: meta.plate, lud16: meta.lud16, link: meta.link || (httpsLinkOrNull(meta.website) ?? undefined) });
               this.onProfileFetched?.(ev.pubkey);
             } catch {}
           },
@@ -621,6 +639,92 @@ export class MobileClient {
         const next = this.reputationWaiting.shift();
         if (next) this.runReputationFetch(next);
       });
+  }
+
+  // ─── Group import / community onboarding ─────────────────────────────────
+
+  /** Sign a group-invite event (the admin-signed community descriptor). The
+   *  event id becomes the immutable group id; the whole event is later encoded
+   *  into the share link. A random `nonce` tag guarantees a unique id even for
+   *  two invites with identical descriptors created in the same second. */
+  async signGroupInvite(descriptor: GroupDescriptor): Promise<Event> {
+    const rnd = new Uint8Array(8);
+    globalThis.crypto.getRandomValues(rnd);
+    const nonce = [...rnd].map((b) => b.toString(16).padStart(2, '0')).join('');
+    return this.signer.signEvent({
+      kind: KIND_GROUP_INVITE,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [['d', nonce], ['nonce', nonce]],
+      content: JSON.stringify(descriptor),
+    });
+  }
+
+  /** Publish a member's join attestation (addressable by d = group id). The
+   *  content embeds the admin-signed invite so any reader can verify it. */
+  async publishGroupJoin(invite: GroupInvite): Promise<void> {
+    const ev = await this.signer.signEvent({
+      kind: KIND_GROUP_JOIN,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [['d', invite.gid], ['p', invite.admin]],
+      content: makeGroupJoinContent(invite),
+    });
+    await Promise.any(this.pool.publish(this.relays, ev));
+  }
+
+  private groupsInFlight = new Set<string>();
+  /** Lazily fetch + cache a peer's VERIFIED group-join attestations. Best-effort
+   *  and throttled by an in-flight guard; fires onReputationFetched so cards
+   *  re-render with the "Same group" badge once results land. */
+  fetchPeerGroups(pubkey: string): void {
+    if (this.peerGroups.has(pubkey) || this.groupsInFlight.has(pubkey)) return;
+    this.groupsInFlight.add(pubkey);
+    query(this.pool, this.relays, { kinds: [KIND_GROUP_JOIN], authors: [pubkey], limit: 50 })
+      .then((events) => {
+        const groups: GroupInvite[] = [];
+        const seen = new Set<string>();
+        for (const ev of events) {
+          const inv = parseGroupJoin(ev.content);
+          // A join only counts if the ATTESTER is the event author (no relaying
+          // someone else's membership) and the gid isn't already recorded.
+          if (inv && !seen.has(inv.gid)) { seen.add(inv.gid); groups.push(inv); }
+        }
+        this.peerGroups.set(pubkey, groups);
+        this.onReputationFetched?.(pubkey);
+      })
+      .catch(() => {})
+      .finally(() => { this.groupsInFlight.delete(pubkey); });
+  }
+
+  /** List members who published a join attestation for `gid` (admin members
+   *  screen). Verified against the embedded admin signature. */
+  async fetchGroupMembers(gid: string): Promise<{ pubkey: string; name?: string }[]> {
+    const events = await query(this.pool, this.relays, { kinds: [KIND_GROUP_JOIN], '#d': [gid], limit: 500 });
+    const members = new Map<string, number>(); // pubkey → newest created_at
+    for (const ev of events) {
+      const inv = parseGroupJoin(ev.content);
+      if (!inv || inv.gid !== gid) continue; // must reference this exact group
+      const prev = members.get(ev.pubkey) ?? 0;
+      if (ev.created_at >= prev) members.set(ev.pubkey, ev.created_at);
+    }
+    return [...members.keys()]
+      .filter((pk) => pk !== this.pubkey)
+      .map((pk) => ({ pubkey: pk, name: this.profiles.get(pk)?.name }));
+  }
+
+  /** Admin one-tap vouch for a group member. Reuses the karma event format but
+   *  keys it on the group id (d = `grp:<gid>`), NOT a deal — so it is a visible
+   *  signal that does NOT inflate the trust-weighted score (which only counts
+   *  karma backed by a proven deal-receipt pair). */
+  async publishGroupVouch(member: string, gid: string, note?: string): Promise<void> {
+    const content: { v: number; score: KarmaScore; note?: string } = { v: SCHEMA_VERSION, score: 2 };
+    if (note) content.note = note;
+    const ev = await this.signer.signEvent({
+      kind: KIND_KARMA,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [['d', `grp:${gid}`], ['p', member]],
+      content: JSON.stringify(content),
+    });
+    await Promise.any(this.pool.publish(this.relays, ev));
   }
 
   async rateKarma(

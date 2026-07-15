@@ -25,8 +25,6 @@ export interface UserProfile {
   /** Full phone number — kept in SecureStore only. What gets published depends on phoneDisplay. */
   phone: string;
   phoneDisplay: PhoneDisplay;
-  /** Optional external link (e.g. provider's website/social). Published as NIP-24 `website`. */
-  externalLink: string;
   /** Optional user-set profile link (e.g. an ID/licence verification page).
    *  MUST be https — peer URLs are untrusted, so we never publish or open a
    *  non-https value. Published as a custom `link` field. */
@@ -42,7 +40,7 @@ export interface UserProfile {
   plateDisplay: PhoneDisplay;
 }
 
-const EMPTY: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+const EMPTY: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
 
 /**
  * Validate + normalize a user/peer profile link. Returns a canonical https URL,
@@ -123,7 +121,19 @@ export async function loadProfile(): Promise<UserProfile> {
     const raw = await kvGet(STORE_KEY);
     if (!raw) return { ...EMPTY };
     const parsed = JSON.parse(raw);
-    return { ...EMPTY, ...parsed, gallery: parsed.gallery ?? [] };
+    const merged: UserProfile = { ...EMPTY, ...parsed, gallery: parsed.gallery ?? [] };
+    // Migrate the retired "External link" field: if the user hasn't set a `link`
+    // yet but has a legacy externalLink/website value that passes https
+    // validation, carry it over so their next save republishes it as `link`.
+    // A non-https legacy value is intentionally left behind (it can't be safely
+    // published or opened, and is no longer editable in the UI).
+    if (!merged.link) {
+      const legacy = httpsLinkOrNull(parsed.externalLink ?? parsed.website);
+      if (legacy) merged.link = legacy;
+    }
+    // Drop the retired field so it's no longer persisted or published.
+    delete (merged as { externalLink?: string }).externalLink;
+    return merged;
   } catch {
     return { ...EMPTY };
   }
@@ -149,8 +159,8 @@ export async function publishProfile(
   if (profile.picture) content.picture = profile.picture;
   if (profile.about) content.about = profile.about;
   if (profile.gallery?.length) content.gallery = profile.gallery;
-  if (profile.externalLink) content.website = profile.externalLink.trim();
   // Only ever publish a valid https link; a non-https value is dropped, not shared.
+  // (The retired `website`/External-link field is no longer written.)
   if (profile.link) {
     const safeLink = httpsLinkOrNull(profile.link);
     if (safeLink) content.link = safeLink;

@@ -21,6 +21,7 @@ import { hasNip07, type Signer } from '../signer';
 import { maskPhone, maskPlate, httpsLinkOrNull, type UserProfile, type PhoneDisplay } from '../profile';
 import { MobileClient } from '../client';
 import { loadPrefs, savePrefs, type UserLocation } from '../prefs';
+import { type JoinedGroup } from '../groups';
 import { getStoredNsec } from '../identity';
 import { backupToFile, buildCloudBundle } from '../backup';
 import { cloudAvailable, cloudSave, cloudRestore, cloudName } from '../cloudBackup';
@@ -103,6 +104,9 @@ function SettingsTab({
   browseAlertNotify,
   browseMaxDistance,
   onBrowsePrefChange,
+  joinedGroups,
+  onCreateGroupInvite,
+  onOpenGroupMembers,
   role,
   onRoleChange,
   language,
@@ -172,6 +176,9 @@ function SettingsTab({
   browseAlertNotify: boolean;
   browseMaxDistance: number;
   onBrowsePrefChange: (p: Partial<{ browseCategory: string; browseSubcategory: string; browseAlertSound: boolean; browseAlertNotify: boolean; browseMaxDistance: number }>) => void;
+  joinedGroups: JoinedGroup[];
+  onCreateGroupInvite: () => void;
+  onOpenGroupMembers: (g: JoinedGroup) => void;
   role: 'passenger' | 'driver' | '';
   onRoleChange: (r: 'passenger' | 'driver') => void;
   language: string;
@@ -194,7 +201,6 @@ function SettingsTab({
   const [gallery, setGallery] = useState<string[]>(profile.gallery ?? []);
   const [phone, setPhone] = useState(profile.phone);
   const [phoneDisplay, setPhoneDisplay] = useState<PhoneDisplay>(profile.phoneDisplay);
-  const [externalLink, setExternalLink] = useState(profile.externalLink ?? '');
   const [link, setLink] = useState(profile.link ?? '');
   const [linkError, setLinkError] = useState<string | null>(null);
   const [vehicleModel, setVehicleModel] = useState(profile.vehicleModel ?? '');
@@ -299,6 +305,7 @@ function SettingsTab({
   const [locationOpen, setLocationOpen] = useState(false);
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const [browsePrefsOpen, setBrowsePrefsOpen] = useState(false);
+  const [groupsOpen, setGroupsOpen] = useState(false);
   // Vehicle Detail: expanded for a pure rideshare Driver (who needs it to take
   // rides), collapsed for a Provider (services vertical) where it's secondary.
   const [vehicleOpen, setVehicleOpen] = useState(!isProvider);
@@ -405,12 +412,11 @@ function SettingsTab({
     setGallery(profile.gallery ?? []);
     setPhone(profile.phone);
     setPhoneDisplay(profile.phoneDisplay);
-    setExternalLink(profile.externalLink ?? '');
     setLink(profile.link ?? '');
     setVehicleModel(profile.vehicleModel ?? '');
     setPlateNumber(profile.plateNumber ?? '');
     setPlateDisplay(profile.plateDisplay ?? 'masked');
-  }, [profile.name, profile.about, profile.picture, profile.gallery, profile.phone, profile.phoneDisplay, profile.externalLink, profile.link, profile.vehicleModel, profile.plateNumber, profile.plateDisplay]);
+  }, [profile.name, profile.about, profile.picture, profile.gallery, profile.phone, profile.phoneDisplay, profile.link, profile.vehicleModel, profile.plateNumber, profile.plateDisplay]);
 
   const pickAvatar = async () => {
     // System photo picker — no media permission needed (Play-policy compliant).
@@ -431,7 +437,6 @@ function SettingsTab({
       await onProfileChange({
         name, picture, about, gallery, phone: e164, phoneDisplay,
         link: link.trim(),
-        externalLink: isProvider ? externalLink.trim() : (profile.externalLink ?? ''),
         vehicleModel: isDriver ? vehicleModel.trim() : (profile.vehicleModel ?? ''),
         plateNumber: isDriver ? plateNumber.trim() : (profile.plateNumber ?? ''),
         plateDisplay: isDriver ? plateDisplay : (profile.plateDisplay ?? 'masked'),
@@ -581,16 +586,6 @@ function SettingsTab({
         keyboardType="url"
       />
       {linkError ? <Text style={s.fieldError}>{linkError}</Text> : null}
-
-      {isProvider && (
-        <Field
-          label={t("External Link (optional)")}
-          value={externalLink}
-          onChange={setExternalLink}
-          placeholder={t("https:// your website or social")}
-          keyboardType="url"
-        />
-      )}
 
       <Field
         label={t("Phone number")}
@@ -849,6 +844,49 @@ function SettingsTab({
               </Pressable>
             </>
           )}
+        </>
+      )}
+
+      {/* Communities — group import: create a one-link invite for a whole group,
+          and manage the groups you've joined (admins can vouch for members). */}
+      <Pressable style={s.collapseHeader} onPress={() => setGroupsOpen((v) => !v)}>
+        <View style={s.collapseLeft}>
+          <Ionicons name="people-outline" size={20} color={palette.text2} style={s.collapseIcon} />
+          <Text style={s.collapseTitle}>{t("Communities")}</Text>
+        </View>
+        <Text style={s.collapseChevron}>{groupsOpen ? '▾' : '▸'}</Text>
+      </Pressable>
+      {groupsOpen && (
+        <>
+          <Text style={s.dim}>{t("Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.")}</Text>
+          <Pressable style={[s.btnAccept, { marginTop: 12 }]} onPress={onCreateGroupInvite}>
+            <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
+              <Ionicons name="add-circle-outline" size={16} color="white" />
+              <Text style={s.btnText}>{t("Create group invite")}</Text>
+            </View>
+          </Pressable>
+          {joinedGroups.length > 0 ? (
+            <>
+              <Text style={[s.label, { marginTop: 14 }]}>{t("Your communities")}</Text>
+              {joinedGroups.map((g) => {
+                const isAdmin = g.admin === client?.pubkey;
+                return (
+                  <Pressable
+                    key={g.gid}
+                    style={s.toggleRow}
+                    disabled={!isAdmin}
+                    onPress={() => { if (isAdmin) onOpenGroupMembers(g); }}
+                  >
+                    <View style={{ flex: 1, marginEnd: 12 }}>
+                      <Text style={s.toggleTitle}>{g.name}</Text>
+                      <Text style={s.dim}>{[t(g.category), g.subcategory ? t(g.subcategory) : null, isAdmin ? t("Admin") : null].filter(Boolean).join(' · ')}</Text>
+                    </View>
+                    {isAdmin ? <Ionicons name={dirIcon('chevron-forward', 'chevron-back')} size={16} color={palette.dim} /> : null}
+                  </Pressable>
+                );
+              })}
+            </>
+          ) : null}
         </>
       )}
 

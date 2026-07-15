@@ -39,9 +39,12 @@ import {
   MSG_CHAT,
   CHAT_INVITE,
   parseInviteLink,
+  parseGroupLink,
+  decodeGroupInvite,
   type Intent,
   type Product,
   type Negotiation,
+  type GroupInvite,
 } from '@freeport/protocol';
 import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, restoreNsec, getStoredNsec } from './src/identity';
 import { resetFirewall as resetMiniAppFirewall } from './src/miniapps/store';
@@ -95,6 +98,8 @@ import { activeWalletProvider } from './src/wallet';
 import { PostTab } from './src/tabs/PostTab';
 import { DealsTab, isImageMsg, isAudioMsg, isTripMsg } from './src/tabs/MessagesTab';
 import { InviteResolvedSheet, chatDisplayName } from './src/tabs/messages/FriendChat';
+import { GroupInviteSheet, GroupJoinSheet, GroupMembersSheet } from './src/tabs/GroupImport';
+import { groupPrefsPatch, recordGroupJoin, joinedGroupGids, type JoinedGroup } from './src/groups';
 import { CallManager, type CallState } from './src/calls/manager';
 import { CallOverlay } from './src/calls/CallOverlay';
 import { callsSupported } from './src/calls/webrtc';
@@ -366,7 +371,7 @@ function AppInner() {
   // lets the resume path tell "config changed" from "same session, refresh".
   const marketSubFor = useRef<{ client: MobileClient; services: boolean } | null>(null);
   const [negos, setNegos] = useState<Negotiation[]>([]);
-  const [profile, setProfile] = useState<UserProfile>({ name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' });
+  const [profile, setProfile] = useState<UserProfile>({ name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' });
   const [servicesEnabled, setServicesEnabled] = useState(false);
   const [experimentalWallet, setExperimentalWallet] = useState(false);
   const experimentalChat = true; // Chat graduated from Experimental — always on
@@ -391,6 +396,17 @@ function AppInner() {
     Platform.OS === 'web' && typeof window !== 'undefined' ? parseInviteLink(window.location.href) : null,
   );
   const [resolvedInvite, setResolvedInvite] = useState<{ pubkey: string; name?: string } | null>(null);
+  // Group import: a decoded (verified) group invite from an opened /g/<payload>
+  // link, awaiting the user's Join; the admin "Create group invite" sheet; the
+  // admin members/vouch sheet; and the local membership list (from prefs).
+  const [resolvedGroup, setResolvedGroup] = useState<GroupInvite | null>(() =>
+    Platform.OS === 'web' && typeof window !== 'undefined'
+      ? ((p) => (p ? decodeGroupInvite(p) : null))(parseGroupLink(window.location.href))
+      : null,
+  );
+  const [showGroupInvite, setShowGroupInvite] = useState(false);
+  const [groupMembersFor, setGroupMembersFor] = useState<JoinedGroup | null>(null);
+  const [joinedGroups, setJoinedGroups] = useState<JoinedGroup[]>([]);
   const [walletNwcUrl, setWalletNwcUrl] = useState('');
   const [walletUnit, setWalletUnit] = useState<'sats' | 'usd' | 'local'>('local');
   const [postDraft, setPostDraft] = useState<RepostDraft | null>(null);
@@ -638,6 +654,7 @@ function AppInner() {
       setDistanceUnit(p.distanceUnit);
       setBrowseCategory(p.browseCategory);
       setBrowseSubcategory(p.browseSubcategory);
+      setJoinedGroups(p.groups);
       setBrowseAlertSound(p.browseAlertSound);
       setBrowseAlertNotify(p.browseAlertNotify);
       setBrowseMaxDistance(p.browseMaxDistance);
@@ -1173,16 +1190,35 @@ function AppInner() {
     };
   }, [client]);
 
-  // Opened invite links (web #hash now; native deep links via Linking).
+  // The reputation/badge layer matches peers against the group ids WE joined —
+  // keep that set on the client in sync with the local membership list.
+  useEffect(() => { if (client) client.myGroupGids = joinedGroupGids(joinedGroups); }, [client, joinedGroups]);
+
+  // Consume a /g/<payload> from the web URL after the join sheet closes, so a
+  // reload doesn't re-open it (mirrors the /i/<code> consume in resolveChatInvite).
+  const clearGroupPath = React.useCallback(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+    if (!/\/g\/[A-Za-z0-9_-]+/.test(window.location.pathname)) return;
+    try { window.history.replaceState(null, '', '/' + window.location.search); } catch { /* best-effort */ }
+  }, []);
+
+  // Opened invite links (web #hash now; native deep links via Linking). Handles
+  // BOTH chat invites (/i/<code>) and group-import links (/g/<payload>).
   useEffect(() => {
+    const handle = (url: string) => {
+      const code = parseInviteLink(url);
+      if (code) { setPendingInviteCode(code); return; }
+      const payload = parseGroupLink(url);
+      if (payload) { const inv = decodeGroupInvite(payload); if (inv) setResolvedGroup(inv); }
+    };
     if (Platform.OS === 'web') {
       if (typeof window === 'undefined') return;
-      const onHash = () => { const code = parseInviteLink(window.location.href); if (code) setPendingInviteCode(code); };
+      const onHash = () => handle(window.location.href);
       window.addEventListener('hashchange', onHash);
       return () => window.removeEventListener('hashchange', onHash);
     }
-    Linking.getInitialURL().then((u) => { const code = u && parseInviteLink(u); if (code) setPendingInviteCode(code); }).catch(() => {});
-    const sub = Linking.addEventListener('url', (e) => { const code = parseInviteLink(e.url); if (code) setPendingInviteCode(code); });
+    Linking.getInitialURL().then((u) => { if (u) handle(u); }).catch(() => {});
+    const sub = Linking.addEventListener('url', (e) => handle(e.url));
     return () => sub.remove();
   }, []);
 
@@ -1396,7 +1432,7 @@ function AppInner() {
               const prof: UserProfile = {
                 // Generate a unique avatar from the new key so the account isn't blank.
                 name: name.trim(), picture: defaultAvatarUrl(npubOf(sk)), about: '', gallery: [],
-                phone: norm.valid ? norm.e164 : phone.trim(), phoneDisplay: 'full', externalLink: '', link: '',
+                phone: norm.valid ? norm.e164 : phone.trim(), phoneDisplay: 'full', link: '',
                 vehicleModel, plateNumber, plateDisplay: 'masked',
               };
               await saveProfile(prof);
@@ -1664,6 +1700,9 @@ function AppInner() {
             if (p.browseMaxDistance !== undefined) setBrowseMaxDistance(p.browseMaxDistance);
             savePrefs(p).catch(() => {});
           }}
+          joinedGroups={joinedGroups}
+          onCreateGroupInvite={() => setShowGroupInvite(true)}
+          onOpenGroupMembers={(g) => setGroupMembersFor(g)}
           role={role}
           onRoleChange={(r) => {
             setRole(r);
@@ -1691,7 +1730,7 @@ function AppInner() {
             // Reset the backup-reminder state too: the NEXT account on this
             // device starts un-backed-up and must be nagged afresh.
             await savePrefs({ role: '', fareConfig: null, backupDone: false, backupReminderDismissedAt: 0, ...(useNip07 ? { useNip07: false } : {}) }).catch(() => {});
-            const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+            const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
             await saveProfile(empty).catch(() => {});
             if (useNip07) setUseNip07(false);
             setRole('');
@@ -1710,7 +1749,7 @@ function AppInner() {
             try {
               if (client) {
                 for (const i of myIntents) { try { await client.withdrawIntent(i); } catch {} }
-                const blank: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+                const blank: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
                 try { await client.publishProfile(blank); } catch {}
               }
             } catch {}
@@ -1722,7 +1761,7 @@ function AppInner() {
             resetMiniAppFirewall(); // drop in-memory mini-app grants with the store
             setFareConfig(null); setFareConfigState(null);
             if (useNip07) setUseNip07(false);
-            const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+            const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
             setRole(''); setProfile(empty); setNpub('');
             resetIntents(); setNegos([]); setMyIntents([]); setConversations([]);
             setExpiredLog([]); setExpiredSeen(new Set());
@@ -1810,6 +1849,52 @@ function AppInner() {
             // Sending an invite implies the user wants the feature.
             setMessagesView('active');
             setTab('messages');
+          }}
+        />
+      )}
+      {/* Group import: admin "Create group invite" sheet. */}
+      {showGroupInvite && (
+        <GroupInviteSheet client={client} onClose={() => setShowGroupInvite(false)} />
+      )}
+      {/* Group import: admin members list + one-tap vouch. */}
+      {groupMembersFor && (
+        <GroupMembersSheet client={client} group={groupMembersFor} onClose={() => setGroupMembersFor(null)} />
+      )}
+      {/* Group import: member join screen (from an opened /g/<payload> link). */}
+      {resolvedGroup && (
+        <GroupJoinSheet
+          client={client}
+          invite={resolvedGroup}
+          onClose={() => {
+            setResolvedGroup(null);
+            clearGroupPath();
+          }}
+          onJoin={async (invite) => {
+            const d = invite.descriptor;
+            // (b) configure Browse to the group's market — live + persisted.
+            const patch = groupPrefsPatch(d);
+            if (patch.servicesEnabled !== undefined) setServicesEnabled(patch.servicesEnabled);
+            if (patch.browseCategory !== undefined) setBrowseCategory(patch.browseCategory);
+            if (patch.browseSubcategory !== undefined) setBrowseSubcategory(patch.browseSubcategory);
+            await savePrefs(patch);
+            // (c) record membership locally.
+            const group: JoinedGroup = {
+              gid: invite.gid,
+              name: d.name,
+              admin: invite.admin,
+              category: d.category,
+              subcategory: d.subcategory,
+              topics: d.topics,
+              joinedAt: Date.now(),
+            };
+            const next = await recordGroupJoin(group);
+            setJoinedGroups(next);
+            if (client) client.myGroupGids = joinedGroupGids(next);
+            // (a) publish the signed join attestation (trust seeding).
+            client?.publishGroupJoin(invite).catch(() => {});
+            setResolvedGroup(null);
+            clearGroupPath();
+            setTab('browse');
           }}
         />
       )}

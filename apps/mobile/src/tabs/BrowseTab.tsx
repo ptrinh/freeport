@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { type Intent, type Product, type ProposedTerms } from '@freeport/protocol';
+import { type Intent, type Product, type ProposedTerms, matchSameGroup } from '@freeport/protocol';
 import { AreaMap } from '../Map';
 import { t, tn } from '../i18n';
 import { MobileClient } from '../client';
@@ -487,6 +487,7 @@ export function MarketTab({
             item={item}
             prof={prof}
             rep={client?.reputations.get(item.pubkey)}
+            sameGroup={client ? matchSameGroup(client.myGroupGids, client.peerGroups.get(item.pubkey) ?? []) : null}
             isMine={mine(item)}
             km={isRide && ref && p.from?.geohash ? distKm(p.from.geohash) : null}
             country={country}
@@ -666,13 +667,15 @@ type Rep = NonNullable<ReturnType<MobileClient['reputations']['get']>>;
  *  and reputations are stored as fresh objects on update, so identity compare
  *  is enough. All callbacks must be referentially stable. */
 const PostCard = React.memo(function PostCard({
-  item, prof, rep, isMine, km, country, distanceUnit, zapTotal, showZap,
+  item, prof, rep, sameGroup, isMine, km, country, distanceUnit, zapTotal, showZap,
   mapOpen, responded, responding,
   onToggleMap, onViewImage, onZap, onRespondStart, onRespondCancel, onRespondSend,
 }: {
   item: Intent;
   prof: Prof | undefined;
   rep: Rep | undefined;
+  /** Name of a group both the viewer and this poster belong to (the "Same group" badge). */
+  sameGroup: string | null;
   isMine: boolean;
   km: number | null;
   country: string;
@@ -731,6 +734,12 @@ const PostCard = React.memo(function PostCard({
           ) : null}
           {rep?.newAccount && <Text style={s.newBadge}>{t("new account")}</Text>}
         </View>
+        {sameGroup ? (
+          <View style={[s.row, { gap: 4, marginTop: 4 }]}>
+            <Ionicons name="people" size={12} color={palette.accent} />
+            <Text style={s.sameGroupBadge}>{t('Same group: {name}', { name: sameGroup })}</Text>
+          </View>
+        ) : null}
         {(prof?.vehicleModel || prof?.plate) ? (
           <Text style={s.authorVehicle}>🚗 {[prof.vehicleModel, prof.plate].filter(Boolean).join(' · ')}</Text>
         ) : null}

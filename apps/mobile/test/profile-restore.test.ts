@@ -37,7 +37,7 @@ const selfKey = nip44.getConversationKey(sk, getPublicKey(sk));
 
 const baseProfile = (over: Partial<UserProfile>): UserProfile => ({
   name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full',
-  externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked', ...over,
+  link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked', ...over,
 });
 
 const syncEventWith = (profile: Partial<UserProfile>) => ({

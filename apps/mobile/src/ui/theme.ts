@@ -256,6 +256,7 @@ function makeStyles(c: Palette) {
     sysDetail: { color: c.text3, fontSize: 12, marginTop: 4 },
     repLine: { color: c.warn, fontSize: 11, marginTop: 3, marginStart: 28 },
     newBadge: { backgroundColor: c.warnBg, color: c.warn, fontSize: 10, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1, marginStart: 6, overflow: 'hidden' },
+    sameGroupBadge: { color: c.accent, fontSize: 11, fontWeight: '600' },
     checkRow: { flexDirection: 'row', alignItems: 'center', marginTop: 14 },
     checkbox: { width: 20, height: 20, borderRadius: 4, borderWidth: 1, borderColor: c.borderStrong, backgroundColor: c.card, alignItems: 'center', justifyContent: 'center' },
     checkboxOn: { backgroundColor: c.accentBtn, borderColor: c.accent },

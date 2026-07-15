@@ -13,6 +13,7 @@ vi.mock('../src/kv', () => ({
 vi.mock('../src/profile', () => ({
   publishProfile: vi.fn(async () => {}),
   maskPhone: (s: string) => s,
+  httpsLinkOrNull: (s: unknown) => (typeof s === 'string' && s.startsWith('https://') ? s : null),
 }));
 vi.mock('../src/karma', () => ({
   publishKarma: vi.fn(async () => {}),
