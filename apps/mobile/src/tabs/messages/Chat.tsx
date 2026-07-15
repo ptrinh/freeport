@@ -64,11 +64,12 @@ export function locationMsg(lat: number, lng: number): string {
  * XSS vectors) are excluded by omission, so a malicious peer can't ship a
  * payload that renders as an innocent "file" chip.
  */
+const ARCHIVE_EXTENSIONS = ['zip', '7z', 'gz', 'tgz', 'tar', 'bz2', 'xz', 'zst', 'rar'];
 export const SAFE_ATTACH_EXTENSIONS = [
-  'pdf', 'txt', 'csv', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip',
+  'pdf', 'txt', 'csv', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', ...ARCHIVE_EXTENSIONS,
   'jpg', 'jpeg', 'png', 'gif', 'webp', 'mp3', 'm4a', 'wav', 'ogg', 'mp4', 'webm',
 ];
-const DOC_EXTENSIONS = ['pdf', 'txt', 'csv', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip'];
+const DOC_EXTENSIONS = ['pdf', 'txt', 'csv', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', ...ARCHIVE_EXTENSIONS];
 
 /** A document URL (non-media safe type) renders as a file chip. */
 export function isDocMsg(t: string): boolean {

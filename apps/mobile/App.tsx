@@ -43,7 +43,7 @@ import {
   type Product,
   type Negotiation,
 } from '@freeport/protocol';
-import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, restoreNsec } from './src/identity';
+import { loadKey, createKey, clearKey, wipeAllLocalData, npubFromHex, npubOf, restoreNsec, getStoredNsec } from './src/identity';
 import { resetFirewall as resetMiniAppFirewall } from './src/miniapps/store';
 import { createPasskeyIdentity, signInWithPasskey } from './src/passkey';
 import { restoreSettingsSync, fillMissingProfileFromRelays } from './src/relaySync';
@@ -478,6 +478,54 @@ function AppInner() {
   const [onboarding, setOnboarding] = useState(false);
   const signerRef = useRef<Signer | null>(null);
   const [initVersion, setInitVersion] = useState(0);
+  // "Back up your account" reminder — a slim banner above the tab bar until a
+  // backup exists (file export, cloud save, passkey, or restored FROM one).
+  // Dismissable, but it re-appears after 7 days (see prefs.backupReminder*).
+  const [backupBanner, setBackupBanner] = useState(false);
+  // Bumped when the banner is tapped: tells SettingsTab to expand the
+  // Account & Backup section and scroll it into view.
+  const [openBackupSignal, setOpenBackupSignal] = useState(0);
+  useEffect(() => {
+    // Only nag once a LOCAL key exists (never during onboarding; NIP-07 users
+    // have no local key to back up), and only when the built-in wallet is on
+    // AND holds funds — that's when an unbacked-up key means losing money.
+    if (onboarding || !npub || !signerRef.current?.secretKey || !experimentalWallet) { setBackupBanner(false); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const p = await loadPrefs();
+        if (p.backupDone) return;
+        if (Date.now() - (p.backupReminderDismissedAt || 0) < 7 * 24 * 3600 * 1000) return;
+        // Migration for installs that backed up before this flag existed: the
+        // key already sitting in the cloud counts as backed up (same check as
+        // Settings' Required-actions box).
+        if (cloudAvailable()) {
+          try {
+            const [saved, cur] = await Promise.all([cloudRestore(), getStoredNsec()]);
+            if (saved && cur && saved.includes(cur)) {
+              savePrefs({ backupDone: true }).catch(() => {});
+              return;
+            }
+          } catch { /* cloud unreachable — fall through to the banner */ }
+        }
+        // Last gate (and the expensive one, so it runs only when every other
+        // condition already passes): the wallet must actually hold funds.
+        const { defaultWalletProvider } = await import('./src/wallet');
+        const w = await defaultWalletProvider();
+        if (!w) return;
+        const bal = await w.balance().catch(() => null);
+        const hasFunds = (bal?.sats ?? 0) > 0
+          || (await w.tokenBalances?.().catch(() => []) ?? []).some((tk) => tk.amount > 0);
+        if (!hasFunds) return;
+        if (!cancelled) setBackupBanner(true);
+      } catch { /* leave hidden */ }
+    })();
+    return () => { cancelled = true; };
+  }, [npub, onboarding, experimentalWallet]);
+  const dismissBackupBanner = () => {
+    setBackupBanner(false);
+    savePrefs({ backupReminderDismissedAt: Date.now() }).catch(() => {});
+  };
   // Install the window.freeport debug API on web (no-op on native), so it's
   // available even on the onboarding screen before a client exists.
   useEffect(() => { installDebugApi(); }, []);
@@ -1322,6 +1370,7 @@ function AppInner() {
   const completePasskeySignIn = async (sk: Uint8Array) => {
     await restoreBackupText(nsecEncode(sk), ''); // same path as a bare-nsec restore
     try { await restoreSettingsSync(sk); } catch { /* fresh account */ }
+    await savePrefs({ backupDone: true }).catch(() => {}); // the passkey IS the backup
     finishOnboarding();
   };
 
@@ -1356,7 +1405,10 @@ function AppInner() {
               // (iCloud Keychain / Google Block Store) so a new device restores it
               // automatically. Don't block the UI; ignore errors.
               if (cloudAvailable()) {
-                (async () => { const k = await loadKey(); if (k) await cloudSave(await buildCloudBundle(k)); })().catch(() => {});
+                (async () => {
+                  const k = await loadKey();
+                  if (k && await cloudSave(await buildCloudBundle(k))) await savePrefs({ backupDone: true });
+                })().catch(() => {});
               }
             }}
             onFinish={finishOnboarding}
@@ -1365,11 +1417,13 @@ function AppInner() {
               // Old backups can predate the avatar — pull what the network
               // already knows for any field the bundle left empty.
               try { await fillMissingProfileFromRelays(sk); } catch { /* offline — local copy stands */ }
+              await savePrefs({ backupDone: true }).catch(() => {}); // restored FROM a backup — one exists
               finishOnboarding();
             }}
             onPasskeyCreate={async () => {
               const sk = await createPasskeyIdentity(t('Freeport account'));
               await restoreNsec(nsecEncode(sk)); // store; onCreate reuses it
+              await savePrefs({ backupDone: true }).catch(() => {}); // the passkey IS the backup
             }}
             onPasskeySignIn={async () => {
               await completePasskeySignIn(await signInWithPasskey());
@@ -1380,6 +1434,7 @@ function AppInner() {
               if (!data) return false; // no backup found
               const sk = await restoreFromBundleText(data); // restores key + settings + saved addresses
               try { await fillMissingProfileFromRelays(sk); } catch { /* offline — local copy stands */ }
+              await savePrefs({ backupDone: true }).catch(() => {}); // restored FROM the cloud backup
               finishOnboarding();
               return true;
             }}
@@ -1531,6 +1586,8 @@ function AppInner() {
           }}
           requiredLocOk={locOk}
           requiredNotifOk={notifSatisfied}
+          openBackupSignal={openBackupSignal}
+          onBackupDone={() => setBackupBanner(false)}
           onDismissNotif={dismissNotif}
           onRequiredRefresh={refreshRequired}
           onProfileChange={async (p) => {
@@ -1631,7 +1688,9 @@ function AppInner() {
             setExpiredLog([]); setExpiredSeen(new Set());
             // Reset custom fare coefficients so the next account starts on defaults.
             setFareConfig(null); setFareConfigState(null);
-            await savePrefs({ role: '', fareConfig: null, ...(useNip07 ? { useNip07: false } : {}) }).catch(() => {});
+            // Reset the backup-reminder state too: the NEXT account on this
+            // device starts un-backed-up and must be nagged afresh.
+            await savePrefs({ role: '', fareConfig: null, backupDone: false, backupReminderDismissedAt: 0, ...(useNip07 ? { useNip07: false } : {}) }).catch(() => {});
             const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
             await saveProfile(empty).catch(() => {});
             if (useNip07) setUseNip07(false);
@@ -1753,6 +1812,24 @@ function AppInner() {
             setTab('messages');
           }}
         />
+      )}
+      {/* Key-backup reminder: slim, dismissable, sits just above the tab bar.
+          Tapping it opens Settings with the Account & Backup section expanded. */}
+      {backupBanner && (
+        <Pressable
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: palette.warnBg, borderTopWidth: 1, borderTopColor: palette.border, paddingHorizontal: 14, paddingVertical: 9 }}
+          onPress={() => { setOpenBackupSignal((n) => n + 1); setTab('settings'); }}
+          accessibilityRole="button"
+          accessibilityLabel={t('Back up your account — without it, losing this device loses your identity')}
+        >
+          <Ionicons name="key-outline" size={16} color={palette.warn} />
+          <Text style={{ color: palette.warn, fontSize: 13, fontWeight: '600', flex: 1 }} numberOfLines={2}>
+            {t('Back up your account — without it, losing this device loses your identity')}
+          </Text>
+          <Pressable onPress={dismissBackupBanner} hitSlop={10} accessibilityLabel={t('Dismiss')}>
+            <Ionicons name="close" size={16} color={palette.warn} />
+          </Pressable>
+        </Pressable>
       )}
       <View style={[s.tabbar, { paddingBottom: insets.bottom }]} accessibilityRole="tablist">
         {visibleTabs.map((tk) => {

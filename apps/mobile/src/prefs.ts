@@ -97,6 +97,13 @@ export interface Prefs {
   /** Only require auth for payments of at least this many sats (0 = always).
    *  Unknown amounts (stablecoin sends) always prompt. */
   payAuthThresholdSats: number;
+  /** True once the key has a backup (file export, cloud save, passkey, or the
+   *  account was restored FROM a backup). Gates the "Back up your account"
+   *  reminder banner. Reset on sign-out so the next account is nagged afresh. */
+  backupDone: boolean;
+  /** When the backup reminder banner was last dismissed (ms epoch, 0 = never).
+   *  It re-appears 7 days later. */
+  backupReminderDismissedAt: number;
 }
 
 const DEFAULTS: Prefs = {
@@ -133,6 +140,8 @@ const DEFAULTS: Prefs = {
   experimentalMiniApps: false,
   payAuthRequired: true,
   payAuthThresholdSats: 0,
+  backupDone: false,
+  backupReminderDismissedAt: 0,
 };
 
 /** Public-instance hostnames we've renamed. Installs that saved one of these

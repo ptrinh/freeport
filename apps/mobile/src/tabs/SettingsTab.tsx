@@ -79,6 +79,8 @@ function SettingsTab({
   requiredNotifOk,
   onDismissNotif,
   onRequiredRefresh,
+  openBackupSignal,
+  onBackupDone,
   onProfileChange,
   onRestore,
   servicesEnabled,
@@ -144,6 +146,10 @@ function SettingsTab({
   requiredNotifOk: boolean;
   onDismissNotif: () => void;
   onRequiredRefresh: (override?: { loc?: boolean; notif?: boolean }) => void;
+  /** Bumped by the app-wide backup banner: expand Account & Backup + scroll to it. */
+  openBackupSignal?: number;
+  /** A backup just completed (file or cloud) — lets the app hide its reminder banner. */
+  onBackupDone?: () => void;
   onProfileChange: (p: UserProfile) => Promise<void>;
   onRestore: () => void;
   servicesEnabled: boolean;
@@ -265,7 +271,10 @@ function SettingsTab({
         // Cloud now stores a JSON bundle containing the nsec (legacy values are a
         // bare nsec). Either way, "backed up" = the cloud copy contains this key.
         const [saved, current] = await Promise.all([cloudRestore(), getStoredNsec()]);
-        if (!cancelled) setCloudBackedUp(!!saved && !!current && saved.includes(current));
+        const ok = !!saved && !!current && saved.includes(current);
+        if (!cancelled) setCloudBackedUp(ok);
+        // Persist the signal for the app-wide backup reminder banner.
+        if (ok) { savePrefs({ backupDone: true }).catch(() => {}); onBackupDone?.(); }
       } catch { /* leave false */ }
     })();
     return () => { cancelled = true; };
@@ -369,6 +378,12 @@ function SettingsTab({
     setVehicleGlow(true);
     setTimeout(() => settingsScroll.current?.scrollTo({ y: Math.max(0, vehicleY.current - 16), animated: true }), 200);
   };
+  // App-wide backup banner tapped: expand Account & Backup + scroll it into view.
+  React.useEffect(() => {
+    if (!openBackupSignal) return;
+    setIdentityOpen(true);
+    setTimeout(() => settingsScroll.current?.scrollToEnd({ animated: true }), 200);
+  }, [openBackupSignal]);
   // Key loss is permanent (identity + karma). The backup UI lives inside the
   // collapsed "Account & Backup" section, so an un-backed-up key gets a spot
   // in the Required-actions box — the one place users actually look.
@@ -443,6 +458,8 @@ function SettingsTab({
       // Desktop save-dialog path: confirm where it landed (web/native have
       // their own download/share-sheet feedback).
       if (savedPath) Alert.alert(t('Account exported'), savedPath);
+      savePrefs({ backupDone: true }).catch(() => {}); // stop the backup reminder
+      onBackupDone?.();
     } catch (e: any) {
       Alert.alert(t('Backup failed'), e?.message ?? 'Try again.');
     } finally { setBackingUp(false); }
@@ -456,6 +473,7 @@ function SettingsTab({
       const ok = secretKey ? await cloudSave(await buildCloudBundle(secretKey)) : false;
       setCloudBackedUp(ok);
       setCloudStatus(ok ? t('Saved to {name}.', { name: cloudName() }) : t('Backup failed'));
+      if (ok) { savePrefs({ backupDone: true }).catch(() => {}); onBackupDone?.(); } // stop the backup reminder
     } catch {
       setCloudStatus(t('Backup failed'));
     } finally { setBackingUp(false); }

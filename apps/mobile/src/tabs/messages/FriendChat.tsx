@@ -230,6 +230,10 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
                       client?.chatSetTtl(c.peer, TTL_STEPS[(cur + 1) % TTL_STEPS.length]).catch(() => {});
                     })
                   : null}
+                {sheetRow(c.muted ? 'notifications-outline' : 'notifications-off-outline', c.muted ? t('Unmute') : t('Mute'), () => {
+                  closeSheet();
+                  client?.chatSetMuted(c.peer, !c.muted);
+                })}
                 {sheetRow(c.archived ? 'archive' : 'archive-outline', c.archived ? t('Unarchive chat') : t('Archive chat'), () => {
                   closeSheet();
                   client?.chatSetArchived(c.peer, !c.archived);
