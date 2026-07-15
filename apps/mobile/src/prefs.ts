@@ -5,6 +5,7 @@
 import { kvGet, kvSet } from './kv';
 import { scheduleCloudSync } from './cloudSync';
 import type { FareConfig } from './pricing';
+import type { JoinedGroup } from './groups';
 
 const STORE_KEY = 'freeport.prefs';
 
@@ -104,6 +105,10 @@ export interface Prefs {
   /** When the backup reminder banner was last dismissed (ms epoch, 0 = never).
    *  It re-appears 7 days later. */
   backupReminderDismissedAt: number;
+  /** Communities the user joined via a group-import link. Device-local
+   *  membership record (group id + admin + market), used to open Browse into the
+   *  group's market and to light the "Same group" badge. */
+  groups: JoinedGroup[];
 }
 
 const DEFAULTS: Prefs = {
@@ -142,6 +147,7 @@ const DEFAULTS: Prefs = {
   payAuthThresholdSats: 0,
   backupDone: false,
   backupReminderDismissedAt: 0,
+  groups: [],
 };
 
 /** Public-instance hostnames we've renamed. Installs that saved one of these

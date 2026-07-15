@@ -35,6 +35,11 @@
               "scheme": "https",
               "host": "freeport.network",
               "pathPrefix": "/i/"
+            },
+            {
+              "scheme": "https",
+              "host": "freeport.network",
+              "pathPrefix": "/g/"
             }
           ],
           "category": [

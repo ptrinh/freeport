@@ -46,6 +46,25 @@ export const KIND_DEAL_RECEIPT = 32104;
 export const KIND_CHAT_INVITE = 32105;
 
 /**
+ * Group invite — the admin-signed community descriptor. It is NOT primarily a
+ * relay event: the whole signed event is base64url-encoded INTO a share link
+ * (…/g/<payload>) so it can be verified fully offline from the link alone. The
+ * event id (a hash commitment over the admin's pubkey + descriptor + created_at)
+ * doubles as the immutable group id — it cannot be forged without the admin's
+ * key. See group.ts.
+ */
+export const KIND_GROUP_INVITE = 32106;
+/**
+ * Group-join attestation — published by a MEMBER when they join a group.
+ * Addressable by (member pubkey, kind, d = group id), so one attestation per
+ * member per group. Its content embeds the full admin-signed group invite event
+ * so any reader can independently verify the admin signature and recompute the
+ * group id — a member cannot fabricate membership in a group the admin never
+ * signed. See group.ts (parseGroupJoin).
+ */
+export const KIND_GROUP_JOIN = 32107;
+
+/**
  * Friend-chat envelope types — JSON inside encrypted DMs, like the negotiation
  * envelopes but keyed purely on the peer pubkey (no intent). Parsed BEFORE the
  * negotiation path; clients that predate chat drop them silently.
