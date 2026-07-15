@@ -361,7 +361,12 @@
       '<div style="color:#5b6b7b;font-size:10px;margin-top:12px">Specimen document — demo only, no cover is provided.</div>' +
       '</div>';
   }
-  function row(k, v) { return '<tr><td>' + k + '</td><td>' + String(v) + '</td></tr>'; }
+  function escHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function row(k, v) { return '<tr><td>' + k + '</td><td>' + escHtml(v) + '</td></tr>'; }
   function renderCert() { $('cert').innerHTML = certHtml(false); }
 
   // ── PDF (minimal, hand-built single-page PDF; no external libs) ───────────
