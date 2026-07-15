@@ -937,5 +937,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Թողեք դատարկ՝ յուրաքանչյուր վճարումը հաստատելու համար։ Անհայտ գումարները միշտ հարցնում են։",
   "sats": "sats",
   "Authentication required": "Պահանջվում է նույնականացում",
+  "Marketplace": "Շուկա",
+  "App": "Հավելված",
+  "Account": "Հաշիվ",
+  "Preferences": "Նախապատվություններ",
+  "Link (optional)": "Հղում (ըստ ցանկության)",
+  "https:// e.g. an ID verification page": "https:// օր.՝ ինքնության հաստատման էջ",
+  "Enter a valid https:// link, or clear the field.": "Մուտքագրեք վավեր https:// հղում կամ մաքրեք դաշտը։",
+  "Open link?": "Բացե՞լ հղումը:",
+  "This opens {host} in your browser.": "Սա բացում է {host}-ը ձեր դիտարկիչում։",
+  "Open profile link": "Բացել պրոֆիլի հղումը",
 };
 export default c;

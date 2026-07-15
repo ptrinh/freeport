@@ -943,5 +943,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Nechajte prázdne na potvrdenie každej platby. Neznáme sumy sa pýtajú vždy.",
   "sats": "sats",
   "Authentication required": "Vyžaduje sa overenie",
+  "Marketplace": "Trhovisko",
+  "App": "Aplikácia",
+  "Account": "Účet",
+  "Preferences": "Predvoľby",
+  "Link (optional)": "Odkaz (voliteľné)",
+  "https:// e.g. an ID verification page": "https:// napr. stránka overenia totožnosti",
+  "Enter a valid https:// link, or clear the field.": "Zadajte platný odkaz https:// alebo vymažte pole.",
+  "Open link?": "Otvoriť odkaz?",
+  "This opens {host} in your browser.": "Týmto sa v prehliadači otvorí {host}.",
+  "Open profile link": "Otvoriť odkaz profilu",
 };
 export default c;

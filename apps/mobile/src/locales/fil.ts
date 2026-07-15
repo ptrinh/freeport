@@ -937,5 +937,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Iwanang blangko para kumpirmahin ang bawat bayad. Palaging nagtatanong ang mga hindi alam na halaga.",
   "sats": "sats",
   "Authentication required": "Kailangan ng authentication",
+  "Marketplace": "Marketplace",
+  "App": "App",
+  "Account": "Account",
+  "Preferences": "Mga Kagustuhan",
+  "Link (optional)": "Link (opsyonal)",
+  "https:// e.g. an ID verification page": "https:// hal. isang page ng pag-verify ng ID",
+  "Enter a valid https:// link, or clear the field.": "Maglagay ng wastong https:// link, o i-clear ang field.",
+  "Open link?": "Buksan ang link?",
+  "This opens {host} in your browser.": "Bubuksan nito ang {host} sa iyong browser.",
+  "Open profile link": "Buksan ang link ng profile",
 };
 export default c;

@@ -980,5 +980,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Để trống để xác nhận mọi khoản thanh toán. Số tiền không xác định luôn được hỏi.",
   "sats": "sats",
   "Authentication required": "Cần xác thực",
+  "Marketplace": "Chợ",
+  "App": "Ứng dụng",
+  "Account": "Tài khoản",
+  "Preferences": "Tùy chọn",
+  "Link (optional)": "Liên kết (tùy chọn)",
+  "https:// e.g. an ID verification page": "https:// ví dụ trang xác minh danh tính",
+  "Enter a valid https:// link, or clear the field.": "Nhập liên kết https:// hợp lệ hoặc xóa trống trường này.",
+  "Open link?": "Mở liên kết?",
+  "This opens {host} in your browser.": "Thao tác này mở {host} trong trình duyệt của bạn.",
+  "Open profile link": "Mở liên kết hồ sơ",
 };
 export default c;

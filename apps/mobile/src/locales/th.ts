@@ -980,5 +980,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "เว้นว่างไว้เพื่อยืนยันทุกการชำระเงิน จำนวนที่ไม่ทราบจะถามเสมอ",
   "sats": "sats",
   "Authentication required": "ต้องมีการยืนยันตัวตน",
+  "Marketplace": "ตลาด",
+  "App": "แอป",
+  "Account": "บัญชี",
+  "Preferences": "ค่ากำหนด",
+  "Link (optional)": "ลิงก์ (ไม่บังคับ)",
+  "https:// e.g. an ID verification page": "https:// เช่น หน้ายืนยันตัวตน",
+  "Enter a valid https:// link, or clear the field.": "ป้อนลิงก์ https:// ที่ถูกต้อง หรือล้างช่องนี้",
+  "Open link?": "เปิดลิงก์หรือไม่",
+  "This opens {host} in your browser.": "การดำเนินการนี้จะเปิด {host} ในเบราว์เซอร์ของคุณ",
+  "Open profile link": "เปิดลิงก์โปรไฟล์",
 };
 export default c;

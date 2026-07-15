@@ -18,6 +18,7 @@ import { defaultAvatarUrl } from '../profile';
 import { s, palette } from '../ui/theme';
 import { uiAlert, confirmAsync } from '../ui/alerts';
 import { Field } from '../ui/fields';
+import { PeerLinkIcon } from '../ui/peerLink';
 
 function sellerName(pubkey: string, client: MobileClient | null): string {
   return (client?.profiles.get(pubkey)?.name || npubFromHex(pubkey).slice(0, 12) + '…').trim();
@@ -207,7 +208,9 @@ export function ShopsView({ client, products, myPubkey, market, defaultCurrency,
         <View key={pubkey} style={[s.card, { marginHorizontal: 0 }]}>
           <View style={[s.row, { gap: 8, alignItems: 'center' }]}>
             <Image source={{ uri: sellerAvatar(pubkey, client) }} style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: palette.chipBg }} />
-            <Text style={[s.cardTitle, { flex: 1 }]} numberOfLines={1}>{sellerName(pubkey, client)}</Text>
+            <Text style={[s.cardTitle, { flexShrink: 1 }]} numberOfLines={1}>{sellerName(pubkey, client)}</Text>
+            <PeerLinkIcon link={client?.profiles.get(pubkey)?.link} />
+            <View style={{ flex: 1 }} />
             <Pressable style={s.mapLink} onPress={() => onChatSeller(pubkey)} accessibilityRole="button" accessibilityLabel={t('Chat with seller')}>
               <Text style={s.mapLinkText}>{'💬 ' + t('Chat with seller')}</Text>
             </Pressable>

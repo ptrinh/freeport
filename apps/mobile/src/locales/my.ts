@@ -937,5 +937,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "ငွေပေးချေမှုတိုင်းကို အတည်ပြုရန် ကွက်လပ်ထားပါ။ မသိသော ပမာဏများကို အမြဲမေးမြန်းပါမည်။",
   "sats": "sats",
   "Authentication required": "အထောက်အထားစိစစ်မှု လိုအပ်သည်",
+  "Marketplace": "စျေးကွက်",
+  "App": "အက်ပ်",
+  "Account": "အကောင့်",
+  "Preferences": "ဦးစားပေးချက်များ",
+  "Link (optional)": "လင့်ခ် (ရွေးချယ်နိုင်)",
+  "https:// e.g. an ID verification page": "https:// ဥပမာ - ID အတည်ပြုစာမျက်နှာ",
+  "Enter a valid https:// link, or clear the field.": "မှန်ကန်သော https:// လင့်ခ်ကို ထည့်ပါ သို့မဟုတ် အကွက်ကို ရှင်းပါ။",
+  "Open link?": "လင့်ခ်ကို ဖွင့်မလား။",
+  "This opens {host} in your browser.": "ဤသည် သင့်ဘရောက်ဇာတွင် {host} ကို ဖွင့်ပါမည်။",
+  "Open profile link": "ပရိုဖိုင်လင့်ခ်ကို ဖွင့်ပါ",
 };
 export default c;

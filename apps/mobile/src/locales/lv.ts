@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Atstājiet tukšu, lai apstiprinātu katru maksājumu. Par nezināmām summām vienmēr tiek jautāts.",
   "sats": "sats",
   "Authentication required": "Nepieciešama autentifikācija",
+  "Marketplace": "Tirgus",
+  "App": "Lietotne",
+  "Account": "Konts",
+  "Preferences": "Izvēles",
+  "Link (optional)": "Saite (neobligāti)",
+  "https:// e.g. an ID verification page": "https:// piem., identitātes apstiprināšanas lapa",
+  "Enter a valid https:// link, or clear the field.": "Ievadiet derīgu https:// saiti vai notīriet lauku.",
+  "Open link?": "Atvērt saiti?",
+  "This opens {host} in your browser.": "Tādējādi pārlūkā tiks atvērts {host}.",
+  "Open profile link": "Atvērt profila saiti",
 };
 export default c;

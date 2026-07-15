@@ -366,7 +366,7 @@ function AppInner() {
   // lets the resume path tell "config changed" from "same session, refresh".
   const marketSubFor = useRef<{ client: MobileClient; services: boolean } | null>(null);
   const [negos, setNegos] = useState<Negotiation[]>([]);
-  const [profile, setProfile] = useState<UserProfile>({ name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' });
+  const [profile, setProfile] = useState<UserProfile>({ name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' });
   const [servicesEnabled, setServicesEnabled] = useState(false);
   const [experimentalWallet, setExperimentalWallet] = useState(false);
   const experimentalChat = true; // Chat graduated from Experimental — always on
@@ -1396,7 +1396,7 @@ function AppInner() {
               const prof: UserProfile = {
                 // Generate a unique avatar from the new key so the account isn't blank.
                 name: name.trim(), picture: defaultAvatarUrl(npubOf(sk)), about: '', gallery: [],
-                phone: norm.valid ? norm.e164 : phone.trim(), phoneDisplay: 'full', externalLink: '',
+                phone: norm.valid ? norm.e164 : phone.trim(), phoneDisplay: 'full', externalLink: '', link: '',
                 vehicleModel, plateNumber, plateDisplay: 'masked',
               };
               await saveProfile(prof);
@@ -1691,7 +1691,7 @@ function AppInner() {
             // Reset the backup-reminder state too: the NEXT account on this
             // device starts un-backed-up and must be nagged afresh.
             await savePrefs({ role: '', fareConfig: null, backupDone: false, backupReminderDismissedAt: 0, ...(useNip07 ? { useNip07: false } : {}) }).catch(() => {});
-            const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+            const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
             await saveProfile(empty).catch(() => {});
             if (useNip07) setUseNip07(false);
             setRole('');
@@ -1710,7 +1710,7 @@ function AppInner() {
             try {
               if (client) {
                 for (const i of myIntents) { try { await client.withdrawIntent(i); } catch {} }
-                const blank: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+                const blank: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
                 try { await client.publishProfile(blank); } catch {}
               }
             } catch {}
@@ -1722,7 +1722,7 @@ function AppInner() {
             resetMiniAppFirewall(); // drop in-memory mini-app grants with the store
             setFareConfig(null); setFareConfigState(null);
             if (useNip07) setUseNip07(false);
-            const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+            const empty: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
             setRole(''); setProfile(empty); setNpub('');
             resetIntents(); setNegos([]); setMyIntents([]); setConversations([]);
             setExpiredLog([]); setExpiredSeen(new Set());

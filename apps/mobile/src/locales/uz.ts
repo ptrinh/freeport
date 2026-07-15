@@ -937,5 +937,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Har bir to'lovni tasdiqlash uchun bo'sh qoldiring. Noma'lum miqdorlar har doim so'raladi.",
   "sats": "sats",
   "Authentication required": "Autentifikatsiya talab qilinadi",
+  "Marketplace": "Bozor",
+  "App": "Ilova",
+  "Account": "Hisob",
+  "Preferences": "Afzalliklar",
+  "Link (optional)": "Havola (ixtiyoriy)",
+  "https:// e.g. an ID verification page": "https:// masalan, shaxsni tasdiqlash sahifasi",
+  "Enter a valid https:// link, or clear the field.": "Yaroqli https:// havolasini kiriting yoki maydonni tozalang.",
+  "Open link?": "Havola ochilsinmi?",
+  "This opens {host} in your browser.": "Bu brauzeringizda {host} ni ochadi.",
+  "Open profile link": "Profil havolasini ochish",
 };
 export default c;

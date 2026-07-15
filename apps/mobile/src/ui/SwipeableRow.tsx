@@ -8,7 +8,7 @@
  * row is open closes it instead of activating the row. Parents keep a single
  * row open at a time via `onOpenRow`.
  */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, PanResponder, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -35,9 +35,30 @@ export function SwipeableRow({ children, leftAction, rightActions = [], onOpenRo
   const cur = useRef(0);
   const base = useRef(0);
   const openRef = useRef(false);
+  // While the PanResponder owns the touch (a real horizontal drag, or the
+  // start-capture of an already-open row) we disable pointer events on the
+  // children so the trailing tap — and, crucially on react-native-web, the
+  // synthetic `click` fired after a mouse drag — can NEVER reach the inner
+  // Pressable and open the chat. A plain tap on a closed row never grants the
+  // responder, so it still opens as normal.
+  const [dragging, setDragging] = useState(false);
+  const clearTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const beginDrag = () => {
+    if (clearTimer.current) { clearTimeout(clearTimer.current); clearTimer.current = null; }
+    setDragging(true);
+  };
+  // Keep pointer events off briefly past release so web's post-drag click
+  // (dispatched after mouseup) lands on nothing instead of the row.
+  const endDrag = () => {
+    if (clearTimer.current) clearTimeout(clearTimer.current);
+    clearTimer.current = setTimeout(() => { setDragging(false); clearTimer.current = null; }, 120);
+  };
   useEffect(() => {
     const id = x.addListener((v) => { cur.current = v.value; });
-    return () => x.removeListener(id);
+    return () => {
+      x.removeListener(id);
+      if (clearTimer.current) clearTimeout(clearTimer.current);
+    };
   }, [x]);
 
   // Widths live in refs so the once-created PanResponder always sees the
@@ -59,13 +80,14 @@ export function SwipeableRow({ children, leftAction, rightActions = [], onOpenRo
       onStartShouldSetPanResponderCapture: () => openRef.current,
       onMoveShouldSetPanResponder: (_e, g) =>
         Math.abs(g.dx) > SLOP && Math.abs(g.dx) > Math.abs(g.dy) * 1.5,
-      onPanResponderGrant: () => { base.current = cur.current; },
+      onPanResponderGrant: () => { base.current = cur.current; beginDrag(); },
       onPanResponderMove: (_e, g) => {
         const { leftW, rightW } = dims.current;
         x.setValue(Math.max(-rightW, Math.min(leftW, base.current + g.dx)));
       },
       onPanResponderRelease: (_e, g) => {
         const { leftW, rightW } = dims.current;
+        endDrag();
         if (Math.abs(g.dx) < SLOP) { snapTo(0); return; } // tap on an open row
         const moved = base.current + g.dx;
         if (rightW > 0 && (moved < -rightW / 2 || (g.vx < -0.3 && moved < 0))) {
@@ -76,7 +98,7 @@ export function SwipeableRow({ children, leftAction, rightActions = [], onOpenRo
           onOpenRowRef.current?.(closeRef.current);
         } else snapTo(0);
       },
-      onPanResponderTerminate: () => snapTo(0),
+      onPanResponderTerminate: () => { endDrag(); snapTo(0); },
     }),
   ).current;
 
@@ -101,7 +123,13 @@ export function SwipeableRow({ children, leftAction, rightActions = [], onOpenRo
         <View style={{ flexDirection: 'row' }}>{rightActions.map(actionBtn)}</View>
       </View>
       <Animated.View {...pan.panHandlers} style={{ transform: [{ translateX: x }] }}>
-        {children}
+        {/* pointerEvents gate: while a drag owns the touch the row's own
+            Pressable can't receive the tap/click, so a swipe never opens the
+            chat; touches still fall through to the PanResponder itself, so
+            re-swiping and vertical scrolling stay unaffected. */}
+        <View pointerEvents={dragging ? 'none' : 'auto'}>
+          {children}
+        </View>
       </Animated.View>
     </View>
   );

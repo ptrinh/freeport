@@ -24,6 +24,7 @@ import { fmtClock } from '../../ui/format';
 import { s, palette } from '../../ui/theme';
 import { CachedImage } from '../../ui/cachedImage';
 import { confirmAsync } from '../../ui/alerts';
+import { PeerLinkIcon } from '../../ui/peerLink';
 import { copyText, clipboardAvailable } from '../../ui/clipboard';
 import { ChatCore, SAFE_ATTACH_EXTENSIONS, isAudioMsg, isImageMsg, isTripMsg, isDocMsg, isLocationMsg, locationMsg, docMsgName } from './Chat';
 import { matchesKeywords } from '../../browseFilter';
@@ -383,6 +384,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
           <View style={{ flexShrink: 1 }}>
             <View style={[s.row, { alignItems: 'baseline', gap: 6 }]}>
               <Text style={[s.cardTitle, { flexShrink: 1 }]} numberOfLines={1}>{chatDisplayName(conv, client)}</Text>
+              <PeerLinkIcon link={client?.profiles.get(conv.peer)?.link} />
               <Text style={[s.dim, { fontSize: 10 }]} numberOfLines={1}>{shortNpub(conv.peer)}</Text>
             </View>
             {online ? (

@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "برای تأیید هر پرداخت خالی بگذارید. مبالغ نامشخص همیشه پرسیده می‌شوند.",
   "sats": "sats",
   "Authentication required": "احراز هویت لازم است",
+  "Marketplace": "بازار",
+  "App": "برنامه",
+  "Account": "حساب",
+  "Preferences": "ترجیحات",
+  "Link (optional)": "پیوند (اختیاری)",
+  "https:// e.g. an ID verification page": "https:// مثلاً یک صفحهٔ تأیید هویت",
+  "Enter a valid https:// link, or clear the field.": "یک پیوند https:// معتبر وارد کنید یا فیلد را پاک کنید.",
+  "Open link?": "پیوند باز شود؟",
+  "This opens {host} in your browser.": "این کار {host} را در مرورگر شما باز می‌کند.",
+  "Open profile link": "باز کردن پیوند نمایه",
 };
 export default c;

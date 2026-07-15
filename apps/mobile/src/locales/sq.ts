@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Lëre bosh për të konfirmuar çdo pagesë. Shumat e panjohura kërkojnë gjithmonë.",
   "sats": "sats",
   "Authentication required": "Kërkohet vërtetim",
+  "Marketplace": "Tregu",
+  "App": "Aplikacioni",
+  "Account": "Llogaria",
+  "Preferences": "Preferencat",
+  "Link (optional)": "Lidhja (opsionale)",
+  "https:// e.g. an ID verification page": "https:// p.sh. një faqe verifikimi identiteti",
+  "Enter a valid https:// link, or clear the field.": "Fut një lidhje të vlefshme https:// ose pastro fushën.",
+  "Open link?": "Të hapet lidhja?",
+  "This opens {host} in your browser.": "Kjo hap {host} në shfletuesin tënd.",
+  "Open profile link": "Hap lidhjen e profilit",
 };
 export default c;

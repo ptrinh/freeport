@@ -937,5 +937,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "ປ່ອຍໃຫ້ວ່າງເພື່ອຢືນຢັນທຸກການຊຳລະ. ຈຳນວນທີ່ບໍ່ຮູ້ຈະຖາມສະເໝີ.",
   "sats": "sats",
   "Authentication required": "ຕ້ອງການການຢືນຢັນຕົວຕົນ",
+  "Marketplace": "ຕະຫຼາດ",
+  "App": "ແອັບ",
+  "Account": "ບັນຊີ",
+  "Preferences": "ຄວາມມັກ",
+  "Link (optional)": "ລິ້ງ (ທາງເລືອກ)",
+  "https:// e.g. an ID verification page": "https:// ຕົວຢ່າງ: ໜ້າຢືນຢັນຕົວຕົນ",
+  "Enter a valid https:// link, or clear the field.": "ໃສ່ລິ້ງ https:// ທີ່ຖືກຕ້ອງ ຫຼື ລ້າງຊ່ອງນີ້.",
+  "Open link?": "ເປີດລິ້ງບໍ?",
+  "This opens {host} in your browser.": "ນີ້ຈະເປີດ {host} ໃນໂປຣແກຣມທ່ອງເວັບຂອງທ່ານ.",
+  "Open profile link": "ເປີດລິ້ງໂປຣໄຟລ໌",
 };
 export default c;

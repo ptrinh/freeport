@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Jäta tühjaks, et kinnitada iga makse. Tundmatute summade puhul küsitakse alati.",
   "sats": "sats",
   "Authentication required": "Autentimine on nõutav",
+  "Marketplace": "Turg",
+  "App": "Rakendus",
+  "Account": "Konto",
+  "Preferences": "Eelistused",
+  "Link (optional)": "Link (valikuline)",
+  "https:// e.g. an ID verification page": "https:// nt isikutuvastuse leht",
+  "Enter a valid https:// link, or clear the field.": "Sisestage kehtiv https:// link või tühjendage väli.",
+  "Open link?": "Kas avada link?",
+  "This opens {host} in your browser.": "See avab {host} teie brauseris.",
+  "Open profile link": "Ava profiili link",
 };
 export default c;

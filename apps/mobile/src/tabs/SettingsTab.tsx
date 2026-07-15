@@ -18,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { t } from '../i18n';
 import { hasNip07, type Signer } from '../signer';
-import { maskPhone, maskPlate, type UserProfile, type PhoneDisplay } from '../profile';
+import { maskPhone, maskPlate, httpsLinkOrNull, type UserProfile, type PhoneDisplay } from '../profile';
 import { MobileClient } from '../client';
 import { loadPrefs, savePrefs, type UserLocation } from '../prefs';
 import { getStoredNsec } from '../identity';
@@ -195,6 +195,8 @@ function SettingsTab({
   const [phone, setPhone] = useState(profile.phone);
   const [phoneDisplay, setPhoneDisplay] = useState<PhoneDisplay>(profile.phoneDisplay);
   const [externalLink, setExternalLink] = useState(profile.externalLink ?? '');
+  const [link, setLink] = useState(profile.link ?? '');
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [vehicleModel, setVehicleModel] = useState(profile.vehicleModel ?? '');
   const [plateNumber, setPlateNumber] = useState(profile.plateNumber ?? '');
   const [plateDisplay, setPlateDisplay] = useState<PhoneDisplay>(profile.plateDisplay ?? 'masked');
@@ -404,10 +406,11 @@ function SettingsTab({
     setPhone(profile.phone);
     setPhoneDisplay(profile.phoneDisplay);
     setExternalLink(profile.externalLink ?? '');
+    setLink(profile.link ?? '');
     setVehicleModel(profile.vehicleModel ?? '');
     setPlateNumber(profile.plateNumber ?? '');
     setPlateDisplay(profile.plateDisplay ?? 'masked');
-  }, [profile.name, profile.about, profile.picture, profile.gallery, profile.phone, profile.phoneDisplay, profile.externalLink, profile.vehicleModel, profile.plateNumber, profile.plateDisplay]);
+  }, [profile.name, profile.about, profile.picture, profile.gallery, profile.phone, profile.phoneDisplay, profile.externalLink, profile.link, profile.vehicleModel, profile.plateNumber, profile.plateDisplay]);
 
   const pickAvatar = async () => {
     // System photo picker — no media permission needed (Play-policy compliant).
@@ -427,6 +430,7 @@ function SettingsTab({
     try {
       await onProfileChange({
         name, picture, about, gallery, phone: e164, phoneDisplay,
+        link: link.trim(),
         externalLink: isProvider ? externalLink.trim() : (profile.externalLink ?? ''),
         vehicleModel: isDriver ? vehicleModel.trim() : (profile.vehicleModel ?? ''),
         plateNumber: isDriver ? plateNumber.trim() : (profile.plateNumber ?? ''),
@@ -439,6 +443,13 @@ function SettingsTab({
   };
 
   const save = () => {
+    // A profile link must be https — peer URLs are treated as untrusted, so we
+    // never store/publish an http or other-scheme value.
+    if (link.trim() && !httpsLinkOrNull(link)) {
+      setLinkError(t('Enter a valid https:// link, or clear the field.'));
+      return;
+    }
+    setLinkError(null);
     let e164 = '';
     if (phone.trim() && phone.trim() !== dialCode.current) {
       const normalized = normalizePhoneField();
@@ -561,6 +572,15 @@ function SettingsTab({
       {client && <SelfStats client={client} onPress={onOpenFeedback} />}
 
       <Field label={t("About Me")} value={about} onChange={setAbout} placeholder={t("A short bio…")} multiline />
+
+      <Field
+        label={t("Link (optional)")}
+        value={link}
+        onChange={(v) => { setLink(v); setLinkError(null); }}
+        placeholder={t("https:// e.g. an ID verification page")}
+        keyboardType="url"
+      />
+      {linkError ? <Text style={s.fieldError}>{linkError}</Text> : null}
 
       {isProvider && (
         <Field
@@ -689,6 +709,7 @@ function SettingsTab({
       </>
       )}
 
+      <Text style={s.groupHeader}>{t('Marketplace')}</Text>
       {/* Location — drives default payment currency; device-only, not published */}
       <Pressable style={s.collapseHeader} onPress={() => setLocationOpen((v) => !v)}>
         <View style={s.collapseLeft}>
@@ -763,103 +784,6 @@ function SettingsTab({
       </>
       )}
 
-      {/* Features */}
-      <Pressable style={s.collapseHeader} onPress={() => setFeaturesOpen((v) => !v)}>
-        <View style={s.collapseLeft}>
-          <Ionicons name="options-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-          <Text style={s.collapseTitle}>{t("Features")}</Text>
-        </View>
-        <Text style={s.collapseChevron}>{featuresOpen ? '▾' : '▸'}</Text>
-      </Pressable>
-      {featuresOpen && (
-      <>
-      <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("Appearance")}</Text>
-      <Text style={s.dim}>{t("Follow the system setting, or force a theme.")}</Text>
-      <View style={[s.segRow, { marginTop: 8 }]}>
-        {(['system', 'dark', 'light'] as const).map((mode) => (
-          <Pressable key={mode} onPress={() => onThemeChange(mode)} style={[s.seg, theme === mode && s.segActive]}>
-            <Ionicons
-              name={mode === 'system' ? 'phone-portrait-outline' : mode === 'dark' ? 'moon-outline' : 'sunny-outline'}
-              size={15}
-              color={theme === mode ? palette.chipBlueText : palette.dim}
-              style={{ marginEnd: 6 }}
-            />
-            <Text style={[s.segText, theme === mode && s.segTextActive]}>
-              {mode === 'system' ? t('System') : mode === 'dark' ? t('Dark') : t('Light')}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-
-      <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("Distance unit")}</Text>
-      <View style={[s.segRow, { marginTop: 8 }]}>
-        {(['auto', 'km', 'mi'] as const).map((u) => (
-          <Pressable key={u} onPress={() => onDistanceUnitChange(u)} style={[s.seg, distanceUnit === u && s.segActive]}>
-            <Text style={[s.segText, distanceUnit === u && s.segTextActive]}>
-              {u === 'auto' ? t('Auto') : u === 'km' ? t('Kilometres') : t('Miles')}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-
-      <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("I'm mainly a")}</Text>
-      <Text style={s.dim}>{t("Your default role (set at sign-up).")}</Text>
-      <View style={[s.segRow, { marginTop: 8 }]}>
-        {(['passenger', 'driver'] as const).map((r) => (
-          <Pressable key={r} onPress={() => switchRole(r)} style={[s.seg, role === r && s.segActive]}>
-            <Ionicons
-              name={r === 'passenger' ? 'person-outline' : 'car-outline'}
-              size={15}
-              color={role === r ? palette.chipBlueText : palette.dim}
-              style={{ marginEnd: 6 }}
-            />
-            <Text style={[s.segText, role === r && s.segTextActive]}>
-              {r === 'passenger' ? t('Passenger / Customer') : t('Driver / Provider')}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-
-      <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("Language")}</Text>
-      <Text style={s.dim}>{t("Defaults to your device language.")}</Text>
-      <View style={{ marginTop: 8 }}>
-        <SelectField
-          value={language}
-          options={LANGUAGE_CODES}
-          onChange={onLanguageChange}
-          labelFor={languageLabel}
-          placeholder={t("Select language…")}
-          scroll
-        />
-      </View>
-
-      {/* Quick-reply custom message: shown as a one-tap chip in deal chats,
-          optionally auto-sent on deal confirmation. The placeholder suggests
-          the country's common instant P2P rail (Zelle/PayNow/…, else cash). */}
-      <Field
-        label={t("Custom message")}
-        value={customMessage}
-        onChange={onCustomMessageChange}
-        placeholder={defaultCustomMessage(location.country)}
-        multiline
-      />
-      <Text style={s.dim}>{t("One-tap reply in deal chats — e.g. your payment details.")}</Text>
-      <Pressable accessibilityRole="switch" accessibilityState={{ checked: autoSendCustomMessage }} style={s.toggleRow} onPress={() => onAutoSendCustomMessageChange(!autoSendCustomMessage)}>
-        <View style={{ flex: 1, marginEnd: 12 }}>
-          <Text style={s.toggleTitle}>{t("Auto-send custom message")}</Text>
-          <Text style={s.dim}>{t("Send it into the chat automatically whenever a deal is confirmed.")}</Text>
-        </View>
-        <View style={[s.switchTrack, autoSendCustomMessage && s.switchTrackOn]}>
-          <View style={[s.switchThumb, autoSendCustomMessage && s.switchThumbOn]} />
-        </View>
-      </Pressable>
-
-      {/* Desktop only: host the Freeport web app on the LAN for others.
-          Inside Features and NOT gated by pushSupported() (which is false in
-          the desktop WebView) so it always shows on desktop. */}
-      {isTauri() && <DesktopHostPanel />}
-      </>
-      )}
 
       {/* Browse — driver/provider/customer feed defaults: category, range, new-post alerts. */}
       {(isDriver || isCustomer) && (
@@ -953,6 +877,7 @@ function SettingsTab({
           by default like the other Settings sections. The OTA update flow lives
           here as a small "Check now" link (native gets a real OTA swap; web just
           hard-reloads to the newest deploy). */}
+      <Text style={s.groupHeader}>{t('Features')}</Text>
       <ExperimentalSection
         walletEnabled={experimentalWallet}
         onWalletEnabledChange={onExperimentalWalletChange}
@@ -989,8 +914,107 @@ function SettingsTab({
         />
       )}
 
+      <Text style={s.groupHeader}>{t('App')}</Text>
+      {/* Features */}
+      <Pressable style={s.collapseHeader} onPress={() => setFeaturesOpen((v) => !v)}>
+        <View style={s.collapseLeft}>
+          <Ionicons name="options-outline" size={20} color={palette.text2} style={s.collapseIcon} />
+          <Text style={s.collapseTitle}>{t("Preferences")}</Text>
+        </View>
+        <Text style={s.collapseChevron}>{featuresOpen ? '▾' : '▸'}</Text>
+      </Pressable>
+      {featuresOpen && (
+      <>
+      <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("Appearance")}</Text>
+      <Text style={s.dim}>{t("Follow the system setting, or force a theme.")}</Text>
+      <View style={[s.segRow, { marginTop: 8 }]}>
+        {(['system', 'dark', 'light'] as const).map((mode) => (
+          <Pressable key={mode} onPress={() => onThemeChange(mode)} style={[s.seg, theme === mode && s.segActive]}>
+            <Ionicons
+              name={mode === 'system' ? 'phone-portrait-outline' : mode === 'dark' ? 'moon-outline' : 'sunny-outline'}
+              size={15}
+              color={theme === mode ? palette.chipBlueText : palette.dim}
+              style={{ marginEnd: 6 }}
+            />
+            <Text style={[s.segText, theme === mode && s.segTextActive]}>
+              {mode === 'system' ? t('System') : mode === 'dark' ? t('Dark') : t('Light')}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("Distance unit")}</Text>
+      <View style={[s.segRow, { marginTop: 8 }]}>
+        {(['auto', 'km', 'mi'] as const).map((u) => (
+          <Pressable key={u} onPress={() => onDistanceUnitChange(u)} style={[s.seg, distanceUnit === u && s.segActive]}>
+            <Text style={[s.segText, distanceUnit === u && s.segTextActive]}>
+              {u === 'auto' ? t('Auto') : u === 'km' ? t('Kilometres') : t('Miles')}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("I'm mainly a")}</Text>
+      <Text style={s.dim}>{t("Your default role (set at sign-up).")}</Text>
+      <View style={[s.segRow, { marginTop: 8 }]}>
+        {(['passenger', 'driver'] as const).map((r) => (
+          <Pressable key={r} onPress={() => switchRole(r)} style={[s.seg, role === r && s.segActive]}>
+            <Ionicons
+              name={r === 'passenger' ? 'person-outline' : 'car-outline'}
+              size={15}
+              color={role === r ? palette.chipBlueText : palette.dim}
+              style={{ marginEnd: 6 }}
+            />
+            <Text style={[s.segText, role === r && s.segTextActive]}>
+              {r === 'passenger' ? t('Passenger / Customer') : t('Driver / Provider')}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("Language")}</Text>
+      <Text style={s.dim}>{t("Defaults to your device language.")}</Text>
+      <View style={{ marginTop: 8 }}>
+        <SelectField
+          value={language}
+          options={LANGUAGE_CODES}
+          onChange={onLanguageChange}
+          labelFor={languageLabel}
+          placeholder={t("Select language…")}
+          scroll
+        />
+      </View>
+
+      {/* Quick-reply custom message: shown as a one-tap chip in deal chats,
+          optionally auto-sent on deal confirmation. The placeholder suggests
+          the country's common instant P2P rail (Zelle/PayNow/…, else cash). */}
+      <Field
+        label={t("Custom message")}
+        value={customMessage}
+        onChange={onCustomMessageChange}
+        placeholder={defaultCustomMessage(location.country)}
+        multiline
+      />
+      <Text style={s.dim}>{t("One-tap reply in deal chats — e.g. your payment details.")}</Text>
+      <Pressable accessibilityRole="switch" accessibilityState={{ checked: autoSendCustomMessage }} style={s.toggleRow} onPress={() => onAutoSendCustomMessageChange(!autoSendCustomMessage)}>
+        <View style={{ flex: 1, marginEnd: 12 }}>
+          <Text style={s.toggleTitle}>{t("Auto-send custom message")}</Text>
+          <Text style={s.dim}>{t("Send it into the chat automatically whenever a deal is confirmed.")}</Text>
+        </View>
+        <View style={[s.switchTrack, autoSendCustomMessage && s.switchTrackOn]}>
+          <View style={[s.switchThumb, autoSendCustomMessage && s.switchThumbOn]} />
+        </View>
+      </Pressable>
+
+      {/* Desktop only: host the Freeport web app on the LAN for others.
+          Inside Features and NOT gated by pushSupported() (which is false in
+          the desktop WebView) so it always shows on desktop. */}
+      {isTauri() && <DesktopHostPanel />}
+      </>
+      )}
       <AboutSection onReplayTour={onReplayTour} />
 
+      <Text style={s.groupHeader}>{t('Account')}</Text>
       {/* Identity — collapsed by default; tap header to expand */}
       <Pressable style={s.collapseHeader} onPress={() => setIdentityOpen((v) => !v)}>
         <View style={s.collapseLeft}>

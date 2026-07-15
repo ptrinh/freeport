@@ -937,5 +937,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Acha wazi ili kuthibitisha kila malipo. Kiasi kisichojulikana huuliza kila mara.",
   "sats": "sats",
   "Authentication required": "Uthibitishaji unahitajika",
+  "Marketplace": "Soko",
+  "App": "Programu",
+  "Account": "Akaunti",
+  "Preferences": "Mapendeleo",
+  "Link (optional)": "Kiungo (hiari)",
+  "https:// e.g. an ID verification page": "https:// mf. ukurasa wa uthibitishaji wa kitambulisho",
+  "Enter a valid https:// link, or clear the field.": "Weka kiungo sahihi cha https://, au futa sehemu hii.",
+  "Open link?": "Fungua kiungo?",
+  "This opens {host} in your browser.": "Hii inafungua {host} kwenye kivinjari chako.",
+  "Open profile link": "Fungua kiungo cha wasifu",
 };
 export default c;

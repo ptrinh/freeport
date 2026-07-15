@@ -27,6 +27,7 @@ import { policeNumberFor } from '../emergency';
 import { quickReplies } from '../quickReplies';
 import { uiAlert, runDealAction, confirmAsync, openMaps } from '../ui/alerts';
 import { SystemNotice, SlideToConfirm } from '../ui/fields';
+import { PeerLinkIcon } from '../ui/peerLink';
 import { ChatThread, CounterEditor, ReportModal, isTripMsg } from './messages/Chat';
 import { KarmaRater, KarmaReceived } from './messages/Karma';
 import { LiveTripShare } from './messages/LiveTripShare';
@@ -396,6 +397,7 @@ export function DealsTab({
           myVehicleModel={profile.vehicleModel}
           myPlateNumber={profile.plateNumber}
           peerProfilePhone={client?.profiles.get(item.peer)?.phone || ''}
+          peerProfileLink={client?.profiles.get(item.peer)?.link || ''}
           escrow={escrows.find((e) => e.nego === item.id)}
           countering={counteringId === item.id}
           confirmingCancel={confirmCancelId === item.id}
@@ -458,6 +460,7 @@ const DealCard = React.memo(function DealCard({
   myVehicleModel,
   myPlateNumber,
   peerProfilePhone,
+  peerProfileLink,
   escrow,
   countering,
   confirmingCancel,
@@ -497,6 +500,8 @@ const DealCard = React.memo(function DealCard({
   myPlateNumber: string;
   /** The peer's published phone (client.profiles is a mutable Map — read in the parent). */
   peerProfilePhone: string;
+  /** The peer's published profile link (https-only; read in the parent, same reason). */
+  peerProfileLink: string;
   /** This deal's escrow (escrows.find in the parent — objects replaced immutably). */
   escrow: EscrowState | undefined;
   countering: boolean;
@@ -688,14 +693,20 @@ const DealCard = React.memo(function DealCard({
               const phone = extractPhone(item.theirContact);
               return phone ? (
                 <>
-                  <Text style={s.dealContact}>{t('Their contact')}: {contactWithoutPhone(item.theirContact, phone)}</Text>
+                  <View style={[s.row, { alignItems: 'center' }]}>
+                    <Text style={s.dealContact}>{t('Their contact')}: {contactWithoutPhone(item.theirContact, phone)}</Text>
+                    <PeerLinkIcon link={peerProfileLink} />
+                  </View>
                   <Pressable style={s.callBtn} onPress={() => Linking.openURL('tel:' + phone)}>
                     <Ionicons name="call" size={14} color="white" />
                     <Text style={s.callBtnText}>{t('Call')} {phone}</Text>
                   </Pressable>
                 </>
               ) : (
-                <Text style={s.dealContact}>{t('Their contact')}: {item.theirContact ?? '—'}</Text>
+                <View style={[s.row, { alignItems: 'center' }]}>
+                  <Text style={s.dealContact}>{t('Their contact')}: {item.theirContact ?? '—'}</Text>
+                  <PeerLinkIcon link={peerProfileLink} />
+                </View>
               );
             })()}
             </View>

@@ -937,5 +937,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "დატოვეთ ცარიელი ყველა გადახდის დასადასტურებლად. უცნობი თანხები ყოველთვის ითხოვს დადასტურებას.",
   "sats": "sats",
   "Authentication required": "ავთენტიფიკაცია საჭიროა",
+  "Marketplace": "ბაზარი",
+  "App": "აპი",
+  "Account": "ანგარიში",
+  "Preferences": "პარამეტრები",
+  "Link (optional)": "ბმული (არასავალდებულო)",
+  "https:// e.g. an ID verification page": "https:// მაგ. პირადობის დადასტურების გვერდი",
+  "Enter a valid https:// link, or clear the field.": "შეიყვანეთ სწორი https:// ბმული, ან გაასუფთავეთ ველი.",
+  "Open link?": "გავხსნათ ბმული?",
+  "This opens {host} in your browser.": "ეს გახსნის {host}-ს თქვენს ბრაუზერში.",
+  "Open profile link": "პროფილის ბმულის გახსნა",
 };
 export default c;

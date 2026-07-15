@@ -274,6 +274,7 @@ function makeStyles(c: Palette) {
     collapseLeft: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
     collapseIcon: { marginEnd: 12, width: 22, textAlign: 'center' },
     collapseTitle: { color: c.text, fontSize: 18, fontWeight: '700', letterSpacing: 0.2 },
+    groupHeader: { color: c.text3, fontSize: 12, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', marginTop: 26, marginBottom: -2, paddingHorizontal: 2 },
     searchBar: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 },
     searchInputWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: c.card, borderRadius: 8, borderWidth: 1, borderColor: c.border, paddingHorizontal: 10 },
     searchInput: { flex: 1, color: c.text, fontSize: 14, paddingVertical: 9 },

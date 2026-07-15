@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "השאר ריק כדי לאשר כל תשלום. סכומים לא ידועים תמיד מבקשים אישור.",
   "sats": "sats",
   "Authentication required": "נדרש אימות",
+  "Marketplace": "שוק",
+  "App": "אפליקציה",
+  "Account": "חשבון",
+  "Preferences": "העדפות",
+  "Link (optional)": "קישור (אופציונלי)",
+  "https:// e.g. an ID verification page": "https:// למשל דף אימות זהות",
+  "Enter a valid https:// link, or clear the field.": "הזינו קישור https:// תקין, או נקו את השדה.",
+  "Open link?": "לפתוח את הקישור?",
+  "This opens {host} in your browser.": "פעולה זו תפתח את {host} בדפדפן שלך.",
+  "Open profile link": "פתח קישור פרופיל",
 };
 export default c;

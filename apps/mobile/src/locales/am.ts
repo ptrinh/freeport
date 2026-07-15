@@ -937,5 +937,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "እያንዳንዱን ክፍያ ለማረጋገጥ ባዶ ይተዉ። ያልታወቁ መጠኖች ሁልጊዜ ይጠይቃሉ።",
   "sats": "sats",
   "Authentication required": "ማረጋገጫ ያስፈልጋል",
+  "Marketplace": "ገበያ",
+  "App": "መተግበሪያ",
+  "Account": "መለያ",
+  "Preferences": "ምርጫዎች",
+  "Link (optional)": "አገናኝ (አማራጭ)",
+  "https:// e.g. an ID verification page": "https:// ለምሳሌ የመታወቂያ ማረጋገጫ ገጽ",
+  "Enter a valid https:// link, or clear the field.": "ትክክለኛ https:// አገናኝ ያስገቡ፣ ወይም መስኩን ያጽዱ።",
+  "Open link?": "አገናኝ ይከፈት?",
+  "This opens {host} in your browser.": "ይህ {host}ን በአሳሽዎ ውስጥ ይከፍታል።",
+  "Open profile link": "የመገለጫ አገናኝ ክፈት",
 };
 export default c;

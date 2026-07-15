@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Оставете празно за да се потврди секое плаќање. За непознати износи секогаш се прашува.",
   "sats": "sats",
   "Authentication required": "Потребна е автентикација",
+  "Marketplace": "Пазар",
+  "App": "Апликација",
+  "Account": "Сметка",
+  "Preferences": "Претпочитања",
+  "Link (optional)": "Врска (изборно)",
+  "https:// e.g. an ID verification page": "https:// на пр. страница за потврда на идентитет",
+  "Enter a valid https:// link, or clear the field.": "Внесете важечка https:// врска или исчистете го полето.",
+  "Open link?": "Да се отвори врската?",
+  "This opens {host} in your browser.": "Ова го отвора {host} во вашиот прелистувач.",
+  "Open profile link": "Отвори врска до профил",
 };
 export default c;

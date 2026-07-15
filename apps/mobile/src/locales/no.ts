@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "La stå tom for å bekrefte hver betaling. Ukjente beløp spør alltid.",
   "sats": "sats",
   "Authentication required": "Autentisering kreves",
+  "Marketplace": "Markedsplass",
+  "App": "App",
+  "Account": "Konto",
+  "Preferences": "Preferanser",
+  "Link (optional)": "Lenke (valgfritt)",
+  "https:// e.g. an ID verification page": "https:// f.eks. en side for ID-verifisering",
+  "Enter a valid https:// link, or clear the field.": "Skriv inn en gyldig https://-lenke, eller tøm feltet.",
+  "Open link?": "Åpne lenke?",
+  "This opens {host} in your browser.": "Dette åpner {host} i nettleseren din.",
+  "Open profile link": "Åpne profillenke",
 };
 export default c;

@@ -980,5 +980,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "留空以确认每笔支付。未知金额始终会询问。",
   "sats": "sats",
   "Authentication required": "需要身份验证",
+  "Marketplace": "市场",
+  "App": "应用",
+  "Account": "账户",
+  "Preferences": "偏好设置",
+  "Link (optional)": "链接（可选）",
+  "https:// e.g. an ID verification page": "https:// 例如身份验证页面",
+  "Enter a valid https:// link, or clear the field.": "请输入有效的 https:// 链接，或清空此字段。",
+  "Open link?": "打开链接？",
+  "This opens {host} in your browser.": "这将在您的浏览器中打开 {host}。",
+  "Open profile link": "打开个人资料链接",
 };
 export default c;

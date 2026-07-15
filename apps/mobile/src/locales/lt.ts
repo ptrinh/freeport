@@ -941,5 +941,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Palikite tuščią, kad būtų patvirtintas kiekvienas mokėjimas. Nežinomų sumų visada klausiama.",
   "sats": "sats",
   "Authentication required": "Reikalingas autentifikavimas",
+  "Marketplace": "Prekyvietė",
+  "App": "Programa",
+  "Account": "Paskyra",
+  "Preferences": "Nuostatos",
+  "Link (optional)": "Nuoroda (nebūtina)",
+  "https:// e.g. an ID verification page": "https:// pvz., tapatybės patvirtinimo puslapis",
+  "Enter a valid https:// link, or clear the field.": "Įveskite galiojančią https:// nuorodą arba išvalykite lauką.",
+  "Open link?": "Atidaryti nuorodą?",
+  "This opens {host} in your browser.": "Taip naršyklėje bus atidaryta {host}.",
+  "Open profile link": "Atidaryti profilio nuorodą",
 };
 export default c;

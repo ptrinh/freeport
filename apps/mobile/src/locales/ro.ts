@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Lasă gol pentru a confirma fiecare plată. Sumele necunoscute solicită întotdeauna confirmarea.",
   "sats": "sats",
   "Authentication required": "Autentificare necesară",
+  "Marketplace": "Piață",
+  "App": "Aplicație",
+  "Account": "Cont",
+  "Preferences": "Preferințe",
+  "Link (optional)": "Link (opțional)",
+  "https:// e.g. an ID verification page": "https:// de ex. o pagină de verificare a identității",
+  "Enter a valid https:// link, or clear the field.": "Introduceți un link https:// valid sau goliți câmpul.",
+  "Open link?": "Deschideți linkul?",
+  "This opens {host} in your browser.": "Aceasta deschide {host} în browserul dvs.",
+  "Open profile link": "Deschide linkul profilului",
 };
 export default c;

@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Hagyd üresen minden fizetés megerősítéséhez. Az ismeretlen összegek mindig rákérdeznek.",
   "sats": "sats",
   "Authentication required": "Hitelesítés szükséges",
+  "Marketplace": "Piactér",
+  "App": "Alkalmazás",
+  "Account": "Fiók",
+  "Preferences": "Preferenciák",
+  "Link (optional)": "Hivatkozás (nem kötelező)",
+  "https:// e.g. an ID verification page": "https:// pl. egy személyazonosság-ellenőrző oldal",
+  "Enter a valid https:// link, or clear the field.": "Adjon meg egy érvényes https:// hivatkozást, vagy törölje a mezőt.",
+  "Open link?": "Megnyitja a hivatkozást?",
+  "This opens {host} in your browser.": "Ez megnyitja a(z) {host} címet a böngészőjében.",
+  "Open profile link": "Profilhivatkozás megnyitása",
 };
 export default c;

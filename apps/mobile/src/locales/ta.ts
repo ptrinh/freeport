@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "ஒவ்வொரு கட்டணத்தையும் உறுதிப்படுத்த காலியாக விடவும். தெரியாத தொகைகள் எப்போதும் கேட்கும்.",
   "sats": "sats",
   "Authentication required": "அங்கீகாரம் தேவை",
+  "Marketplace": "சந்தை",
+  "App": "செயலி",
+  "Account": "கணக்கு",
+  "Preferences": "விருப்பங்கள்",
+  "Link (optional)": "இணைப்பு (விருப்பத்தேர்வு)",
+  "https:// e.g. an ID verification page": "https:// எ.கா. அடையாள சரிபார்ப்பு பக்கம்",
+  "Enter a valid https:// link, or clear the field.": "செல்லுபடியாகும் https:// இணைப்பை உள்ளிடவும் அல்லது புலத்தை அழிக்கவும்.",
+  "Open link?": "இணைப்பைத் திறக்கவா?",
+  "This opens {host} in your browser.": "இது உங்கள் உலாவியில் {host} ஐத் திறக்கும்.",
+  "Open profile link": "சுயவிவர இணைப்பைத் திற",
 };
 export default c;

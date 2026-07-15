@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Los leeg om elke betaling te bevestig. Onbekende bedrae vra altyd.",
   "sats": "sats",
   "Authentication required": "Verifikasie vereis",
+  "Marketplace": "Mark",
+  "App": "Toepassing",
+  "Account": "Rekening",
+  "Preferences": "Voorkeure",
+  "Link (optional)": "Skakel (opsioneel)",
+  "https:// e.g. an ID verification page": "https:// bv. 'n ID-verifikasiebladsy",
+  "Enter a valid https:// link, or clear the field.": "Voer 'n geldige https://-skakel in, of maak die veld skoon.",
+  "Open link?": "Skakel oopmaak?",
+  "This opens {host} in your browser.": "Dit maak {host} in jou blaaier oop.",
+  "Open profile link": "Maak profielskakel oop",
 };
 export default c;

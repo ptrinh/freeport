@@ -937,5 +937,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "සෑම ගෙවීමක්ම තහවුරු කිරීමට හිස්ව තබන්න. නොදන්නා මුදල් සැම විටම විමසයි.",
   "sats": "sats",
   "Authentication required": "සත්‍යාපනය අවශ්‍යයි",
+  "Marketplace": "වෙළඳපොළ",
+  "App": "යෙදුම",
+  "Account": "ගිණුම",
+  "Preferences": "මනාප",
+  "Link (optional)": "සබැඳිය (විකල්ප)",
+  "https:// e.g. an ID verification page": "https:// උදා. හැඳුනුම්පත් සත්‍යාපන පිටුව",
+  "Enter a valid https:// link, or clear the field.": "වලංගු https:// සබැඳියක් ඇතුළත් කරන්න, නැතහොත් ක්ෂේත්‍රය හිස් කරන්න.",
+  "Open link?": "සබැඳිය විවෘත කරන්නද?",
+  "This opens {host} in your browser.": "මෙය ඔබේ බ්‍රවුසරයේ {host} විවෘත කරයි.",
+  "Open profile link": "පැතිකඩ සබැඳිය විවෘත කරන්න",
 };
 export default c;

@@ -32,6 +32,7 @@ import { fetchZapTotals } from '../zaps';
 import { ShopsView } from './ShopsView';
 import { defaultIntentTime, timeToWindow, parsePayment, fmtWindow, extractPhone, myPostTitle, primaryGeohash, fmtPayment } from '../ui/format';
 import { uiAlert, openMaps } from '../ui/alerts';
+import { PeerLinkIcon } from '../ui/peerLink';
 import { Row, DurationField, TimeField, PaymentField, Field, type IoniconName } from '../ui/fields';
 
 export function MarketTab({
@@ -717,6 +718,7 @@ const PostCard = React.memo(function PostCard({
             ? <CachedImage uri={prof.picture} style={s.authorAvatar} recyclingKey={item.pubkey} />
             : <View style={[s.authorAvatar, s.avatarEmpty]} />}
           <Text style={s.authorName}>{prof?.name || item.pubkey.slice(0, 10) + '…'}</Text>
+          <PeerLinkIcon link={prof?.link} />
           {prof?.phone && isDisplayablePhone(prof.phone) ? (
             (() => {
               // Browse always shows a masked number — even when the poster

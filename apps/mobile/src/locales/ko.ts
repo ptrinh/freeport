@@ -980,5 +980,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "모든 결제를 확인하려면 비워 두세요. 알 수 없는 금액은 항상 확인합니다.",
   "sats": "sats",
   "Authentication required": "인증 필요",
+  "Marketplace": "마켓플레이스",
+  "App": "앱",
+  "Account": "계정",
+  "Preferences": "환경설정",
+  "Link (optional)": "링크(선택 사항)",
+  "https:// e.g. an ID verification page": "https:// 예: 신분 확인 페이지",
+  "Enter a valid https:// link, or clear the field.": "유효한 https:// 링크를 입력하거나 필드를 비우세요.",
+  "Open link?": "링크를 여시겠습니까?",
+  "This opens {host} in your browser.": "브라우저에서 {host}을(를) 엽니다.",
+  "Open profile link": "프로필 링크 열기",
 };
 export default c;

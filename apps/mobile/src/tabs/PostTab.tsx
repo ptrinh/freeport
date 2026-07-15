@@ -4,7 +4,6 @@ import {
   Animated,
   Easing,
   findNodeHandle,
-  KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
@@ -105,8 +104,14 @@ export function PostTab({
   const formTitle = t(role === 'passenger' ? 'New Request' : 'New Post');
   const formScroll = useRef<ScrollView>(null);  // so a form can scroll a missing required field into view
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-      <ScrollView ref={formScroll} contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
+    // Keyboard avoidance: rely on the ScrollView's native iOS keyboard insets
+    // (same as Browse/Messages/Settings) rather than wrapping in a
+    // KeyboardAvoidingView. behavior="padding" + ScrollView leaves a stale
+    // bottom pad (≈ keyboard height) that doesn't reset after dismiss on iOS,
+    // which showed up as a large empty gap below the form. automaticallyAdjust…
+    // is a no-op on Android (windowSoftInputMode=adjustResize handles it) and
+    // on web, so those platforms are unchanged.
+    <ScrollView ref={formScroll} contentContainerStyle={s.pad} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false}>
         {(() => {
           const nowSec = Math.floor(Date.now() / 1000);
           // Show only LIVE, still-open requests here. Drop:
@@ -177,8 +182,7 @@ export function PostTab({
             </Animated.View>
           </>
         )}
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </ScrollView>
   );
 }
 

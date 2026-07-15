@@ -27,6 +27,10 @@ export interface UserProfile {
   phoneDisplay: PhoneDisplay;
   /** Optional external link (e.g. provider's website/social). Published as NIP-24 `website`. */
   externalLink: string;
+  /** Optional user-set profile link (e.g. an ID/licence verification page).
+   *  MUST be https — peer URLs are untrusted, so we never publish or open a
+   *  non-https value. Published as a custom `link` field. */
+  link: string;
   /** Lightning address (lud16) — auto-filled from the wallet when it's on, so
    *  others can zap this user's posts (NIP-57). Published as `lud16`. */
   lud16?: string;
@@ -38,7 +42,29 @@ export interface UserProfile {
   plateDisplay: PhoneDisplay;
 }
 
-const EMPTY: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+const EMPTY: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
+
+/**
+ * Validate + normalize a user/peer profile link. Returns a canonical https URL,
+ * or null for anything else — http, other schemes, userinfo tricks, over-long or
+ * unparseable input. Used on BOTH ends: we validate before publishing our own
+ * link, and re-validate any peer-supplied value before opening it (never trust
+ * stored/received data). Mirrors the mini-app firewall's https-only discipline.
+ */
+export function httpsLinkOrNull(input: string | undefined | null): string | null {
+  if (typeof input !== 'string' || !input.trim() || input.length > 1024) return null;
+  let u: URL;
+  try { u = new URL(input.trim()); } catch { return null; }
+  if (u.protocol !== 'https:' || !u.hostname || u.username || u.password) return null;
+  return u.toString();
+}
+
+/** Hostname of a validated https link, for showing the user where a tap leads. */
+export function linkHost(input: string | undefined | null): string | null {
+  const safe = httpsLinkOrNull(input);
+  if (!safe) return null;
+  try { return new URL(safe).hostname; } catch { return null; }
+}
 
 /**
  * A deterministic default avatar for a fresh account, so new users aren't a
@@ -124,6 +150,11 @@ export async function publishProfile(
   if (profile.about) content.about = profile.about;
   if (profile.gallery?.length) content.gallery = profile.gallery;
   if (profile.externalLink) content.website = profile.externalLink.trim();
+  // Only ever publish a valid https link; a non-https value is dropped, not shared.
+  if (profile.link) {
+    const safeLink = httpsLinkOrNull(profile.link);
+    if (safeLink) content.link = safeLink;
+  }
   if (profile.lud16) content.lud16 = profile.lud16.trim();
   // Masking happens HERE, before publish — relays never see the full number
   // unless the user explicitly opted into 'full'.

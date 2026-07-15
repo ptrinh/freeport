@@ -60,7 +60,7 @@ function ExperimentalSection({
       <Pressable style={s.collapseHeader} onPress={() => setOpen((v) => !v)}>
         <View style={s.collapseLeft}>
           <MaterialCommunityIcons name="flask-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-          <Text style={s.collapseTitle}>{t('Experimental')}</Text>
+          <Text style={s.collapseTitle}>{t('Features')}</Text>
         </View>
         <Text style={s.collapseChevron}>{open ? '▾' : '▸'}</Text>
       </Pressable>

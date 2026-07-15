@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Αφήστε το κενό για να επιβεβαιώνετε κάθε πληρωμή. Τα άγνωστα ποσά ζητούν πάντα επιβεβαίωση.",
   "sats": "sats",
   "Authentication required": "Απαιτείται έλεγχος ταυτότητας",
+  "Marketplace": "Αγορά",
+  "App": "Εφαρμογή",
+  "Account": "Λογαριασμός",
+  "Preferences": "Προτιμήσεις",
+  "Link (optional)": "Σύνδεσμος (προαιρετικό)",
+  "https:// e.g. an ID verification page": "https:// π.χ. μια σελίδα επαλήθευσης ταυτότητας",
+  "Enter a valid https:// link, or clear the field.": "Εισαγάγετε έναν έγκυρο σύνδεσμο https:// ή καθαρίστε το πεδίο.",
+  "Open link?": "Άνοιγμα συνδέσμου;",
+  "This opens {host} in your browser.": "Αυτό ανοίγει το {host} στο πρόγραμμα περιήγησής σας.",
+  "Open profile link": "Άνοιγμα συνδέσμου προφίλ",
 };
 export default c;

@@ -980,5 +980,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Kosongkan untuk mengonfirmasi setiap pembayaran. Jumlah yang tidak diketahui selalu ditanyakan.",
   "sats": "sats",
   "Authentication required": "Autentikasi diperlukan",
+  "Marketplace": "Pasar",
+  "App": "Aplikasi",
+  "Account": "Akun",
+  "Preferences": "Preferensi",
+  "Link (optional)": "Tautan (opsional)",
+  "https:// e.g. an ID verification page": "https:// mis. halaman verifikasi identitas",
+  "Enter a valid https:// link, or clear the field.": "Masukkan tautan https:// yang valid, atau kosongkan kolom.",
+  "Open link?": "Buka tautan?",
+  "This opens {host} in your browser.": "Ini membuka {host} di browser Anda.",
+  "Open profile link": "Buka tautan profil",
 };
 export default c;

@@ -940,5 +940,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "Jätä tyhjäksi vahvistaaksesi jokaisen maksun. Tuntemattomat summat kysyvät aina.",
   "sats": "sats",
   "Authentication required": "Tunnistautuminen vaaditaan",
+  "Marketplace": "Kauppapaikka",
+  "App": "Sovellus",
+  "Account": "Tili",
+  "Preferences": "Asetukset",
+  "Link (optional)": "Linkki (valinnainen)",
+  "https:// e.g. an ID verification page": "https:// esim. henkilöllisyyden vahvistussivu",
+  "Enter a valid https:// link, or clear the field.": "Anna kelvollinen https://-linkki tai tyhjennä kenttä.",
+  "Open link?": "Avataanko linkki?",
+  "This opens {host} in your browser.": "Tämä avaa {host}-sivuston selaimessasi.",
+  "Open profile link": "Avaa profiililinkki",
 };
 export default c;

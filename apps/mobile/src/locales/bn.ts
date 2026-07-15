@@ -937,5 +937,15 @@ const c: Record<string, string> = {
   "Leave empty to confirm every payment. Unknown amounts always ask.": "প্রতিটি পেমেন্ট নিশ্চিত করতে খালি রাখুন। অজানা পরিমাণ সবসময় জিজ্ঞাসা করে।",
   "sats": "sats",
   "Authentication required": "প্রমাণীকরণ আবশ্যক",
+  "Marketplace": "বাজার",
+  "App": "অ্যাপ",
+  "Account": "অ্যাকাউন্ট",
+  "Preferences": "পছন্দসমূহ",
+  "Link (optional)": "লিঙ্ক (ঐচ্ছিক)",
+  "https:// e.g. an ID verification page": "https:// যেমন একটি আইডি যাচাইকরণ পৃষ্ঠা",
+  "Enter a valid https:// link, or clear the field.": "একটি বৈধ https:// লিঙ্ক লিখুন, অথবা ক্ষেত্রটি খালি করুন।",
+  "Open link?": "লিঙ্ক খুলবেন?",
+  "This opens {host} in your browser.": "এটি আপনার ব্রাউজারে {host} খুলবে।",
+  "Open profile link": "প্রোফাইল লিঙ্ক খুলুন",
 };
 export default c;
