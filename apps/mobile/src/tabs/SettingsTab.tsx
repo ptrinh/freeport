@@ -57,15 +57,20 @@ import { conciergeModulePresent } from '../concierge/model';
 type SubScreen = 'profile' | 'marketplace' | 'features' | 'preferences' | 'about' | 'account';
 
 /** A top-level menu row: icon + title + forward chevron, opens a subscreen. */
-function NavRow({ icon, title, onPress }: { icon: React.ComponentProps<typeof Ionicons>['name']; title: string; onPress: () => void }) {
+function NavRow({ icon, title, onPress, glow }: { icon: React.ComponentProps<typeof Ionicons>['name']; title: string; onPress: () => void; glow?: Animated.Value }) {
+  const bg = glow
+    ? glow.interpolate({ inputRange: [0, 1], outputRange: ['transparent', palette.chipBlueBg] })
+    : undefined;
   return (
-    <Pressable style={s.collapseHeader} onPress={onPress} accessibilityRole="button">
-      <View style={s.collapseLeft}>
-        <Ionicons name={icon} size={20} color={palette.text2} style={s.collapseIcon} />
-        <Text style={s.collapseTitle}>{title}</Text>
-      </View>
-      <Ionicons name={dirIcon('chevron-forward', 'chevron-back')} size={18} color={palette.text3} />
-    </Pressable>
+    <Animated.View style={bg ? { backgroundColor: bg, borderRadius: 10 } : undefined}>
+      <Pressable style={s.collapseHeader} onPress={onPress} accessibilityRole="button">
+        <View style={s.collapseLeft}>
+          <Ionicons name={icon} size={20} color={palette.text2} style={s.collapseIcon} />
+          <Text style={s.collapseTitle}>{title}</Text>
+        </View>
+        <Ionicons name={dirIcon('chevron-forward', 'chevron-back')} size={18} color={palette.text3} />
+      </Pressable>
+    </Animated.View>
   );
 }
 
@@ -113,6 +118,7 @@ function SettingsTab({
   onDismissNotif,
   onRequiredRefresh,
   openBackupSignal,
+  profileHighlightSignal,
   onBackupDone,
   onProfileChange,
   onRestore,
@@ -184,6 +190,9 @@ function SettingsTab({
   onRequiredRefresh: (override?: { loc?: boolean; notif?: boolean }) => void;
   /** Bumped by the app-wide backup banner: expand Account & Backup + scroll to it. */
   openBackupSignal?: number;
+  /** Bumped by the guided tour's "edit your details" step: show the menu and
+   *  glow the Profile row so the user learns where their details live. */
+  profileHighlightSignal?: number;
   /** A backup just completed (file or cloud) — lets the app hide its reminder banner. */
   onBackupDone?: () => void;
   onProfileChange: (p: UserProfile) => Promise<void>;
@@ -433,6 +442,33 @@ function SettingsTab({
     if (!openBackupSignal) return;
     setSubScreen('account');
   }, [openBackupSignal]);
+  // Guided-tour "edit your details" step (profileHighlightSignal bumped): show
+  // the top-level menu and pulse the Profile row so the user learns where their
+  // details live now that Settings is a menu.
+  const profileGlow = useRef(new Animated.Value(0)).current;
+  React.useEffect(() => {
+    if (!profileHighlightSignal) return;
+    setSubScreen(null);
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(profileGlow, { toValue: 1, duration: 600, useNativeDriver: false }),
+        Animated.timing(profileGlow, { toValue: 0, duration: 600, useNativeDriver: false }),
+      ]),
+      { iterations: 3 },
+    );
+    loop.start();
+    return () => { loop.stop(); profileGlow.setValue(0); };
+  }, [profileHighlightSignal, profileGlow]);
+  // Subtle slide+fade when switching between the menu and a subscreen: forward
+  // (into a subscreen) eases in from the right, back (to the menu) from the left.
+  const navAnim = useRef(new Animated.Value(1)).current;
+  const navOffset = subScreen === null ? -22 : 22;
+  React.useLayoutEffect(() => {
+    navAnim.setValue(0);
+    const a = Animated.timing(navAnim, { toValue: 1, duration: 190, useNativeDriver: false });
+    a.start();
+    return () => a.stop();
+  }, [subScreen, navAnim]);
   // Entering a subscreen (or returning to the menu) starts scrolled to the top.
   React.useEffect(() => {
     settingsScroll.current?.scrollTo({ y: 0, animated: false });
@@ -600,9 +636,10 @@ function SettingsTab({
           )}
         </View>
       )}
+      <Animated.View style={{ opacity: navAnim, transform: [{ translateX: navAnim.interpolate({ inputRange: [0, 1], outputRange: [navOffset, 0] }) }] }}>
       {subScreen === null && (
       <>
-        <NavRow icon="person-outline" title={t('Profile')} onPress={() => setSubScreen('profile')} />
+        <NavRow icon="person-outline" title={t('Profile')} onPress={() => setSubScreen('profile')} glow={profileGlow} />
         <NavRow icon="storefront-outline" title={t('Marketplace')} onPress={() => setSubScreen('marketplace')} />
         <NavRow icon="flask-outline" title={t('Features')} onPress={() => setSubScreen('features')} />
         <NavRow icon="options-outline" title={t('Preferences')} onPress={() => setSubScreen('preferences')} />
@@ -1245,6 +1282,7 @@ function SettingsTab({
           </Modal>
         </>
       )}
+      </Animated.View>
     </ScrollView>
   );
 }

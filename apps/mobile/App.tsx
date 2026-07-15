@@ -501,6 +501,8 @@ function AppInner() {
   // Bumped when the banner is tapped: tells SettingsTab to expand the
   // Account & Backup section and scroll it into view.
   const [openBackupSignal, setOpenBackupSignal] = useState(0);
+  // Bumped when the tour's "edit details" step runs: glow the Profile row.
+  const [profileHighlightSignal, setProfileHighlightSignal] = useState(0);
   useEffect(() => {
     // Only nag once a LOCAL key exists (never during onboarding; NIP-07 users
     // have no local key to back up), and only when the built-in wallet is on
@@ -1299,7 +1301,7 @@ function AppInner() {
   // step highlights a tab; a `wheel` step stays on Post and instead demos the
   // amount wheel. The passenger flow inserts a dedicated wheel/pricing step
   // right after the Post step.
-  type TourStep = { tab: Tab; wheel?: boolean; completed?: boolean; final?: boolean; text: string };
+  type TourStep = { tab: Tab; wheel?: boolean; completed?: boolean; final?: boolean; highlightProfile?: boolean; text: string };
   // Closing note shown to everyone: Freeport has no operator, so safety is a
   // shared responsibility. Inspiring sign-off rather than another tab pointer.
   const tourFinalStep: TourStep = { tab: 'settings', final: true, text: 'Freeport has no company in the middle. You are Freeport — and we rely on you to keep it safe. If someone’s details, like a licence plate or phone number, don’t match, don’t go through with the deal. Report them instead.' };
@@ -1308,7 +1310,7 @@ function AppInner() {
         { tab: 'browse', text: 'Tap here to find rides, negotiate, or accept a ride.' },
         { tab: 'messages', text: 'When you have a deal, tap here to chat, negotiate, or cancel the ride.' },
         { tab: 'messages', completed: true, text: 'Tap here to see your completed rides and rate karma scores.' },
-        { tab: 'settings', text: "Edit your details here. Back up your identity so you don't lose your karma when you switch devices." },
+        { tab: 'settings', highlightProfile: true, text: "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices." },
         tourFinalStep,
       ]
     : [
@@ -1316,7 +1318,7 @@ function AppInner() {
         { tab: 'post', wheel: true, text: 'Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.' },
         { tab: 'messages', text: 'When you have a deal, tap here to chat, negotiate, or cancel the ride.' },
         { tab: 'messages', completed: true, text: 'Tap here to see your completed rides and rate karma scores.' },
-        { tab: 'settings', text: "Edit your details here. Back up your identity so you don't lose your karma when you switch devices." },
+        { tab: 'settings', highlightProfile: true, text: "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices." },
         tourFinalStep,
       ];
   const curTourStep: TourStep | null = tourStep != null ? tourSteps[tourStep] : null;
@@ -1331,6 +1333,8 @@ function AppInner() {
     // The Completed step highlights the Completed view; the plain Messages step
     // shows Active.
     if (stp.tab === 'messages') setMessagesView(stp.completed ? 'completed' : 'active');
+    // The settings "edit details" step points into the Profile row — glow it.
+    if (stp.highlightProfile) setProfileHighlightSignal((v) => v + 1);
   };
   // On the dedicated wheel/pricing step, demo the amount wheel (glow + slide
   // right → back to 0) once the Post tab has rendered the form + wheel.
@@ -1623,6 +1627,7 @@ function AppInner() {
           requiredLocOk={locOk}
           requiredNotifOk={notifSatisfied}
           openBackupSignal={openBackupSignal}
+          profileHighlightSignal={profileHighlightSignal}
           onBackupDone={() => setBackupBanner(false)}
           onDismissNotif={dismissNotif}
           onRequiredRefresh={refreshRequired}
