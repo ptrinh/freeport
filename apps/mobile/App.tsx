@@ -501,8 +501,6 @@ function AppInner() {
   // Bumped when the banner is tapped: tells SettingsTab to expand the
   // Account & Backup section and scroll it into view.
   const [openBackupSignal, setOpenBackupSignal] = useState(0);
-  // Bumped when the tour's "edit details" step runs: glow the Profile row.
-  const [profileHighlightSignal, setProfileHighlightSignal] = useState(0);
   useEffect(() => {
     // Only nag once a LOCAL key exists (never during onboarding; NIP-07 users
     // have no local key to back up), and only when the built-in wallet is on
@@ -1343,8 +1341,8 @@ function AppInner() {
     // The Completed step highlights the Completed view; the plain Messages step
     // shows Active.
     if (stp.tab === 'messages') setMessagesView(stp.completed ? 'completed' : 'active');
-    // The settings "edit details" step points into the Profile row — glow it.
-    if (stp.highlightProfile) setProfileHighlightSignal((v) => v + 1);
+    // The Profile-row glow is driven by the live tour step (see the
+    // profileHighlight prop below), so nothing to trigger here.
   };
   // On the dedicated wheel/pricing step, demo the amount wheel (glow + slide
   // right → back to 0) once the Post tab has rendered the form + wheel.
@@ -1637,7 +1635,7 @@ function AppInner() {
           requiredLocOk={locOk}
           requiredNotifOk={notifSatisfied}
           openBackupSignal={openBackupSignal}
-          profileHighlightSignal={profileHighlightSignal}
+          profileHighlight={curTourStep?.highlightProfile === true}
           onBackupDone={() => setBackupBanner(false)}
           onDismissNotif={dismissNotif}
           onRequiredRefresh={refreshRequired}
@@ -1738,7 +1736,7 @@ function AppInner() {
             await clearKey();
             await MobileClient.clearStoredNegotiations(); // don't leak deals to the next account
             // Clear per-account System-notice state so the next account starts clean.
-            await Promise.all([kvSet('freeport.expiredLog', '[]'), kvSet('freeport.expiredSeen', '[]'), kvSet('freeport.rated', '[]')]).catch(() => {});
+            await Promise.all([kvSet('freeport.expiredLog', '[]'), kvSet('freeport.expiredSeen', '[]'), kvSet('freeport.rated', '[]'), kvSet('freeport.ratingSkipped', '[]')]).catch(() => {});
             setExpiredLog([]); setExpiredSeen(new Set());
             // Reset custom fare coefficients so the next account starts on defaults.
             setFareConfig(null); setFareConfigState(null);
@@ -1997,10 +1995,12 @@ function AppInner() {
         <View
           pointerEvents="box-none"
           style={[s.tourOverlay,
-            // Place the card near what it points at: just under the top toggle
-            // for the Completed step, high for the wheel step (so the wheel below
-            // stays visible), otherwise above the bottom tab bar.
-            curTourStep.completed ? { top: insets.top + 108 }
+            // Place the card near what it points at: just under the Active/
+            // Archived toggle for the Completed step (which sits below the root
+            // keyword-filter input — ~46px — so the card clears it), high for the
+            // wheel step (so the wheel below stays visible), otherwise above the
+            // bottom tab bar.
+            curTourStep.completed ? { top: insets.top + 154 }
               : curTourStep.wheel ? { top: insets.top + 56 }
               : { bottom: insets.bottom + 72 }]}
         >

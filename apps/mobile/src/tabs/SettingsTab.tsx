@@ -62,8 +62,10 @@ function NavRow({ icon, title, onPress, glow }: { icon: React.ComponentProps<typ
     ? glow.interpolate({ inputRange: [0, 1], outputRange: ['transparent', palette.chipBlueBg] })
     : undefined;
   return (
-    <Animated.View style={bg ? { backgroundColor: bg, borderRadius: 10 } : undefined}>
-      <Pressable style={s.collapseHeader} onPress={onPress} accessibilityRole="button">
+    // The glow paints THIS wrapper; collapseHeader's marginTop is moved here so
+    // the highlight box hugs the row itself, not the 12px gap above it.
+    <Animated.View style={[{ marginTop: 12, borderRadius: 10 }, bg ? { backgroundColor: bg } : null]}>
+      <Pressable style={[s.collapseHeader, { marginTop: 0 }]} onPress={onPress} accessibilityRole="button">
         <View style={s.collapseLeft}>
           <Ionicons name={icon} size={20} color={palette.text2} style={s.collapseIcon} />
           <Text style={s.collapseTitle}>{title}</Text>
@@ -118,7 +120,7 @@ function SettingsTab({
   onDismissNotif,
   onRequiredRefresh,
   openBackupSignal,
-  profileHighlightSignal,
+  profileHighlight,
   onBackupDone,
   onProfileChange,
   onRestore,
@@ -190,9 +192,10 @@ function SettingsTab({
   onRequiredRefresh: (override?: { loc?: boolean; notif?: boolean }) => void;
   /** Bumped by the app-wide backup banner: expand Account & Backup + scroll to it. */
   openBackupSignal?: number;
-  /** Bumped by the guided tour's "edit your details" step: show the menu and
-   *  glow the Profile row so the user learns where their details live. */
-  profileHighlightSignal?: number;
+  /** True while the guided tour is on its "edit your details" step: show the
+   *  menu and glow the Profile row. A live boolean (not a counter) so the glow
+   *  stops once the tour leaves the step and never replays on a later mount. */
+  profileHighlight?: boolean;
   /** A backup just completed (file or cloud) — lets the app hide its reminder banner. */
   onBackupDone?: () => void;
   onProfileChange: (p: UserProfile) => Promise<void>;
@@ -442,12 +445,14 @@ function SettingsTab({
     if (!openBackupSignal) return;
     setSubScreen('account');
   }, [openBackupSignal]);
-  // Guided-tour "edit your details" step (profileHighlightSignal bumped): show
-  // the top-level menu and pulse the Profile row so the user learns where their
-  // details live now that Settings is a menu.
+  // Guided-tour "edit your details" step: show the top-level menu and pulse the
+  // Profile row so the user learns where their details live now that Settings is
+  // a menu. Driven by the LIVE tour state (a boolean), not a fire-once counter —
+  // so returning to Settings after the tour ended (a fresh mount with the tour
+  // no longer on this step) does NOT replay the glow.
   const profileGlow = useRef(new Animated.Value(0)).current;
   React.useEffect(() => {
-    if (!profileHighlightSignal) return;
+    if (!profileHighlight) { profileGlow.stopAnimation(); profileGlow.setValue(0); return; }
     setSubScreen(null);
     const loop = Animated.loop(
       Animated.sequence([
@@ -458,7 +463,7 @@ function SettingsTab({
     );
     loop.start();
     return () => { loop.stop(); profileGlow.setValue(0); };
-  }, [profileHighlightSignal, profileGlow]);
+  }, [profileHighlight, profileGlow]);
   // Subtle slide+fade when switching between the menu and a subscreen: forward
   // (into a subscreen) eases in from the right, back (to the menu) from the left.
   const navAnim = useRef(new Animated.Value(1)).current;

@@ -163,9 +163,16 @@ export function DealsTab({
     loop.start();
     return () => loop.stop();
   }, [glowCompleted, segGlow]);
-  // Deals where the user dismissed the auto-opened rater (session-only — a reload
-  // re-opens it, which is fine: we still want them to rate a completed deal).
+  // Deals where the user dismissed the auto-opened rater. Persisted (like
+  // ratedIds) so switching tabs — which remounts this tab — or reopening the
+  // Archived view doesn't re-surface the rater for a deal already skipped.
   const [skippedRating, setSkippedRating] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    kvGet('freeport.ratingSkipped').then((raw) => {
+      if (!raw) return;
+      try { setSkippedRating(new Set(JSON.parse(raw) as string[])); } catch {}
+    });
+  }, []);
   const [reportingId, setReportingId] = useState<string | null>(null);
   // Fulfillment progress lives on the negotiation (n.stage) so it syncs to both
   // parties over the DM channel and survives reloads — no local-only state.
@@ -188,8 +195,16 @@ export function DealsTab({
   const handleConfirmCancelChange = useCallback((id: string | null) => setConfirmCancelId(id), []);
   const handleCounterStart = useCallback((id: string) => setCounteringId(id), []);
   const handleCounterCancel = useCallback(() => setCounteringId(null), []);
-  const handleSkipRating = useCallback((id: string) => setSkippedRating((prev) => new Set([...prev, id])), []);
-  const handleReopenRating = useCallback((id: string) => setSkippedRating((prev) => { const n = new Set(prev); n.delete(id); return n; }), []);
+  const handleSkipRating = useCallback((id: string) => setSkippedRating((prev) => {
+    const next = new Set([...prev, id]);
+    kvSet('freeport.ratingSkipped', JSON.stringify([...next])).catch(() => {});
+    return next;
+  }), []);
+  const handleReopenRating = useCallback((id: string) => setSkippedRating((prev) => {
+    const n = new Set(prev); n.delete(id);
+    kvSet('freeport.ratingSkipped', JSON.stringify([...n])).catch(() => {});
+    return n;
+  }), []);
 
   // A confirmed deal stays Active until its trip/service is marked completed.
   // Cancelled/expired are always Completed (history).
