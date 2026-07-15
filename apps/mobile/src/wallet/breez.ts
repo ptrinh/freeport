@@ -154,7 +154,28 @@ export class BreezSparkProvider implements WalletProvider {
     const input = destination.trim();
     const isBolt11 = /^ln(bc|tbs|tb|bcrt)/i.test(input);
     if (!isBolt11 && (!sats || sats <= 0)) throw new Error('amount-required');
-    // The SDK's parser handles bolt11 / lightning address / Spark address.
+
+    // Lightning addresses (user@domain) and LNURL-pay are NOT valid
+    // SendPaymentMethods: prepareSendPayment only accepts bolt11 / Bitcoin /
+    // Spark, and rejects these two with the SDK's verbatim
+    // "Unsupported payment method". They must resolve to a bolt11 invoice
+    // through the dedicated LNURL-pay flow (prepareLnurlPay → lnurlPay).
+    if (!isBolt11) {
+      const parsed = await this.sdk.parse(input);
+      const variant = variantOf(parsed);
+      if (variant === 'lightningaddress' || variant === 'lnurlpay') {
+        const details = variantDetails(parsed);
+        // lightningAddress wraps the LNURL details in `payRequest`; a bare
+        // lnurlPay *is* those details.
+        const payRequest = variant === 'lightningaddress' ? details?.payRequest : details;
+        const prepared = await this.sdk.prepareLnurlPay({ amount: BigInt(Math.round(sats!)), payRequest });
+        const r = await this.sdk.lnurlPay({ prepareResponse: prepared });
+        if (paymentFailed(r?.payment?.status)) throw new Error('payment failed');
+        return {};
+      }
+    }
+
+    // bolt11 / Bitcoin address / Spark address → SendPayment.
     const prepared = await this.sdk.prepareSendPayment({
       paymentRequest: inputPaymentRequest(this.M, input),
       ...(isBolt11 ? {} : { amount: BigInt(Math.round(sats!)) }),

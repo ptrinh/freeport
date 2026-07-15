@@ -5,6 +5,7 @@ import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
 import type { ParsedDest, TokenBalanceInfo, WalletProvider } from '../../wallet';
 import { authorizePayment } from '../../payAuth';
+import { isLightningAddress } from '../../wallet/lnurl';
 import { ScanSheet, scanSupported } from './ScanSheet';
 
 export interface WalletContact { name: string; address: string }
@@ -79,7 +80,15 @@ export function SendSheet({
     setBusy(true); setError('');
     try {
       const d = await provider.parse(input);
-      if (d.kind === 'unknown') { setError(t("Couldn't recognize this destination")); return; }
+      if (d.kind === 'unknown') {
+        // A syntactically valid lightning address that fails to parse means the
+        // wallet couldn't resolve it (unknown user / domain down) — say so,
+        // rather than the generic "not a destination" message.
+        setError(isLightningAddress(input.trim())
+          ? t("Couldn't find this Lightning address — check the name and try again")
+          : t("Couldn't recognize this destination"));
+        return;
+      }
       setDest(d);
       const needsAmount = d.kind !== 'bolt11' || d.sats == null;
       setStep(needsAmount ? 'amount' : 'confirm');
@@ -109,11 +118,23 @@ export function SendSheet({
       setStep('done');
       onPaid();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : '';
+      // Log the raw SDK error for debugging; show the user a friendly,
+      // translated message instead of a scary verbatim string like
+      // "Invalid input: Unsupported payment method".
+      const raw = e instanceof Error ? e.message : String(e);
+      console.warn('wallet send failed:', raw);
+      const low = raw.toLowerCase();
       setError(
-        msg === 'unsupported-address' ? t("This wallet can't pay this type of address")
-        : msg === 'amount-required' ? t('Enter an amount in sats')
-        : msg || t('Payment failed'));
+        raw === 'amount-required' ? t('Enter an amount in sats')
+        : raw === 'unsupported-address' || low.includes('unsupported')
+          ? t("This wallet can't pay this type of address")
+        : low.includes('insufficient') || low.includes('not enough') || low.includes('balance too low')
+          ? t('Not enough balance to send this payment')
+        : low.includes('lnurl min') || low.includes('lnurl max') || low.includes('out of range') || low.includes('exceeds lnurl') || low.includes('below lnurl')
+          ? t('That amount is outside what this address accepts')
+        : low.includes('lnurl') || low.includes('lightning address')
+          ? t("Couldn't reach this Lightning address — check the name and try again")
+        : t('Payment failed. Please try again.'));
       setStep('error');
     }
   };
