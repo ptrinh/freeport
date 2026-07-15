@@ -38,6 +38,7 @@
     "expo": "~54.0.0",
     "expo-application": "~7.0.8",
     "expo-asset": "~12.0.13",
+    "expo-audio": "~1.1.1",
     "expo-av": "~16.0.8",
     "expo-camera": "~17.0.10",
     "expo-clipboard": "~8.0.8",

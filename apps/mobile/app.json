@@ -31,9 +31,16 @@
           "action": "VIEW",
           "autoVerify": true,
           "data": [
-            { "scheme": "https", "host": "freeport.network", "pathPrefix": "/i/" }
+            {
+              "scheme": "https",
+              "host": "freeport.network",
+              "pathPrefix": "/i/"
+            }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "permissions": [
@@ -123,6 +130,12 @@
         "expo-camera",
         {
           "cameraPermission": "Freeport uses the camera to scan payment QR codes."
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Freeport uses the microphone so you can record and send voice messages."
         }
       ]
     ],

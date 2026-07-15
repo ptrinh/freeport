@@ -8,17 +8,18 @@
  *   haptic + a two-tone "di-ding". Throttled to collapse bursts.
  *
  * Sounds are tiny bundled WAVs (ship over-the-air, no rebuild) played via
- * expo-av (already in the binary). expo-haptics is requireOptionalNativeModule
+ * audioShim (expo-audio when the binary has it, expo-av otherwise — both ship
+ * in some binary generation). expo-haptics is requireOptionalNativeModule
  * → null on builds without it, so haptic calls are guarded to no-op safely.
  * Web has its own variant (haptics.web.ts).
  */
 import { Platform, Vibration } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
+import { createSound, setSfxMode, type ShimSound } from './audioShim';
 
-let clickSound: Audio.Sound | null = null;
-let notifySound: Audio.Sound | null = null;
-let celebrateSound: Audio.Sound | null = null;
+let clickSound: ShimSound | null = null;
+let notifySound: ShimSound | null = null;
+let celebrateSound: ShimSound | null = null;
 let loaded = false;
 
 async function ensureSounds(): Promise<void> {
@@ -27,15 +28,10 @@ async function ensureSounds(): Promise<void> {
   try {
     // Mix with the user's music; never force playback through the iOS mute
     // switch (a UI click that ignores silent mode would be obnoxious).
-    await Audio.setAudioModeAsync({
-      playsInSilentModeIOS: false,
-      interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
-      interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
-      shouldDuckAndroid: true,
-    });
-    clickSound = (await Audio.Sound.createAsync(require('../assets/click.wav'), { volume: 0.09 })).sound;
-    notifySound = (await Audio.Sound.createAsync(require('../assets/notify.wav'), { volume: 0.9 })).sound;
-    celebrateSound = (await Audio.Sound.createAsync(require('../assets/celebrate.wav'), { volume: 0.9 })).sound;
+    await setSfxMode();
+    clickSound = await createSound(require('../assets/click.wav'), { volume: 0.09 });
+    notifySound = await createSound(require('../assets/notify.wav'), { volume: 0.9 });
+    celebrateSound = await createSound(require('../assets/celebrate.wav'), { volume: 0.9 });
   } catch { /* sounds unavailable — haptics still work */ }
 }
 ensureSounds();
@@ -50,7 +46,7 @@ export function wheelTick(): void {
   } else if (Platform.OS === 'ios') {
     try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {}); } catch { /* no module */ }
   }
-  try { clickSound?.replayAsync().catch(() => {}); } catch { /* not loaded yet */ }
+  try { clickSound?.replay().catch(() => {}); } catch { /* not loaded yet */ }
 }
 
 let lastAlert = 0;
@@ -64,7 +60,7 @@ export function eventAlert(): void {
     try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {}); } catch { /* no module */ }
   }
   if (!loaded) ensureSounds();
-  try { notifySound?.replayAsync().catch(() => {}); } catch { /* not loaded yet */ }
+  try { notifySound?.replay().catch(() => {}); } catch { /* not loaded yet */ }
 }
 
 /** Celebration "tada" + a success haptic — deal completed / onboarding done. */
@@ -75,5 +71,5 @@ export function playCelebrate(): void {
     try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {}); } catch { /* no module */ }
   }
   if (!loaded) ensureSounds();
-  try { celebrateSound?.replayAsync().catch(() => {}); } catch { /* not loaded yet */ }
+  try { celebrateSound?.replay().catch(() => {}); } catch { /* not loaded yet */ }
 }

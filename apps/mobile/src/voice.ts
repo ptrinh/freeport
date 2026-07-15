@@ -1,11 +1,19 @@
 /**
- * Voice memo recording & playback — native (expo-av).
+ * Voice memo recording & playback — native (expo-audio, with an expo-av
+ * fallback for binaries shipped before expo-audio was added; see audioShim).
  * The web build swaps in voice.web.ts (MediaRecorder + HTMLAudio).
  *
  * Record returns the data to hand to upload.uploadFile(): a local file URI
  * (native) plus a filename and mime type. Playback streams the uploaded URL.
  */
-import { Audio } from 'expo-av';
+import {
+  createSound,
+  requestRecordingPermissions,
+  setRecordingMode,
+  startRecorder,
+  type ShimRecorder,
+  type ShimSound,
+} from './audioShim';
 
 export interface VoiceClip {
   data: string; // local file URI on native
@@ -13,18 +21,15 @@ export interface VoiceClip {
   name: string;
 }
 
-let recording: Audio.Recording | null = null;
-let sound: Audio.Sound | null = null;
+let recording: ShimRecorder | null = null;
+let sound: ShimSound | null = null;
 
 /** Begin recording. Throws if mic permission is denied. */
 export async function startRecording(): Promise<void> {
-  const perm = await Audio.requestPermissionsAsync();
-  if (!perm.granted) throw new Error('Microphone permission denied');
-  await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
-  const { recording: rec } = await Audio.Recording.createAsync(
-    Audio.RecordingOptionsPresets.HIGH_QUALITY,
-  );
-  recording = rec;
+  const granted = await requestRecordingPermissions();
+  if (!granted) throw new Error('Microphone permission denied');
+  await setRecordingMode(true);
+  recording = await startRecorder();
 }
 
 /** Stop recording and return the clip, or null if nothing was recorded. */
@@ -32,13 +37,13 @@ export async function stopRecording(): Promise<VoiceClip | null> {
   if (!recording) return null;
   const rec = recording;
   recording = null;
+  let uri: string | null;
   try {
-    await rec.stopAndUnloadAsync();
-    await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+    uri = await rec.stop();
+    await setRecordingMode(false);
   } catch {
     return null;
   }
-  const uri = rec.getURI();
   if (!uri) return null;
   const ext = uri.split('.').pop()?.toLowerCase() ?? 'm4a';
   const mime = ext === 'caf' ? 'audio/x-caf' : ext === 'mp3' ? 'audio/mpeg' : 'audio/mp4';
@@ -75,7 +80,7 @@ export function voiceRate(): number {
 export async function setVoiceRate(rate: number): Promise<void> {
   playbackRate = rate;
   if (sound) {
-    try { await sound.setRateAsync(rate, true); } catch { /* not loaded */ }
+    try { await sound.setRate(rate); } catch { /* not loaded */ }
   }
 }
 
@@ -86,68 +91,64 @@ export async function seekVoice(url: string, fraction: number, onStatus: (st: Vo
   else currentListener = onStatus;
   const s = sound;
   if (!s) return;
-  const st: any = await s.getStatusAsync();
+  const st = await s.getStatus();
   if (!st.isLoaded) return;
-  if (Number.isFinite(st.durationMillis) && st.durationMillis > 0) {
-    await s.setPositionAsync(Math.max(0, Math.min(1, fraction)) * st.durationMillis);
+  if (st.durationMillis > 0) {
+    await s.setPositionMillis(Math.max(0, Math.min(1, fraction)) * st.durationMillis);
   }
-  if (!st.isPlaying) await s.playAsync().catch(() => {});
+  if (!st.playing) await s.play().catch(() => {});
 }
 
 /** Toggle play/pause for a clip; starting a different clip stops the last. */
 export async function toggleVoice(url: string, onStatus: (st: VoicePlayback) => void): Promise<void> {
   if (currentUrl === url && sound) {
     currentListener = onStatus; // rebind (bubble re-mounted)
-    const st: any = await sound.getStatusAsync();
+    const st = await sound.getStatus();
     if (st.isLoaded) {
-      if (st.isPlaying) await sound.pauseAsync();
-      else await sound.playAsync();
+      if (st.playing) await sound.pause();
+      else await sound.play();
       return;
     }
   }
   // Different clip (or dead sound): stop the old one and tell its bubble.
   if (sound) {
-    try { await sound.unloadAsync(); } catch { /* already gone */ }
+    try { await sound.unload(); } catch { /* already gone */ }
     currentListener?.({ playing: false, positionMillis: 0, durationMillis: 0, done: true });
     sound = null;
   }
-  const { sound: s } = await Audio.Sound.createAsync(
-    { uri: url },
-    { shouldPlay: true, progressUpdateIntervalMillis: 250 },
-  );
+  const s = await createSound({ uri: url }, { shouldPlay: true, progressUpdateIntervalMillis: 250 });
   sound = s;
   currentUrl = url;
   currentListener = onStatus;
-  s.setOnPlaybackStatusUpdate((st: any) => {
+  s.setOnStatus((st) => {
     if (!st.isLoaded) return;
-    // Web streams can report Infinity/undefined duration — normalize to 0 so
-    // the UI falls back to elapsed-time display instead of a dead bubble.
-    const dur = Number.isFinite(st.durationMillis) ? st.durationMillis : 0;
+    // Unknown durations are already normalized to 0 by the shim, so the UI
+    // falls back to elapsed-time display instead of a dead bubble.
     currentListener?.({
-      playing: !!st.isPlaying,
-      positionMillis: st.positionMillis ?? 0,
-      durationMillis: dur,
-      done: !!st.didJustFinish,
+      playing: st.playing,
+      positionMillis: st.positionMillis,
+      durationMillis: st.durationMillis,
+      done: st.didJustFinish,
       rate: playbackRate,
     });
     if (st.didJustFinish) {
-      s.unloadAsync().catch(() => {});
+      s.unload().catch(() => {});
       if (sound === s) { sound = null; currentUrl = null; }
     }
   });
-  if (playbackRate !== 1) await s.setRateAsync(playbackRate, true).catch(() => {});
+  if (playbackRate !== 1) await s.setRate(playbackRate).catch(() => {});
   // Belt-and-braces: some expo-av web versions ignore shouldPlay in the
   // initial status when created from an async chain.
-  await s.playAsync().catch(() => {});
+  await s.play().catch(() => {});
 }
 
 export async function playAudio(url: string): Promise<void> {
   try {
-    if (sound) { await sound.unloadAsync(); sound = null; }
+    if (sound) { await sound.unload(); sound = null; }
   } catch {}
-  const { sound: s } = await Audio.Sound.createAsync({ uri: url }, { shouldPlay: true });
+  const s = await createSound({ uri: url }, { shouldPlay: true });
   sound = s;
-  s.setOnPlaybackStatusUpdate((st) => {
-    if (st.isLoaded && st.didJustFinish) { s.unloadAsync().catch(() => {}); if (sound === s) sound = null; }
+  s.setOnStatus((st) => {
+    if (st.isLoaded && st.didJustFinish) { s.unload().catch(() => {}); if (sound === s) sound = null; }
   });
 }
