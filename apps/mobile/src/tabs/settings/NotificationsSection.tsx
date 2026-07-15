@@ -40,6 +40,12 @@ function NotificationsSection({
     pushStatus().then(setPushState);
   }, []);
   const myPubkeyHex = client?.pubkey ?? '';
+  // Proof-of-ownership signer for /subscribe: the notifier only enrolls a
+  // DM-watch on our pubkey when the request is signed by it (kind 27235).
+  const signAuth = React.useMemo(
+    () => (client ? client.signAuthEvent.bind(client) : undefined),
+    [client],
+  );
   // Reflect whether Telegram is linked (best-effort; only if the server offers it).
   // Debounced so editing the Notification-service-URL field doesn't fire a
   // request per keystroke — it settles, then checks once.
@@ -77,7 +83,7 @@ function NotificationsSection({
         setPushState('off');
         await kvSet('freeport.pushOn', '0').catch(() => {});
       } else {
-        const st = await enablePush(myPubkeyHex, notifyEndpoint.trim(), pushFilters);
+        const st = await enablePush(myPubkeyHex, notifyEndpoint.trim(), pushFilters, signAuth);
         setPushState(st);
         // Mark the server as the active notifier so the app skips its local
         // fallback notification (avoids a second alert when you open the app).
@@ -89,7 +95,7 @@ function NotificationsSection({
   // re-registers the existing subscription, no permission prompt / resubscribe).
   React.useEffect(() => {
     if (pushState === 'on' && notifyEndpoint.trim()) {
-      void updatePush(myPubkeyHex, notifyEndpoint.trim(), pushFilters);
+      void updatePush(myPubkeyHex, notifyEndpoint.trim(), pushFilters, signAuth);
     }
   }, [pushFilters, pushState]);
 

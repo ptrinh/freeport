@@ -14,6 +14,10 @@
  * iOS note: only works once the site is Added to Home Screen (iOS 16.4+), and
  * the permission prompt must come from a user tap.
  */
+import { buildSubscribeAuth, type SignAuthFn } from './pushAuth';
+
+export type { SignAuthFn };
+
 export type PushStatus = 'on' | 'off' | 'denied' | 'unsupported' | 'error';
 
 export interface PushFilters {
@@ -55,11 +59,13 @@ async function fetchVapidKey(endpoint: string): Promise<string | null> {
   }
 }
 
-async function register(endpoint: string, pubkeyHex: string, sub: PushSubscription, filters?: PushFilters): Promise<boolean> {
+async function register(endpoint: string, pubkeyHex: string, sub: PushSubscription, filters?: PushFilters, sign?: SignAuthFn): Promise<boolean> {
+  // Prove we own the pubkey we ask the server to watch (DM-timing metadata).
+  const auth = pubkeyHex ? await buildSubscribeAuth(sign, sub.endpoint) : null;
   const res = await fetch(api(endpoint, '/subscribe'), {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ subscription: sub.toJSON(), pubkey: pubkeyHex || undefined, filters: filters ?? {} }),
+    body: JSON.stringify({ subscription: sub.toJSON(), pubkey: pubkeyHex || undefined, filters: filters ?? {}, auth: auth ?? undefined }),
   });
   return res.ok;
 }
@@ -81,7 +87,7 @@ export async function pushStatus(): Promise<PushStatus> {
  *  with DOMException NetworkError where the browser's push service is
  *  unreachable (e.g. FCM blocked country-wide), which surfaced as unhandled
  *  rejections in production (GlitchTip issue 4). */
-export async function enablePush(pubkeyHex: string, endpoint: string, filters?: PushFilters): Promise<PushStatus> {
+export async function enablePush(pubkeyHex: string, endpoint: string, filters?: PushFilters, sign?: SignAuthFn): Promise<PushStatus> {
   if (!pushSupported()) return 'unsupported';
   if (!endpoint) return 'error' as PushStatus;
   try {
@@ -99,7 +105,7 @@ export async function enablePush(pubkeyHex: string, endpoint: string, filters?: 
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(key) as BufferSource,
     });
-    return (await register(endpoint, pubkeyHex, sub, filters)) ? 'on' : ('error' as PushStatus);
+    return (await register(endpoint, pubkeyHex, sub, filters, sign)) ? 'on' : ('error' as PushStatus);
   } catch {
     return 'error' as PushStatus;
   }
@@ -107,12 +113,12 @@ export async function enablePush(pubkeyHex: string, endpoint: string, filters?: 
 
 /** Update the registered filters without re-subscribing (cheap; safe to call
  *  on pref changes). No-op if not currently subscribed. */
-export async function updatePush(pubkeyHex: string, endpoint: string, filters?: PushFilters): Promise<void> {
+export async function updatePush(pubkeyHex: string, endpoint: string, filters?: PushFilters, sign?: SignAuthFn): Promise<void> {
   if (!pushSupported() || !endpoint) return;
   try {
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.getSubscription();
-    if (sub) await register(endpoint, pubkeyHex, sub, filters);
+    if (sub) await register(endpoint, pubkeyHex, sub, filters, sign);
   } catch {
     /* ignore */
   }

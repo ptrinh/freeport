@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { loadVapid, configureWebPush } from './vapid.js';
 import { SubStore } from './store.js';
 import { Watcher } from './watcher.js';
+import { verifySubscribeAuth } from './auth.js';
 
 // A push endpoint must belong to a real browser push service. Without this the
 // server would POST VAPID-signed payloads to any attacker-supplied URL (e.g.
@@ -48,9 +49,23 @@ const subSchema = z.object({
   }).default({}),
   /** Watch this pubkey for inbound DMs (kind 4) → "New message" push. */
   pubkey: z.string().regex(/^[0-9a-f]{64}$/).optional(),
+  /** Proof of ownership of `pubkey` — a NIP-98-style signed event (kind 27235,
+   *  signed BY `pubkey`, recent created_at, `u` tag = push endpoint/token).
+   *  Verified in the handler (needs the request's transport key). */
+  auth: z.object({
+    id: z.string(), pubkey: z.string(), created_at: z.number(), kind: z.number(),
+    tags: z.array(z.array(z.string())), content: z.string(), sig: z.string(),
+  }).optional(),
 }).refine((d) => !!d.subscription !== !!d.expoPushToken, {
   message: 'Provide exactly one of subscription (web) or expoPushToken (native).',
 });
+
+/** When set (e.g. `REQUIRE_SUBSCRIBE_AUTH=1`), a DM-watch subscribe WITHOUT a
+ *  proof is rejected outright. Default off: clients shipped before the proof
+ *  existed re-POST /subscribe on every launch as their keep-alive heartbeat —
+ *  hard-failing them would silently kill notifications for every existing
+ *  install until it updates. Flip on once old clients have aged out. */
+const requireSubscribeAuth = () => !['', '0', 'false'].includes((process.env.REQUIRE_SUBSCRIBE_AUTH ?? '').toLowerCase());
 
 export interface Notifier { store: SubStore; watcher: Watcher; publicKey: string; }
 
@@ -85,7 +100,26 @@ export function mountNotify(app: Express, relays: string[], dataDir: string, lim
   app.post('/subscribe', limiter, (req, res) => {
     const parsed = subSchema.safeParse(req.body);
     if (!parsed.success) { res.status(400).json({ error: parsed.error.issues }); return; }
-    const { subscription, expoPushToken, filters, pubkey } = parsed.data;
+    const { subscription, expoPushToken, filters, pubkey, auth } = parsed.data;
+    // Watching a pubkey's inbound DMs leaks DM timing/existence metadata, so it
+    // requires proof the caller CONTROLS that pubkey (signed, fresh, and bound
+    // to this request's push endpoint/token). Filter-only subscriptions
+    // (intents are public) need no proof.
+    if (pubkey) {
+      const transportKey = expoPushToken ?? subscription!.endpoint;
+      if (auth) {
+        const v = verifySubscribeAuth(auth, pubkey, transportKey);
+        if (!v.ok) { res.status(401).json({ error: `invalid auth: ${v.reason}` }); return; }
+      } else if (requireSubscribeAuth()) {
+        res.status(401).json({ error: 'auth required: sign a kind-27235 event with the watched pubkey' });
+        return;
+      } else {
+        // Legacy client (pre-proof app builds heartbeat /subscribe on launch).
+        // Accepted for continuity; will be rejected once REQUIRE_SUBSCRIBE_AUTH
+        // is turned on.
+        console.error(`[notify] DEPRECATED: /subscribe with pubkey but no auth proof (pubkey ${pubkey.slice(0, 8)}…) — set REQUIRE_SUBSCRIBE_AUTH=1 to enforce`);
+      }
+    }
     let rec;
     try {
       rec = expoPushToken

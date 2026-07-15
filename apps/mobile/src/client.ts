@@ -249,6 +249,15 @@ export class MobileClient {
     this.pubkey = signer.pubkey;
   }
 
+  /**
+   * Sign a short-lived NIP-98-style auth event (kind 27235) proving this
+   * client controls `this.pubkey` — used by the notify /subscribe endpoint so
+   * only the key owner can enroll a DM-watch push for their pubkey.
+   */
+  signAuthEvent(template: { kind: number; created_at: number; tags: string[][]; content: string }): Promise<Event> {
+    return this.signer.signEvent(template);
+  }
+
   /** How many of our relays currently have an open WebSocket. */
   connectedRelayCount(): number {
     let n = 0;

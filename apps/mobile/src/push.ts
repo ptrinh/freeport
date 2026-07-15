@@ -13,6 +13,9 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { kvGet, kvSet } from './kv';
+import { buildSubscribeAuth, type SignAuthFn } from './pushAuth';
+
+export type { SignAuthFn };
 
 export type PushStatus = 'on' | 'off' | 'denied' | 'unsupported' | 'error';
 
@@ -42,11 +45,13 @@ async function getToken(): Promise<string | null> {
   }
 }
 
-async function register(endpoint: string, token: string, pubkeyHex: string, filters?: PushFilters): Promise<boolean> {
+async function register(endpoint: string, token: string, pubkeyHex: string, filters?: PushFilters, sign?: SignAuthFn): Promise<boolean> {
+  // Prove we own the pubkey we ask the server to watch (DM-timing metadata).
+  const auth = pubkeyHex ? await buildSubscribeAuth(sign, token) : null;
   const res = await fetch(api(endpoint, '/subscribe'), {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ expoPushToken: token, pubkey: pubkeyHex || undefined, filters: filters ?? {} }),
+    body: JSON.stringify({ expoPushToken: token, pubkey: pubkeyHex || undefined, filters: filters ?? {}, auth: auth ?? undefined }),
   });
   return res.ok;
 }
@@ -66,7 +71,7 @@ export async function pushStatus(): Promise<PushStatus> {
 /** Request permission, get an Expo token, and register with the sender.
  *  Never rejects — resolves 'error' instead (register()'s fetch throws on
  *  network failure; see the web variant's GlitchTip issue 4). */
-export async function enablePush(pubkeyHex: string, endpoint: string, filters?: PushFilters): Promise<PushStatus> {
+export async function enablePush(pubkeyHex: string, endpoint: string, filters?: PushFilters, sign?: SignAuthFn): Promise<PushStatus> {
   if (!pushSupported()) return 'unsupported';
   if (!endpoint) return 'error';
   try {
@@ -75,7 +80,7 @@ export async function enablePush(pubkeyHex: string, endpoint: string, filters?: 
     if (status !== 'granted') return status === 'denied' ? 'denied' : 'off';
     const token = await getToken();
     if (!token) return 'error';
-    const ok = await register(endpoint, token, pubkeyHex, filters);
+    const ok = await register(endpoint, token, pubkeyHex, filters, sign);
     if (!ok) return 'error';
     await kvSet(TOKEN_KEY, token);
     return 'on';
@@ -85,10 +90,10 @@ export async function enablePush(pubkeyHex: string, endpoint: string, filters?: 
 }
 
 /** Update registered filters without re-requesting permission. No-op if not registered. */
-export async function updatePush(pubkeyHex: string, endpoint: string, filters?: PushFilters): Promise<void> {
+export async function updatePush(pubkeyHex: string, endpoint: string, filters?: PushFilters, sign?: SignAuthFn): Promise<void> {
   if (!pushSupported() || !endpoint) return;
   const token = await kvGet(TOKEN_KEY);
-  if (token) await register(endpoint, token, pubkeyHex, filters).catch(() => {});
+  if (token) await register(endpoint, token, pubkeyHex, filters, sign).catch(() => {});
 }
 
 export async function disablePush(_pubkeyHex: string, endpoint: string): Promise<void> {
