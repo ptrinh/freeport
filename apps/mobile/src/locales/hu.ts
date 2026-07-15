@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Koppints ide fuvarok kereséséhez, alkudozáshoz vagy fuvar elfogadásához.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Ha megvan az üzlet, koppints ide a csevegéshez, alkudozáshoz vagy a fuvar lemondásához.",
   "Tap here to see your completed rides and rate karma scores.": "Koppints ide a teljesített fuvaraid megtekintéséhez és a karma értékelésekhez.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Itt szerkesztheted az adataidat. Mentsd el a személyazonosságodat, hogy ne veszítsd el a karmádat eszközváltáskor.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Koppints ide fuvar foglalásához. A hagyományos fuvarmegosztással ellentétben itt te szabod meg az árat (becslővel), és a sofőrrel alkudozol. Foglalás után nézz vissza időnként – nincsenek push értesítések.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Állítsd be az árat a kerék forgatásával. Koppints az összegre a kézi beíráshoz. Húzd 0-ra, hogy a sofőr ajánljon árat.",
   "Ride: <destination> @ <time>": "Fuvar: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Közösségek",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Hozz el egy egész csoportot a Freeportra egyetlen linkkel. Mindenki, aki csatlakozik, ugyanarra a piacra érkezik.",
   "Your communities": "A közösségeid",
+  "Couldn't find this Lightning address — check the name and try again": "Ez a Lightning-cím nem található — ellenőrizd a nevet, és próbáld újra",
+  "Couldn't reach this Lightning address — check the name and try again": "Ez a Lightning-cím nem érhető el — ellenőrizd a nevet, és próbáld újra",
+  "Not enough balance to send this payment": "Nincs elég egyenleg a fizetés elküldéséhez",
+  "That amount is outside what this address accepts": "Ez az összeg kívül esik azon, amit ez a cím elfogad",
+  "Payment failed. Please try again.": "A fizetés sikertelen. Kérjük, próbáld újra.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Nyisd meg a Beállításokat, majd a Profilt az adataid szerkesztéséhez. Mentsd el a személyazonosságodat, hogy ne veszítsd el a karmádat eszközváltáskor.",
+  "{name} is calling — tap to answer": "{name} hív — koppintson a válaszhoz",
 };
 export default c;

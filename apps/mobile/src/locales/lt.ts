@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Bakstelėkite čia, kad rastumėte keliones, derėtumėtės ar priimtumėte kelionę.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Sudarę sandorį, bakstelėkite čia, kad susirašinėtumėte, derėtumėtės ar atšauktumėte kelionę.",
   "Tap here to see your completed rides and rate karma scores.": "Bakstelėkite čia, kad pamatytumėte užbaigtas keliones ir įvertintumėte karmos balus.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Redaguokite savo duomenis čia. Sukurkite tapatybės atsarginę kopiją, kad keisdami įrenginį neprarastumėte karmos.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Bakstelėkite čia, kad užsisakytumėte kelionę. Skirtingai nei įprastose pavėžėjimo paslaugose, kainą nustatote patys (su skaičiuokle) ir derėtumėtės su vairuotoju. Užsakę kartkartėmis patikrinkite — automatinių pranešimų nėra.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Nustatykite kainą sukdami ratuką. Bakstelėkite sumą, kad įvestumėte ją ranka. Nutempkite iki 0, kad kainą pasiūlytų vairuotojas.",
   "Ride: <destination> @ <time>": "Kelionė: <destination> @ <time>",
@@ -975,5 +974,12 @@ const c: Record<string, string> = {
   "Communities": "Bendruomenės",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Pakvieskite visą grupę į Freeport viena nuoroda. Visi prisijungę patenka į tą pačią rinką.",
   "Your communities": "Jūsų bendruomenės",
+  "Couldn't find this Lightning address — check the name and try again": "Nepavyko rasti šio Lightning adreso — patikrinkite pavadinimą ir bandykite dar kartą",
+  "Couldn't reach this Lightning address — check the name and try again": "Nepavyko pasiekti šio Lightning adreso — patikrinkite pavadinimą ir bandykite dar kartą",
+  "Not enough balance to send this payment": "Nepakanka lėšų šiam mokėjimui atlikti",
+  "That amount is outside what this address accepts": "Ši suma nepatenka į šio adreso priimamų sumų ribas",
+  "Payment failed. Please try again.": "Mokėjimas nepavyko. Bandykite dar kartą.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Atidarykite Nustatymai, tada Profilis, kad redaguotumėte savo duomenis. Sukurkite tapatybės atsarginę kopiją, kad keisdami įrenginį neprarastumėte karmos.",
+  "{name} is calling — tap to answer": "{name} skambina — palieskite, kad atsilieptumėte",
 };
 export default c;

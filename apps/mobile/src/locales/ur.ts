@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "سواری تلاش کرنے، مول بھاؤ کرنے یا سواری قبول کرنے کے لیے یہاں ٹیپ کریں۔",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "جب سودا طے ہو جائے تو چیٹ کرنے، مول بھاؤ کرنے یا سواری منسوخ کرنے کے لیے یہاں ٹیپ کریں۔",
   "Tap here to see your completed rides and rate karma scores.": "اپنی مکمل شدہ سواریاں دیکھنے اور کرما اسکور دینے کے لیے یہاں ٹیپ کریں۔",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "اپنی تفصیلات یہاں ترمیم کریں۔ اپنی شناخت کا بیک اپ رکھیں تاکہ ڈیوائس بدلنے پر آپ کا کرما ضائع نہ ہو۔",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "سواری بک کرنے کے لیے یہاں ٹیپ کریں۔ روایتی رائیڈ ہیلنگ کے برعکس، آپ خود اپنی قیمت طے کرتے ہیں (اندازہ لگانے والے کی مدد سے) اور ڈرائیور سے مول بھاؤ کرتے ہیں۔ بکنگ کے بعد، وقتاً فوقتاً واپس آ کر دیکھتے رہیں — یہاں کوئی پش نوٹیفکیشن نہیں ہیں۔",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "پہیہ گھما کر اپنی قیمت طے کریں۔ رقم خود ٹائپ کرنے کے لیے اس پر ٹیپ کریں۔ ڈرائیور کو قیمت پیش کرنے دینے کے لیے 0 تک گھسیٹیں۔",
   "Ride: <destination> @ <time>": "سواری: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "کمیونٹیز",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "ایک لنک سے پورے گروپ کو Freeport پر لائیں۔ شامل ہونے والا ہر شخص اسی مارکیٹ میں پہنچتا ہے۔",
   "Your communities": "آپ کی کمیونٹیز",
+  "Couldn't find this Lightning address — check the name and try again": "یہ Lightning پتہ نہیں مل سکا — نام دیکھ کر دوبارہ کوشش کریں",
+  "Couldn't reach this Lightning address — check the name and try again": "اس Lightning پتے تک نہیں پہنچا جا سکا — نام دیکھ کر دوبارہ کوشش کریں",
+  "Not enough balance to send this payment": "یہ ادائیگی بھیجنے کے لیے کافی بیلنس نہیں ہے",
+  "That amount is outside what this address accepts": "یہ رقم اس حد سے باہر ہے جو یہ پتہ قبول کرتا ہے",
+  "Payment failed. Please try again.": "ادائیگی ناکام۔ براہ کرم دوبارہ کوشش کریں۔",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "اپنی تفصیلات میں ترمیم کرنے کے لیے ترتیبات کھولیں، پھر پروفائل پر جائیں۔ اپنی شناخت کا بیک اپ رکھیں تاکہ ڈیوائس بدلنے پر آپ کا کرما ضائع نہ ہو۔",
+  "{name} is calling — tap to answer": "{name} کال کر رہے ہیں — جواب دینے کے لیے ٹیپ کریں",
 };
 export default c;

@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Натисніть тут, щоб знайти поїздки, домовитися про ціну або прийняти поїздку.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Коли угоду укладено, натисніть тут, щоб написати, домовитися про ціну або скасувати поїздку.",
   "Tap here to see your completed rides and rate karma scores.": "Натисніть тут, щоб переглянути завершені поїздки та оцінити karma.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Редагуйте свої дані тут. Зробіть резервну копію особистих даних, щоб не втратити karma під час зміни пристрою.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Натисніть тут, щоб замовити поїздку. На відміну від звичайних сервісів виклику авто, ви самі встановлюєте ціну (з підказкою оцінювача) і домовляєтеся з водієм. Після замовлення час від часу перевіряйте статус — push-сповіщень тут немає.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Встановіть ціну, прокрутивши коліщатко. Натисніть на суму, щоб ввести її вручну. Перетягніть до 0, щоб водій сам запропонував ціну.",
   "Ride: <destination> @ <time>": "Поїздка: <destination> @ <time>",
@@ -980,5 +979,12 @@ const c: Record<string, string> = {
   "Communities": "Спільноти",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Приведіть цілу групу на Freeport за одним посиланням. Усі, хто приєднується, потрапляють на той самий ринок.",
   "Your communities": "Ваші спільноти",
+  "Couldn't find this Lightning address — check the name and try again": "Не вдалося знайти цю адресу Lightning — перевірте назву та спробуйте ще раз",
+  "Couldn't reach this Lightning address — check the name and try again": "Не вдалося зв'язатися з цією адресою Lightning — перевірте назву та спробуйте ще раз",
+  "Not enough balance to send this payment": "Недостатньо коштів для надсилання цього платежу",
+  "That amount is outside what this address accepts": "Ця сума поза межами того, що приймає ця адреса",
+  "Payment failed. Please try again.": "Помилка платежу. Спробуйте ще раз.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Відкрийте Налаштування, потім Профіль, щоб змінити свої дані. Зробіть резервну копію особистих даних, щоб не втратити karma під час зміни пристрою.",
+  "{name} is calling — tap to answer": "{name} телефонує — торкніться, щоб відповісти",
 };
 export default c;

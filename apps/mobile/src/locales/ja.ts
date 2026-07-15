@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "次へ",
   "Tap here to find rides, negotiate, or accept a ride.": "ここをタップして配車を探す、交渉する、または配車を引き受けます。",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "成立したら、ここをタップしてチャット、交渉、または配車のキャンセルができます。",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "ここで情報を編集できます。端末を変えてもカルマを失わないよう、IDをバックアップしてください。",
   "Posted": "投稿しました",
   "Your ride request is live.": "配車リクエストが公開されました。",
   "Your service offer is live.": "サービスの提供が公開されました。",
@@ -1014,5 +1013,12 @@ const c: Record<string, string> = {
   "Communities": "コミュニティ",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "1つのリンクでグループ全体を Freeport に招待しましょう。参加した全員が同じマーケットに入ります。",
   "Your communities": "あなたのコミュニティ",
+  "Couldn't find this Lightning address — check the name and try again": "この Lightning アドレスが見つかりませんでした — 名前を確認してもう一度お試しください",
+  "Couldn't reach this Lightning address — check the name and try again": "この Lightning アドレスに接続できませんでした — 名前を確認してもう一度お試しください",
+  "Not enough balance to send this payment": "この支払いを送るには残高が不足しています",
+  "That amount is outside what this address accepts": "その金額はこのアドレスが受け付ける範囲外です",
+  "Payment failed. Please try again.": "支払いに失敗しました。もう一度お試しください。",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "設定を開き、次にプロフィールで情報を編集できます。端末を変えてもカルマを失わないよう、IDをバックアップしてください。",
+  "{name} is calling — tap to answer": "{name} さんから着信 — タップして応答",
 };
 export default c;

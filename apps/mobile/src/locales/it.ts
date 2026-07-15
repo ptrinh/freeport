@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Tocca qui per trovare corse, negoziare o accettare una corsa.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Quando hai un accordo, tocca qui per chattare, negoziare o annullare la corsa.",
   "Tap here to see your completed rides and rate karma scores.": "Tocca qui per vedere le tue corse completate e valutare i punteggi karma.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Modifica qui i tuoi dati. Esegui il backup della tua identità per non perdere il tuo karma quando cambi dispositivo.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Tocca qui per prenotare una corsa. A differenza dei servizi di ride-hailing tradizionali, sei tu a fissare il prezzo (con uno stimatore) e a negoziare con il conducente. Dopo la prenotazione, controlla di tanto in tanto: non ci sono notifiche push.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Imposta il tuo prezzo girando la ruota. Tocca l'importo per digitarlo manualmente. Trascina fino a 0 per lasciare che sia il conducente a proporre un prezzo.",
   "Ride: <destination> @ <time>": "Corsa: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Comunità",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Porta un intero gruppo su Freeport con un solo link. Chiunque si unisce arriva nello stesso mercato.",
   "Your communities": "Le tue comunità",
+  "Couldn't find this Lightning address — check the name and try again": "Impossibile trovare questo indirizzo Lightning — controlla il nome e riprova",
+  "Couldn't reach this Lightning address — check the name and try again": "Impossibile raggiungere questo indirizzo Lightning — controlla il nome e riprova",
+  "Not enough balance to send this payment": "Saldo insufficiente per inviare questo pagamento",
+  "That amount is outside what this address accepts": "Quell'importo è fuori da ciò che questo indirizzo accetta",
+  "Payment failed. Please try again.": "Pagamento non riuscito. Riprova.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Apri Impostazioni, poi Profilo per modificare i tuoi dati. Esegui il backup della tua identità per non perdere il tuo karma quando cambi dispositivo.",
+  "{name} is calling — tap to answer": "{name} sta chiamando — tocca per rispondere",
 };
 export default c;

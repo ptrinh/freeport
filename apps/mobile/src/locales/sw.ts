@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Gusa hapa kupata safari, kujadiliana bei, au kukubali safari.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Ukiwa na mpango, gusa hapa kupiga gumzo, kujadiliana bei, au kughairi safari.",
   "Tap here to see your completed rides and rate karma scores.": "Gusa hapa kuona safari zako zilizokamilika na kutoa alama za karma.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Hariri taarifa zako hapa. Hifadhi nakala ya utambulisho wako ili usipoteze karma yako unapobadilisha kifaa.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Gusa hapa kuagiza safari. Tofauti na huduma za kawaida za kuita gari, wewe unaweka bei yako mwenyewe (kwa kikadiriaji) na kujadiliana na dereva. Baada ya kuagiza, rudi kuangalia mara kwa mara — hakuna arifa za kutumwa.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Weka bei yako kwa kuzungusha gurudumu. Gusa kiasi kuandika mwenyewe. Buruta hadi 0 ili kumruhusu dereva atoe bei.",
   "Ride: <destination> @ <time>": "Safari: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "Jumuiya",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Lete kikundi kizima kwenye Freeport kwa kiungo kimoja. Kila anayejiunga hufika kwenye soko lile lile.",
   "Your communities": "Jumuiya zako",
+  "Couldn't find this Lightning address — check the name and try again": "Haikuweza kupata anwani hii ya Lightning — angalia jina na ujaribu tena",
+  "Couldn't reach this Lightning address — check the name and try again": "Haikuweza kufikia anwani hii ya Lightning — angalia jina na ujaribu tena",
+  "Not enough balance to send this payment": "Salio halitoshi kutuma malipo haya",
+  "That amount is outside what this address accepts": "Kiasi hicho kiko nje ya kile anwani hii inakubali",
+  "Payment failed. Please try again.": "Malipo yameshindikana. Tafadhali jaribu tena.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Fungua Mipangilio, kisha Wasifu ili kuhariri taarifa zako. Hifadhi nakala ya utambulisho wako ili usipoteze karma yako unapobadilisha kifaa.",
+  "{name} is calling — tap to answer": "{name} anapiga simu — gusa ili kujibu",
 };
 export default c;

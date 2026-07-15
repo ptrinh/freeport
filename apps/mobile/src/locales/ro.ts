@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Apasă aici pentru a găsi curse, a negocia sau a accepta o cursă.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Când ai o înțelegere, apasă aici pentru a discuta, a negocia sau a anula cursa.",
   "Tap here to see your completed rides and rate karma scores.": "Apasă aici pentru a vedea cursele finalizate și a evalua scorurile de karma.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Editează-ți detaliile aici. Fă o copie a identității tale ca să nu îți pierzi karma când schimbi dispozitivul.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Apasă aici pentru a rezerva o cursă. Spre deosebire de serviciile clasice de ride-hailing, îți stabilești singur prețul (cu un estimator) și negociezi cu șoferul. După rezervare, verifică din când în când — nu există notificări push.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Stabilește-ți prețul învârtind roata. Apasă pe sumă pentru a o introduce manual. Trage la 0 pentru a lăsa șoferul să propună un preț.",
   "Ride: <destination> @ <time>": "Cursă: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Comunități",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Adu un grup întreg pe Freeport cu un singur link. Toți cei care se alătură ajung în aceeași piață.",
   "Your communities": "Comunitățile tale",
+  "Couldn't find this Lightning address — check the name and try again": "Nu am găsit această adresă Lightning — verifică numele și încearcă din nou",
+  "Couldn't reach this Lightning address — check the name and try again": "Nu am putut contacta această adresă Lightning — verifică numele și încearcă din nou",
+  "Not enough balance to send this payment": "Sold insuficient pentru a trimite această plată",
+  "That amount is outside what this address accepts": "Acea sumă este în afara a ceea ce acceptă această adresă",
+  "Payment failed. Please try again.": "Plata a eșuat. Încearcă din nou.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Deschide Setări, apoi Profil pentru a-ți edita detaliile. Fă o copie a identității tale ca să nu îți pierzi karma când schimbi dispozitivul.",
+  "{name} is calling — tap to answer": "{name} sună — atinge pentru a răspunde",
 };
 export default c;

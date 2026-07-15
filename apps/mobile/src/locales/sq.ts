@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Trokit këtu për të gjetur udhëtime, për të negociuar ose për të pranuar një udhëtim.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Kur ke një marrëveshje, trokit këtu për të biseduar, negociuar ose anuluar udhëtimin.",
   "Tap here to see your completed rides and rate karma scores.": "Trokit këtu për të parë udhëtimet e përfunduara dhe për të vlerësuar pikët e karmës.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Modifiko të dhënat e tua këtu. Bëj kopje rezervë të identitetit tënd që të mos humbasësh karmën kur ndërron pajisje.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Trokit këtu për të rezervuar një udhëtim. Ndryshe nga shërbimet tradicionale të transportit, ti vendos vetë çmimin (me një vlerësues) dhe negocion me shoferin. Pas rezervimit, kontrollo herë pas here — nuk ka njoftime push.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Vendos çmimin duke rrotulluar rrotën. Trokit shumën për ta shkruar manualisht. Tërhiqe deri në 0 për t'i lënë shoferit të ofrojë një çmim.",
   "Ride: <destination> @ <time>": "Udhëtim: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Komunitetet",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Sill një grup të tërë në Freeport me një lidhje të vetme. Të gjithë ata që bashkohen mbërrijnë në të njëjtin treg.",
   "Your communities": "Komunitetet e tua",
+  "Couldn't find this Lightning address — check the name and try again": "Kjo adresë Lightning nuk u gjet — kontrollo emrin dhe provo përsëri",
+  "Couldn't reach this Lightning address — check the name and try again": "Kjo adresë Lightning nuk u arrit — kontrollo emrin dhe provo përsëri",
+  "Not enough balance to send this payment": "Balancë e pamjaftueshme për të dërguar këtë pagesë",
+  "That amount is outside what this address accepts": "Ajo shumë është jashtë asaj që pranon kjo adresë",
+  "Payment failed. Please try again.": "Pagesa dështoi. Ju lutemi provoni përsëri.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Hap Cilësimet, pastaj Profili për të modifikuar të dhënat e tua. Bëj kopje rezervë të identitetit tënd që të mos humbasësh karmën kur ndërron pajisje.",
+  "{name} is calling — tap to answer": "{name} po telefonon — trokitni për t'iu përgjigjur",
 };
 export default c;

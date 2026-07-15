@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "রাইড খুঁজতে, দরদাম করতে, বা রাইড গ্রহণ করতে এখানে ট্যাপ করুন।",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "ডিল হয়ে গেলে চ্যাট করতে, দরদাম করতে, বা রাইড বাতিল করতে এখানে ট্যাপ করুন।",
   "Tap here to see your completed rides and rate karma scores.": "আপনার সম্পন্ন রাইডগুলো দেখতে এবং karma স্কোর রেট করতে এখানে ট্যাপ করুন।",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "এখানে আপনার তথ্য সম্পাদনা করুন। ডিভাইস বদলালে যেন আপনার karma হারিয়ে না যায়, তাই আপনার পরিচয় ব্যাকআপ করে রাখুন।",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "রাইড বুক করতে এখানে ট্যাপ করুন। প্রচলিত রাইড-হেলিং সেবার মতো নয়, এখানে আপনি নিজেই দাম ঠিক করেন (একটি এস্টিমেটরসহ) এবং চালকের সঙ্গে দরদাম করেন। বুক করার পর মাঝে মাঝে দেখে নিন — কোনো পুশ নোটিফিকেশন নেই।",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "চাকা ঘুরিয়ে আপনার দাম ঠিক করুন। নিজে টাইপ করতে পরিমাণটিতে ট্যাপ করুন। চালককে দাম প্রস্তাব করতে দিতে 0-তে টেনে নিন।",
   "Ride: <destination> @ <time>": "রাইড: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "সম্প্রদায়",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "একটি লিঙ্কে একটি পুরো গ্রুপকে Freeport-এ নিয়ে আসুন। যারা যোগ দেয় সবাই একই মার্কেটে পৌঁছায়।",
   "Your communities": "আপনার সম্প্রদায়গুলো",
+  "Couldn't find this Lightning address — check the name and try again": "এই Lightning ঠিকানা খুঁজে পাওয়া যায়নি — নামটি যাচাই করে আবার চেষ্টা করুন",
+  "Couldn't reach this Lightning address — check the name and try again": "এই Lightning ঠিকানায় পৌঁছানো যায়নি — নামটি যাচাই করে আবার চেষ্টা করুন",
+  "Not enough balance to send this payment": "এই পেমেন্ট পাঠানোর জন্য পর্যাপ্ত ব্যালেন্স নেই",
+  "That amount is outside what this address accepts": "সেই পরিমাণটি এই ঠিকানা যা গ্রহণ করে তার বাইরে",
+  "Payment failed. Please try again.": "পেমেন্ট ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "সেটিংস খুলুন, তারপর আপনার তথ্য সম্পাদনা করতে প্রোফাইল। ডিভাইস বদলালে যেন আপনার karma হারিয়ে না যায়, তাই আপনার পরিচয় ব্যাকআপ করে রাখুন।",
+  "{name} is calling — tap to answer": "{name} কল করছে — উত্তর দিতে ট্যাপ করুন",
 };
 export default c;

@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Tik hier om ritte te vind, te onderhandel, of 'n rit te aanvaar.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Wanneer jy 'n ooreenkoms het, tik hier om te gesels, te onderhandel, of die rit te kanselleer.",
   "Tap here to see your completed rides and rate karma scores.": "Tik hier om jou voltooide ritte te sien en karmatellings te beoordeel.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Wysig jou besonderhede hier. Rugsteun jou identiteit sodat jy nie jou karma verloor wanneer jy van toestel verander nie.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Tik hier om 'n rit te bespreek. Anders as tradisionele rittebestelling stel jy jou eie prys (met 'n beramer) en onderhandel jy met die bestuurder. Kyk gereeld terug nadat jy bespreek het — daar is geen stootkennisgewings nie.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Stel jou prys deur die wiel te draai. Tik die bedrag om dit handmatig in te tik. Sleep na 0 om die bestuurder 'n prys te laat aanbied.",
   "Ride: <destination> @ <time>": "Rit: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Gemeenskappe",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Bring 'n hele groep na Freeport met een skakel. Almal wat aansluit, land in dieselfde mark.",
   "Your communities": "Jou gemeenskappe",
+  "Couldn't find this Lightning address — check the name and try again": "Kon nie hierdie Lightning-adres vind nie — kontroleer die naam en probeer weer",
+  "Couldn't reach this Lightning address — check the name and try again": "Kon nie hierdie Lightning-adres bereik nie — kontroleer die naam en probeer weer",
+  "Not enough balance to send this payment": "Nie genoeg saldo om hierdie betaling te stuur nie",
+  "That amount is outside what this address accepts": "Daardie bedrag is buite wat hierdie adres aanvaar",
+  "Payment failed. Please try again.": "Betaling het misluk. Probeer asseblief weer.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Maak Instellings oop, dan Profiel om jou besonderhede te wysig. Rugsteun jou identiteit sodat jy nie jou karma verloor wanneer jy van toestel verander nie.",
+  "{name} is calling — tap to answer": "{name} bel — tik om te antwoord",
 };
 export default c;

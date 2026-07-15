@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Pieskaries šeit, lai atrastu braucienus, vienotos par cenu vai pieņemtu braucienu.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Kad darījums ir noslēgts, pieskaries šeit, lai sarakstītos, vienotos vai atceltu braucienu.",
   "Tap here to see your completed rides and rate karma scores.": "Pieskaries šeit, lai redzētu pabeigtos braucienus un novērtētu karmas punktus.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Rediģē savus datus šeit. Dublē savu identitāti, lai nezaudētu karmu, mainot ierīci.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Pieskaries šeit, lai pieteiktu braucienu. Atšķirībā no parastajiem braukšanas pakalpojumiem tu pats nosaki cenu (ar aplēses palīdzību) un vienojies ar vadītāju. Pēc pieteikšanas ik pa laikam ieskaties — nav uznirstošo paziņojumu.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Iestati cenu, griežot ritenīti. Pieskaries summai, lai to ievadītu manuāli. Velc līdz 0, lai vadītājs piedāvā cenu.",
   "Ride: <destination> @ <time>": "Brauciens: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Kopienas",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Atvediet veselu grupu uz Freeport ar vienu saiti. Visi, kas pievienojas, nonāk vienā tirgū.",
   "Your communities": "Jūsu kopienas",
+  "Couldn't find this Lightning address — check the name and try again": "Neizdevās atrast šo Lightning adresi — pārbaudi nosaukumu un mēģini vēlreiz",
+  "Couldn't reach this Lightning address — check the name and try again": "Neizdevās sasniegt šo Lightning adresi — pārbaudi nosaukumu un mēģini vēlreiz",
+  "Not enough balance to send this payment": "Nepietiek līdzekļu, lai veiktu šo maksājumu",
+  "That amount is outside what this address accepts": "Šī summa ir ārpus tā, ko šī adrese pieņem",
+  "Payment failed. Please try again.": "Maksājums neizdevās. Lūdzu, mēģini vēlreiz.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Atver Iestatījumi, tad Profils, lai rediģētu savus datus. Dublē savu identitāti, lai nezaudētu karmu, mainot ierīci.",
+  "{name} is calling — tap to answer": "{name} zvana — pieskarieties, lai atbildētu",
 };
 export default c;

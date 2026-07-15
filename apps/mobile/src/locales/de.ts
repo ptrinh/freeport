@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "Weiter",
   "Tap here to find rides, negotiate, or accept a ride.": "Tippe hier, um Fahrten zu finden, zu verhandeln oder eine Fahrt anzunehmen.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Wenn du einen Deal hast, tippe hier, um zu chatten, zu verhandeln oder die Fahrt zu stornieren.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Bearbeite hier deine Daten. Sichere deine Identität, damit du dein Karma beim Gerätewechsel nicht verlierst.",
   "Posted": "Veröffentlicht",
   "Your ride request is live.": "Deine Fahrtanfrage ist live.",
   "Your service offer is live.": "Dein Serviceangebot ist live.",
@@ -1017,5 +1016,12 @@ const c: Record<string, string> = {
   "Communities": "Communities",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Bring eine ganze Gruppe mit einem Link zu Freeport. Alle, die beitreten, landen im selben Markt.",
   "Your communities": "Deine Communities",
+  "Couldn't find this Lightning address — check the name and try again": "Diese Lightning-Adresse wurde nicht gefunden — prüfe den Namen und versuche es erneut",
+  "Couldn't reach this Lightning address — check the name and try again": "Diese Lightning-Adresse war nicht erreichbar — prüfe den Namen und versuche es erneut",
+  "Not enough balance to send this payment": "Nicht genügend Guthaben, um diese Zahlung zu senden",
+  "That amount is outside what this address accepts": "Dieser Betrag liegt außerhalb dessen, was diese Adresse akzeptiert",
+  "Payment failed. Please try again.": "Zahlung fehlgeschlagen. Bitte versuche es erneut.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Öffne die Einstellungen und dann das Profil, um deine Daten zu bearbeiten. Sichere deine Identität, damit du dein Karma beim Gerätewechsel nicht verlierst.",
+  "{name} is calling — tap to answer": "{name} ruft an — zum Annehmen tippen",
 };
 export default c;

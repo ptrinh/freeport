@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Dodirnite ovdje za pronalazak vožnji, pregovaranje ili prihvaćanje vožnje.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Kada sklopite dogovor, dodirnite ovdje za razgovor, pregovaranje ili otkazivanje vožnje.",
   "Tap here to see your completed rides and rate karma scores.": "Dodirnite ovdje za pregled dovršenih vožnji i ocjenjivanje karma bodova.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Ovdje uredite svoje podatke. Sigurnosno pohranite svoj identitet kako ne biste izgubili karmu pri promjeni uređaja.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Dodirnite ovdje za rezervaciju vožnje. Za razliku od klasičnih usluga prijevoza, vi sami određujete cijenu (uz procjenitelj) i pregovarate s vozačem. Nakon rezervacije, povremeno provjerite — nema push obavijesti.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Odredite cijenu okretanjem kotačića. Dodirnite iznos za ručni unos. Povucite na 0 da vozač ponudi cijenu.",
   "Ride: <destination> @ <time>": "Vožnja: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Zajednice",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Dovedi cijelu grupu na Freeport jednom poveznicom. Svatko tko se pridruži završi na istom tržištu.",
   "Your communities": "Tvoje zajednice",
+  "Couldn't find this Lightning address — check the name and try again": "Ova Lightning adresa nije pronađena — provjerite naziv i pokušajte ponovno",
+  "Couldn't reach this Lightning address — check the name and try again": "Nije moguće doći do ove Lightning adrese — provjerite naziv i pokušajte ponovno",
+  "Not enough balance to send this payment": "Nedovoljan saldo za slanje ove uplate",
+  "That amount is outside what this address accepts": "Taj iznos je izvan onoga što ova adresa prihvaća",
+  "Payment failed. Please try again.": "Plaćanje nije uspjelo. Pokušajte ponovno.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Otvorite Postavke, zatim Profil za uređivanje svojih podataka. Sigurnosno pohranite svoj identitet kako ne biste izgubili karmu pri promjeni uređaja.",
+  "{name} is calling — tap to answer": "{name} zove — dodirnite za odgovor",
 };
 export default c;

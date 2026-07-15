@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Tryk her for at finde ture, forhandle eller acceptere en tur.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Når du har en aftale, så tryk her for at chatte, forhandle eller aflyse turen.",
   "Tap here to see your completed rides and rate karma scores.": "Tryk her for at se dine gennemførte ture og bedømme karma-scorer.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Rediger dine oplysninger her. Sikkerhedskopiér din identitet, så du ikke mister din karma, når du skifter enhed.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Tryk her for at bestille en tur. I modsætning til traditionel taxabestilling fastsætter du selv din pris (med et estimat) og forhandler med chaufføren. Efter bestilling skal du tjekke ind en gang imellem – der er ingen push-notifikationer.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Fastsæt din pris ved at dreje hjulet. Tryk på beløbet for at indtaste det manuelt. Træk til 0 for at lade chaufføren give et tilbud.",
   "Ride: <destination> @ <time>": "Tur: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Fællesskaber",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Bring en hel gruppe til Freeport med ét link. Alle, der er med, lander på samme marked.",
   "Your communities": "Dine fællesskaber",
+  "Couldn't find this Lightning address — check the name and try again": "Denne Lightning-adresse blev ikke fundet — tjek navnet, og prøv igen",
+  "Couldn't reach this Lightning address — check the name and try again": "Kunne ikke nå denne Lightning-adresse — tjek navnet, og prøv igen",
+  "Not enough balance to send this payment": "Ikke nok saldo til at sende denne betaling",
+  "That amount is outside what this address accepts": "Det beløb er uden for, hvad denne adresse accepterer",
+  "Payment failed. Please try again.": "Betalingen mislykkedes. Prøv igen.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Åbn Indstillinger, derefter Profil for at redigere dine oplysninger. Sikkerhedskopiér din identitet, så du ikke mister din karma, når du skifter enhed.",
+  "{name} is calling — tap to answer": "{name} ringer — tryk for at svare",
 };
 export default c;

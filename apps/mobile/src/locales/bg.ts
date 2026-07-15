@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Докоснете тук, за да намерите пътувания, да преговаряте или да приемете пътуване.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Когато имате сделка, докоснете тук, за да пишете, преговаряте или откажете пътуването.",
   "Tap here to see your completed rides and rate karma scores.": "Докоснете тук, за да видите завършените си пътувания и да оцените karma резултати.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Редактирайте данните си тук. Архивирайте самоличността си, за да не загубите karma, когато смените устройство.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Докоснете тук, за да резервирате пътуване. За разлика от традиционните таксиметрови услуги, вие сами определяте цената си (с помощта на калкулатор) и преговаряте с шофьора. След резервацията проверявайте от време на време — няма push известия.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Определете цената си, като завъртите колелото. Докоснете сумата, за да я въведете ръчно. Плъзнете до 0, за да оставите шофьора да предложи цена.",
   "Ride: <destination> @ <time>": "Пътуване: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Общности",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Доведи цяла група във Freeport с една връзка. Всеки, който се присъедини, попада на същия пазар.",
   "Your communities": "Твоите общности",
+  "Couldn't find this Lightning address — check the name and try again": "Този Lightning адрес не беше намерен — проверете името и опитайте отново",
+  "Couldn't reach this Lightning address — check the name and try again": "Този Lightning адрес не можа да бъде достигнат — проверете името и опитайте отново",
+  "Not enough balance to send this payment": "Недостатъчна наличност за изпращане на това плащане",
+  "That amount is outside what this address accepts": "Тази сума е извън това, което този адрес приема",
+  "Payment failed. Please try again.": "Плащането е неуспешно. Моля, опитайте отново.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Отворете Настройки, след това Профил, за да редактирате данните си. Архивирайте самоличността си, за да не загубите karma, когато смените устройство.",
+  "{name} is calling — tap to answer": "{name} се обажда — докоснете, за да отговорите",
 };
 export default c;

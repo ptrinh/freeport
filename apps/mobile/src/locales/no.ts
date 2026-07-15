@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Trykk her for å finne turer, forhandle eller godta en tur.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Når du har en avtale, trykk her for å chatte, forhandle eller avlyse turen.",
   "Tap here to see your completed rides and rate karma scores.": "Trykk her for å se fullførte turer og gi karmapoeng.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Rediger opplysningene dine her. Sikkerhetskopier identiteten din så du ikke mister karmaen når du bytter enhet.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Trykk her for å bestille en tur. I motsetning til vanlig drosjebestilling setter du din egen pris (med et prisanslag) og forhandler med sjåføren. Etter bestilling, sjekk innom av og til — det finnes ingen push-varsler.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Sett prisen ved å dreie på hjulet. Trykk på beløpet for å skrive det inn manuelt. Dra til 0 for å la sjåføren foreslå en pris.",
   "Ride: <destination> @ <time>": "Tur: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Fellesskap",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Ta med en hel gruppe til Freeport med én lenke. Alle som blir med, havner i samme marked.",
   "Your communities": "Fellesskapene dine",
+  "Couldn't find this Lightning address — check the name and try again": "Fant ikke denne Lightning-adressen — sjekk navnet og prøv igjen",
+  "Couldn't reach this Lightning address — check the name and try again": "Fikk ikke kontakt med denne Lightning-adressen — sjekk navnet og prøv igjen",
+  "Not enough balance to send this payment": "Ikke nok saldo til å sende denne betalingen",
+  "That amount is outside what this address accepts": "Det beløpet er utenfor det denne adressen godtar",
+  "Payment failed. Please try again.": "Betalingen mislyktes. Prøv igjen.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Åpne Innstillinger, deretter Profil for å redigere opplysningene dine. Sikkerhetskopier identiteten din så du ikke mister karmaen når du bytter enhet.",
+  "{name} is calling — tap to answer": "{name} ringer — trykk for å svare",
 };
 export default c;

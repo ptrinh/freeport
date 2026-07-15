@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "التالي",
   "Tap here to find rides, negotiate, or accept a ride.": "اضغط هنا للعثور على رحلات أو التفاوض أو قبول رحلة.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "عندما تبرم صفقة، اضغط هنا للدردشة أو التفاوض أو إلغاء الرحلة.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "عدّل بياناتك هنا. انسخ هويتك احتياطيًا حتى لا تفقد نقاط الكارما عند تغيير الجهاز.",
   "Posted": "تم النشر",
   "Your ride request is live.": "طلب رحلتك أصبح مباشرًا.",
   "Your service offer is live.": "عرض خدمتك أصبح مباشرًا.",
@@ -1017,5 +1016,12 @@ const c: Record<string, string> = {
   "Communities": "المجتمعات",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "أحضر مجموعة بأكملها إلى Freeport برابط واحد. كل من ينضم يصل إلى السوق نفسه.",
   "Your communities": "مجتمعاتك",
+  "Couldn't find this Lightning address — check the name and try again": "تعذّر العثور على عنوان Lightning هذا — تحقق من الاسم وحاول مرة أخرى",
+  "Couldn't reach this Lightning address — check the name and try again": "تعذّر الوصول إلى عنوان Lightning هذا — تحقق من الاسم وحاول مرة أخرى",
+  "Not enough balance to send this payment": "الرصيد غير كافٍ لإرسال هذه الدفعة",
+  "That amount is outside what this address accepts": "هذا المبلغ خارج ما يقبله هذا العنوان",
+  "Payment failed. Please try again.": "فشل الدفع. يرجى المحاولة مرة أخرى.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "افتح الإعدادات، ثم الملف الشخصي لتعديل بياناتك. انسخ هويتك احتياطيًا حتى لا تفقد نقاط الكارما عند تغيير الجهاز.",
+  "{name} is calling — tap to answer": "{name} يتصل بك — انقر للرد",
 };
 export default c;

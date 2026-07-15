@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "İleri",
   "Tap here to find rides, negotiate, or accept a ride.": "Yolculuk bulmak, pazarlık etmek veya bir yolculuğu kabul etmek için buraya dokunun.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Bir anlaşmanız olduğunda sohbet etmek, pazarlık etmek veya yolculuğu iptal etmek için buraya dokunun.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Bilgilerinizi buradan düzenleyin. Cihaz değiştirirken karma puanınızı kaybetmemek için kimliğinizi yedekleyin.",
   "Posted": "Yayınlandı",
   "Your ride request is live.": "Yolculuk talebiniz yayında.",
   "Your service offer is live.": "Hizmet teklifiniz yayında.",
@@ -1017,5 +1016,12 @@ const c: Record<string, string> = {
   "Communities": "Topluluklar",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Tüm bir grubu tek bir bağlantıyla Freeport'a getir. Katılan herkes aynı pazara gelir.",
   "Your communities": "Toplulukların",
+  "Couldn't find this Lightning address — check the name and try again": "Bu Lightning adresi bulunamadı — adı kontrol edip tekrar deneyin",
+  "Couldn't reach this Lightning address — check the name and try again": "Bu Lightning adresine ulaşılamadı — adı kontrol edip tekrar deneyin",
+  "Not enough balance to send this payment": "Bu ödemeyi göndermek için yeterli bakiye yok",
+  "That amount is outside what this address accepts": "Bu tutar, bu adresin kabul ettiği aralığın dışında",
+  "Payment failed. Please try again.": "Ödeme başarısız. Lütfen tekrar deneyin.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Bilgilerinizi düzenlemek için Ayarlar'ı, ardından Profil'i açın. Cihaz değiştirirken karma puanınızı kaybetmemek için kimliğinizi yedekleyin.",
+  "{name} is calling — tap to answer": "{name} arıyor — yanıtlamak için dokunun",
 };
 export default c;

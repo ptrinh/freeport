@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "다음",
   "Tap here to find rides, negotiate, or accept a ride.": "여기를 눌러 운행을 찾거나 협상하거나 운행을 수락하세요.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "거래가 성사되면 여기를 눌러 채팅, 협상 또는 운행 취소를 할 수 있습니다.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "여기에서 정보를 수정하세요. 기기를 바꿔도 카르마를 잃지 않도록 신원을 백업하세요.",
   "Posted": "게시됨",
   "Your ride request is live.": "탑승 요청이 게시되었습니다.",
   "Your service offer is live.": "서비스 제안이 게시되었습니다.",
@@ -1014,5 +1013,12 @@ const c: Record<string, string> = {
   "Communities": "커뮤니티",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "링크 하나로 그룹 전체를 Freeport로 데려오세요. 참여하는 모든 사람이 같은 마켓으로 들어옵니다.",
   "Your communities": "내 커뮤니티",
+  "Couldn't find this Lightning address — check the name and try again": "이 Lightning 주소를 찾을 수 없습니다 — 이름을 확인하고 다시 시도하세요",
+  "Couldn't reach this Lightning address — check the name and try again": "이 Lightning 주소에 연결할 수 없습니다 — 이름을 확인하고 다시 시도하세요",
+  "Not enough balance to send this payment": "이 결제를 보내기에 잔액이 부족합니다",
+  "That amount is outside what this address accepts": "해당 금액은 이 주소가 허용하는 범위를 벗어났습니다",
+  "Payment failed. Please try again.": "결제에 실패했습니다. 다시 시도해 주세요.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "설정을 연 다음 프로필에서 정보를 수정하세요. 기기를 바꿔도 카르마를 잃지 않도록 신원을 백업하세요.",
+  "{name} is calling — tap to answer": "{name} 님이 전화 중 — 눌러서 응답",
 };
 export default c;

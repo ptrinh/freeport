@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "下一步",
   "Tap here to find rides, negotiate, or accept a ride.": "点这里查找行程、议价或接单。",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "达成交易后，点这里聊天、议价或取消行程。",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "在这里编辑你的信息。备份你的身份，以免换设备时丢失 karma 积分。",
   "Posted": "已发布",
   "Your ride request is live.": "您的叫车请求已上线。",
   "Your service offer is live.": "您的服务报价已上线。",
@@ -1014,5 +1013,12 @@ const c: Record<string, string> = {
   "Communities": "社区",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "用一个链接把整个群组带到 Freeport。加入的每个人都会进入同一个市场。",
   "Your communities": "你的社区",
+  "Couldn't find this Lightning address — check the name and try again": "找不到此 Lightning 地址 — 请检查名称后重试",
+  "Couldn't reach this Lightning address — check the name and try again": "无法连接此 Lightning 地址 — 请检查名称后重试",
+  "Not enough balance to send this payment": "余额不足，无法发送此笔付款",
+  "That amount is outside what this address accepts": "该金额超出此地址接受的范围",
+  "Payment failed. Please try again.": "支付失败。请重试。",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "打开设置，然后进入个人资料以编辑你的信息。备份你的身份，以免换设备时丢失 karma 积分。",
+  "{name} is calling — tap to answer": "{name} 来电 — 点按接听",
 };
 export default c;

@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Ťuknutím sem nájdete jazdy, dohodnete sa alebo prijmete jazdu.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Keď máte dohodu, ťuknutím sem môžete chatovať, vyjednávať alebo jazdu zrušiť.",
   "Tap here to see your completed rides and rate karma scores.": "Ťuknutím sem zobrazíte svoje dokončené jazdy a ohodnotíte skóre karmy.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Tu upravte svoje údaje. Zálohujte si svoju identitu, aby ste pri prechode na iné zariadenie neprišli o karmu.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Ťuknutím sem si objednáte jazdu. Na rozdiel od bežných taxislužieb si cenu určujete sami (s pomocou odhadu) a vyjednávate s vodičom. Po objednaní sa občas vráťte a skontrolujte to — push notifikácie tu nie sú.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Cenu nastavíte otočením kolieska. Ťuknutím na sumu ju zadáte ručne. Potiahnutím na 0 necháte cenu navrhnúť vodiča.",
   "Ride: <destination> @ <time>": "Jazda: <destination> @ <time>",
@@ -977,5 +976,12 @@ const c: Record<string, string> = {
   "Communities": "Komunity",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Priveďte celú skupinu na Freeport jedným odkazom. Každý, kto sa pridá, sa ocitne na rovnakom trhu.",
   "Your communities": "Vaše komunity",
+  "Couldn't find this Lightning address — check the name and try again": "Túto adresu Lightning sa nepodarilo nájsť — skontrolujte názov a skúste znova",
+  "Couldn't reach this Lightning address — check the name and try again": "Túto adresu Lightning sa nepodarilo dosiahnuť — skontrolujte názov a skúste znova",
+  "Not enough balance to send this payment": "Nedostatočný zostatok na odoslanie tejto platby",
+  "That amount is outside what this address accepts": "Táto suma je mimo rozsahu, ktorý táto adresa akceptuje",
+  "Payment failed. Please try again.": "Platba zlyhala. Skúste to znova.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Otvorte Nastavenia a potom Profil na úpravu svojich údajov. Zálohujte si svoju identitu, aby ste pri prechode na iné zariadenie neprišli o karmu.",
+  "{name} is calling — tap to answer": "{name} volá — ťuknutím prijmete",
 };
 export default c;

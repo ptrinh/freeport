@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "შეეხეთ აქ მგზავრობის მოსაძებნად, ფასის შესათანხმებლად ან მგზავრობის დასადასტურებლად.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "როცა გარიგება გაქვთ, შეეხეთ აქ მიმოწერისთვის, ფასის შესათანხმებლად ან მგზავრობის გასაუქმებლად.",
   "Tap here to see your completed rides and rate karma scores.": "შეეხეთ აქ დასრულებული მგზავრობების სანახავად და karma-ის შესაფასებლად.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "შეცვალეთ თქვენი მონაცემები აქ. შექმენით თქვენი იდენტობის სარეზერვო ასლი, რომ მოწყობილობის შეცვლისას karma არ დაკარგოთ.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "შეეხეთ აქ მგზავრობის დასაჯავშნად. ჩვეულებრივი ტაქსის სერვისებისგან განსხვავებით, ფასს თქვენ თვითონ ადგენთ (შეფასების ხელსაწყოს დახმარებით) და მძღოლს უთანხმდებით. დაჯავშნის შემდეგ დროდადრო შემოიხედეთ — push-შეტყობინებები არ არის.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "დააყენეთ ფასი ბორბლის დატრიალებით. ხელით ჩასაწერად შეეხეთ თანხას. გადაიტანეთ 0-ზე, რომ მძღოლმა ფასი შემოგთავაზოთ.",
   "Ride: <destination> @ <time>": "მგზავრობა: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "საზოგადოებები",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "მოიყვანე მთელი ჯგუფი Freeport-ზე ერთი ბმულით. ყველა, ვინც შემოუერთდება, იმავე ბაზარზე ხვდება.",
   "Your communities": "შენი საზოგადოებები",
+  "Couldn't find this Lightning address — check the name and try again": "ეს Lightning მისამართი ვერ მოიძებნა — შეამოწმეთ სახელი და სცადეთ თავიდან",
+  "Couldn't reach this Lightning address — check the name and try again": "ამ Lightning მისამართთან დაკავშირება ვერ მოხერხდა — შეამოწმეთ სახელი და სცადეთ თავიდან",
+  "Not enough balance to send this payment": "ამ გადახდის გასაგზავნად ბალანსი არასაკმარისია",
+  "That amount is outside what this address accepts": "ეს თანხა სცილდება იმას, რასაც ეს მისამართი იღებს",
+  "Payment failed. Please try again.": "გადახდა ვერ შესრულდა. გთხოვთ, სცადოთ თავიდან.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "გახსენით პარამეტრები, შემდეგ პროფილი თქვენი მონაცემების რედაქტირებისთვის. შექმენით თქვენი იდენტობის სარეზერვო ასლი, რომ მოწყობილობის შეცვლისას karma არ დაკარგოთ.",
+  "{name} is calling — tap to answer": "{name} რეკავს — შეეხეთ პასუხისთვის",
 };
 export default c;

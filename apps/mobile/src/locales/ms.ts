@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Ketik di sini untuk mencari tumpangan, berunding, atau menerima tumpangan.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Apabila anda ada perjanjian, ketik di sini untuk bersembang, berunding, atau membatalkan tumpangan.",
   "Tap here to see your completed rides and rate karma scores.": "Ketik di sini untuk melihat tumpangan anda yang selesai dan menilai skor karma.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Sunting butiran anda di sini. Sandarkan identiti anda supaya anda tidak kehilangan karma apabila bertukar peranti.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Ketik di sini untuk menempah tumpangan. Tidak seperti perkhidmatan tumpangan biasa, anda tetapkan harga sendiri (dengan penganggar) dan berunding dengan pemandu. Selepas menempah, semak semula dari semasa ke semasa — tiada pemberitahuan tolak.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Tetapkan harga anda dengan memutar roda. Ketik jumlah itu untuk menaipnya secara manual. Seret ke 0 untuk membenarkan pemandu menawarkan harga.",
   "Ride: <destination> @ <time>": "Tumpangan: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "Komuniti",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Bawa seluruh kumpulan ke Freeport dengan satu pautan. Semua yang menyertai tiba di pasaran yang sama.",
   "Your communities": "Komuniti anda",
+  "Couldn't find this Lightning address — check the name and try again": "Tidak dapat mencari alamat Lightning ini — semak nama dan cuba lagi",
+  "Couldn't reach this Lightning address — check the name and try again": "Tidak dapat menghubungi alamat Lightning ini — semak nama dan cuba lagi",
+  "Not enough balance to send this payment": "Baki tidak mencukupi untuk menghantar pembayaran ini",
+  "That amount is outside what this address accepts": "Jumlah itu di luar julat yang diterima oleh alamat ini",
+  "Payment failed. Please try again.": "Pembayaran gagal. Sila cuba lagi.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Buka Tetapan, kemudian Profil untuk menyunting butiran anda. Sandarkan identiti anda supaya anda tidak kehilangan karma apabila bertukar peranti.",
+  "{name} is calling — tap to answer": "{name} sedang memanggil — ketik untuk menjawab",
 };
 export default c;

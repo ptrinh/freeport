@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "Suivant",
   "Tap here to find rides, negotiate, or accept a ride.": "Touchez ici pour trouver des courses, négocier ou accepter une course.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Quand vous avez un accord, touchez ici pour discuter, négocier ou annuler la course.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Modifiez vos informations ici. Sauvegardez votre identité pour ne pas perdre votre karma en changeant d'appareil.",
   "Posted": "Publié",
   "Your ride request is live.": "Votre demande de course est en ligne.",
   "Your service offer is live.": "Votre offre de service est en ligne.",
@@ -1017,5 +1016,12 @@ const c: Record<string, string> = {
   "Communities": "Communautés",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Amène tout un groupe sur Freeport avec un seul lien. Toute personne qui rejoint arrive dans le même marché.",
   "Your communities": "Tes communautés",
+  "Couldn't find this Lightning address — check the name and try again": "Impossible de trouver cette adresse Lightning — vérifiez le nom et réessayez",
+  "Couldn't reach this Lightning address — check the name and try again": "Impossible de joindre cette adresse Lightning — vérifiez le nom et réessayez",
+  "Not enough balance to send this payment": "Solde insuffisant pour envoyer ce paiement",
+  "That amount is outside what this address accepts": "Ce montant est en dehors de ce que cette adresse accepte",
+  "Payment failed. Please try again.": "Échec du paiement. Veuillez réessayer.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Ouvrez Paramètres, puis Profil pour modifier vos informations. Sauvegardez votre identité pour ne pas perdre votre karma en changeant d'appareil.",
+  "{name} is calling — tap to answer": "{name} vous appelle — appuyez pour répondre",
 };
 export default c;

@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Dotknij tutaj, aby znaleźć przejazdy, negocjować lub przyjąć przejazd.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Gdy zawrzesz umowę, dotknij tutaj, aby czatować, negocjować lub anulować przejazd.",
   "Tap here to see your completed rides and rate karma scores.": "Dotknij tutaj, aby zobaczyć ukończone przejazdy i ocenić karmę.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Edytuj tutaj swoje dane. Zrób kopię zapasową tożsamości, aby nie stracić karmy przy zmianie urządzenia.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Dotknij tutaj, aby zamówić przejazd. W przeciwieństwie do tradycyjnych aplikacji, sam ustalasz cenę (z pomocą szacowania) i negocjujesz z kierowcą. Po zamówieniu zaglądaj od czasu do czasu — nie ma powiadomień push.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Ustaw cenę, obracając pokrętłem. Dotknij kwoty, aby wpisać ją ręcznie. Przeciągnij do 0, aby pozwolić kierowcy zaproponować cenę.",
   "Ride: <destination> @ <time>": "Przejazd: <destination> @ <time>",
@@ -976,5 +975,12 @@ const c: Record<string, string> = {
   "Communities": "Społeczności",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Przyprowadź całą grupę na Freeport jednym linkiem. Każdy, kto dołączy, trafia na ten sam rynek.",
   "Your communities": "Twoje społeczności",
+  "Couldn't find this Lightning address — check the name and try again": "Nie znaleziono tego adresu Lightning — sprawdź nazwę i spróbuj ponownie",
+  "Couldn't reach this Lightning address — check the name and try again": "Nie udało się połączyć z tym adresem Lightning — sprawdź nazwę i spróbuj ponownie",
+  "Not enough balance to send this payment": "Za mało środków, aby wysłać tę płatność",
+  "That amount is outside what this address accepts": "Ta kwota jest poza zakresem akceptowanym przez ten adres",
+  "Payment failed. Please try again.": "Płatność nie powiodła się. Spróbuj ponownie.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Otwórz Ustawienia, a następnie Profil, aby edytować swoje dane. Zrób kopię zapasową tożsamości, aby nie stracić karmy przy zmianie urządzenia.",
+  "{name} is calling — tap to answer": "{name} dzwoni — dotknij, aby odebrać",
 };
 export default c;

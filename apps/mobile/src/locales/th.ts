@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "ถัดไป",
   "Tap here to find rides, negotiate, or accept a ride.": "แตะที่นี่เพื่อค้นหาเที่ยวรถ ต่อรอง หรือรับงาน",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "เมื่อมีดีลแล้ว แตะที่นี่เพื่อแชท ต่อรอง หรือยกเลิกเที่ยวรถ",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "แก้ไขข้อมูลของคุณได้ที่นี่ สำรองข้อมูลตัวตนของคุณไว้เพื่อไม่ให้สูญเสียคะแนนกรรมเมื่อเปลี่ยนอุปกรณ์",
   "Posted": "โพสต์แล้ว",
   "Your ride request is live.": "คำขอเดินทางของคุณเผยแพร่แล้ว",
   "Your service offer is live.": "ข้อเสนอบริการของคุณเผยแพร่แล้ว",
@@ -1014,5 +1013,12 @@ const c: Record<string, string> = {
   "Communities": "ชุมชน",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "พาทั้งกลุ่มมาที่ Freeport ด้วยลิงก์เดียว ทุกคนที่เข้าร่วมจะไปอยู่ในตลาดเดียวกัน",
   "Your communities": "ชุมชนของคุณ",
+  "Couldn't find this Lightning address — check the name and try again": "ไม่พบที่อยู่ Lightning นี้ — ตรวจสอบชื่อแล้วลองใหม่",
+  "Couldn't reach this Lightning address — check the name and try again": "ไม่สามารถเชื่อมต่อกับที่อยู่ Lightning นี้ได้ — ตรวจสอบชื่อแล้วลองใหม่",
+  "Not enough balance to send this payment": "ยอดเงินไม่พอสำหรับการชำระเงินนี้",
+  "That amount is outside what this address accepts": "จำนวนเงินนี้อยู่นอกช่วงที่ที่อยู่นี้รับได้",
+  "Payment failed. Please try again.": "การชำระเงินล้มเหลว กรุณาลองใหม่",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "เปิด ตั้งค่า แล้วไปที่ โปรไฟล์ เพื่อแก้ไขข้อมูลของคุณ สำรองข้อมูลตัวตนของคุณไว้เพื่อไม่ให้สูญเสียคะแนนกรรมเมื่อเปลี่ยนอุปกรณ์",
+  "{name} is calling — tap to answer": "{name} กำลังโทร — แตะเพื่อรับสาย",
 };
 export default c;

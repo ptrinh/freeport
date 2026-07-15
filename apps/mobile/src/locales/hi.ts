@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "आगे",
   "Tap here to find rides, negotiate, or accept a ride.": "सवारी खोजने, मोलभाव करने या सवारी स्वीकार करने के लिए यहाँ टैप करें।",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "जब आपकी डील हो जाए, तो चैट करने, मोलभाव करने या सवारी रद्द करने के लिए यहाँ टैप करें।",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "अपना विवरण यहाँ संपादित करें। अपनी पहचान का बैकअप लें ताकि डिवाइस बदलने पर आपका कर्म अंक न खोए।",
   "Posted": "पोस्ट किया गया",
   "Your ride request is live.": "आपका राइड अनुरोध लाइव है।",
   "Your service offer is live.": "आपकी सेवा पेशकश लाइव है।",
@@ -1014,5 +1013,12 @@ const c: Record<string, string> = {
   "Communities": "समुदाय",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "एक ही लिंक से एक पूरे समूह को Freeport पर लाएँ। जो भी शामिल होता है, वह उसी मार्केट में पहुँचता है।",
   "Your communities": "आपके समुदाय",
+  "Couldn't find this Lightning address — check the name and try again": "यह Lightning पता नहीं मिला — नाम जाँचें और फिर से प्रयास करें",
+  "Couldn't reach this Lightning address — check the name and try again": "इस Lightning पते तक नहीं पहुँचा जा सका — नाम जाँचें और फिर से प्रयास करें",
+  "Not enough balance to send this payment": "यह भुगतान भेजने के लिए पर्याप्त बैलेंस नहीं है",
+  "That amount is outside what this address accepts": "वह राशि इस पते द्वारा स्वीकृत सीमा से बाहर है",
+  "Payment failed. Please try again.": "भुगतान विफल। कृपया फिर से प्रयास करें।",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "सेटिंग्स खोलें, फिर अपना विवरण संपादित करने के लिए प्रोफ़ाइल। अपनी पहचान का बैकअप लें ताकि डिवाइस बदलने पर आपका कर्म अंक न खोए।",
+  "{name} is calling — tap to answer": "{name} कॉल कर रहे हैं — जवाब देने के लिए टैप करें",
 };
 export default c;

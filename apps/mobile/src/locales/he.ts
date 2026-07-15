@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "הקישו כאן כדי למצוא נסיעות, לנהל משא ומתן או לקבל נסיעה.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "כשיש לכם עסקה, הקישו כאן כדי לשוחח, לנהל משא ומתן או לבטל את הנסיעה.",
   "Tap here to see your completed rides and rate karma scores.": "הקישו כאן כדי לראות את הנסיעות שהשלמתם ולדרג ציוני קארמה.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "ערכו את הפרטים שלכם כאן. גבו את הזהות שלכם כדי לא לאבד את הקארמה כשאתם מחליפים מכשיר.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "הקישו כאן כדי להזמין נסיעה. בניגוד להזמנת נסיעות מסורתית, אתם קובעים את המחיר בעצמכם (בעזרת מחשבון הערכה) ומנהלים משא ומתן עם הנהג. לאחר ההזמנה, בדקו מדי פעם — אין התראות דחיפה.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "קבעו את המחיר על ידי סיבוב הגלגל. הקישו על הסכום כדי להקליד אותו ידנית. גררו ל-0 כדי לתת לנהג להציע מחיר.",
   "Ride: <destination> @ <time>": "נסיעה: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "קהילות",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "הביאו קבוצה שלמה ל-Freeport בקישור אחד. כל מי שמצטרף מגיע לאותו שוק.",
   "Your communities": "הקהילות שלכם",
+  "Couldn't find this Lightning address — check the name and try again": "לא נמצאה כתובת Lightning זו — בדקו את השם ונסו שוב",
+  "Couldn't reach this Lightning address — check the name and try again": "לא ניתן היה להגיע לכתובת Lightning זו — בדקו את השם ונסו שוב",
+  "Not enough balance to send this payment": "אין מספיק יתרה לשליחת תשלום זה",
+  "That amount is outside what this address accepts": "הסכום הזה מחוץ למה שכתובת זו מקבלת",
+  "Payment failed. Please try again.": "התשלום נכשל. אנא נסו שוב.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "פתחו הגדרות, ואז פרופיל כדי לערוך את הפרטים שלכם. גבו את הזהות שלכם כדי לא לאבד את הקארמה כשאתם מחליפים מכשיר.",
+  "{name} is calling — tap to answer": "{name} מתקשר — הקש כדי לענות",
 };
 export default c;

@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Сапар табу, бағаны келісу немесе сапарды қабылдау үшін осы жерді басыңыз.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Мәміле жасалғанда чаттасу, бағаны келісу немесе сапардан бас тарту үшін осы жерді басыңыз.",
   "Tap here to see your completed rides and rate karma scores.": "Аяқталған сапарларыңызды көру және karma ұпайларын бағалау үшін осы жерді басыңыз.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Деректеріңізді осы жерде өңдеңіз. Құрылғыны ауыстырғанда karma жоғалтып алмас үшін жеке тұлғаңыздың сақтық көшірмесін жасаңыз.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Сапарға тапсырыс беру үшін осы жерді басыңыз. Дәстүрлі такси шақыруға қарағанда, бағаны өзіңіз белгілейсіз (бағалауыш көмегімен) және жүргізушімен келісесіз. Тапсырыстан кейін анда-санда тексеріп тұрыңыз — push-хабарламалар жоқ.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Дөңгелекті айналдырып бағаны белгілеңіз. Қолмен енгізу үшін соманы басыңыз. Жүргізуші өз бағасын ұсынуы үшін 0-ге сүйреңіз.",
   "Ride: <destination> @ <time>": "Сапар: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "Қауымдастықтар",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Бүкіл топты бір сілтемемен Freeport-қа әкел. Қосылғандардың бәрі бір нарыққа түседі.",
   "Your communities": "Сенің қауымдастықтарың",
+  "Couldn't find this Lightning address — check the name and try again": "Бұл Lightning мекенжайы табылмады — атауын тексеріп, қайта көріңіз",
+  "Couldn't reach this Lightning address — check the name and try again": "Бұл Lightning мекенжайына жету мүмкін болмады — атауын тексеріп, қайта көріңіз",
+  "Not enough balance to send this payment": "Бұл төлемді жіберуге баланс жеткіліксіз",
+  "That amount is outside what this address accepts": "Бұл сома осы мекенжай қабылдайтын шектен тыс",
+  "Payment failed. Please try again.": "Төлем сәтсіз аяқталды. Қайталап көріңіз.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Параметрлерді ашыңыз, содан кейін деректеріңізді өңдеу үшін Профильді ашыңыз. Құрылғыны ауыстырғанда karma жоғалтып алмас үшін жеке тұлғаңыздың сақтық көшірмесін жасаңыз.",
+  "{name} is calling — tap to answer": "{name} қоңырау шалып жатыр — жауап беру үшін түртіңіз",
 };
 export default c;

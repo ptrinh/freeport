@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "I-tap dito para maghanap ng sasakyan, makipagtawaran, o tumanggap ng biyahe.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Kapag may deal ka na, i-tap dito para mag-chat, makipagtawaran, o kanselahin ang biyahe.",
   "Tap here to see your completed rides and rate karma scores.": "I-tap dito para makita ang iyong mga natapos na biyahe at magbigay ng karma score.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "I-edit ang iyong detalye dito. I-back up ang iyong identity para hindi mawala ang iyong karma kapag lumipat ka ng device.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "I-tap dito para mag-book ng biyahe. Hindi tulad ng karaniwang ride-hailing, ikaw ang nagtatakda ng iyong presyo (may estimator) at nakikipagtawaran sa drayber. Pagkatapos mag-book, balik-balikan mo paminsan-minsan — walang push notification.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Itakda ang iyong presyo sa pamamagitan ng pag-ikot ng wheel. I-tap ang halaga para i-type nang manu-mano. I-drag sa 0 para hayaan ang drayber na magbigay ng presyo.",
   "Ride: <destination> @ <time>": "Biyahe: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "Mga Komunidad",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Dalhin ang isang buong grupo sa Freeport gamit ang isang link. Ang lahat ng sasali ay mapupunta sa parehong market.",
   "Your communities": "Ang iyong mga komunidad",
+  "Couldn't find this Lightning address — check the name and try again": "Hindi nahanap ang Lightning address na ito — tingnan ang pangalan at subukang muli",
+  "Couldn't reach this Lightning address — check the name and try again": "Hindi maabot ang Lightning address na ito — tingnan ang pangalan at subukang muli",
+  "Not enough balance to send this payment": "Hindi sapat ang balanse para maipadala ang bayad na ito",
+  "That amount is outside what this address accepts": "Ang halagang iyon ay wala sa tinatanggap ng address na ito",
+  "Payment failed. Please try again.": "Nabigo ang pagbabayad. Pakisubukang muli.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Buksan ang Mga Setting, tapos ang Profile para i-edit ang iyong detalye. I-back up ang iyong identity para hindi mawala ang iyong karma kapag lumipat ka ng device.",
+  "{name} is calling — tap to answer": "Tumatawag si {name} — i-tap para sagutin",
 };
 export default c;

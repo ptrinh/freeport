@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Sayohatlarni topish, narx kelishish yoki sayohatni qabul qilish uchun shu yerni bosing.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Kelishuvga erishganingizda, suhbatlashish, narx kelishish yoki sayohatni bekor qilish uchun shu yerni bosing.",
   "Tap here to see your completed rides and rate karma scores.": "Yakunlangan sayohatlaringizni ko'rish va karma ballarini baholash uchun shu yerni bosing.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Ma'lumotlaringizni shu yerda tahrirlang. Qurilmani almashtirganingizda karmangizni yo'qotmaslik uchun shaxsingizni zaxiralang.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Sayohat buyurtma qilish uchun shu yerni bosing. An'anaviy taksi chaqirishdan farqli o'laroq, siz o'zingiz narxni belgilaysiz (baholagich yordamida) va haydovchi bilan kelishasiz. Buyurtmadan so'ng vaqti-vaqti bilan tekshirib turing — push bildirishnomalari yo'q.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "G'ildirakni aylantirib narxingizni belgilang. Qo'lda kiritish uchun summani bosing. Haydovchi narx taklif qilishi uchun 0 ga torting.",
   "Ride: <destination> @ <time>": "Sayohat: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "Hamjamiyatlar",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Butun guruhni bitta havola bilan Freeport'ga olib keling. Qoʻshilgan har bir kishi bitta bozorga tushadi.",
   "Your communities": "Hamjamiyatlaringiz",
+  "Couldn't find this Lightning address — check the name and try again": "Bu Lightning manzili topilmadi — nomni tekshirib qayta urinib ko'ring",
+  "Couldn't reach this Lightning address — check the name and try again": "Bu Lightning manziliga bog'lanib bo'lmadi — nomni tekshirib qayta urinib ko'ring",
+  "Not enough balance to send this payment": "Bu to'lovni yuborish uchun balans yetarli emas",
+  "That amount is outside what this address accepts": "Bu miqdor ushbu manzil qabul qiladigan chegaradan tashqarida",
+  "Payment failed. Please try again.": "To'lov amalga oshmadi. Iltimos, qayta urinib ko'ring.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Ma'lumotlaringizni tahrirlash uchun Sozlamalar, so'ng Profil bo'limini oching. Qurilmani almashtirganingizda karmangizni yo'qotmaslik uchun shaxsingizni zaxiralang.",
+  "{name} is calling — tap to answer": "{name} qo'ng'iroq qilmoqda — javob berish uchun bosing",
 };
 export default c;

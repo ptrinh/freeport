@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "ගමන් සොයා ගැනීමට, මිල සාකච්ඡා කිරීමට, හෝ ගමනක් භාර ගැනීමට මෙතැන ඔබන්න.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "ගනුදෙනුවක් ඇති විට, කතාබහ කිරීමට, මිල සාකච්ඡා කිරීමට, හෝ ගමන අවලංගු කිරීමට මෙතැන ඔබන්න.",
   "Tap here to see your completed rides and rate karma scores.": "ඔබ සම්පූර්ණ කළ ගමන් බැලීමට සහ karma ලකුණු ශ්‍රේණිගත කිරීමට මෙතැන ඔබන්න.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "ඔබේ විස්තර මෙහි සංස්කරණය කරන්න. ඔබ උපාංග මාරු කරන විට ඔබේ karma නැති නොවන පරිදි ඔබේ අනන්‍යතාව උපස්ථ කර ගන්න.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "ගමනක් වෙන් කර ගැනීමට මෙතැන ඔබන්න. සාම්ප්‍රදායික ගමන් සේවා මෙන් නොව, ඔබ ඔබේම මිල නියම කරයි (ඇස්තමේන්තුකරුවක් සමඟ) සහ රියදුරු සමඟ සාකච්ඡා කරයි. වෙන් කිරීමෙන් පසු, වරින් වර නැවත පරීක්ෂා කරන්න — push දැනුම්දීම් නොමැත.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "රෝදය කරකවා ඔබේ මිල නියම කරන්න. අතින් ටයිප් කිරීමට මුදල ඔබන්න. රියදුරුට මිලක් ඉදිරිපත් කිරීමට ඉඩ දීමට 0 දක්වා අදින්න.",
   "Ride: <destination> @ <time>": "ගමන: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "ප්‍රජාවන්",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "එක් සබැඳියකින් මුළු කණ්ඩායමක්ම Freeport වෙත ගෙන එන්න. එක්වන සියලුදෙනා එකම වෙළඳපොළට පැමිණේ.",
   "Your communities": "ඔබේ ප්‍රජාවන්",
+  "Couldn't find this Lightning address — check the name and try again": "මෙම Lightning ලිපිනය සොයාගත නොහැකි විය — නම පරීක්ෂා කර නැවත උත්සාහ කරන්න",
+  "Couldn't reach this Lightning address — check the name and try again": "මෙම Lightning ලිපිනයට සම්බන්ධ විය නොහැකි විය — නම පරීක්ෂා කර නැවත උත්සාහ කරන්න",
+  "Not enough balance to send this payment": "මෙම ගෙවීම යැවීමට ප්‍රමාණවත් ශේෂයක් නැත",
+  "That amount is outside what this address accepts": "එම මුදල මෙම ලිපිනය පිළිගන්නා පරාසයෙන් පිටත වේ",
+  "Payment failed. Please try again.": "ගෙවීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "ඔබේ විස්තර සංස්කරණය කිරීමට සැකසුම් විවෘත කර, ඉන්පසු පැතිකඩ වෙත යන්න. ඔබ උපාංග මාරු කරන විට ඔබේ karma නැති නොවන පරිදි ඔබේ අනන්‍යතාව උපස්ථ කර ගන්න.",
+  "{name} is calling — tap to answer": "{name} අමතයි — පිළිතුරු දීමට තට්ටු කරන්න",
 };
 export default c;

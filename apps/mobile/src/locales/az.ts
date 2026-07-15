@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Sürüş tapmaq, qiymət danışmaq və ya sürüşü qəbul etmək üçün buraya toxun.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Sövdələşmən olduqda söhbət etmək, qiymət danışmaq və ya sürüşü ləğv etmək üçün buraya toxun.",
   "Tap here to see your completed rides and rate karma scores.": "Tamamlanmış sürüşlərini görmək və karma xallarını qiymətləndirmək üçün buraya toxun.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Məlumatlarını burada redaktə et. Cihaz dəyişəndə karmanı itirməmək üçün şəxsiyyətini ehtiyat nüsxələ.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Sürüş sifariş etmək üçün buraya toxun. Ənənəvi sürüş sifarişindən fərqli olaraq, qiyməti özün təyin edirsən (qiymət hesablayıcısı ilə) və sürücü ilə danışırsan. Sifarişdən sonra ara-sıra yoxla — push bildirişlər yoxdur.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Çarxı fırladaraq qiymətini təyin et. Məbləği əllə daxil etmək üçün ona toxun. Sürücünün qiymət təklif etməsi üçün 0-a sürüşdür.",
   "Ride: <destination> @ <time>": "Sürüş: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "İcmalar",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Bütöv bir qrupu bir linklə Freeport-a gətirin. Qoşulan hər kəs eyni bazara düşür.",
   "Your communities": "İcmalarınız",
+  "Couldn't find this Lightning address — check the name and try again": "Bu Lightning ünvanı tapılmadı — adı yoxlayın və yenidən cəhd edin",
+  "Couldn't reach this Lightning address — check the name and try again": "Bu Lightning ünvanına çatmaq mümkün olmadı — adı yoxlayın və yenidən cəhd edin",
+  "Not enough balance to send this payment": "Bu ödənişi göndərmək üçün balans kifayət etmir",
+  "That amount is outside what this address accepts": "Bu məbləğ bu ünvanın qəbul etdiyindən kənardadır",
+  "Payment failed. Please try again.": "Ödəniş alınmadı. Zəhmət olmasa, yenidən cəhd edin.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Ayarları aç, sonra məlumatlarını redaktə etmək üçün Profil. Cihaz dəyişəndə karmanı itirməmək üçün şəxsiyyətini ehtiyat nüsxələ.",
+  "{name} is calling — tap to answer": "{name} zəng edir — cavab vermək üçün toxunun",
 };
 export default c;

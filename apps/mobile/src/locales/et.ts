@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Puuduta siin, et leida sõite, pidada läbirääkimisi või sõit vastu võtta.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Kui tehing on sõlmitud, puuduta siin, et vestelda, läbi rääkida või sõit tühistada.",
   "Tap here to see your completed rides and rate karma scores.": "Puuduta siin, et näha oma lõpetatud sõite ja anda karmahinnanguid.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Muuda oma andmeid siin. Varunda oma identiteet, et mitte kaotada karmat seadme vahetamisel.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Puuduta siin, et tellida sõit. Erinevalt tavalisest sõidutellimisest määrad sa ise hinna (kalkulaatori abil) ja pead juhiga läbirääkimisi. Pärast tellimist vaata aeg-ajalt tagasi — tõuketeavitusi ei ole.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Määra oma hind ratast keerates. Puuduta summat, et see käsitsi sisestada. Lohista nullini, et lasta juhil hind pakkuda.",
   "Ride: <destination> @ <time>": "Sõit: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Kogukonnad",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Too terve grupp ühe lingiga Freeporti. Kõik liitujad jõuavad samale turule.",
   "Your communities": "Sinu kogukonnad",
+  "Couldn't find this Lightning address — check the name and try again": "Seda Lightningi aadressi ei leitud — kontrolli nime ja proovi uuesti",
+  "Couldn't reach this Lightning address — check the name and try again": "Selle Lightningi aadressiga ei õnnestunud ühendust saada — kontrolli nime ja proovi uuesti",
+  "Not enough balance to send this payment": "Selle makse saatmiseks pole piisavalt saldot",
+  "That amount is outside what this address accepts": "See summa jääb väljapoole seda, mida see aadress aktsepteerib",
+  "Payment failed. Please try again.": "Makse ebaõnnestus. Palun proovi uuesti.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Ava Seaded, seejärel Profiil, et oma andmeid muuta. Varunda oma identiteet, et mitte kaotada karmat seadme vahetamisel.",
+  "{name} is calling — tap to answer": "{name} helistab — vastamiseks puudutage",
 };
 export default c;

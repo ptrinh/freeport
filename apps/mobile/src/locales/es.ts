@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "Siguiente",
   "Tap here to find rides, negotiate, or accept a ride.": "Toca aquí para buscar viajes, negociar o aceptar un viaje.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Cuando tengas un trato, toca aquí para chatear, negociar o cancelar el viaje.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Edita tus datos aquí. Haz una copia de tu identidad para no perder tu karma al cambiar de dispositivo.",
   "Posted": "Publicado",
   "Your ride request is live.": "Tu solicitud de viaje está activa.",
   "Your service offer is live.": "Tu oferta de servicio está activa.",
@@ -1017,5 +1016,12 @@ const c: Record<string, string> = {
   "Communities": "Comunidades",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Lleva a todo un grupo a Freeport con un solo enlace. Todos los que se unan llegan al mismo mercado.",
   "Your communities": "Tus comunidades",
+  "Couldn't find this Lightning address — check the name and try again": "No se encontró esta dirección Lightning — comprueba el nombre e inténtalo de nuevo",
+  "Couldn't reach this Lightning address — check the name and try again": "No se pudo contactar con esta dirección Lightning — comprueba el nombre e inténtalo de nuevo",
+  "Not enough balance to send this payment": "Saldo insuficiente para enviar este pago",
+  "That amount is outside what this address accepts": "Esa cantidad está fuera de lo que acepta esta dirección",
+  "Payment failed. Please try again.": "El pago falló. Inténtalo de nuevo.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Abre Ajustes y luego Perfil para editar tus datos. Haz una copia de tu identidad para no perder tu karma al cambiar de dispositivo.",
+  "{name} is calling — tap to answer": "{name} está llamando — toca para responder",
 };
 export default c;

@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "برای یافتن سفر، چانه‌زنی یا پذیرفتن سفر اینجا را بزنید.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "وقتی به توافق رسیدید، برای گفتگو، چانه‌زنی یا لغو سفر اینجا را بزنید.",
   "Tap here to see your completed rides and rate karma scores.": "برای دیدن سفرهای انجام‌شده و امتیازدهی به کارما اینجا را بزنید.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "مشخصات خود را اینجا ویرایش کنید. از هویت خود نسخه پشتیبان بگیرید تا هنگام تعویض دستگاه کارمای خود را از دست ندهید.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "برای رزرو سفر اینجا را بزنید. برخلاف سرویس‌های سنتی درخواست خودرو، شما قیمت خود را تعیین می‌کنید (با کمک برآوردگر) و با راننده چانه می‌زنید. پس از رزرو، هر از گاهی سر بزنید — اعلان فوری وجود ندارد.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "با چرخاندن چرخ قیمت خود را تعیین کنید. برای وارد کردن دستی مبلغ، روی آن بزنید. برای اینکه راننده قیمت پیشنهاد دهد، آن را تا ۰ بکشید.",
   "Ride: <destination> @ <time>": "سفر: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "جوامع",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "یک گروه کامل را با یک پیوند به Freeport بیاور. هر کسی که بپیوندد به همان بازار می‌رسد.",
   "Your communities": "جوامع تو",
+  "Couldn't find this Lightning address — check the name and try again": "این آدرس Lightning پیدا نشد — نام را بررسی کنید و دوباره تلاش کنید",
+  "Couldn't reach this Lightning address — check the name and try again": "دسترسی به این آدرس Lightning ممکن نشد — نام را بررسی کنید و دوباره تلاش کنید",
+  "Not enough balance to send this payment": "موجودی کافی برای ارسال این پرداخت وجود ندارد",
+  "That amount is outside what this address accepts": "این مبلغ خارج از محدوده‌ای است که این آدرس می‌پذیرد",
+  "Payment failed. Please try again.": "پرداخت ناموفق بود. لطفاً دوباره تلاش کنید.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "تنظیمات را باز کنید، سپس برای ویرایش مشخصات خود پروفایل. از هویت خود نسخه پشتیبان بگیرید تا هنگام تعویض دستگاه کارمای خود را از دست ندهید.",
+  "{name} is calling — tap to answer": "{name} در حال تماس است — برای پاسخ ضربه بزنید",
 };
 export default c;

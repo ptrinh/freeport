@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Etsi kyytejä, neuvottele tai hyväksy kyyti napauttamalla tästä.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Kun kauppa on syntynyt, napauta tästä keskustellaksesi, neuvotellaksesi tai peruaksesi kyydin.",
   "Tap here to see your completed rides and rate karma scores.": "Napauta tästä nähdäksesi suoritetut kyytisi ja arvioidaksesi karma-pisteitä.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Muokkaa tietojasi täällä. Varmuuskopioi henkilöllisyytesi, jotta et menetä karmaasi vaihtaessasi laitetta.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Napauta tästä varataksesi kyydin. Toisin kuin perinteisessä kyytipalvelussa, määrität itse hintasi (arviolaskurin avulla) ja neuvottelet kuljettajan kanssa. Tarkista tilanne varauksen jälkeen aika ajoin – push-ilmoituksia ei ole.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Aseta hintasi pyörittämällä kiekkoa. Napauta summaa kirjoittaaksesi sen käsin. Vedä nollaan, niin kuljettaja saa ehdottaa hintaa.",
   "Ride: <destination> @ <time>": "Kyyti: <destination> klo <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Yhteisöt",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Tuo kokonainen ryhmä Freeportiin yhdellä linkillä. Kaikki liittyvät päätyvät samalle markkinalle.",
   "Your communities": "Yhteisösi",
+  "Couldn't find this Lightning address — check the name and try again": "Tätä Lightning-osoitetta ei löytynyt — tarkista nimi ja yritä uudelleen",
+  "Couldn't reach this Lightning address — check the name and try again": "Tähän Lightning-osoitteeseen ei saatu yhteyttä — tarkista nimi ja yritä uudelleen",
+  "Not enough balance to send this payment": "Saldo ei riitä tämän maksun lähettämiseen",
+  "That amount is outside what this address accepts": "Summa on tämän osoitteen hyväksymän rajan ulkopuolella",
+  "Payment failed. Please try again.": "Maksu epäonnistui. Yritä uudelleen.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Avaa Asetukset ja sitten Profiili muokataksesi tietojasi. Varmuuskopioi henkilöllisyytesi, jotta et menetä karmaasi vaihtaessasi laitetta.",
+  "{name} is calling — tap to answer": "{name} soittaa — vastaa napauttamalla",
 };
 export default c;

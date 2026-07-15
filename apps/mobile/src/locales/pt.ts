@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "Seguinte",
   "Tap here to find rides, negotiate, or accept a ride.": "Toque aqui para encontrar corridas, negociar ou aceitar uma corrida.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Quando tiver um acordo, toque aqui para conversar, negociar ou cancelar a corrida.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Edite seus dados aqui. Faça backup da sua identidade para não perder seu karma ao trocar de dispositivo.",
   "Posted": "Publicado",
   "Your ride request is live.": "Sua solicitação de corrida está no ar.",
   "Your service offer is live.": "Sua oferta de serviço está no ar.",
@@ -1017,5 +1016,12 @@ const c: Record<string, string> = {
   "Communities": "Comunidades",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Traga um grupo inteiro para o Freeport com uma ligação. Todos os que aderem chegam ao mesmo mercado.",
   "Your communities": "As suas comunidades",
+  "Couldn't find this Lightning address — check the name and try again": "Não foi possível encontrar este endereço Lightning — verifique o nome e tente novamente",
+  "Couldn't reach this Lightning address — check the name and try again": "Não foi possível alcançar este endereço Lightning — verifique o nome e tente novamente",
+  "Not enough balance to send this payment": "Saldo insuficiente para enviar este pagamento",
+  "That amount is outside what this address accepts": "Esse valor está fora do que este endereço aceita",
+  "Payment failed. Please try again.": "Falha no pagamento. Tente novamente.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Abra as Definições e depois o Perfil para editar seus dados. Faça backup da sua identidade para não perder seu karma ao trocar de dispositivo.",
+  "{name} is calling — tap to answer": "{name} está ligando — toque para atender",
 };
 export default c;

@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "ចុចទីនេះដើម្បីស្វែងរកការជិះ ចរចា ឬទទួលយកការជិះ។",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "នៅពេលអ្នកមានកិច្ចព្រមព្រៀង ចុចទីនេះដើម្បីជជែក ចរចា ឬបោះបង់ការជិះ។",
   "Tap here to see your completed rides and rate karma scores.": "ចុចទីនេះដើម្បីមើលការជិះដែលបានបញ្ចប់ និងវាយតម្លៃពិន្ទុ karma។",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "កែសម្រួលព័ត៌មានរបស់អ្នកនៅទីនេះ។ បម្រុងទុកអត្តសញ្ញាណរបស់អ្នក ដើម្បីកុំឱ្យបាត់ karma នៅពេលអ្នកប្ដូរឧបករណ៍។",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "ចុចទីនេះដើម្បីកក់ការជិះ។ មិនដូចសេវាហៅរថយន្តបែបធម្មតាទេ អ្នកកំណត់តម្លៃដោយខ្លួនឯង (មានឧបករណ៍ប៉ាន់ស្មាន) ហើយចរចាជាមួយអ្នកបើកបរ។ បន្ទាប់ពីកក់រួច សូមត្រឡប់មកមើលម្ដងម្កាល — មិនមានការជូនដំណឹងរុញ (push notification) ឡើយ។",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "កំណត់តម្លៃរបស់អ្នកដោយបង្វិលកង់។ ចុចលើចំនួនទឹកប្រាក់ដើម្បីវាយវាដោយដៃ។ អូសទៅ 0 ដើម្បីឱ្យអ្នកបើកបរស្នើតម្លៃ។",
   "Ride: <destination> @ <time>": "ការជិះ៖ <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "សហគមន៍",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "នាំក្រុមទាំងមូលមក Freeport ដោយប្រើតំណតែមួយ។ អ្នកទាំងអស់គ្នាដែលចូលរួម នឹងចូលដល់ទីផ្សារតែមួយ។",
   "Your communities": "សហគមន៍របស់អ្នក",
+  "Couldn't find this Lightning address — check the name and try again": "រកមិនឃើញអាសយដ្ឋាន Lightning នេះទេ — ពិនិត្យឈ្មោះ ហើយព្យាយាមម្ដងទៀត",
+  "Couldn't reach this Lightning address — check the name and try again": "មិនអាចទាក់ទងអាសយដ្ឋាន Lightning នេះបានទេ — ពិនិត្យឈ្មោះ ហើយព្យាយាមម្ដងទៀត",
+  "Not enough balance to send this payment": "សមតុល្យមិនគ្រប់គ្រាន់ដើម្បីផ្ញើការបង់ប្រាក់នេះទេ",
+  "That amount is outside what this address accepts": "ចំនួននោះស្ថិតនៅក្រៅអ្វីដែលអាសយដ្ឋាននេះទទួលយក",
+  "Payment failed. Please try again.": "ការបង់ប្រាក់បរាជ័យ។ សូមព្យាយាមម្ដងទៀត។",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "បើកការកំណត់ បន្ទាប់មកប្រវត្តិរូប ដើម្បីកែសម្រួលព័ត៌មានរបស់អ្នក។ បម្រុងទុកអត្តសញ្ញាណរបស់អ្នក ដើម្បីកុំឱ្យបាត់ karma នៅពេលអ្នកប្ដូរឧបករណ៍។",
+  "{name} is calling — tap to answer": "{name} កំពុងហៅ — ចុចដើម្បីឆ្លើយ",
 };
 export default c;

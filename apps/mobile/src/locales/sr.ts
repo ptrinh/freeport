@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Dodirnite ovde da pronađete vožnje, pregovarate ili prihvatite vožnju.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Kada imate dogovor, dodirnite ovde da ćaskate, pregovarate ili otkažete vožnju.",
   "Tap here to see your completed rides and rate karma scores.": "Dodirnite ovde da vidite svoje završene vožnje i ocenite karma bodove.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Ovde izmenite svoje podatke. Napravite rezervnu kopiju identiteta da ne izgubite karmu kada promenite uređaj.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Dodirnite ovde da rezervišete vožnju. Za razliku od klasičnih taksi aplikacija, vi sami određujete cenu (uz procenu) i pregovarate s vozačem. Nakon rezervacije, povremeno proverite — nema push obaveštenja.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Odredite cenu okretanjem točka. Dodirnite iznos da ga unesete ručno. Prevucite na 0 da vozač ponudi cenu.",
   "Ride: <destination> @ <time>": "Vožnja: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Заједнице",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Доведите целу групу на Freeport једном везом. Свако ко се придружи стиже на исто тржиште.",
   "Your communities": "Твоје заједнице",
+  "Couldn't find this Lightning address — check the name and try again": "Nije moguće pronaći ovu Lightning adresu — proverite naziv i pokušajte ponovo",
+  "Couldn't reach this Lightning address — check the name and try again": "Nije moguće dostići ovu Lightning adresu — proverite naziv i pokušajte ponovo",
+  "Not enough balance to send this payment": "Nedovoljno sredstava za slanje ove uplate",
+  "That amount is outside what this address accepts": "Taj iznos je izvan onoga što ova adresa prihvata",
+  "Payment failed. Please try again.": "Plaćanje nije uspelo. Pokušajte ponovo.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Otvorite Podešavanja, zatim Profil da izmenite svoje podatke. Napravite rezervnu kopiju identiteta da ne izgubite karmu kada promenite uređaj.",
+  "{name} is calling — tap to answer": "{name} зове — додирните да одговорите",
 };
 export default c;

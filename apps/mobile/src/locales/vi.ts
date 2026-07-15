@@ -107,7 +107,6 @@ const c: Record<string, string> = {
   "Next": "Tiếp tục",
   "Tap here to find rides, negotiate, or accept a ride.": "Ấn vào đây để tìm cuốc xe, thương lượng, hoặc nhận cuốc.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Nếu có kèo, ấn vào đây để trao đổi, thương lượng, hoặc huỷ cuốc xe.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Cần chỉnh sửa thông tin gì thì vào đây. Nhớ sao lưu danh tính để khỏi mất điểm karma khi đổi thiết bị.",
   "Posted": "Đã đăng",
   "Your ride request is live.": "Yêu cầu đi xe của bạn đã được đăng.",
   "Your service offer is live.": "Đề nghị dịch vụ của bạn đã được đăng.",
@@ -1014,5 +1013,12 @@ const c: Record<string, string> = {
   "Communities": "Cộng đồng",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Đưa cả một nhóm lên Freeport chỉ với một liên kết. Mọi người tham gia đều vào cùng một thị trường.",
   "Your communities": "Cộng đồng của bạn",
+  "Couldn't find this Lightning address — check the name and try again": "Không tìm thấy địa chỉ Lightning này — kiểm tra lại tên rồi thử lại",
+  "Couldn't reach this Lightning address — check the name and try again": "Không kết nối được với địa chỉ Lightning này — kiểm tra lại tên rồi thử lại",
+  "Not enough balance to send this payment": "Không đủ số dư để gửi khoản thanh toán này",
+  "That amount is outside what this address accepts": "Số tiền này nằm ngoài mức mà địa chỉ này chấp nhận",
+  "Payment failed. Please try again.": "Thanh toán thất bại. Vui lòng thử lại.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Mở Cài đặt, rồi vào Hồ sơ để chỉnh sửa thông tin của bạn. Nhớ sao lưu danh tính để khỏi mất điểm karma khi đổi thiết bị.",
+  "{name} is calling — tap to answer": "{name} đang gọi — chạm để trả lời",
 };
 export default c;

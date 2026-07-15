@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Πάτησε εδώ για να βρεις διαδρομές, να διαπραγματευτείς ή να αποδεχτείς μια διαδρομή.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Όταν έχεις μια συμφωνία, πάτησε εδώ για να συνομιλήσεις, να διαπραγματευτείς ή να ακυρώσεις τη διαδρομή.",
   "Tap here to see your completed rides and rate karma scores.": "Πάτησε εδώ για να δεις τις ολοκληρωμένες διαδρομές σου και να βαθμολογήσεις το karma.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Επεξεργάσου τα στοιχεία σου εδώ. Δημιούργησε αντίγραφο ασφαλείας της ταυτότητάς σου για να μη χάσεις το karma σου όταν αλλάζεις συσκευή.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Πάτησε εδώ για να κλείσεις μια διαδρομή. Σε αντίθεση με τις παραδοσιακές υπηρεσίες μεταφοράς, ορίζεις εσύ την τιμή σου (με βοηθό εκτίμησης) και διαπραγματεύεσαι με τον οδηγό. Μετά την κράτηση, έλεγχε κάθε τόσο — δεν υπάρχουν ειδοποιήσεις push.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Όρισε την τιμή σου περιστρέφοντας τον τροχό. Πάτησε το ποσό για να το πληκτρολογήσεις χειροκίνητα. Σύρε στο 0 για να αφήσεις τον οδηγό να προτείνει τιμή.",
   "Ride: <destination> @ <time>": "Διαδρομή: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Κοινότητες",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Φέρε μια ολόκληρη ομάδα στο Freeport με έναν σύνδεσμο. Όποιος συμμετέχει καταλήγει στην ίδια αγορά.",
   "Your communities": "Οι κοινότητές σου",
+  "Couldn't find this Lightning address — check the name and try again": "Δεν βρέθηκε αυτή η διεύθυνση Lightning — έλεγξε το όνομα και δοκίμασε ξανά",
+  "Couldn't reach this Lightning address — check the name and try again": "Δεν ήταν δυνατή η σύνδεση με αυτή τη διεύθυνση Lightning — έλεγξε το όνομα και δοκίμασε ξανά",
+  "Not enough balance to send this payment": "Ανεπαρκές υπόλοιπο για την αποστολή αυτής της πληρωμής",
+  "That amount is outside what this address accepts": "Αυτό το ποσό είναι εκτός των ορίων που δέχεται αυτή η διεύθυνση",
+  "Payment failed. Please try again.": "Η πληρωμή απέτυχε. Δοκίμασε ξανά.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Άνοιξε τις Ρυθμίσεις και μετά το Προφίλ για να επεξεργαστείς τα στοιχεία σου. Δημιούργησε αντίγραφο ασφαλείας της ταυτότητάς σου για να μη χάσεις το karma σου όταν αλλάζεις συσκευή.",
+  "{name} is calling — tap to answer": "Ο/Η {name} καλεί — πατήστε για απάντηση",
 };
 export default c;

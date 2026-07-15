@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Tryck här för att hitta resor, förhandla eller acceptera en resa.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "När du har en överenskommelse trycker du här för att chatta, förhandla eller avboka resan.",
   "Tap here to see your completed rides and rate karma scores.": "Tryck här för att se dina genomförda resor och betygsätta karma.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Redigera dina uppgifter här. Säkerhetskopiera din identitet så att du inte förlorar din karma när du byter enhet.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Tryck här för att boka en resa. Till skillnad från traditionella taxitjänster sätter du ditt eget pris (med en uppskattning) och förhandlar med föraren. Titta in då och då efter bokningen – det finns inga push-notiser.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Ställ in ditt pris genom att snurra på hjulet. Tryck på beloppet för att skriva in det manuellt. Dra till 0 för att låta föraren föreslå ett pris.",
   "Ride: <destination> @ <time>": "Resa: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Communities",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Ta med en hel grupp till Freeport med en enda länk. Alla som går med hamnar på samma marknad.",
   "Your communities": "Dina communities",
+  "Couldn't find this Lightning address — check the name and try again": "Den här Lightning-adressen kunde inte hittas — kontrollera namnet och försök igen",
+  "Couldn't reach this Lightning address — check the name and try again": "Den här Lightning-adressen kunde inte nås — kontrollera namnet och försök igen",
+  "Not enough balance to send this payment": "Otillräckligt saldo för att skicka den här betalningen",
+  "That amount is outside what this address accepts": "Det beloppet ligger utanför vad den här adressen accepterar",
+  "Payment failed. Please try again.": "Betalningen misslyckades. Försök igen.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Öppna Inställningar och sedan Profil för att redigera dina uppgifter. Säkerhetskopiera din identitet så att du inte förlorar din karma när du byter enhet.",
+  "{name} is calling — tap to answer": "{name} ringer — tryck för att svara",
 };
 export default c;

@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "Далее",
   "Tap here to find rides, negotiate, or accept a ride.": "Нажмите здесь, чтобы найти поездки, договориться или принять поездку.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Когда есть сделка, нажмите здесь, чтобы написать, договориться или отменить поездку.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Здесь можно изменить свои данные. Сделайте резервную копию профиля, чтобы не потерять карму при смене устройства.",
   "Posted": "Опубликовано",
   "Your ride request is live.": "Ваш запрос на поездку опубликован.",
   "Your service offer is live.": "Ваше предложение услуги опубликовано.",
@@ -1023,5 +1022,12 @@ const c: Record<string, string> = {
   "Communities": "Сообщества",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Приведите целую группу на Freeport по одной ссылке. Все, кто присоединяется, попадают на один и тот же рынок.",
   "Your communities": "Ваши сообщества",
+  "Couldn't find this Lightning address — check the name and try again": "Не удалось найти этот адрес Lightning — проверьте имя и попробуйте снова",
+  "Couldn't reach this Lightning address — check the name and try again": "Не удалось связаться с этим адресом Lightning — проверьте имя и попробуйте снова",
+  "Not enough balance to send this payment": "Недостаточно средств для отправки этого платежа",
+  "That amount is outside what this address accepts": "Эта сумма вне диапазона, который принимает этот адрес",
+  "Payment failed. Please try again.": "Платёж не прошёл. Попробуйте снова.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Откройте Настройки, затем Профиль, чтобы изменить свои данные. Сделайте резервную копию профиля, чтобы не потерять карму при смене устройства.",
+  "{name} is calling — tap to answer": "{name} звонит — коснитесь, чтобы ответить",
 };
 export default c;

@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "பயணங்களைக் கண்டறிய, பேரம் பேச, அல்லது ஒரு பயணத்தை ஏற்க இங்கே தட்டவும்.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "ஒரு பரிவர்த்தனை முடிந்தவுடன், அரட்டையடிக்க, பேரம் பேச, அல்லது பயணத்தை ரத்துசெய்ய இங்கே தட்டவும்.",
   "Tap here to see your completed rides and rate karma scores.": "உங்கள் முடிந்த பயணங்களைப் பார்க்கவும், கர்மா மதிப்பெண்களை மதிப்பிடவும் இங்கே தட்டவும்.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "உங்கள் விவரங்களை இங்கே திருத்தவும். சாதனங்களை மாற்றும்போது உங்கள் கர்மாவை இழக்காதிருக்க உங்கள் அடையாளத்தைக் காப்புப் பிரதி எடுத்து வைக்கவும்.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "ஒரு பயணத்தை முன்பதிவு செய்ய இங்கே தட்டவும். வழக்கமான வாகனப் பதிவு சேவைகளைப் போலல்லாமல், நீங்களே உங்கள் விலையை (மதிப்பீட்டாளருடன்) நிர்ணயித்து ஓட்டுநருடன் பேரம் பேசலாம். முன்பதிவு செய்த பிறகு, அவ்வப்போது மீண்டும் சரிபார்க்கவும் — புஷ் அறிவிப்புகள் இல்லை.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "சக்கரத்தைச் சுழற்றி உங்கள் விலையை நிர்ணயிக்கவும். கைமுறையாகத் தட்டச்சு செய்ய தொகையைத் தட்டவும். ஓட்டுநர் விலை வழங்கட்டும் என்றால் 0 வரை இழுக்கவும்.",
   "Ride: <destination> @ <time>": "பயணம்: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "சமூகங்கள்",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "ஒரே இணைப்பில் ஒரு முழுக் குழுவையும் Freeport க்கு கொண்டு வாருங்கள். இணையும் அனைவரும் ஒரே சந்தையில் வந்து சேர்கிறார்கள்.",
   "Your communities": "உங்கள் சமூகங்கள்",
+  "Couldn't find this Lightning address — check the name and try again": "இந்த Lightning முகவரியைக் கண்டறிய முடியவில்லை — பெயரைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்",
+  "Couldn't reach this Lightning address — check the name and try again": "இந்த Lightning முகவரியை அணுக முடியவில்லை — பெயரைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்",
+  "Not enough balance to send this payment": "இந்தப் பணம் செலுத்த போதிய இருப்பு இல்லை",
+  "That amount is outside what this address accepts": "அந்தத் தொகை இந்த முகவரி ஏற்கும் வரம்பிற்கு வெளியே உள்ளது",
+  "Payment failed. Please try again.": "பணம் செலுத்துதல் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "உங்கள் விவரங்களைத் திருத்த அமைப்புகள் திறந்து, பிறகு சுயவிவரம் செல்லவும். சாதனங்களை மாற்றும்போது உங்கள் கர்மாவை இழக்காதிருக்க உங்கள் அடையாளத்தைக் காப்புப் பிரதி எடுத்து வைக்கவும்.",
+  "{name} is calling — tap to answer": "{name} அழைக்கிறார் — பதிலளிக்க தட்டவும்",
 };
 export default c;

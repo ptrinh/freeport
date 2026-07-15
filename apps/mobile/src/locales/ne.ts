@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "सवारी खोज्न, मोलमोलाइ गर्न वा सवारी स्वीकार गर्न यहाँ ट्याप गर्नुहोस्।",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "सम्झौता भएपछि च्याट गर्न, मोलमोलाइ गर्न वा सवारी रद्द गर्न यहाँ ट्याप गर्नुहोस्।",
   "Tap here to see your completed rides and rate karma scores.": "तपाईंका सम्पन्न सवारीहरू हेर्न र karma स्कोर मूल्याङ्कन गर्न यहाँ ट्याप गर्नुहोस्।",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "आफ्नो विवरण यहाँ सम्पादन गर्नुहोस्। यन्त्र फेर्दा आफ्नो karma नगुमाउन आफ्नो पहिचान ब्याकअप गर्नुहोस्।",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "सवारी बुक गर्न यहाँ ट्याप गर्नुहोस्। परम्परागत राइड-हेलिङभन्दा फरक, तपाईं आफैं मूल्य तोक्नुहुन्छ (अनुमानकको सहयोगमा) र चालकसँग मोलमोलाइ गर्नुहुन्छ। बुक गरेपछि बेलाबेलामा फर्केर हेर्नुहोस् — कुनै पुश सूचना हुँदैन।",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "ह्विल घुमाएर आफ्नो मूल्य तोक्नुहोस्। म्यानुअल रूपमा टाइप गर्न रकममा ट्याप गर्नुहोस्। चालकलाई मूल्य प्रस्ताव गर्न दिन ० सम्म तान्नुहोस्।",
   "Ride: <destination> @ <time>": "सवारी: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "समुदायहरू",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "एउटै लिङ्कले सम्पूर्ण समूहलाई Freeport मा ल्याउनुहोस्। सामेल हुने सबै एउटै बजारमा पुग्छन्।",
   "Your communities": "तपाईंका समुदायहरू",
+  "Couldn't find this Lightning address — check the name and try again": "यो Lightning ठेगाना फेला परेन — नाम जाँच गरेर फेरि प्रयास गर्नुहोस्",
+  "Couldn't reach this Lightning address — check the name and try again": "यो Lightning ठेगानामा पुग्न सकिएन — नाम जाँच गरेर फेरि प्रयास गर्नुहोस्",
+  "Not enough balance to send this payment": "यो भुक्तानी पठाउन पर्याप्त ब्यालेन्स छैन",
+  "That amount is outside what this address accepts": "त्यो रकम यो ठेगानाले स्वीकार गर्ने सीमाभन्दा बाहिर छ",
+  "Payment failed. Please try again.": "भुक्तानी असफल भयो। कृपया फेरि प्रयास गर्नुहोस्।",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "आफ्नो विवरण सम्पादन गर्न सेटिङहरू खोल्नुहोस्, त्यसपछि प्रोफाइल जानुहोस्। यन्त्र फेर्दा आफ्नो karma नगुमाउन आफ्नो पहिचान ब्याकअप गर्नुहोस्।",
+  "{name} is calling — tap to answer": "{name} ले कल गर्दै — जवाफ दिन ट्याप गर्नुहोस्",
 };
 export default c;

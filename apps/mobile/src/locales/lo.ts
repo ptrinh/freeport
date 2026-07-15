@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "ແຕະບ່ອນນີ້ເພື່ອຊອກຫາການເດີນທາງ, ຕໍ່ລອງລາຄາ ຫຼື ຮັບການເດີນທາງ.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "ເມື່ອທ່ານມີຂໍ້ຕົກລົງແລ້ວ, ແຕະບ່ອນນີ້ເພື່ອສົນທະນາ, ຕໍ່ລອງລາຄາ ຫຼື ຍົກເລີກການເດີນທາງ.",
   "Tap here to see your completed rides and rate karma scores.": "ແຕະບ່ອນນີ້ເພື່ອເບິ່ງການເດີນທາງທີ່ສຳເລັດແລ້ວ ແລະ ໃຫ້ຄະແນນ karma.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "ແກ້ໄຂຂໍ້ມູນຂອງທ່ານບ່ອນນີ້. ສຳຮອງຂໍ້ມູນຕົວຕົນຂອງທ່ານໄວ້ ເພື່ອບໍ່ໃຫ້ສູນເສຍ karma ເມື່ອທ່ານປ່ຽນອຸປະກອນ.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "ແຕະບ່ອນນີ້ເພື່ອຈອງການເດີນທາງ. ຕ່າງຈາກບໍລິການເອີ້ນລົດແບບເກົ່າ, ທ່ານກຳນົດລາຄາເອງ (ມີຕົວປະເມີນ) ແລະ ຕໍ່ລອງກັບຄົນຂັບ. ຫຼັງຈາກຈອງແລ້ວ, ໃຫ້ກັບມາກວດເບິ່ງເປັນໄລຍະ — ບໍ່ມີການແຈ້ງເຕືອນແບບ push.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "ກຳນົດລາຄາຂອງທ່ານໂດຍໝູນວົງລໍ້. ແຕະທີ່ຈຳນວນເງິນເພື່ອພິມເອງ. ລາກໄປຫາ 0 ເພື່ອໃຫ້ຄົນຂັບສະເໜີລາຄາ.",
   "Ride: <destination> @ <time>": "ການເດີນທາງ: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "ຊຸມຊົນ",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "ນຳກຸ່ມທັງໝົດມາສູ່ Freeport ດ້ວຍລິ້ງດຽວ. ທຸກຄົນທີ່ເຂົ້າຮ່ວມຈະໄປຢູ່ຕະຫຼາດດຽວກັນ.",
   "Your communities": "ຊຸມຊົນຂອງທ່ານ",
+  "Couldn't find this Lightning address — check the name and try again": "ບໍ່ພົບທີ່ຢູ່ Lightning ນີ້ — ກວດຊື່ແລ້ວລອງໃໝ່",
+  "Couldn't reach this Lightning address — check the name and try again": "ບໍ່ສາມາດຕິດຕໍ່ທີ່ຢູ່ Lightning ນີ້ໄດ້ — ກວດຊື່ແລ້ວລອງໃໝ່",
+  "Not enough balance to send this payment": "ຍອດເງິນບໍ່ພຽງພໍທີ່ຈະສົ່ງການຈ່າຍເງິນນີ້",
+  "That amount is outside what this address accepts": "ຈຳນວນເງິນນີ້ຢູ່ນອກຂອບເຂດທີ່ທີ່ຢູ່ນີ້ຮັບໄດ້",
+  "Payment failed. Please try again.": "ການຈ່າຍເງິນລົ້ມເຫລວ. ກະລຸນາລອງໃໝ່.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "ໄປທີ່ ການຕັ້ງຄ່າ ແລ້ວເລືອກ ໂປຣໄຟລ໌ ເພື່ອແກ້ໄຂຂໍ້ມູນຂອງທ່ານ. ສຳຮອງຂໍ້ມູນຕົວຕົນຂອງທ່ານໄວ້ ເພື່ອບໍ່ໃຫ້ສູນເສຍ karma ເມື່ອທ່ານປ່ຽນອຸປະກອນ.",
+  "{name} is calling — tap to answer": "{name} ກຳລັງໂທ — ແຕະເພື່ອຮັບສາຍ",
 };
 export default c;

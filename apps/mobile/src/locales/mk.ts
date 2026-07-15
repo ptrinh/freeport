@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Допрете тука за да најдете возења, да преговарате или да прифатите возење.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Кога имате договор, допрете тука за да разговарате, да преговарате или да го откажете возењето.",
   "Tap here to see your completed rides and rate karma scores.": "Допрете тука за да ги видите завршените возења и да оцените karma резултати.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Уредете ги вашите податоци тука. Направете резервна копија на вашиот идентитет за да не ја изгубите karma кога ќе го смените уредот.",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Допрете тука за да резервирате возење. За разлика од традиционалното нарачување превоз, вие ја одредувате сопствената цена (со проценувач) и преговарате со возачот. По резервацијата, проверувајте одвреме-навреме — нема push известувања.",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Поставете ја вашата цена со вртење на тркалото. Допрете го износот за рачно да го внесете. Повлечете до 0 за да дозволите возачот да понуди цена.",
   "Ride: <destination> @ <time>": "Возење: <destination> @ <time>",
@@ -974,5 +973,12 @@ const c: Record<string, string> = {
   "Communities": "Заедници",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Донесете цела група на Freeport со една врска. Секој што ќе се придружи се наоѓа на истиот пазар.",
   "Your communities": "Вашите заедници",
+  "Couldn't find this Lightning address — check the name and try again": "Не можевме да ја најдеме оваа Lightning адреса — проверете го името и обидете се повторно",
+  "Couldn't reach this Lightning address — check the name and try again": "Не можевме да ја достигнеме оваа Lightning адреса — проверете го името и обидете се повторно",
+  "Not enough balance to send this payment": "Нема доволно средства за да се испрати ова плаќање",
+  "That amount is outside what this address accepts": "Тој износ е надвор од она што го прифаќа оваа адреса",
+  "Payment failed. Please try again.": "Плаќањето не успеа. Обидете се повторно.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Отворете Поставки, потоа Профил за да ги уредите вашите податоци. Направете резервна копија на вашиот идентитет за да не ја изгубите karma кога ќе го смените уредот.",
+  "{name} is calling — tap to answer": "{name} се јавува — допрете за да одговорите",
 };
 export default c;

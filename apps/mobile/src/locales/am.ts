@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "ጉዞ ለማግኘት፣ ለመደራደር ወይም ጉዞ ለመቀበል እዚህ ይንኩ።",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "ስምምነት ሲኖርዎት ለመወያየት፣ ለመደራደር ወይም ጉዞውን ለመሰረዝ እዚህ ይንኩ።",
   "Tap here to see your completed rides and rate karma scores.": "የተጠናቀቁ ጉዞዎችዎን ለማየት እና የkarma ነጥቦችን ለመገምገም እዚህ ይንኩ።",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "ዝርዝሮችዎን እዚህ ያስተካክሉ። መሣሪያ ሲቀይሩ karma እንዳያጡ ማንነትዎን ምትኬ ያስቀምጡ።",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "ጉዞ ለመያዝ እዚህ ይንኩ። ከተለመደው የጉዞ አገልግሎት በተለየ፣ የራስዎን ዋጋ (በገማች እገዛ) ይወስናሉ እና ከአሽከርካሪው ጋር ይደራደራሉ። ከያዙ በኋላ አልፎ አልፎ ይመለሱና ይመልከቱ — የግፋ ማሳወቂያዎች የሉም።",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "ጎማውን በማሽከርከር ዋጋዎን ይወስኑ። በእጅ ለመተየብ መጠኑን ይንኩ። አሽከርካሪው ዋጋ እንዲያቀርብ ወደ 0 ይጎትቱ።",
   "Ride: <destination> @ <time>": "ጉዞ፦ <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "ማህበረሰቦች",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "ሙሉ ቡድን በአንድ ማገናኛ ወደ Freeport ያምጡ። የሚቀላቀል ሁሉ በተመሳሳይ ገበያ ውስጥ ይገባል።",
   "Your communities": "የእርስዎ ማህበረሰቦች",
+  "Couldn't find this Lightning address — check the name and try again": "ይህ የLightning አድራሻ አልተገኘም — ስሙን አረጋግጠው እንደገና ይሞክሩ",
+  "Couldn't reach this Lightning address — check the name and try again": "ወደዚህ የLightning አድራሻ መድረስ አልተቻለም — ስሙን አረጋግጠው እንደገና ይሞክሩ",
+  "Not enough balance to send this payment": "ይህን ክፍያ ለመላክ በቂ ቀሪ ሂሳብ የለም",
+  "That amount is outside what this address accepts": "ያ መጠን ይህ አድራሻ ከሚቀበለው ውጭ ነው",
+  "Payment failed. Please try again.": "ክፍያ አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "ቅንብሮችን ይክፈቱ፣ ከዚያ ዝርዝሮችዎን ለማስተካከል መገለጫ ይክፈቱ። መሣሪያ ሲቀይሩ karma እንዳያጡ ማንነትዎን ምትኬ ያስቀምጡ።",
+  "{name} is calling — tap to answer": "{name} እየደወለ ነው — ለመመለስ ይንኩ",
 };
 export default c;

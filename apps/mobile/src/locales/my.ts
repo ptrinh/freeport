@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "ခရီးစဉ်များ ရှာရန်၊ ဈေးညှိရန် သို့မဟုတ် ခရီးစဉ် လက်ခံရန် ဤနေရာကို နှိပ်ပါ။",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "သဘောတူညီမှု ရရှိပြီးပါက စကားပြောရန်၊ ဈေးညှိရန် သို့မဟုတ် ခရီးစဉ်ကို ပယ်ဖျက်ရန် ဤနေရာကို နှိပ်ပါ။",
   "Tap here to see your completed rides and rate karma scores.": "ပြီးဆုံးသွားသော ခရီးစဉ်များကို ကြည့်ရှုပြီး karma အမှတ်များကို အဆင့်သတ်မှတ်ရန် ဤနေရာကို နှိပ်ပါ။",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "သင့်အချက်အလက်များကို ဤနေရာတွင် ပြင်ဆင်ပါ။ စက်ပစ္စည်း ပြောင်းသည့်အခါ သင့် karma မဆုံးရှုံးစေရန် သင့်အထောက်အထားကို အရန်သိမ်းထားပါ။",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "ခရီးစဉ် ကြိုတင်မှာယူရန် ဤနေရာကို နှိပ်ပါ။ ရိုးရာ ကားခေါ်ဝန်ဆောင်မှုနှင့် မတူဘဲ သင်ကိုယ်တိုင် ဈေးနှုန်း သတ်မှတ်ပြီး (ခန့်မှန်းကိရိယာဖြင့်) ယာဉ်မောင်းနှင့် ဈေးညှိနိုင်ပါသည်။ မှာယူပြီးနောက် အခါအားလျော်စွာ ပြန်စစ်ဆေးပါ — push အသိပေးချက်များ မရှိပါ။",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "ဘီးကို လှည့်ခြင်းဖြင့် သင့်ဈေးနှုန်းကို သတ်မှတ်ပါ။ ကိုယ်တိုင်ရိုက်ထည့်ရန် ပမာဏကို နှိပ်ပါ။ ယာဉ်မောင်းအား ဈေးပေးခွင့်ပြုရန် 0 သို့ ဆွဲချပါ။",
   "Ride: <destination> @ <time>": "ခရီးစဉ်: <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "အသိုင်းအဝိုင်းများ",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "အုပ်စုတစ်ခုလုံးကို လင့်ခ်တစ်ခုတည်းဖြင့် Freeport သို့ ခေါ်ဆောင်လာပါ။ ပါဝင်သူတိုင်း စျေးကွက်တူတွင် ရောက်ရှိကြသည်။",
   "Your communities": "သင့်အသိုင်းအဝိုင်းများ",
+  "Couldn't find this Lightning address — check the name and try again": "ဤ Lightning လိပ်စာကို ရှာမတွေ့ပါ — အမည်ကို စစ်ဆေးပြီး ထပ်စမ်းကြည့်ပါ",
+  "Couldn't reach this Lightning address — check the name and try again": "ဤ Lightning လိပ်စာသို့ ဆက်သွယ်၍မရပါ — အမည်ကို စစ်ဆေးပြီး ထပ်စမ်းကြည့်ပါ",
+  "Not enough balance to send this payment": "ဤငွေပေးချေမှုကို ပို့ရန် လက်ကျန်ငွေ မလုံလောက်ပါ",
+  "That amount is outside what this address accepts": "ထိုပမာဏသည် ဤလိပ်စာ လက်ခံသည့် အတိုင်းအတာ ပြင်ပတွင် ရှိသည်",
+  "Payment failed. Please try again.": "ငွေပေးချေမှု မအောင်မြင်ပါ။ ထပ်စမ်းကြည့်ပါ။",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "သင့်အချက်အလက်များ ပြင်ဆင်ရန် ဆက်တင်များ ကိုဖွင့်ပြီး ပရိုဖိုင် သို့သွားပါ။ စက်ပစ္စည်း ပြောင်းသည့်အခါ သင့် karma မဆုံးရှုံးစေရန် သင့်အထောက်အထားကို အရန်သိမ်းထားပါ။",
+  "{name} is calling — tap to answer": "{name} ခေါ်ဆိုနေသည် — ဖြေဆိုရန် တို့ပါ",
 };
 export default c;

@@ -544,7 +544,6 @@ const c: Record<string, string> = {
   "Tap here to find rides, negotiate, or accept a ride.": "Հպեք այստեղ՝ ուղևորություն գտնելու, սակարկելու կամ ուղևորություն ընդունելու համար։",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Երբ գործարք ունենաք, հպեք այստեղ՝ զրուցելու, սակարկելու կամ ուղևորությունը չեղարկելու համար։",
   "Tap here to see your completed rides and rate karma scores.": "Հպեք այստեղ՝ ձեր ավարտված ուղևորությունները տեսնելու և կարմայի միավորները գնահատելու համար։",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Խմբագրեք ձեր տվյալներն այստեղ։ Պահուստավորեք ձեր ինքնությունը, որպեսզի սարքը փոխելիս չկորցնեք ձեր կարման։",
   "Tap here to book a ride. Unlike traditional ride-hailing, you set your own price (with an estimator) and negotiate with the driver. After booking, check back now and then — there are no push notifications.": "Հպեք այստեղ՝ ուղևորություն պատվիրելու համար։ Ի տարբերություն սովորական տաքսի ծառայությունների՝ դուք ինքներդ եք սահմանում գինը (գնահատիչի օգնությամբ) և սակարկում վարորդի հետ։ Պատվիրելուց հետո ժամանակ առ ժամանակ ստուգեք. push-ծանուցումներ չկան։",
   "Set your price by spinning the wheel. Tap the amount to type it manually. Drag to 0 to let the driver offer a price.": "Սահմանեք ձեր գինը՝ պտտելով անիվը։ Հպեք գումարին՝ այն ձեռքով մուտքագրելու համար։ Քաշեք մինչև 0՝ վարորդին գին առաջարկելու հնարավորություն տալու համար։",
   "Ride: <destination> @ <time>": "Ուղևորություն՝ <destination> @ <time>",
@@ -971,5 +970,12 @@ const c: Record<string, string> = {
   "Communities": "Համայնքներ",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Բեր ամբողջ խումբը Freeport մեկ հղումով։ Բոլոր միացողները հայտնվում են նույն շուկայում։",
   "Your communities": "Քո համայնքները",
+  "Couldn't find this Lightning address — check the name and try again": "Այս Lightning հասցեն չգտնվեց — ստուգեք անունը և փորձեք նորից",
+  "Couldn't reach this Lightning address — check the name and try again": "Չհաջողվեց կապ հաստատել այս Lightning հասցեի հետ — ստուգեք անունը և փորձեք նորից",
+  "Not enough balance to send this payment": "Այս վճարումն ուղարկելու համար բալանսը բավարար չէ",
+  "That amount is outside what this address accepts": "Այդ գումարը դուրս է այն սահմաններից, որ ընդունում է այս հասցեն",
+  "Payment failed. Please try again.": "Վճարումը ձախողվեց։ Խնդրում ենք փորձել նորից։",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Բացեք Կարգավորումները, ապա Պրոֆիլը՝ ձեր տվյալները խմբագրելու համար։ Պահուստավորեք ձեր ինքնությունը, որպեսզի սարքը փոխելիս չկորցնեք ձեր կարման։",
+  "{name} is calling — tap to answer": "{name} զանգում է — հպեք պատասխանելու համար",
 };
 export default c;

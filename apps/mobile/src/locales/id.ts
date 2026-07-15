@@ -111,7 +111,6 @@ const c: Record<string, string> = {
   "Next": "Berikutnya",
   "Tap here to find rides, negotiate, or accept a ride.": "Ketuk di sini untuk mencari perjalanan, bernegosiasi, atau menerima perjalanan.",
   "When you have a deal, tap here to chat, negotiate, or cancel the ride.": "Saat ada kesepakatan, ketuk di sini untuk mengobrol, bernegosiasi, atau membatalkan perjalanan.",
-  "Edit your details here. Back up your identity so you don't lose your karma when you switch devices.": "Edit detail Anda di sini. Cadangkan identitas Anda agar tidak kehilangan karma saat berganti perangkat.",
   "Posted": "Terkirim",
   "Your ride request is live.": "Permintaan tumpangan Anda sudah tayang.",
   "Your service offer is live.": "Penawaran layanan Anda sudah tayang.",
@@ -1014,5 +1013,12 @@ const c: Record<string, string> = {
   "Communities": "Komunitas",
   "Bring a whole group to Freeport with one link. Everyone who joins lands in the same market.": "Bawa satu grup penuh ke Freeport dengan satu tautan. Semua yang bergabung masuk ke pasar yang sama.",
   "Your communities": "Komunitasmu",
+  "Couldn't find this Lightning address — check the name and try again": "Alamat Lightning ini tidak ditemukan — periksa namanya dan coba lagi",
+  "Couldn't reach this Lightning address — check the name and try again": "Tidak dapat menjangkau alamat Lightning ini — periksa namanya dan coba lagi",
+  "Not enough balance to send this payment": "Saldo tidak cukup untuk mengirim pembayaran ini",
+  "That amount is outside what this address accepts": "Jumlah itu di luar yang diterima oleh alamat ini",
+  "Payment failed. Please try again.": "Pembayaran gagal. Silakan coba lagi.",
+  "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Buka Pengaturan, lalu Profil untuk mengedit detail Anda. Cadangkan identitas Anda agar tidak kehilangan karma saat berganti perangkat.",
+  "{name} is calling — tap to answer": "{name} menelepon — ketuk untuk menjawab",
 };
 export default c;
