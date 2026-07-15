@@ -255,6 +255,41 @@ describe('payments', () => {
     expect((await call(bridge, 'webln.makeInvoice', { amount: 100 })).error).toBe('no wallet');
   });
 
+  it('authorizePay denial blocks the payment and refunds the reservation', async () => {
+    const { bridge, firewall, wallet } = makeBridge({
+      approveResult: { ok: true },
+      authorizePay: vi.fn(async () => false),
+    });
+    wallet.parseAmount.mockReturnValue(900);
+    const res = await call(bridge, 'webln.sendPayment', { invoice: 'lnbc_x' });
+    expect(res).toEqual({ id: 'r1', ok: false, error: 'denied by user' });
+    expect(wallet.payInvoice).not.toHaveBeenCalled();
+    expect(firewall.spentToday(APP, T0 + 60_000)).toBe(0); // reservation rolled back
+  });
+
+  it('authorizePay runs even for auto-allowed under-cap payments, with the invoice amount', async () => {
+    const authorizePay = vi.fn(async () => true);
+    const { bridge, firewall, wallet, approve } = makeBridge({ authorizePay });
+    firewall.setSpendCap(APP, 10_000);
+    wallet.parseAmount.mockReturnValue(600);
+    const res = await call(bridge, 'webln.sendPayment', { invoice: 'lnbc_x' });
+    expect(res.ok).toBe(true);
+    expect(approve).not.toHaveBeenCalled();               // under cap — no dialog
+    expect(authorizePay).toHaveBeenCalledWith({ amountSats: 600 }); // …but the human gate still ran
+  });
+
+  it('a throwing authorizePay fails closed (payment blocked, nothing spent)', async () => {
+    const { bridge, firewall, wallet } = makeBridge({
+      approveResult: { ok: true },
+      authorizePay: vi.fn(async () => { throw new Error('auth exploded'); }),
+    });
+    wallet.parseAmount.mockReturnValue(300);
+    const res = await call(bridge, 'webln.sendPayment', { invoice: 'lnbc_x' });
+    expect(res.ok).toBe(false);
+    expect(wallet.payInvoice).not.toHaveBeenCalled();
+    expect(firewall.spentToday(APP, T0 + 60_000)).toBe(0);
+  });
+
   it('makeInvoice validates amount natively', async () => {
     const { bridge } = makeBridge();
     for (const amount of [0, -5, 1.5, 'all', NaN]) {

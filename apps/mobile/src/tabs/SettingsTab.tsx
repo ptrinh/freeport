@@ -46,6 +46,7 @@ import { NotificationsSection } from './settings/NotificationsSection';
 import { FareEstimator } from './settings/FareEstimator';
 import { AboutSection } from './settings/AboutSection';
 import { ExperimentalSection } from './settings/ExperimentalSection';
+import { PaymentSecuritySection } from './settings/PaymentSecuritySection';
 import { ChatSection } from './settings/ChatSection';
 import { callsSupported } from '../calls/webrtc';
 import { conciergeModulePresent } from '../concierge/model';
@@ -932,6 +933,9 @@ function SettingsTab({
         miniAppsEnabled={experimentalMiniApps}
         onMiniAppsEnabledChange={onExperimentalMiniAppsChange}
       />
+
+      {/* Payment auth gate — only meaningful once something can pay. */}
+      {(experimentalWallet || experimentalMiniApps) && <PaymentSecuritySection />}
 
       {/* Mini-apps live in their own "Apps" bottom tab when enabled — see
           AppsTab. The toggle above turns that tab on. */}

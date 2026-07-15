@@ -20,6 +20,7 @@ import { Modal, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../i18n';
 import { s, palette } from '../ui/theme';
+import { authorizePayment } from '../payAuth';
 import type { Signer } from '../signer';
 import type { MiniAppFirewall, MiniAppRecord } from './firewall';
 import { MiniAppBridge, type ApprovalRequest, type ApprovalResult, type BridgeContext } from './bridge';
@@ -73,6 +74,7 @@ export function MiniAppShell({
       setTimeout(() => URL.revokeObjectURL(url), 4000);
     },
     persist: persistFirewall,
+    authorizePay: ({ amountSats }) => authorizePayment(amountSats, t('Confirm payment')),
     approve: (req) => {
       const turn = approvalChain.current.then(
         () => new Promise<ApprovalResult>((resolve) => setApproval({ req, resolve })),

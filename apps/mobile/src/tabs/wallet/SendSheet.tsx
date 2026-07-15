@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { s, palette } from '../../ui/theme';
 import type { ParsedDest, TokenBalanceInfo, WalletProvider } from '../../wallet';
+import { authorizePayment } from '../../payAuth';
 import { ScanSheet, scanSupported } from './ScanSheet';
 
 export interface WalletContact { name: string; address: string }
@@ -97,6 +98,11 @@ export function SendSheet({
   const pay = async () => {
     if (!provider || !dest) return;
     setStep('paying'); setError('');
+    // Payment auth gate (Face ID / passkey, Settings-controlled). Token sends
+    // pass null — the sat cost is unknown, so they always prompt.
+    if (!(await authorizePayment(asset ? null : Number.isFinite(sats) ? sats : null, t('Confirm payment')))) {
+      setError(t('Authentication required')); setStep('error'); return;
+    }
     try {
       if (asset && provider.payToken) await provider.payToken(dest.raw, asset, amount.trim());
       else await provider.pay(dest.raw, dest.kind === 'bolt11' && dest.sats != null ? undefined : sats);

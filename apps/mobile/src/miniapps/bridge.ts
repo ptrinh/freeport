@@ -69,6 +69,10 @@ export interface BridgeDeps {
   saveFile?: ((file: { name: string; mimeType: string; dataBase64: string }) => Promise<void>) | null;
   /** Called after any state change worth persisting (grants, spend). */
   persist: () => void;
+  /** Payment auth gate (Face ID / passkey) — runs AFTER the approval dialog,
+   *  right before the wallet is touched. Resolves false to block. Optional so
+   *  the adversarial suite and headless shells run ungated. */
+  authorizePay?: (info: { amountSats: number | null }) => Promise<boolean>;
   now?: () => number;
 }
 
@@ -204,6 +208,21 @@ export class MiniAppBridge {
     else if (msg.method === 'freeport.paySpark') reserved = typeof p.sats === 'number' ? p.sats : 0;
     if (reserved > 0) { this.deps.firewall.recordSpend(this.origin, reserved, this.now()); this.deps.persist(); }
 
+    // Payment auth gate — after the reservation (which must stay synchronous
+    // with evaluate() for TOCTOU safety), so a denial refunds like a failed
+    // payment. Runs even for auto-approved under-cap payments: the cap trusts
+    // the app, this step verifies the HUMAN.
+    if (msg.method === 'webln.sendPayment' || msg.method === 'freeport.paySpark') {
+      const gate = this.deps.authorizePay;
+      if (gate) {
+        const amountSats = msg.method === 'webln.sendPayment'
+          ? this.deps.wallet?.parseAmount(invoice) ?? null
+          : typeof p.sats === 'number' ? p.sats : null;
+        const ok = await gate({ amountSats }).catch(() => false);
+        if (!ok) { this.refund(reserved); return { id, ok: false, error: 'denied by user' }; }
+      }
+    }
+
     return this.execute(id, msg.method as BridgeMethod, p, template, invoice, reserved);
   }
 
@@ -337,9 +356,14 @@ export function sanitizeTemplate(input: unknown): EventTemplate | null {
       tags.push([...t] as string[]);
     }
   }
-  const createdAt = Number.isInteger(e.created_at) && (e.created_at as number) > 0
+  // Clamp created_at to now ± 10 min: an approved app must not be able to
+  // back/post-date events the user signs under their identity.
+  const now = Math.floor(Date.now() / 1000);
+  const SKEW = 600;
+  let createdAt = Number.isInteger(e.created_at) && (e.created_at as number) > 0
     ? (e.created_at as number)
-    : Math.floor(Date.now() / 1000);
+    : now;
+  if (createdAt < now - SKEW || createdAt > now + SKEW) createdAt = now;
   return { kind: kind as number, content: e.content, tags, created_at: createdAt };
 }
 

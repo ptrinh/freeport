@@ -109,7 +109,7 @@ const HAS_PASSKEY_KEY = 'freeport.hasPasskey';
 function markHasPasskey(): void {
   try { if (Platform.OS === 'web') localStorage.setItem(HAS_PASSKEY_KEY, '1'); } catch { /* ignore */ }
 }
-function hasLocalPasskeyHint(): boolean {
+export function hasLocalPasskeyHint(): boolean {
   try { return Platform.OS === 'web' && localStorage.getItem(HAS_PASSKEY_KEY) === '1'; } catch { return false; }
 }
 

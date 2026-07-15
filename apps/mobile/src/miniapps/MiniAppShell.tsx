@@ -18,6 +18,8 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { Ionicons } from '@expo/vector-icons';
 import { s, palette } from '../ui/theme';
+import { t } from '../i18n';
+import { authorizePayment } from '../payAuth';
 import type { Signer } from '../signer';
 import type { MiniAppFirewall, MiniAppRecord } from './firewall';
 import { MiniAppBridge, encodeResponseJs, type ApprovalRequest, type ApprovalResult, type BridgeContext } from './bridge';
@@ -79,6 +81,7 @@ export function MiniAppShell({
         if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(uri, { mimeType, UTI: mimeType === 'application/pdf' ? 'com.adobe.pdf' : undefined });
       },
       persist: persistFirewall,
+      authorizePay: ({ amountSats }) => authorizePayment(amountSats, t('Confirm payment')),
       approve: (req) => {
         const turn = approvalChain.current.then(
           () => new Promise<ApprovalResult>((resolve) => setApproval({ req, resolve })),

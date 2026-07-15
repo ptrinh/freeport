@@ -91,6 +91,12 @@ export interface Prefs {
   experimentalLlm: boolean;
   /** Experimental: mini-apps shell (NIP-07 + WebLN WebView host). Native-only. */
   experimentalMiniApps: boolean;
+  /** Require Face ID / biometrics / passkey before any payment (wallet Send
+   *  and mini-app payments). On by default; see src/payAuth.ts. */
+  payAuthRequired: boolean;
+  /** Only require auth for payments of at least this many sats (0 = always).
+   *  Unknown amounts (stablecoin sends) always prompt. */
+  payAuthThresholdSats: number;
 }
 
 const DEFAULTS: Prefs = {
@@ -125,6 +131,8 @@ const DEFAULTS: Prefs = {
   chatTranslate: false,
   experimentalLlm: false,
   experimentalMiniApps: false,
+  payAuthRequired: true,
+  payAuthThresholdSats: 0,
 };
 
 /** Public-instance hostnames we've renamed. Installs that saved one of these

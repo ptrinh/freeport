@@ -13,7 +13,8 @@
       "bundleIdentifier": "uk.trinh.freeport",
       "supportsTablet": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSFaceIDUsageDescription": "Face ID confirms it's you before a payment is sent."
       },
       "buildNumber": "24",
       "associatedDomains": [
