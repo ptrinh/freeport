@@ -34,8 +34,19 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 - **Nobody profits — including me.** No operator, no cut. A protocol, not a
   platform. Run it or fork it.
 - **No one will protect you here — that's the point, and the price.** No
-  support line, no refunds, no arbiter. Reputation and your own judgment are
-  the whole safety net.
+  support line, no refunds, no central authority. Your own judgment is the
+  first line of defense — but you're not entirely on your own. The protocol
+  gives you tools to lower the risk, all opt-in and none run by an operator:
+  a robust [reputation system](#what-works-today) (peer karma, co-signed deal
+  receipts, web-of-trust weighting); decentralized escrow **arbitration**
+  ([`examples/arbitrator`](examples/arbitrator)) where a mutually chosen
+  arbitrator resolves disputes and earns only when one is raised;
+  decentralized **ID verification**
+  ([`examples/id-verification`](examples/id-verification)) to prove who you're
+  dealing with; and **insurance**
+  ([`examples/insurance-store`](examples/insurance-store)) priced from
+  on-chain reputation. Reputation and these safeguards are the safety net —
+  you choose how much of it to use.
 
 ## What works today
 
@@ -84,6 +95,15 @@ matching server — relays are dumb pub/sub, all logic is client-side.
     quotes underwritten from npub-derived reputation, with a downloadable PDF
     certificate, live at
     [apps.freeport.network/insurance-store](https://apps.freeport.network/insurance-store/)
+  - [`examples/id-verification`](examples/id-verification) — a paid identity /
+    licence verification service: submit documents, book a video call, and get
+    a shareable verification link for your profile, live at
+    [apps.freeport.network/id-verification](https://apps.freeport.network/id-verification/)
+  - [`examples/arbitrator`](examples/arbitrator) — decentralized dispute
+    arbitration: an escrow with the arbitrator as a conditional key, encrypted
+    evidence (NIP-44), and a fee only charged when a dispute is actually
+    raised — the arbitrator's npub karma is their license, live at
+    [apps.freeport.network/arbitrator](https://apps.freeport.network/arbitrator/)
 - **On-device AI (experimental)**: describe what you need in any language
   and it drafts your post; incoming chat messages auto-translate. Runs
   entirely on your device (Apple Intelligence / Android ML Kit + Gemini
