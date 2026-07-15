@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Image,
   Linking,
   Modal,
   Pressable,
@@ -20,6 +19,7 @@ import { startRecording, stopRecording, toggleVoice, seekVoice, setVoiceRate, ty
 import { defaultIntentTime, timeToWindow, parsePayment, fmtPayment } from '../../ui/format';
 import { currencyForMarket, type Currency } from '../../locations';
 import { s, palette } from '../../ui/theme';
+import { CachedImage } from '../../ui/cachedImage';
 import { uiAlert } from '../../ui/alerts';
 import { Field, ReadonlyField, DurationField, TimeField, PaymentField } from '../../ui/fields';
 import { translateMessage } from '../../concierge/translate';
@@ -262,7 +262,7 @@ const ChatBubble = React.memo(function ChatBubble({
         ? <VoiceMessage url={text} dir={dir} />
         : isImageMsg(text)
         ? <Pressable onPress={() => onZoom(text)}>
-            <Image source={{ uri: text }} style={s.chatImage} resizeMode="cover" />
+            <CachedImage uri={text} style={s.chatImage} recyclingKey={text} />
           </Pressable>
         : isLocationMsg(text)
         ? <Pressable style={s.trackMsg} onPress={() => Linking.openURL(text.trim())}>
@@ -530,7 +530,7 @@ export function ChatCore({ messages, onSend, quickReplies, emptyHint, tickFor, t
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
           >
-            {viewerUri ? <Image source={{ uri: viewerUri }} style={s.imgViewerImage} resizeMode="contain" /> : null}
+            {viewerUri ? <CachedImage uri={viewerUri} style={s.imgViewerImage} contentFit="contain" /> : null}
           </ScrollView>
           <Pressable style={s.imgViewerClose} onPress={() => setViewerUri(null)} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('Close image')}>
             <Ionicons name="close" size={26} color="#fff" />

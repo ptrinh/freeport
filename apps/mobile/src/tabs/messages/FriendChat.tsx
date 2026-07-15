@@ -9,7 +9,7 @@
  *     and a "Generate new invite link" rotation.
  *   - ChatFab: the floating + button that opens the InviteSheet.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Share, Text, TextInput, View } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,11 +22,13 @@ import { qrDataUrl } from '../../wallet/qr';
 import { webBase } from '../../webBase';
 import { fmtClock } from '../../ui/format';
 import { s, palette } from '../../ui/theme';
+import { CachedImage } from '../../ui/cachedImage';
 import { confirmAsync } from '../../ui/alerts';
 import { copyText, clipboardAvailable } from '../../ui/clipboard';
 import { ChatCore, SAFE_ATTACH_EXTENSIONS, isAudioMsg, isImageMsg, isTripMsg, isDocMsg, isLocationMsg, locationMsg, docMsgName } from './Chat';
 import { matchesKeywords } from '../../browseFilter';
 import { DraggableFab } from '../../ui/DraggableFab';
+import { SwipeableRow } from '../../ui/SwipeableRow';
 import { uploadFile, UploadError } from '../../upload';
 import { getCurrentCoords } from '../../geo';
 
@@ -70,12 +72,27 @@ function lastLine(conv: Conversation): string {
 }
 
 function Avatar({ uri, size = 44 }: { uri: string; size?: number }) {
-  return <Image source={{ uri }} style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: palette.chipBg }} />;
+  return <CachedImage uri={uri} style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: palette.chipBg }} recyclingKey={uri} />;
 }
 
 // ─── Conversation list ───────────────────────────────────────────────────────
 
-export function FriendChatSection({ client, conversations, blockedPubkeys, onOpen, onAcceptInvite, chatEnabled = true, archivedView = false, filterKeyword = '' }: {
+/** Bottom-sheet menu row — shared look with the in-chat burger menu. */
+function sheetRow(icon: React.ComponentProps<typeof Ionicons>['name'], label: string, onPress: () => void, danger = false) {
+  return (
+    <Pressable
+      key={label}
+      style={[s.row, { paddingVertical: 12, gap: 12, alignItems: 'center' }]}
+      onPress={onPress}
+      accessibilityRole="button" accessibilityLabel={label}
+    >
+      <Ionicons name={icon} size={20} color={danger ? palette.danger : palette.text2} />
+      <Text style={{ color: danger ? palette.danger : palette.text, fontSize: 15 }}>{label}</Text>
+    </Pressable>
+  );
+}
+
+export function FriendChatSection({ client, conversations, blockedPubkeys, onOpen, onAcceptInvite, chatEnabled = true, archivedView = false, filterKeyword = '', onToggleBlock }: {
   client: MobileClient | null;
   conversations: Conversation[];
   blockedPubkeys: Set<string>;
@@ -90,7 +107,24 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
   archivedView?: boolean;
   /** Comma-separated keyword filter (matches name + message text). */
   filterKeyword?: string;
+  /** Enables Block/Unblock in the swipe "More" sheet. */
+  onToggleBlock?: (pubkey: string) => void;
 }) {
+  // Swipe state: at most one row open (WhatsApp behavior) + the "More" sheet.
+  const openRowClose = useRef<(() => void) | null>(null);
+  const rowOpened = (close: () => void) => {
+    if (openRowClose.current && openRowClose.current !== close) openRowClose.current();
+    openRowClose.current = close;
+  };
+  const [morePeer, setMorePeer] = useState<string | null>(null);
+  const deleteConv = async (peer: string) => {
+    const ok = await confirmAsync(
+      t('Delete conversation?'),
+      t('Removes this chat and its messages from this device only. If they message or invite you again, a new request appears.'),
+      t('Delete'),
+    );
+    if (ok) client?.chatDeleteConversation(peer);
+  };
   // Blocked peers: hide their PENDING invites (spam), but keep an already-
   // active chat visible — the unblock action lives in its header.
   const kw = filterKeyword.trim().toLowerCase();
@@ -139,7 +173,21 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
       {live.map((c) => {
         const unread = unreadCount(c);
         return (
-          <Pressable key={c.peer} style={[s.card, { marginHorizontal: 0, flexDirection: 'row', alignItems: 'center', gap: 10 }]} onPress={() => onOpen(c.peer)}>
+          <SwipeableRow
+            key={c.peer}
+            onOpenRow={rowOpened}
+            leftAction={{ icon: 'trash-outline', label: t('Delete'), color: '#dc2626', onPress: () => { deleteConv(c.peer); } }}
+            rightActions={[
+              {
+                icon: c.archived ? 'archive' : 'archive-outline',
+                label: c.archived ? t('Unarchive') : t('Archive'),
+                color: '#2563eb',
+                onPress: () => client?.chatSetArchived(c.peer, !c.archived),
+              },
+              { icon: 'ellipsis-horizontal', label: t('More'), color: '#6b7280', onPress: () => setMorePeer(c.peer) },
+            ]}
+          >
+          <Pressable style={[s.card, { marginHorizontal: 0, flexDirection: 'row', alignItems: 'center', gap: 10 }]} onPress={() => onOpen(c.peer)}>
             <Avatar uri={avatarUri(c, client)} />
             <View style={{ flex: 1 }}>
               <View style={[s.row, { alignItems: 'baseline', gap: 6 }]}>
@@ -151,14 +199,64 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
               </Text>
             </View>
             <View style={{ alignItems: 'flex-end', gap: 4 }}>
-              <Text style={[s.dim, { fontSize: 11 }]}>{fmtRowTime(c.messages[c.messages.length - 1]?.ts ?? c.updatedAt)}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                {c.muted && <Ionicons name="notifications-off-outline" size={13} color={palette.dim} accessibilityLabel={t('Muted')} />}
+                <Text style={[s.dim, { fontSize: 11 }]}>{fmtRowTime(c.messages[c.messages.length - 1]?.ts ?? c.updatedAt)}</Text>
+              </View>
               {unread > 0 && (
                 <View style={s.badge}><Text style={s.badgeText}>{unread}</Text></View>
               )}
             </View>
           </Pressable>
+          </SwipeableRow>
         );
       })}
+      {(() => {
+        // "More" sheet from a swiped row — the same actions as the in-chat
+        // burger menu, minus the ones that need the thread open.
+        const c = morePeer ? conversations.find((x) => x.peer === morePeer) : null;
+        if (!c) return null;
+        const closeSheet = () => setMorePeer(null);
+        const ttlLabel = c.disappearTtl ? (TTL_LABELS[c.disappearTtl] ?? '24h') : t('Off');
+        const isBlocked = blockedPubkeys.has(c.peer);
+        return (
+          <Modal visible transparent animationType="fade" onRequestClose={closeSheet}>
+            <Pressable style={s.sortBackdrop} onPress={closeSheet}>
+              <Pressable style={s.sortSheet} onPress={() => {}}>
+                {sheetRow('chatbubble-ellipses-outline', t('Open chat'), () => { closeSheet(); onOpen(c.peer); })}
+                {c.state === 'active'
+                  ? sheetRow('timer-outline', `${t('Disappearing messages')}: ${ttlLabel}`, () => {
+                      const cur = TTL_STEPS.indexOf(c.disappearTtl ?? 0);
+                      client?.chatSetTtl(c.peer, TTL_STEPS[(cur + 1) % TTL_STEPS.length]).catch(() => {});
+                    })
+                  : null}
+                {sheetRow(c.archived ? 'archive' : 'archive-outline', c.archived ? t('Unarchive chat') : t('Archive chat'), () => {
+                  closeSheet();
+                  client?.chatSetArchived(c.peer, !c.archived);
+                })}
+                {c.messages.length > 0
+                  ? sheetRow('remove-circle-outline', t('Clear conversation'), async () => {
+                      closeSheet();
+                      const ok = await confirmAsync(t('Clear conversation?'), t('Removes all messages on this device only — the other person keeps their copy.'), t('Clear'));
+                      if (ok) client?.chatClearMessages(c.peer);
+                    })
+                  : null}
+                {sheetRow('trash-outline', t('Delete conversation'), () => { closeSheet(); deleteConv(c.peer); }, true)}
+                {onToggleBlock
+                  ? sheetRow(isBlocked ? 'ban' : 'ban-outline', isBlocked ? t('Unblock') : t('Block this person'), async () => {
+                      closeSheet();
+                      if (!isBlocked) {
+                        const ok = await confirmAsync(t('Block this person?'), t('You will not receive any more messages from them.'), t('Block'));
+                        if (!ok) return;
+                      }
+                      onToggleBlock(c.peer);
+                    }, !isBlocked)
+                  : null}
+              </Pressable>
+            </Pressable>
+          </Modal>
+        );
+      })()}
     </View>
   );
 }
@@ -348,11 +446,29 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
                       client?.chatSetTtl(conv.peer, TTL_STEPS[(cur + 1) % TTL_STEPS.length]).catch(() => {});
                     })
                   : null}
+                {menuRow(conv.muted ? 'notifications-outline' : 'notifications-off-outline', conv.muted ? t('Unmute') : t('Mute'), () => {
+                  setMenuOpen(false);
+                  client?.chatSetMuted(conv.peer, !conv.muted);
+                })}
                 {menuRow(conv.archived ? 'archive' : 'archive-outline', conv.archived ? t('Unarchive chat') : t('Archive chat'), () => {
                   setMenuOpen(false);
                   client?.chatSetArchived(conv.peer, !conv.archived);
                   onClose();
                 })}
+                {conv.messages.length > 0
+                  ? menuRow('remove-circle-outline', t('Clear conversation'), async () => {
+                      setMenuOpen(false);
+                      const ok = await confirmAsync(t('Clear conversation?'), t('Removes all messages on this device only — the other person keeps their copy.'), t('Clear'));
+                      if (ok) client?.chatClearMessages(conv.peer);
+                    })
+                  : null}
+                {menuRow('trash-outline', t('Delete conversation'), async () => {
+                  setMenuOpen(false);
+                  const ok = await confirmAsync(t('Delete conversation?'), t('Removes this chat and its messages from this device only. If they message or invite you again, a new request appears.'), t('Delete'));
+                  if (!ok) return;
+                  client?.chatDeleteConversation(conv.peer);
+                  onClose();
+                }, true)}
                 {menuRow(blocked ? 'ban' : 'ban-outline', blocked ? t('Unblock') : t('Block this person'), async () => {
                   setMenuOpen(false);
                   if (!blocked) {

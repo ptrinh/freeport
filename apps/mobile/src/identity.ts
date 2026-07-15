@@ -5,6 +5,7 @@
  */
 import 'react-native-get-random-values';
 import { kvGet, kvSet, kvDelete } from './kv';
+import { kvCacheDelete } from './kvCache';
 import { generateSecretKey, getPublicKey } from 'nostr-tools/pure';
 import * as nip19 from 'nostr-tools/nip19';
 import * as nip49 from 'nostr-tools/nip49';
@@ -68,6 +69,13 @@ export async function wipeAllLocalData(): Promise<void> {
     'freeport.escrows', 'freeport.conversations', 'freeport.chatInvite',
   ];
   await Promise.all(KEYS.map((k) => kvDelete(k).catch(() => {})));
+  // Bulk caches (deals, chats, escrows, outbox…) live in kvCache (files on
+  // native) — wipe those copies too, plus any unmigrated SecureStore residue.
+  const CACHE_KEYS = [
+    'freeport.negotiations', 'freeport.published', 'freeport.outbox',
+    'freeport.dmLastSeen', 'freeport.escrows', 'freeport.conversations',
+  ];
+  await Promise.all(CACHE_KEYS.map((k) => kvCacheDelete(k).catch(() => {})));
 }
 
 /** The raw stored nsec string (for cloud backup), or null if none. */

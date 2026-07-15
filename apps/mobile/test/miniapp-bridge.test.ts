@@ -155,6 +155,18 @@ describe('sanitizeTemplate', () => {
     expect(Object.keys(t).sort()).toEqual(['content', 'created_at', 'kind', 'tags']);
     expect(t.created_at).toBeGreaterThan(0);
   });
+
+  it('clamps a back/post-dated created_at to now', () => {
+    const now = Math.floor(Date.now() / 1000);
+    // Far in the past and far in the future are both replaced with now.
+    for (const forged of [1, now - 86400, now + 86400]) {
+      const t = sanitizeTemplate({ kind: 1, content: 'x', created_at: forged })!;
+      expect(Math.abs(t.created_at - now)).toBeLessThanOrEqual(5);
+    }
+    // A timestamp within the skew window is kept as-is.
+    const ok = sanitizeTemplate({ kind: 1, content: 'x', created_at: now - 60 })!;
+    expect(ok.created_at).toBe(now - 60);
+  });
 });
 
 describe('nip04 / nip44 round-trips', () => {

@@ -202,7 +202,13 @@ function MyPostCard({ intent, negos, client }: { intent: Intent; negos: Negotiat
   const doCancel = async () => {
     if (!client) return;
     setCancelling(true);
-    try { await client.withdrawIntent(intent); } catch {} finally { setCancelling(false); setConfirming(false); }
+    try {
+      await client.withdrawIntent(intent);
+    } catch (e) {
+      // Surface it — a swallowed failure leaves the listing live while the UI
+      // implies it was withdrawn.
+      uiAlert(t('Could not withdraw'), e instanceof Error ? e.message : undefined);
+    } finally { setCancelling(false); setConfirming(false); }
   };
 
   return (

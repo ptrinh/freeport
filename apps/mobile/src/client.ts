@@ -16,6 +16,7 @@ import { publishReceipt } from './receipts';
 import { fetchReputation, type Reputation } from './reputation';
 import { buildTrustMap } from './wot';
 import { kvGet, kvSet, kvDelete } from './kv';
+import { kvCacheGet, kvCacheSet, kvCacheDelete } from './kvCache';
 import type { Signer } from './signer';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { applyChatInbound, applyChatOutbound, newConversation, sweepExpired, type Conversation } from './conversations';
@@ -293,13 +294,13 @@ export class MobileClient {
 
   private async persistOutbox(): Promise<void> {
     try {
-      await kvSet(OUTBOX_STORE_KEY, JSON.stringify(this.outbox));
+      await kvCacheSet(OUTBOX_STORE_KEY, JSON.stringify(this.outbox));
     } catch { /* best-effort */ }
   }
 
   private async loadOutbox(): Promise<void> {
     try {
-      const raw = await kvGet(OUTBOX_STORE_KEY);
+      const raw = await kvCacheGet(OUTBOX_STORE_KEY);
       if (!raw) return;
       const cutoff = Math.floor(Date.now() / 1000) - OUTBOX_MAX_AGE_SECONDS;
       this.outbox = (JSON.parse(raw) as Array<{ event: Event }>).filter(
@@ -358,8 +359,8 @@ export class MobileClient {
 
   private async persistNegotiationsNow(): Promise<void> {
     try {
-      await kvSet(NEGO_STORE_KEY, JSON.stringify([...this.negotiations.values()]));
-      if (this.dmLastSeenTs > 0) await kvSet(DM_LAST_SEEN_KEY, String(this.dmLastSeenTs));
+      await kvCacheSet(NEGO_STORE_KEY, JSON.stringify([...this.negotiations.values()]));
+      if (this.dmLastSeenTs > 0) await kvCacheSet(DM_LAST_SEEN_KEY, String(this.dmLastSeenTs));
     } catch {
       /* best-effort; a failed write just means this change isn't cached */
     }
@@ -372,7 +373,7 @@ export class MobileClient {
     try {
       const cutoff = Math.floor(Date.now() / 1000) - 7 * 24 * 3600;
       const recent = [...this.published.values()].filter((i) => i.createdAt >= cutoff);
-      await kvSet(PUBLISHED_STORE_KEY, JSON.stringify(recent));
+      await kvCacheSet(PUBLISHED_STORE_KEY, JSON.stringify(recent));
     } catch {
       /* best-effort */
     }
@@ -380,7 +381,7 @@ export class MobileClient {
 
   private async loadPublished(): Promise<void> {
     try {
-      const raw = await kvGet(PUBLISHED_STORE_KEY);
+      const raw = await kvCacheGet(PUBLISHED_STORE_KEY);
       if (!raw) return;
       for (const intent of JSON.parse(raw) as Intent[]) {
         if (intent?.id && !this.published.has(intent.id)) {
@@ -399,18 +400,18 @@ export class MobileClient {
    */
   /** Erase persisted negotiations (call on sign-out so the next account starts clean). */
   static async clearStoredNegotiations(): Promise<void> {
-    try { await kvDelete(NEGO_STORE_KEY); } catch { /* best-effort */ }
-    try { await kvDelete(PUBLISHED_STORE_KEY); } catch { /* best-effort */ }
-    try { await kvDelete(OUTBOX_STORE_KEY); } catch { /* best-effort */ }
-    try { await kvDelete(DM_LAST_SEEN_KEY); } catch { /* best-effort */ }
-    try { await kvDelete(CHAT_STORE_KEY); } catch { /* best-effort */ }
+    try { await kvCacheDelete(NEGO_STORE_KEY); } catch { /* best-effort */ }
+    try { await kvCacheDelete(PUBLISHED_STORE_KEY); } catch { /* best-effort */ }
+    try { await kvCacheDelete(OUTBOX_STORE_KEY); } catch { /* best-effort */ }
+    try { await kvCacheDelete(DM_LAST_SEEN_KEY); } catch { /* best-effort */ }
+    try { await kvCacheDelete(CHAT_STORE_KEY); } catch { /* best-effort */ }
     try { await kvDelete(CHAT_INVITE_KEY); } catch { /* best-effort */ }
-    try { await kvDelete(ESCROW_STORE_KEY); } catch { /* best-effort */ }
+    try { await kvCacheDelete(ESCROW_STORE_KEY); } catch { /* best-effort */ }
   }
 
   async loadNegotiations(): Promise<void> {
     try {
-      const ts = Number(await kvGet(DM_LAST_SEEN_KEY));
+      const ts = Number(await kvCacheGet(DM_LAST_SEEN_KEY));
       if (Number.isFinite(ts) && ts > 0) this.dmLastSeenTs = ts;
     } catch { /* first launch */ }
     await this.loadOutbox(); // undelivered DMs from the previous session retry first
@@ -418,7 +419,7 @@ export class MobileClient {
     await this.loadConversations(); // friend chats (experimental Chat feature)
     await this.loadEscrows(); // HODL escrows — the buyer's preimage lives here
     try {
-      const raw = await kvGet(NEGO_STORE_KEY);
+      const raw = await kvCacheGet(NEGO_STORE_KEY);
       if (!raw) return;
       const list = JSON.parse(raw) as Negotiation[];
       let healed = false;
@@ -444,17 +445,26 @@ export class MobileClient {
     return this.trustPromise;
   }
 
+  /** Newest intent created_at this session has seen — a resume resubscribes
+   *  from here (minus a skew margin) instead of re-downloading and re-parsing
+   *  the full 24 h window (and re-triggering profile/reputation fetches for
+   *  every author) on every foreground. */
+  private marketNewestTs = 0;
+
   watchMarket(market: string | string[]): () => void {
     const markets = Array.isArray(market) ? market : [market];
+    const now = Math.floor(Date.now() / 1000);
+    const since = Math.max(now - 24 * 3600, this.marketNewestTs - 600);
     const sub = this.pool.subscribeMany(
       this.relays,
       {
         kinds: [KIND_INTENT_OFFER, KIND_INTENT_REQUEST],
         '#t': markets,
-        since: Math.floor(Date.now() / 1000) - 24 * 3600,
+        since,
       },
       {
         onevent: (ev: Event) => {
+          if (ev.created_at > this.marketNewestTs) this.marketNewestTs = ev.created_at;
           const intent = parseIntentEvent(ev);
           if (!intent) return;
           if (intent.pubkey === this.pubkey) {
@@ -863,7 +873,7 @@ export class MobileClient {
     if (!this.escrowPersistTimer) {
       this.escrowPersistTimer = setTimeout(() => {
         this.escrowPersistTimer = null;
-        kvSet(ESCROW_STORE_KEY, JSON.stringify([...this.escrows.values()])).catch(() => {});
+        kvCacheSet(ESCROW_STORE_KEY, JSON.stringify([...this.escrows.values()])).catch(() => {});
       }, 250);
     }
     this.onEscrowUpdate?.(escrow);
@@ -871,7 +881,7 @@ export class MobileClient {
 
   async loadEscrows(): Promise<void> {
     try {
-      const raw = await kvGet(ESCROW_STORE_KEY);
+      const raw = await kvCacheGet(ESCROW_STORE_KEY);
       if (!raw) return;
       for (const e of JSON.parse(raw) as EscrowState[]) {
         if (!e?.nego) continue;
@@ -1132,16 +1142,22 @@ export class MobileClient {
    */
   async postIntent(input: BuildIntentInput, profile?: UserProfile): Promise<Intent> {
     // Refuse to publish prohibited (illegal) content under the user's key.
+    // One typed view of the free-form payload instead of per-field `as any`
+    // casts — an `as any` in this file once silently killed all DM delivery.
+    const p = (input.payload ?? {}) as Partial<{
+      category: string; service: string; notes: string; note: string; subcategory: string;
+      from: { name?: string }; to: { name?: string }; location: { name?: string };
+    }>;
     const verdict = screenIntent(
-      (input.payload as any)?.category,
+      p.category,
       input.title,
-      (input.payload as any)?.service,
-      (input.payload as any)?.notes,
-      (input.payload as any)?.note,
-      (input.payload as any)?.from?.name,
-      (input.payload as any)?.to?.name,
-      (input.payload as any)?.location?.name,
-      (input.payload as any)?.subcategory,
+      p.service,
+      p.notes,
+      p.note,
+      p.from?.name,
+      p.to?.name,
+      p.location?.name,
+      p.subcategory,
     );
     if (!verdict.allowed) throw new Error(verdict.reason ?? 'This listing is not allowed.');
     if (profile && (profile.name || profile.picture || profile.about || profile.phone)) {
@@ -1151,7 +1167,7 @@ export class MobileClient {
     // Mine NIP-13 PoW so each post carries a CPU cost (anti-spam). The nonce
     // tag is preserved through signing, so the published id keeps its PoW.
     const tmpl = buildIntentTemplate(input);
-    let mined: any = { ...tmpl, pubkey: this.signer.pubkey };
+    let mined: typeof tmpl & { pubkey: string } = { ...tmpl, pubkey: this.signer.pubkey };
     try { mined = await minePowAsync(mined, POW_DIFFICULTY); } catch { /* best-effort */ }
     const ev = await this.signer.signEvent({
       kind: mined.kind, created_at: mined.created_at, tags: mined.tags, content: mined.content,
@@ -1312,16 +1328,20 @@ export class MobileClient {
 
   private commitConversation(conv: Conversation): void {
     this.conversations.set(conv.peer, conv);
+    this.persistConversations();
+  }
+
+  private persistConversations(): void {
     if (this.chatPersistTimer) return;
     this.chatPersistTimer = setTimeout(() => {
       this.chatPersistTimer = null;
-      kvSet(CHAT_STORE_KEY, JSON.stringify([...this.conversations.values()])).catch(() => {});
+      kvCacheSet(CHAT_STORE_KEY, JSON.stringify([...this.conversations.values()])).catch(() => {});
     }, 250);
   }
 
   async loadConversations(): Promise<void> {
     try {
-      const raw = await kvGet(CHAT_STORE_KEY);
+      const raw = await kvCacheGet(CHAT_STORE_KEY);
       if (!raw) return;
       for (const conv of JSON.parse(raw) as Conversation[]) {
         if (!conv?.peer) continue;
@@ -1453,7 +1473,7 @@ export class MobileClient {
     const conv = this.conversations.get(peer);
     if (!conv || conv.state !== 'pending_in') return;
     this.conversations.delete(peer);
-    kvSet(CHAT_STORE_KEY, JSON.stringify([...this.conversations.values()])).catch(() => {});
+    kvCacheSet(CHAT_STORE_KEY, JSON.stringify([...this.conversations.values()])).catch(() => {});
     this.onConversationUpdate?.({ ...conv, state: 'rejected' });
     await this.sendChatEnvelope(peer, makeChatReject());
   }
@@ -1533,11 +1553,44 @@ export class MobileClient {
     this.sendChatEnvelope(peer, makeChatAck('delivered', 0, Math.floor(Date.now() / 1000))).catch(() => {});
   }
 
+  /** Clear all messages in a conversation (local only — the peer keeps their
+   *  copy). The handshake state and seenEventIds replay guard survive, so a
+   *  relay backfill can't resurrect the cleared messages. */
+  chatClearMessages(peer: string): void {
+    const conv = this.conversations.get(peer);
+    if (!conv || !conv.messages.length) return;
+    const updated: Conversation = { ...conv, messages: [] };
+    this.commitConversation(updated);
+    this.onConversationUpdate?.(updated);
+  }
+
+  /** Delete a conversation entirely (local only — the peer isn't told).
+   *  Inbound messages from this peer are now stranger messages (dropped);
+   *  a replayed/new invite recreates the thread as a fresh request. */
+  chatDeleteConversation(peer: string): void {
+    const conv = this.conversations.get(peer);
+    if (!conv) return;
+    this.conversations.delete(peer);
+    this.persistConversations();
+    // Listeners rebuild their list from the map, which no longer holds conv.
+    this.onConversationUpdate?.(conv);
+  }
+
   /** Archive/unarchive a conversation (local only — the peer isn't told). */
   chatSetArchived(peer: string, archived: boolean): void {
     const conv = this.conversations.get(peer);
     if (!conv) return;
     const updated = { ...conv, archived };
+    this.commitConversation(updated);
+    this.onConversationUpdate?.(updated);
+  }
+
+  /** Mute/unmute a conversation (local only): messages still arrive, but the
+   *  app skips sounds, notifications and badge counts for this peer. */
+  chatSetMuted(peer: string, muted: boolean): void {
+    const conv = this.conversations.get(peer);
+    if (!conv) return;
+    const updated = { ...conv, muted };
     this.commitConversation(updated);
     this.onConversationUpdate?.(updated);
   }

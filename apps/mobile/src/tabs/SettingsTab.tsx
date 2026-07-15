@@ -271,6 +271,19 @@ function SettingsTab({
     return () => { cancelled = true; };
   }, [cloudOn]);
   const [identityOpen, setIdentityOpen] = useState(false);
+  // The built-in wallet's funds derive from the key being wiped — probe the
+  // balance when a sign-out/delete dialog opens so the confirmation can say
+  // what's at stake. Best-effort: null = no funds / no wallet / unknown.
+  const [wipeBalance, setWipeBalance] = useState<number | null>(null);
+  const probeWipeBalance = () => {
+    setWipeBalance(null);
+    if (!experimentalWallet || !signerRef.current?.secretKey) return;
+    import('../wallet')
+      .then(({ defaultWalletProvider }) => defaultWalletProvider())
+      .then((p) => p?.balance())
+      .then((b) => { if (b && b.sats > 0) setWipeBalance(b.sats); })
+      .catch(() => { /* unknown balance — the generic warning still shows */ });
+  };
   const [profileOpen, setProfileOpen] = useState(true);
   const [locationOpen, setLocationOpen] = useState(false);
   const [featuresOpen, setFeaturesOpen] = useState(false);
@@ -1015,7 +1028,7 @@ function SettingsTab({
           )}
 
           {/* Sign out — wipes the identity from this device; needs a backup first */}
-          <Pressable style={[s.btnDecline, { marginTop: 16, backgroundColor: '#7f1d1d', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }]} onPress={() => { setBackedUp(false); setSignOutOpen(true); }}>
+          <Pressable style={[s.btnDecline, { marginTop: 16, backgroundColor: '#7f1d1d', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }]} onPress={() => { setBackedUp(false); probeWipeBalance(); setSignOutOpen(true); }}>
             <Ionicons name="log-out-outline" size={16} color="white" />
             <Text style={s.btnText}>{t("Sign out")}</Text>
           </Pressable>
@@ -1027,6 +1040,13 @@ function SettingsTab({
                 {signerRef.current?.secretKey ? (
                   <>
                     <Text style={s.dim}>{t("This erases your identity from this device. Without a backup file you CANNOT restore it — your key, profile and reputation are gone for good. Back it up first (Backup Identity above), then confirm.")}</Text>
+                    {experimentalWallet && (
+                      <Text style={[s.dim, { color: palette.danger, marginTop: 8 }]}>
+                        {wipeBalance != null
+                          ? t('Your built-in wallet holds {sats} sats. Its funds derive from this key — without a backup they are unrecoverable.', { sats: String(wipeBalance) })
+                          : t('The built-in wallet derives from this key — any funds in it are unrecoverable without a backup.')}
+                      </Text>
+                    )}
                     <Pressable style={s.checkRow} onPress={() => setBackedUp((v) => !v)}>
                       <View style={[s.checkbox, backedUp && s.checkboxOn]}>{backedUp && <Text style={s.checkboxTick}>✓</Text>}</View>
                       <Text style={s.checkLabel}>{t("I have backed up my identity")}</Text>
@@ -1054,7 +1074,7 @@ function SettingsTab({
           {/* Delete account — permanently erases the identity + all data (Apple
               Guideline 5.1.1(v)). Distinct from Sign out; no backup gate. */}
           <Text style={[s.dim, { marginTop: 20 }]}>{t("Permanently delete your account and all of its data from this device. This is different from signing out and cannot be undone.")}</Text>
-          <Pressable style={[s.btnDecline, { marginTop: 8, backgroundColor: '#b91c1c', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }]} onPress={() => { setDeleteConfirm(false); setDeleteOpen(true); }}>
+          <Pressable style={[s.btnDecline, { marginTop: 8, backgroundColor: '#b91c1c', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }]} onPress={() => { setDeleteConfirm(false); probeWipeBalance(); setDeleteOpen(true); }}>
             <Ionicons name="trash-outline" size={16} color="white" />
             <Text style={s.btnText}>{t("Delete account")}</Text>
           </Pressable>
@@ -1064,6 +1084,13 @@ function SettingsTab({
               <Pressable style={s.sortSheet} onPress={() => {}}>
                 <Text style={s.sectionTitle}>{t("Delete account")}</Text>
                 <Text style={s.dim}>{t("This permanently deletes your account. Your identity key, profile, posts, messages, reputation and settings are erased from this device, your cloud backup is removed, and your public listings are withdrawn. This cannot be undone and your account cannot be recovered.")}</Text>
+                {experimentalWallet && !!signerRef.current?.secretKey && (
+                  <Text style={[s.dim, { color: palette.danger, marginTop: 8 }]}>
+                    {wipeBalance != null
+                      ? t('Your built-in wallet holds {sats} sats. Its funds derive from this key — without a backup they are unrecoverable.', { sats: String(wipeBalance) })
+                      : t('The built-in wallet derives from this key — any funds in it are unrecoverable without a backup.')}
+                  </Text>
+                )}
                 <Pressable style={s.checkRow} onPress={() => setDeleteConfirm((v) => !v)}>
                   <View style={[s.checkbox, deleteConfirm && s.checkboxOn]}>{deleteConfirm && <Text style={s.checkboxTick}>✓</Text>}</View>
                   <Text style={s.checkLabel}>{t("I understand this permanently deletes my account and cannot be undone")}</Text>

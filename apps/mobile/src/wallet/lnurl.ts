@@ -17,6 +17,9 @@ export async function lnurlPayInvoice(address: string, sats: number): Promise<st
   if (!metaResp.ok) throw new Error('lnurl-unreachable');
   const meta = await metaResp.json();
   if (meta?.tag !== 'payRequest' || !meta.callback) throw new Error('lnurl-bad-response');
+  // Callback is chosen by the untrusted server — require https so it can't
+  // downgrade us to a MITM-able invoice fetch.
+  if (!/^https:\/\//i.test(String(meta.callback))) throw new Error('lnurl-bad-response');
   if ((meta.minSendable && msat < meta.minSendable) || (meta.maxSendable && msat > meta.maxSendable)) {
     throw new Error('lnurl-amount-out-of-range');
   }

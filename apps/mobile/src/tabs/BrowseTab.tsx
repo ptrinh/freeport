@@ -1,8 +1,7 @@
-import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Modal,
   Platform,
   Pressable,
@@ -28,6 +27,7 @@ import { dirIcon } from '../rtl';
 import { maskPhone, isDisplayablePhone } from '../profile';
 import { getPow } from 'nostr-tools/nip13';
 import { s, palette } from '../ui/theme';
+import { CachedImage } from '../ui/cachedImage';
 import { fetchZapTotals } from '../zaps';
 import { ShopsView } from './ShopsView';
 import { defaultIntentTime, timeToWindow, parsePayment, fmtWindow, extractPhone, myPostTitle, primaryGeohash, fmtPayment } from '../ui/format';
@@ -52,6 +52,7 @@ export function MarketTab({
   onChatSeller,
   shopMarket = '',
   shopCurrency = 'USD',
+  netStatus = 'online',
 }: {
   intents: Intent[];
   client: MobileClient | null;
@@ -72,6 +73,9 @@ export function MarketTab({
   onChatSeller?: (pubkey: string) => void;
   shopMarket?: string;
   shopCurrency?: string;
+  /** Relay connectivity — lets the empty state distinguish "no posts" from
+   *  "relays unreachable" instead of showing the same waiting message. */
+  netStatus?: 'connecting' | 'online' | 'offline';
 }) {
   const country = location.country;
   // Resolve the unit HERE from the raw preference + this tab's own location —
@@ -164,6 +168,28 @@ export function MarketTab({
   useEffect(() => { setLimit(PAGE_SIZE); }, [keyword, filterCat, filterSub, servicesEnabled, sortPrefs]);
 
   const mine = (i: Intent) => client != null && i.pubkey === client.pubkey;
+
+  // Stable handlers for the memoized PostCard rows: client/myContact/onZap can
+  // be fresh closures on every parent render, so read them through refs — the
+  // callbacks keep one identity for the list's whole lifetime.
+  const clientRef = useRef(client); clientRef.current = client;
+  const myContactRef = useRef(myContact); myContactRef.current = myContact;
+  const onZapRef = useRef(onZap); onZapRef.current = onZap;
+  const handleToggleMap = useCallback((id: string) => setMapOpenId((cur) => (cur === id ? null : id)), []);
+  const handleViewImage = useCallback((url: string) => setCardViewerUri(url), []);
+  const handleZap = useCallback((i: Intent) => onZapRef.current?.(i), []);
+  const handleRespondStart = useCallback((id: string) => setRespondingId(id), []);
+  const handleRespondCancel = useCallback(() => setRespondingId(null), []);
+  const handleRespondSend = useCallback(async (i: Intent, terms: ProposedTerms, accepting: boolean) => {
+    // Unchanged time + amount → one-tap accept that confirms the deal outright
+    // (no offer round, no owner confirm). Otherwise it's a counter-offer the
+    // owner still accepts.
+    const c = clientRef.current;
+    if (accepting) await c?.acceptIntent(i, terms, myContactRef.current(i));
+    else await c?.respond(i, terms, myContactRef.current(i));
+    setRespondedIds((prev) => new Set([...prev, i.id]));
+    setRespondingId(null);
+  }, []);
   // Defer the keyword so typing stays responsive: the expensive filter+sort
   // below recomputes at low priority off the deferred value while the input
   // updates immediately.
@@ -422,7 +448,7 @@ export function MarketTab({
       ListEmptyComponent={
         <View style={s.emptyWrap}>
           <Ionicons
-            name={kw ? 'search-outline' : refSettling ? 'locate-outline' : shown.hiddenFar > 0 ? 'compass-outline' : 'radio-outline'}
+            name={kw ? 'search-outline' : refSettling ? 'locate-outline' : shown.hiddenFar > 0 ? 'compass-outline' : netStatus === 'offline' ? 'cloud-offline-outline' : 'radio-outline'}
             size={40}
             color={palette.dim}
           />
@@ -433,6 +459,8 @@ export function MarketTab({
                 ? (shown.nearestHiddenKm != null
                     ? t('{n} posts are outside your area — the nearest is {dist} away.', { n: shown.hiddenFar, dist: formatDistance(shown.nearestHiddenKm, location.country || undefined, distanceUnit) })
                     : t('{n} posts are outside your area.', { n: shown.hiddenFar }))
+                : netStatus === 'offline' ? t('No connection to the network — posts will appear once you are back online.')
+                : netStatus === 'connecting' ? t('Connecting to the network…')
                 : t('Waiting for posts/requests on the network…')}
           </Text>
           {!kw && !refSettling && shown.hiddenFar > 0 ? (
@@ -452,159 +480,28 @@ export function MarketTab({
       renderItem={({ item }) => {
         const p = item.content.payload as Record<string, any>;
         const isRide = item.content.schema.startsWith('rideshare');
-        const isSvc = item.content.schema.startsWith('service');
+        const prof = client?.profiles.get(item.pubkey);
         return (
-          <View style={s.card}>
-            <View style={s.row}>
-              <Text style={s.chip}>{isRide ? t('Rideshare') : isSvc ? t('Service/Product') : item.content.market}</Text>
-              <Text style={[s.chip, item.content.side === 'offer' ? s.chipGreen : s.chipBlue]}>
-                {t(item.content.side)}
-              </Text>
-              {isRide && p.category ? (
-                <View style={s.vehicleChip}>
-                  <MaterialCommunityIcons name={(VEHICLE_ICONS[p.category] ?? 'car') as any} size={13} color={palette.chipText} style={{ marginEnd: 4 }} />
-                  <Text style={s.vehicleChipText}>{t(p.category)}</Text>
-                </View>
-              ) : p.category ? <Text style={s.chip}>{t(p.category)}</Text> : null}
-              {(() => {
-                // Distance from the user's area (selected location, else GPS) to pickup.
-                if (!isRide || !ref || !p.from?.geohash) return null;
-                const km = distKm(p.from.geohash);
-                if (km == null) return null;
-                return <Text style={[s.chip, s.distChip]}>📍 {formatDistance(km, country, distanceUnit)}</Text>;
-              })()}
-              {isSvc && p.subcategory ? <Text style={s.chip}>{t(p.subcategory)}</Text> : null}
-              {mine(item) && <Text style={[s.chip, s.chipYou]}>{t("you")}</Text>}
-            </View>
-            {(() => {
-              const prof = client?.profiles.get(item.pubkey);
-              const rep = client?.reputations.get(item.pubkey);
-              return (
-                <View style={{ marginTop: 6 }}>
-                  <View style={s.row}>
-                    {prof?.picture
-                      ? <Image source={{ uri: prof.picture }} style={s.authorAvatar} />
-                      : <View style={[s.authorAvatar, s.avatarEmpty]} />}
-                    <Text style={s.authorName}>{prof?.name || item.pubkey.slice(0, 10) + '…'}</Text>
-                    {prof?.phone && isDisplayablePhone(prof.phone) ? (
-                      (() => {
-                        // Browse always shows a masked number — even when the poster
-                        // publishes their full number to the network (so it feels less
-                        // exposed). The full number is still readable at deal time.
-                        const callable = extractPhone(prof.phone);
-                        const shown = callable ? maskPhone(callable) : prof.phone;
-                        return <Text style={s.authorPhone}>📱 {shown}</Text>;
-                      })()
-                    ) : null}
-                    {rep?.newAccount && <Text style={s.newBadge}>{t("new account")}</Text>}
-                  </View>
-                  {(prof?.vehicleModel || prof?.plate) ? (
-                    <Text style={s.authorVehicle}>🚗 {[prof.vehicleModel, prof.plate].filter(Boolean).join(' · ')}</Text>
-                  ) : null}
-                  {rep && rep.deals > 0 && (
-                    <Text style={s.repLine}>
-                      {rep.ratingCount > 0 ? `${rep.label} · ` : ''}
-                      {t('{deals} deals · {partners} partners · {inNetwork} in your network', { deals: rep.deals, partners: rep.partners, inNetwork: rep.partnersInNetwork })}
-                      {rep.verifiedBy > 0 ? ` · 📱 ${t('verified by {n}', { n: rep.verifiedBy })}` : ''}
-                    </Text>
-                  )}
-                </View>
-              );
-            })()}
-            <Text style={s.cardTitle}>{isRide ? myPostTitle(item) : item.content.title}</Text>
-            {isRide && p.note ? <Row label={t("Note")} value={p.note} /> : null}
-            {isSvc && (
-              <>
-                <Row label={t("Service")} value={p.service} />
-                <Row label={t("Location")} value={p.location?.name} />
-                {p.duration_minutes && <Row label={t("Duration")} value={`${p.duration_minutes} min`} />}
-                {p.notes && <Row label={t("Notes")} value={p.notes} />}
-              </>
-            )}
-            {p.payment ? <Text style={s.priceTag}>💵 {p.payment}</Text> : null}
-            {!isRide && item.content.window && (
-              <Row label={t("Time")} value={fmtWindow(item.content.window)} />
-            )}
-            {Array.isArray(p.images) && p.images.length > 0 && (
-              <View style={s.imageGrid}>
-                {(p.images as string[]).map((url: string) => (
-                  <Pressable key={url} onPress={() => setCardViewerUri(url)}>
-                    <Image source={{ uri: url }} style={s.imageThumb} />
-                  </Pressable>
-                ))}
-              </View>
-            )}
-            {isRide && p.from?.name && p.to?.name && (
-              <Pressable style={s.mapLink} onPress={() => openMaps(routeUrl(placeParam(p.from?.geohash, p.from.name), placeParam(p.to?.geohash, p.to.name)))}>
-                <Text style={s.mapLinkText}>{'🗺 ' + t('View route in Google Maps')}</Text>
-              </Pressable>
-            )}
-            {isSvc && p.location?.geohash && (
-              <>
-                <View style={s.btnRow}>
-                  <Pressable
-                    style={s.mapLink}
-                    onPress={() => setMapOpenId(mapOpenId === item.id ? null : item.id)}
-                  >
-                    <Text style={s.mapLinkText}>{mapOpenId === item.id ? '▾ ' + t('Hide map') : '🗺 ' + t('Show area map')}</Text>
-                  </Pressable>
-                  <Pressable
-                    style={s.mapLink}
-                    onPress={() => openMaps(placeUrl(p.location?.name ?? '', p.location?.geohash))}
-                  >
-                    <Text style={s.mapLinkText}>{t("Open in Google Maps")}</Text>
-                  </Pressable>
-                </View>
-                {mapOpenId === item.id && (
-                  <ServiceAreaMap name={p.location?.name ?? ''} geohash={p.location.geohash} />
-                )}
-              </>
-            )}
-            <View style={[s.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
-              <Text style={[s.meta, { flex: 1 }]}>
-                {item.pubkey.slice(0, 10)}… · expires {new Date(item.content.expires_at * 1000).toLocaleTimeString()}
-              </Text>
-              {walletEnabled && onZap && !mine(item) && client?.profiles.get(item.pubkey)?.lud16 ? (
-                <Pressable style={s.mapLink} onPress={() => onZap(item)} hitSlop={6} accessibilityRole="button" accessibilityLabel={t('Zap')}>
-                  <Text style={s.mapLinkText}>
-                    {'⚡ ' + ((zapTotals.get(item.id) ?? 0) > 0 ? `${zapTotals.get(item.id)!.toLocaleString()}` : t('Zap'))}
-                  </Text>
-                </Pressable>
-              ) : null}
-            </View>
-
-            {/* Respond — open a negotiation with this poster. */}
-            {(() => {
-              const already = respondedIds.has(item.id) || client?.hasNegotiationFor(item) === true;
-              if (already) {
-                return <Text style={s.respondedText}>{'✓ ' + t('Responded — see Messages tab')}</Text>;
-              }
-              if (respondingId === item.id) {
-                return (
-                  <RespondEditor
-                    intent={item}
-                    onSend={async (terms, accepting) => {
-                      // Unchanged time + amount → one-tap accept that confirms
-                      // the deal outright (no offer round, no owner confirm).
-                      // Otherwise it's a counter-offer the owner still accepts.
-                      if (accepting) await client?.acceptIntent(item, terms, myContact(item));
-                      else await client?.respond(item, terms, myContact(item));
-                      setRespondedIds((prev) => new Set([...prev, item.id]));
-                      setRespondingId(null);
-                    }}
-                    onCancel={() => setRespondingId(null)}
-                  />
-                );
-              }
-              return (
-                <Pressable style={s.respondBtn} onPress={() => setRespondingId(item.id)}>
-                  <Text style={s.respondBtnText}>
-                    {mine(item) ? 'Respond (self-test)' : isRide ? t('Offer to take this ride') : t('Respond')}
-                  </Text>
-                </Pressable>
-              );
-            })()}
-          </View>
+          <PostCard
+            item={item}
+            prof={prof}
+            rep={client?.reputations.get(item.pubkey)}
+            isMine={mine(item)}
+            km={isRide && ref && p.from?.geohash ? distKm(p.from.geohash) : null}
+            country={country}
+            distanceUnit={distanceUnit}
+            zapTotal={zapTotals.get(item.id) ?? 0}
+            showZap={walletEnabled && !!onZap && !mine(item) && !!prof?.lud16}
+            mapOpen={mapOpenId === item.id}
+            responded={respondedIds.has(item.id) || client?.hasNegotiationFor(item) === true}
+            responding={respondingId === item.id}
+            onToggleMap={handleToggleMap}
+            onViewImage={handleViewImage}
+            onZap={handleZap}
+            onRespondStart={handleRespondStart}
+            onRespondCancel={handleRespondCancel}
+            onRespondSend={handleRespondSend}
+          />
         );
       }}
     />
@@ -619,7 +516,7 @@ export function MarketTab({
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
         >
-          {cardViewerUri ? <Image source={{ uri: cardViewerUri }} style={s.imgViewerImage} resizeMode="contain" /> : null}
+          {cardViewerUri ? <CachedImage uri={cardViewerUri} style={s.imgViewerImage} contentFit="contain" /> : null}
         </ScrollView>
         <Pressable style={s.imgViewerClose} onPress={() => setCardViewerUri(null)} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('Close image')}>
           <Ionicons name="close" size={26} color="#fff" />
@@ -760,6 +657,171 @@ function SortModal({
  * 5km-radius circle. The geohash is only ~±0.6km precise — the circle honestly
  * communicates "somewhere in this area" rather than a false exact pin.
  */
+type Prof = NonNullable<ReturnType<MobileClient['profiles']['get']>>;
+type Rep = NonNullable<ReturnType<MobileClient['reputations']['get']>>;
+
+/** One Browse feed card. Memoized so the frequent intent flushes and profile/
+ *  reputation callbacks only re-render rows whose own data changed — profiles
+ *  and reputations are stored as fresh objects on update, so identity compare
+ *  is enough. All callbacks must be referentially stable. */
+const PostCard = React.memo(function PostCard({
+  item, prof, rep, isMine, km, country, distanceUnit, zapTotal, showZap,
+  mapOpen, responded, responding,
+  onToggleMap, onViewImage, onZap, onRespondStart, onRespondCancel, onRespondSend,
+}: {
+  item: Intent;
+  prof: Prof | undefined;
+  rep: Rep | undefined;
+  isMine: boolean;
+  km: number | null;
+  country: string;
+  distanceUnit: ReturnType<typeof effectiveUnit>;
+  zapTotal: number;
+  showZap: boolean;
+  mapOpen: boolean;
+  responded: boolean;
+  responding: boolean;
+  onToggleMap: (id: string) => void;
+  onViewImage: (url: string) => void;
+  onZap: (i: Intent) => void;
+  onRespondStart: (id: string) => void;
+  onRespondCancel: () => void;
+  onRespondSend: (i: Intent, terms: ProposedTerms, accepting: boolean) => Promise<void>;
+}) {
+  const p = item.content.payload as Record<string, any>;
+  const isRide = item.content.schema.startsWith('rideshare');
+  const isSvc = item.content.schema.startsWith('service');
+  return (
+    <View style={s.card}>
+      <View style={s.row}>
+        <Text style={s.chip}>{isRide ? t('Rideshare') : isSvc ? t('Service/Product') : item.content.market}</Text>
+        <Text style={[s.chip, item.content.side === 'offer' ? s.chipGreen : s.chipBlue]}>
+          {t(item.content.side)}
+        </Text>
+        {isRide && p.category ? (
+          <View style={s.vehicleChip}>
+            <MaterialCommunityIcons name={(VEHICLE_ICONS[p.category] ?? 'car') as any} size={13} color={palette.chipText} style={{ marginEnd: 4 }} />
+            <Text style={s.vehicleChipText}>{t(p.category)}</Text>
+          </View>
+        ) : p.category ? <Text style={s.chip}>{t(p.category)}</Text> : null}
+        {/* Distance from the user's area (selected location, else GPS) to pickup. */}
+        {isRide && km != null ? (
+          <Text style={[s.chip, s.distChip]}>📍 {formatDistance(km, country, distanceUnit)}</Text>
+        ) : null}
+        {isSvc && p.subcategory ? <Text style={s.chip}>{t(p.subcategory)}</Text> : null}
+        {isMine && <Text style={[s.chip, s.chipYou]}>{t("you")}</Text>}
+      </View>
+      <View style={{ marginTop: 6 }}>
+        <View style={s.row}>
+          {prof?.picture
+            ? <CachedImage uri={prof.picture} style={s.authorAvatar} recyclingKey={item.pubkey} />
+            : <View style={[s.authorAvatar, s.avatarEmpty]} />}
+          <Text style={s.authorName}>{prof?.name || item.pubkey.slice(0, 10) + '…'}</Text>
+          {prof?.phone && isDisplayablePhone(prof.phone) ? (
+            (() => {
+              // Browse always shows a masked number — even when the poster
+              // publishes their full number to the network (so it feels less
+              // exposed). The full number is still readable at deal time.
+              const callable = extractPhone(prof.phone);
+              const shown = callable ? maskPhone(callable) : prof.phone;
+              return <Text style={s.authorPhone}>📱 {shown}</Text>;
+            })()
+          ) : null}
+          {rep?.newAccount && <Text style={s.newBadge}>{t("new account")}</Text>}
+        </View>
+        {(prof?.vehicleModel || prof?.plate) ? (
+          <Text style={s.authorVehicle}>🚗 {[prof.vehicleModel, prof.plate].filter(Boolean).join(' · ')}</Text>
+        ) : null}
+        {rep && rep.deals > 0 && (
+          <Text style={s.repLine}>
+            {rep.ratingCount > 0 ? `${rep.label} · ` : ''}
+            {t('{deals} deals · {partners} partners · {inNetwork} in your network', { deals: rep.deals, partners: rep.partners, inNetwork: rep.partnersInNetwork })}
+            {rep.verifiedBy > 0 ? ` · 📱 ${t('verified by {n}', { n: rep.verifiedBy })}` : ''}
+          </Text>
+        )}
+      </View>
+      <Text style={s.cardTitle}>{isRide ? myPostTitle(item) : item.content.title}</Text>
+      {isRide && p.note ? <Row label={t("Note")} value={p.note} /> : null}
+      {isSvc && (
+        <>
+          <Row label={t("Service")} value={p.service} />
+          <Row label={t("Location")} value={p.location?.name} />
+          {p.duration_minutes && <Row label={t("Duration")} value={`${p.duration_minutes} min`} />}
+          {p.notes && <Row label={t("Notes")} value={p.notes} />}
+        </>
+      )}
+      {p.payment ? <Text style={s.priceTag}>💵 {p.payment}</Text> : null}
+      {!isRide && item.content.window && (
+        <Row label={t("Time")} value={fmtWindow(item.content.window)} />
+      )}
+      {Array.isArray(p.images) && p.images.length > 0 && (
+        <View style={s.imageGrid}>
+          {(p.images as string[]).map((url: string) => (
+            <Pressable key={url} onPress={() => onViewImage(url)}>
+              <CachedImage uri={url} style={s.imageThumb} recyclingKey={url} />
+            </Pressable>
+          ))}
+        </View>
+      )}
+      {isRide && p.from?.name && p.to?.name && (
+        <Pressable style={s.mapLink} onPress={() => openMaps(routeUrl(placeParam(p.from?.geohash, p.from.name), placeParam(p.to?.geohash, p.to.name)))}>
+          <Text style={s.mapLinkText}>{'🗺 ' + t('View route in Google Maps')}</Text>
+        </Pressable>
+      )}
+      {isSvc && p.location?.geohash && (
+        <>
+          <View style={s.btnRow}>
+            <Pressable
+              style={s.mapLink}
+              onPress={() => onToggleMap(item.id)}
+            >
+              <Text style={s.mapLinkText}>{mapOpen ? '▾ ' + t('Hide map') : '🗺 ' + t('Show area map')}</Text>
+            </Pressable>
+            <Pressable
+              style={s.mapLink}
+              onPress={() => openMaps(placeUrl(p.location?.name ?? '', p.location?.geohash))}
+            >
+              <Text style={s.mapLinkText}>{t("Open in Google Maps")}</Text>
+            </Pressable>
+          </View>
+          {mapOpen && (
+            <ServiceAreaMap name={p.location?.name ?? ''} geohash={p.location.geohash} />
+          )}
+        </>
+      )}
+      <View style={[s.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
+        <Text style={[s.meta, { flex: 1 }]}>
+          {item.pubkey.slice(0, 10)}… · expires {new Date(item.content.expires_at * 1000).toLocaleTimeString()}
+        </Text>
+        {showZap ? (
+          <Pressable style={s.mapLink} onPress={() => onZap(item)} hitSlop={6} accessibilityRole="button" accessibilityLabel={t('Zap')}>
+            <Text style={s.mapLinkText}>
+              {'⚡ ' + (zapTotal > 0 ? `${zapTotal.toLocaleString()}` : t('Zap'))}
+            </Text>
+          </Pressable>
+        ) : null}
+      </View>
+
+      {/* Respond — open a negotiation with this poster. */}
+      {responded ? (
+        <Text style={s.respondedText}>{'✓ ' + t('Responded — see Messages tab')}</Text>
+      ) : responding ? (
+        <RespondEditor
+          intent={item}
+          onSend={(terms, accepting) => onRespondSend(item, terms, accepting)}
+          onCancel={onRespondCancel}
+        />
+      ) : (
+        <Pressable style={s.respondBtn} onPress={() => onRespondStart(item.id)}>
+          <Text style={s.respondBtnText}>
+            {isMine ? 'Respond (self-test)' : isRide ? t('Offer to take this ride') : t('Respond')}
+          </Text>
+        </Pressable>
+      )}
+    </View>
+  );
+});
+
 function ServiceAreaMap({ name, geohash }: { name: string; geohash: string }) {
   const center = geohashToCoords(geohash);
   if (!center) return null;

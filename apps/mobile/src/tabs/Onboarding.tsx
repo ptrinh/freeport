@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Linking,
   ActivityIndicator,
-  Alert,
   Animated,
   Easing,
   Image,
@@ -249,9 +248,9 @@ export function Onboarding({
     setBusy('cloud');
     try {
       const found = await onCloudRestore();
-      if (!found) Alert.alert(t('No cloud backup found.'));
+      if (!found) uiAlert(t('No cloud backup found.'));
     } catch (e: any) {
-      Alert.alert('Restore failed', e?.message ?? 'Invalid backup.');
+      uiAlert(t('Restore failed'), e?.message ?? t('Invalid backup.'));
     } finally {
       setBusy(null);
     }
@@ -263,7 +262,7 @@ export function Onboarding({
     if (!raw || raw === dialCode.current) { setPhoneError(null); return; }
     const r = normalizePhone(raw, dialCode.current);
     if (r.valid) { setPhone(r.formatted); setPhoneError(null); }
-    else setPhoneError(r.error ?? 'Invalid phone number');
+    else setPhoneError(r.error ?? t('Invalid phone number'));
   };
 
   // Phone is required AND must be a valid number (same rule as Settings).
@@ -295,7 +294,7 @@ export function Onboarding({
       onFinish();
     } catch (e: any) {
       prepRef.current = null;      // allow a retry on failure
-      Alert.alert(t('Could not create account'), e?.message ?? '');
+      uiAlert(t('Could not create account'), e?.message ?? '');
     } finally {
       setBusy(null);
     }
@@ -340,7 +339,7 @@ export function Onboarding({
               {!!passkeyErr && <Text style={[s.dim, { color: palette.danger, textAlign: 'center', marginTop: 6 }]}>{passkeyErr}</Text>}
             </>
           )}
-          <Text style={[s.dim, { textAlign: 'center', marginVertical: 16 }]}>— or —</Text>
+          <Text style={[s.dim, { textAlign: 'center', marginVertical: 16 }]}>{t('— or —')}</Text>
           {showCloud && (
             <Pressable style={[s.btnCounter, { marginBottom: 12 }, busy === 'cloud' && { opacity: 0.6 }]} onPress={cloudRestoreNow} disabled={busy !== null}>
               {busy === 'cloud' ? <ActivityIndicator color="white" /> : <Text style={s.btnText}>{t("Restore account from {name}", { name: cloudName() })}</Text>}

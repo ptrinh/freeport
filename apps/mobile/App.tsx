@@ -362,6 +362,9 @@ function AppInner() {
     if (intentsFlush.current) { clearTimeout(intentsFlush.current); intentsFlush.current = null; }
     setIntents([]);
   };
+  // Which (client, services) pair the market subscription was last built for —
+  // lets the resume path tell "config changed" from "same session, refresh".
+  const marketSubFor = useRef<{ client: MobileClient; services: boolean } | null>(null);
   const [negos, setNegos] = useState<Negotiation[]>([]);
   const [profile, setProfile] = useState<UserProfile>({ name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', externalLink: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' });
   const [servicesEnabled, setServicesEnabled] = useState(false);
@@ -748,6 +751,7 @@ function AppInner() {
       // (mirrors onIncomingMessage; the push server doesn't know about chat
       // DMs' content either way — envelopes are indistinguishable kind-4s).
       c.onIncomingChat = (conv, env) => {
+        if (conv.muted) return; // muted thread: no ding, no notification
         if (AppState.currentState === 'active') {
           if (Date.now() >= alertsMutedUntil.current) eventAlert();
           return;
@@ -873,7 +877,13 @@ function AppInner() {
   // area sharding can be switched back on at scale.
   useEffect(() => {
     if (!client) return;
-    resetIntents();
+    // Reset only when the client/config actually changed. A foreground resume
+    // (resumeTick) keeps the in-memory feed and resubscribes from the client's
+    // newest-seen watermark instead of re-downloading 24 h of intents (which
+    // also re-triggered profile + reputation fetches for every author).
+    const isResumeOnly = marketSubFor.current?.client === client && marketSubFor.current?.services === servicesEnabled;
+    if (!isResumeOnly) resetIntents();
+    marketSubFor.current = { client, services: servicesEnabled };
     const markets = servicesEnabled ? [DEMO_MARKET, SERVICE_MARKET] : [DEMO_MARKET];
     const unsub = client.watchMarket(markets);
     // Storefronts ride the services vertical — same market tag.
@@ -996,7 +1006,7 @@ function AppInner() {
   // renders regardless, so the badge must lead the user to it.
   const chatBadge = React.useMemo(() => tab === 'messages'
     ? 0
-    : conversations.reduce((n, c) => (blocked.has(c.peer) ? n : n + (experimentalChat ? convUnread(c) : 0) + (c.state === 'pending_in' ? 1 : 0)), 0),
+    : conversations.reduce((n, c) => (blocked.has(c.peer) ? n : n + (experimentalChat && !c.muted ? convUnread(c) : 0) + (c.state === 'pending_in' ? 1 : 0)), 0),
     [tab, conversations, blocked, experimentalChat]);
 
   const pendingCount = negos.filter(
@@ -1432,7 +1442,7 @@ function AppInner() {
           </Pressable>
         ) : null}
       </Animated.View>
-      {tab === 'browse' && <MarketTab intents={intents} client={client} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} walletEnabled={experimentalWallet} onZap={(i) => setZapTarget(i)} products={products} shopMarket={SERVICE_MARKET} shopCurrency={defaultCurrency} onChatSeller={(pubkey) => {
+      {tab === 'browse' && <MarketTab intents={intents} client={client} netStatus={netStatus} servicesEnabled={servicesEnabled} location={location} myContact={(i) => buildContact(i, true)} doneListingKeys={doneListingKeys} distanceUnitPref={distanceUnit} defaultCategory={browseCategory} defaultSubcategory={browseSubcategory} maxDistance={browseMaxDistance} onScroll={onContentScroll} walletEnabled={experimentalWallet} onZap={(i) => setZapTarget(i)} products={products} shopMarket={SERVICE_MARKET} shopCurrency={defaultCurrency} onChatSeller={(pubkey) => {
         // Conversational checkout: a chat request to the seller. Implies the
         // Chat experiment (same consent model as opening an invite link).
         client?.chatInvite(pubkey, profile.name || undefined).catch(() => {});

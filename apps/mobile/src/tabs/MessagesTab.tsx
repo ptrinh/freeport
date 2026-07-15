@@ -239,6 +239,7 @@ export function DealsTab({
         chatEnabled={chatEnabled}
         archivedView={view === 'completed'}
         filterKeyword={completedKw}
+        onToggleBlock={onToggleBlock}
       />
       <View style={[s.segRow, { marginHorizontal: 12, marginTop: 8 }]}>
         {(['active', 'completed'] as const).map((v) => {

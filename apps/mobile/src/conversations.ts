@@ -23,6 +23,9 @@ export interface Conversation {
   name?: string;
   /** Local-only: hidden from the main list. Cleared when a new message arrives. */
   archived?: boolean;
+  /** Local-only: no sound/notification/badge for inbound messages. Sticky —
+   *  unlike archived, new activity does NOT clear it. */
+  muted?: boolean;
   messages: ChatMessage[];
   updatedAt: number;
   /** Newest inbound ts the user has SEEN (conversation opened) — drives unread. */
