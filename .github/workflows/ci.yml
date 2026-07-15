@@ -25,6 +25,13 @@ jobs:
         run: npm ci --prefix apps/mobile
       - name: Build packages
         run: npm run build
+      # Backstop for swallowed-catch / `as any` regressions (both have caused
+      # real field bugs). --max-warnings is the count at introduction —
+      # ratchet it DOWN in package.json as warnings are fixed; never up.
+      - name: Lint
+        run: npm run lint
+      - name: Check Breez SDK versions stay aligned (web wasm vs native)
+        run: node scripts/check-breez-versions.mjs
       - name: Test (protocol, agent, freeport-self-hosted, mobile)
         run: npm test
       - name: Typecheck mobile app

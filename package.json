@@ -11,12 +11,16 @@
   "scripts": {
     "build": "npm run build -w @freeport/protocol -w @freeport/agent -w freeport-self-hosted",
     "test": "npm run test -w @freeport/protocol -w @freeport/agent -w freeport-self-hosted && npm run test --prefix apps/mobile",
+    "lint": "eslint . --max-warnings 318",
     "demo": "bash demo/run-demo.sh"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.1.9",
+    "eslint": "^10.7.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "tsx": "^4.19.0",
     "typescript": "^5.5.0",
+    "typescript-eslint": "^8.64.0",
     "vitest": "^2.1.0"
   }
 }

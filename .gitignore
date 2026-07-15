@@ -45,3 +45,6 @@ apps/desktop/src-tauri/binaries/
 packages/freeport-self-hosted/web-dist/
 packages/freeport-self-hosted/.web-export/
 apps/mobile/freeport-source.zip
+
+# Stale one-off expo export — never commit build output
+apps/mobile/dist-fresh/
