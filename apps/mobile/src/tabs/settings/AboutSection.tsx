@@ -10,10 +10,14 @@ const DONATION_BTC = 'bc1ps44wjx3wpu4s0xj746gz2lu45nspsm9059d3ym8xz0nrhu4psyasdg
 
 function AboutSection({
   onReplayTour,
+  flat = false,
 }: {
   onReplayTour: () => void;
+  /** Rendered inside its own subscreen — drop the accordion header, always expanded. */
+  flat?: boolean;
 }) {
   const [aboutOpen, setAboutOpen] = useState(false);
+  const open = flat || aboutOpen;
   const [donationCopied, setDonationCopied] = useState(false);
   // On a mobile-browser web session (not the installed PWA / native app),
   // suggest the native app — shown as a passive notice in About.
@@ -66,14 +70,16 @@ function AboutSection({
           by default like the other Settings sections. The OTA update flow lives
           here as a small "Check now" link (native gets a real OTA swap; web just
           hard-reloads to the newest deploy). */}
-      <Pressable style={s.collapseHeader} onPress={() => setAboutOpen((v) => !v)}>
-        <View style={s.collapseLeft}>
-          <Ionicons name="information-circle-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-          <Text style={s.collapseTitle}>{t("About")}</Text>
-        </View>
-        <Text style={s.collapseChevron}>{aboutOpen ? '▾' : '▸'}</Text>
-      </Pressable>
-      {aboutOpen && (
+      {!flat && (
+        <Pressable style={s.collapseHeader} onPress={() => setAboutOpen((v) => !v)}>
+          <View style={s.collapseLeft}>
+            <Ionicons name="information-circle-outline" size={20} color={palette.text2} style={s.collapseIcon} />
+            <Text style={s.collapseTitle}>{t("About")}</Text>
+          </View>
+          <Text style={s.collapseChevron}>{aboutOpen ? '▾' : '▸'}</Text>
+        </Pressable>
+      )}
+      {open && (
         <>
           <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
             <Text style={s.mono}>{versionLabel()}</Text>

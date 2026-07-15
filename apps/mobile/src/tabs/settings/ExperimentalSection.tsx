@@ -41,6 +41,7 @@ function ExperimentalSection({
   llmSupported = true,
   miniAppsEnabled,
   onMiniAppsEnabledChange,
+  flat = false,
 }: {
   walletEnabled: boolean;
   onWalletEnabledChange: (v: boolean) => void;
@@ -52,18 +53,23 @@ function ExperimentalSection({
   llmSupported?: boolean;
   miniAppsEnabled: boolean;
   onMiniAppsEnabledChange: (v: boolean) => void;
+  /** Rendered inside the Features subscreen — drop the accordion header, always expanded. */
+  flat?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [accOpen, setAccOpen] = useState(false);
+  const open = flat || accOpen;
 
   return (
     <>
-      <Pressable style={s.collapseHeader} onPress={() => setOpen((v) => !v)}>
-        <View style={s.collapseLeft}>
-          <MaterialCommunityIcons name="flask-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-          <Text style={s.collapseTitle}>{t('Features')}</Text>
-        </View>
-        <Text style={s.collapseChevron}>{open ? '▾' : '▸'}</Text>
-      </Pressable>
+      {!flat && (
+        <Pressable style={s.collapseHeader} onPress={() => setAccOpen((v) => !v)}>
+          <View style={s.collapseLeft}>
+            <MaterialCommunityIcons name="flask-outline" size={20} color={palette.text2} style={s.collapseIcon} />
+            <Text style={s.collapseTitle}>{t('Features')}</Text>
+          </View>
+          <Text style={s.collapseChevron}>{accOpen ? '▾' : '▸'}</Text>
+        </Pressable>
+      )}
       {open && (
         <>
           <Text style={s.dim}>{t('Early features that may change or break. Off by default.')}</Text>

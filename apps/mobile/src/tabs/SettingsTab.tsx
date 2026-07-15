@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
+  BackHandler,
   Image,
   Linking,
   Modal,
@@ -51,6 +52,37 @@ import { PaymentSecuritySection } from './settings/PaymentSecuritySection';
 import { ChatSection } from './settings/ChatSection';
 import { callsSupported } from '../calls/webrtc';
 import { conciergeModulePresent } from '../concierge/model';
+
+/** Which second-level screen is open (null = the top-level 6-row menu). */
+type SubScreen = 'profile' | 'marketplace' | 'features' | 'preferences' | 'about' | 'account';
+
+/** A top-level menu row: icon + title + forward chevron, opens a subscreen. */
+function NavRow({ icon, title, onPress }: { icon: React.ComponentProps<typeof Ionicons>['name']; title: string; onPress: () => void }) {
+  return (
+    <Pressable style={s.collapseHeader} onPress={onPress} accessibilityRole="button">
+      <View style={s.collapseLeft}>
+        <Ionicons name={icon} size={20} color={palette.text2} style={s.collapseIcon} />
+        <Text style={s.collapseTitle}>{title}</Text>
+      </View>
+      <Ionicons name={dirIcon('chevron-forward', 'chevron-back')} size={18} color={palette.text3} />
+    </Pressable>
+  );
+}
+
+/** Subscreen header: back chevron + section title; tapping returns to the menu. */
+function SubHeader({ title, onBack }: { title: string; onBack: () => void }) {
+  return (
+    <Pressable
+      style={[s.collapseHeader, { marginTop: 0, borderTopWidth: 0 }]}
+      onPress={onBack}
+      accessibilityRole="button"
+      accessibilityLabel={t('Back to Settings')}
+    >
+      <Ionicons name={dirIcon('chevron-back', 'chevron-forward')} size={26} color={palette.link} style={{ marginEnd: 6 }} />
+      <Text style={[s.collapseTitle, { flex: 1 }]}>{title}</Text>
+    </Pressable>
+  );
+}
 
 function SettingsTab({
   npub,
@@ -223,6 +255,10 @@ function SettingsTab({
     ? browseSubcategory
     : (browseCat === RIDESHARE_CATEGORY ? DEFAULT_RIDESHARE_SUBCATEGORY : (browseSubOptions[0] ?? ''));
   const browseUnit = effectiveUnit(distanceUnit, location.country);
+  // Fare Estimator is a ride-fare tool — only relevant when the user operates in
+  // ridesharing: either the app is rideshare-only (services off) or their Browse
+  // category is Ridesharing. A pure product/service user doesn't see it.
+  const showFareEstimator = !servicesEnabled || browseCat === RIDESHARE_CATEGORY;
   const dialCode = useRef('+84');
   const autoFilledDial = useRef('');
 
@@ -287,7 +323,10 @@ function SettingsTab({
     })();
     return () => { cancelled = true; };
   }, [cloudOn]);
-  const [identityOpen, setIdentityOpen] = useState(false);
+  // Two-level navigation: null shows the 6-row top-level menu; a value opens
+  // that subscreen. Only ONE new level exists — Marketplace keeps its children
+  // as accordion sections within its own subscreen.
+  const [subScreen, setSubScreen] = useState<SubScreen | null>(null);
   // The built-in wallet's funds derive from the key being wiped — probe the
   // balance when a sign-out/delete dialog opens so the confirmation can say
   // what's at stake. Best-effort: null = no funds / no wallet / unknown.
@@ -301,9 +340,7 @@ function SettingsTab({
       .then((b) => { if (b && b.sats > 0) setWipeBalance(b.sats); })
       .catch(() => { /* unknown balance — the generic warning still shows */ });
   };
-  const [profileOpen, setProfileOpen] = useState(true);
   const [locationOpen, setLocationOpen] = useState(false);
-  const [featuresOpen, setFeaturesOpen] = useState(false);
   const [browsePrefsOpen, setBrowsePrefsOpen] = useState(false);
   const [groupsOpen, setGroupsOpen] = useState(false);
   // Vehicle Detail: expanded for a pure rideshare Driver (who needs it to take
@@ -327,10 +364,12 @@ function SettingsTab({
   }, [vehicleGlow, vehGlow]);
   const switchRole = (r: 'passenger' | 'driver') => {
     if (r === 'driver' && !vehicleModel.trim()) {
+      // Vehicle Detail now lives in the Profile subscreen (the role picker is in
+      // Preferences), so jump there, expand + pulse it, and scroll it into view.
+      setSubScreen('profile');
       setVehicleOpen(true);
       setVehicleGlow(true);
-      // Scroll the (now-expanded) Vehicle panel into view once it's laid out.
-      setTimeout(() => settingsScroll.current?.scrollTo({ y: Math.max(0, vehicleY.current - 16), animated: true }), 420);
+      setTimeout(() => settingsScroll.current?.scrollTo({ y: Math.max(0, vehicleY.current - 16), animated: true }), 450);
     }
     onRoleChange(r);
   };
@@ -383,16 +422,30 @@ function SettingsTab({
     onRequiredRefresh?.(g ? { notif: true } : undefined);
   };
   const fillVehicle = () => {
+    setSubScreen('profile');
     setVehicleOpen(true);
     setVehicleGlow(true);
-    setTimeout(() => settingsScroll.current?.scrollTo({ y: Math.max(0, vehicleY.current - 16), animated: true }), 200);
+    setTimeout(() => settingsScroll.current?.scrollTo({ y: Math.max(0, vehicleY.current - 16), animated: true }), 350);
   };
-  // App-wide backup banner tapped: expand Account & Backup + scroll it into view.
+  // App-wide backup banner tapped (openBackupSignal bumped): open the
+  // Account & Backup subscreen — its content renders fully expanded there.
   React.useEffect(() => {
     if (!openBackupSignal) return;
-    setIdentityOpen(true);
-    setTimeout(() => settingsScroll.current?.scrollToEnd({ animated: true }), 200);
+    setSubScreen('account');
   }, [openBackupSignal]);
+  // Entering a subscreen (or returning to the menu) starts scrolled to the top.
+  React.useEffect(() => {
+    settingsScroll.current?.scrollTo({ y: 0, animated: false });
+  }, [subScreen]);
+  // Android hardware back closes the open subscreen first (no nav library here).
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (subScreen !== null) { setSubScreen(null); return true; }
+      return false;
+    });
+    return () => sub.remove();
+  }, [subScreen]);
   // Key loss is permanent (identity + karma). The backup UI lives inside the
   // collapsed "Account & Backup" section, so an un-backed-up key gets a spot
   // in the Required-actions box — the one place users actually look.
@@ -540,25 +593,27 @@ function SettingsTab({
           {backupMissing && (
             <Pressable
               style={s.requiredBtn}
-              onPress={() => {
-                setIdentityOpen(true);
-                setTimeout(() => settingsScroll.current?.scrollToEnd({ animated: true }), 120);
-              }}
+              onPress={() => setSubScreen('account')}
             >
               <Text style={s.requiredBtnText}>{t("Back up your account — without it, losing this device loses your identity")}</Text>
             </Pressable>
           )}
         </View>
       )}
-      <Pressable style={s.collapseHeader} onPress={() => setProfileOpen((v) => !v)}>
-        <View style={s.collapseLeft}>
-          <Ionicons name="person-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-          <Text style={s.collapseTitle}>{t("Profile")}</Text>
-        </View>
-        <Text style={s.collapseChevron}>{profileOpen ? '▾' : '▸'}</Text>
-      </Pressable>
-      {profileOpen && (
+      {subScreen === null && (
       <>
+        <NavRow icon="person-outline" title={t('Profile')} onPress={() => setSubScreen('profile')} />
+        <NavRow icon="storefront-outline" title={t('Marketplace')} onPress={() => setSubScreen('marketplace')} />
+        <NavRow icon="flask-outline" title={t('Features')} onPress={() => setSubScreen('features')} />
+        <NavRow icon="options-outline" title={t('Preferences')} onPress={() => setSubScreen('preferences')} />
+        <NavRow icon="information-circle-outline" title={t('About')} onPress={() => setSubScreen('about')} />
+        <NavRow icon="key-outline" title={t('Account & Backup')} onPress={() => setSubScreen('account')} />
+      </>
+      )}
+
+      {subScreen === 'profile' && (
+      <>
+      <SubHeader title={t('Profile')} onBack={() => setSubScreen(null)} />
       {/* Avatar */}
       <View style={s.avatarRow}>
         <Pressable onPress={pickAvatar} disabled={uploading}>
@@ -704,7 +759,9 @@ function SettingsTab({
       </>
       )}
 
-      <Text style={s.groupHeader}>{t('Marketplace')}</Text>
+      {subScreen === 'marketplace' && (
+      <>
+      <SubHeader title={t('Marketplace')} onBack={() => setSubScreen(null)} />
       {/* Location — drives default payment currency; device-only, not published */}
       <Pressable style={s.collapseHeader} onPress={() => setLocationOpen((v) => !v)}>
         <View style={s.collapseLeft}>
@@ -903,20 +960,23 @@ function SettingsTab({
         />
       )}
 
-      {/* Fare Estimator — user-tunable coefficients for the ride-fare estimate */}
-      <FareEstimator
-        fareConfig={fareConfig}
-        fareDefaults={fareDefaults}
-        fareCurrency={fareCurrency}
-        onFareConfigChange={onFareConfigChange}
-      />
+      {/* Fare Estimator — ride-fare coefficients; only for rideshare-relevant roles */}
+      {showFareEstimator && (
+        <FareEstimator
+          fareConfig={fareConfig}
+          fareDefaults={fareDefaults}
+          fareCurrency={fareCurrency}
+          onFareConfigChange={onFareConfigChange}
+        />
+      )}
+      </>
+      )}
 
-      {/* About — version, low-key update check, credits & feedback. Collapsed
-          by default like the other Settings sections. The OTA update flow lives
-          here as a small "Check now" link (native gets a real OTA swap; web just
-          hard-reloads to the newest deploy). */}
-      <Text style={s.groupHeader}>{t('Features')}</Text>
+      {subScreen === 'features' && (
+      <>
+      <SubHeader title={t('Features')} onBack={() => setSubScreen(null)} />
       <ExperimentalSection
+        flat
         walletEnabled={experimentalWallet}
         onWalletEnabledChange={onExperimentalWalletChange}
         servicesEnabled={servicesEnabled}
@@ -952,17 +1012,12 @@ function SettingsTab({
         />
       )}
 
-      <Text style={s.groupHeader}>{t('App')}</Text>
-      {/* Features */}
-      <Pressable style={s.collapseHeader} onPress={() => setFeaturesOpen((v) => !v)}>
-        <View style={s.collapseLeft}>
-          <Ionicons name="options-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-          <Text style={s.collapseTitle}>{t("Preferences")}</Text>
-        </View>
-        <Text style={s.collapseChevron}>{featuresOpen ? '▾' : '▸'}</Text>
-      </Pressable>
-      {featuresOpen && (
+      </>
+      )}
+
+      {subScreen === 'preferences' && (
       <>
+      <SubHeader title={t('Preferences')} onBack={() => setSubScreen(null)} />
       <Text style={[s.toggleTitle, { marginTop: 14 }]}>{t("Appearance")}</Text>
       <Text style={s.dim}>{t("Follow the system setting, or force a theme.")}</Text>
       <View style={[s.segRow, { marginTop: 8 }]}>
@@ -1050,19 +1105,17 @@ function SettingsTab({
       {isTauri() && <DesktopHostPanel />}
       </>
       )}
-      <AboutSection onReplayTour={onReplayTour} />
 
-      <Text style={s.groupHeader}>{t('Account')}</Text>
-      {/* Identity — collapsed by default; tap header to expand */}
-      <Pressable style={s.collapseHeader} onPress={() => setIdentityOpen((v) => !v)}>
-        <View style={s.collapseLeft}>
-          <Ionicons name="key-outline" size={20} color={palette.text2} style={s.collapseIcon} />
-          <Text style={s.collapseTitle}>{t("Account & Backup")}</Text>
-        </View>
-        <Text style={s.collapseChevron}>{identityOpen ? '▾' : '▸'}</Text>
-      </Pressable>
-      {identityOpen && (
+      {subScreen === 'about' && (
+      <>
+      <SubHeader title={t('About')} onBack={() => setSubScreen(null)} />
+      <AboutSection onReplayTour={onReplayTour} flat />
+      </>
+      )}
+
+      {subScreen === 'account' && (
         <>
+        <SubHeader title={t('Account & Backup')} onBack={() => setSubScreen(null)} />
           <Text selectable style={s.mono}>Nostr Key: {shortNpub(npub)}</Text>
           {cloudOn && cloudBackedUp && (
             <Text style={[s.dim, { color: palette.success, marginTop: 2 }]}>✓ {t('Account is synced to {name}.', { name: cloudName() })}</Text>
