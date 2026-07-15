@@ -1178,6 +1178,16 @@ function AppInner() {
           notify('Freeport', t('Missed call'), { tab: 'messages' });
         }
       },
+      onIncomingCall: (peer, video) => {
+        // Foreground: the ringing overlay + tone already handle it. Backgrounded:
+        // fire a high-priority local notification so the user can tap in and
+        // answer before the ring times out. Fired even when server push is on —
+        // the content-blind server can only say "New message"; this one knows
+        // it's a call and who's calling. (Killed-app ringing needs CallKit/VoIP.)
+        if (AppState.currentState === 'active') return;
+        const name = client.profiles.get(peer)?.name?.trim() || npubFromHex(peer).slice(0, 12) + '…';
+        notify(t('Incoming call'), (video ? '📹 ' : '📞 ') + t('{name} is calling — tap to answer', { name }), { tab: 'messages' });
+      },
     });
     callManagerRef.current = mgr;
     client.onCallSignal = (from, env) => {

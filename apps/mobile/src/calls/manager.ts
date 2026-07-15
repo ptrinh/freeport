@@ -80,6 +80,9 @@ export interface CallManagerDeps {
   onStreams: (local: any | null, remote: any | null) => void;
   /** A ring that nobody answered (either direction) — drives the chat notice. */
   onMissed?: (peer: string, direction: 'incoming' | 'outgoing', video?: boolean) => void;
+  /** An accepted incoming ring just started (phase → incoming) — lets the app
+   *  post a local "incoming call" notification when it's backgrounded. */
+  onIncomingCall?: (peer: string, video: boolean) => void;
   ringTimeoutMs?: number;
   gatherTimeoutMs?: number;
   /** Test seam. */
@@ -204,6 +207,7 @@ export class CallManager {
       }
       this.pendingOfferSdp = env.sdp!;
       this.setState({ phase: 'incoming', peer: from, callId: env.call, video: !!env.video });
+      this.deps.onIncomingCall?.(from, !!env.video);
       this.ringTimer = setTimeout(() => {
         if (this.state.phase === 'incoming' && this.state.callId === env.call) {
           this.deps.onMissed?.(from, 'incoming', !!env.video);

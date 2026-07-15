@@ -4,7 +4,7 @@
  * volume while the call rings. Played via audioShim (expo-audio when the
  * binary has it, expo-av otherwise — voice memos use the same shim).
  */
-import { createSound, type ShimSound } from '../audioShim';
+import { createSound, setRingMode, type ShimSound } from '../audioShim';
 
 let sound: ShimSound | null = null;
 let starting = false;
@@ -13,6 +13,9 @@ export async function startRinging(): Promise<void> {
   if (sound || starting) return;
   starting = true;
   try {
+    // Route to a ring-through-silent session first, else the ring is muted on a
+    // silent phone or after a UI sound left playsInSilentMode:false.
+    await setRingMode().catch(() => {});
     sound = await createSound(
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       require('../../assets/ringtone.wav'),

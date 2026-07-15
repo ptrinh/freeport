@@ -200,6 +200,29 @@ export async function setSfxMode(): Promise<void> {
   }
 }
 
+/** Incoming-call ring session: audible even when the phone is on silent
+ *  (a call ringer should ring through the mute switch, like a phone). Without
+ *  this the ring inherits whatever category the last sound left — and the UI
+ *  SFX mode sets playsInSilentMode:false, which silences the ring on a muted
+ *  device. Mixes with other audio rather than interrupting it. */
+export async function setRingMode(): Promise<void> {
+  const mod = await loadExpoAudio();
+  if (mod) {
+    await mod.setAudioModeAsync({
+      playsInSilentMode: true,
+      interruptionMode: 'mixWithOthers',
+      interruptionModeAndroid: 'duckOthers',
+    });
+  } else {
+    await Av.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
+      interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+      shouldDuckAndroid: true,
+    });
+  }
+}
+
 /** Start a HIGH_QUALITY (.m4a on both platforms) voice recording. */
 export async function startRecorder(): Promise<ShimRecorder> {
   const mod = await loadExpoAudio();
