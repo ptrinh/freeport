@@ -13,7 +13,7 @@
  */
 import React, { useMemo, useRef, useState, useCallback } from 'react';
 import { Linking, Modal, Platform, Pressable, Text, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import type { WebView as WebViewType } from 'react-native-webview';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,6 +32,33 @@ import type { WalletProvider } from '../wallet';
 
 function sameOrigin(url: string, origin: string): boolean {
   try { return new URL(url).origin === origin; } catch { return false; }
+}
+
+// react-native-webview's native view (RNCWebView) ships in the binary from the
+// mini-apps release (1.6.0) on. On an OLDER binary the JS require is still safe,
+// but rendering the view throws — so we require lazily (keeping the OTA bundle
+// loadable on pre-1.6.0 runtimes) and wrap the render in an error boundary that
+// degrades to an "update needed" notice instead of crashing. Probing the native
+// registry directly is unreliable under the new architecture, so we let the
+// render fail and catch it — correct on both old and new arch.
+let WebView: typeof WebViewType | null = null;
+try { WebView = require('react-native-webview').WebView; } catch { WebView = null; }
+
+class WebViewBoundary extends React.Component<{ fallback: React.ReactNode; children: React.ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { /* native component missing on an old binary — show fallback */ }
+  render() { return this.state.failed ? this.props.fallback : this.props.children; }
+}
+
+function MiniAppUnavailable() {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 }}>
+      <Ionicons name="cloud-download-outline" size={40} color={palette.text3} />
+      <Text style={[s.toggleTitle, { textAlign: 'center' }]}>{t('Mini-apps need a newer version of the app')}</Text>
+      <Text style={[s.dim, { textAlign: 'center' }]}>{t('Update Freeport from your app store to open mini-apps.')}</Text>
+    </View>
+  );
 }
 
 /** Fresh per-shell secret tying bridge RPC to the main frame (see shim.ts). */
@@ -59,7 +86,7 @@ export function MiniAppShell({
   context?: BridgeContext | null;
   onClose: () => void;
 }) {
-  const webRef = useRef<WebView>(null);
+  const webRef = useRef<WebViewType>(null);
   const [approval, setApproval] = useState<{ req: ApprovalRequest; resolve: (r: ApprovalResult) => void } | null>(null);
   // Approval dialogs show ONE at a time; concurrent asks queue behind each
   // other (the firewall's ask-flood cap bounds the queue at 3). Without this,
@@ -120,6 +147,8 @@ export function MiniAppShell({
           </Pressable>
         </View>
         {verified ? null : <NotMiniAppNotice alive={alive} />}
+        {WebView ? (
+        <WebViewBoundary fallback={<MiniAppUnavailable />}>
         <WebView
           ref={webRef}
           source={{ uri: app.url || app.origin }}
@@ -146,6 +175,8 @@ export function MiniAppShell({
             return false;
           }}
         />
+        </WebViewBoundary>
+        ) : <MiniAppUnavailable />}
       </View>
       {approval ? (
         <ApprovalDialog
