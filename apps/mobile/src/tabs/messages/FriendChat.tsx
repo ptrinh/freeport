@@ -11,6 +11,7 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Share, Text, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { t, tn } from '../../i18n';
@@ -296,6 +297,10 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
   /** On-device auto-translate target for inbound messages. */
   translateTo?: string;
 }) {
+  // Full-screen <Modal> renders outside the app's SafeAreaProvider padding, so
+  // apply the top inset here or the header sits under the notch/status bar and
+  // becomes untappable on iOS (user report).
+  const insets = useSafeAreaInsets();
   // Opening the thread reads it — advances the local mark and (receipts on)
   // tells the peer. Re-run as new messages arrive while the thread is open.
   useEffect(() => {
@@ -373,7 +378,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
           modals portal outside #freeport-shell, so without this the content
           shrink-wrapped narrow and lost the side backdrop (user report). */}
       <View nativeID="freeport-shell-modal" style={s.appShell}>
-        <View style={s.root}>
+        <View style={[s.root, { paddingTop: insets.top }]}>
         {/* Compact header: name + tight presence line, ONLY call/video icons
             inline, everything else behind the burger menu (user request). */}
         <View style={[s.row, { paddingHorizontal: 12, paddingVertical: 7, gap: 8, borderBottomWidth: 1, borderBottomColor: palette.border, alignItems: 'center' }]}>

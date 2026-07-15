@@ -31,6 +31,16 @@ export type IntentSink = (ev: Event, geohash?: string) => void;
 interface PushBody { body: string; tag: string; data: Record<string, unknown> }
 
 const KIND_DM = 4;
+// Friend chat upgrades to NIP-17 gift wrap (kind 1059) between updated clients,
+// so a kind-4-only watch never sees those messages and no push fires. Gift wraps
+// are addressed to the recipient via a `p` tag (content stays encrypted — same
+// privacy as the kind-4 watch), so we can detect existence and push "New message".
+const KIND_GIFT_WRAP = 1059;
+// NIP-59 randomizes a gift wrap's created_at up to 2 days into the past to defeat
+// time-correlation, so a tight `since` would drop them — subscribe with a 2-day
+// window (matches the client). Replays on re-subscribe are absorbed by the
+// per-event dedupe + DM coalesce, so this doesn't spam.
+const WRAP_BACKFILL_SEC = 2 * 24 * 3600;
 // Freeport sends negotiation CONTROL messages (offers, accepts, counters, stage
 // updates, contact exchange, the auto-shared trip link) as kind-4 DMs too, not
 // just human chat. The notifier is content-blind (NIP-04), so it can't tell them
@@ -43,6 +53,7 @@ export class Watcher {
   private readonly expo = new Expo();
   private intentSub: { close: () => void } | null = null;
   private dmSub: { close: () => void } | null = null;
+  private wrapSub: { close: () => void } | null = null;
   private intentKinds: number[] = [];
   private pubkeys: string[] = [];
   /**
@@ -95,15 +106,24 @@ export class Watcher {
       this.pubkeys = nextPubkeys;
       this.dmSub?.close();
       this.dmSub = null;
+      this.wrapSub?.close();
+      this.wrapSub = null;
       if (this.pubkeys.length) {
         this.dmSub = this.pool.subscribeMany(
           this.relays,
           { kinds: [KIND_DM], '#p': this.pubkeys, since: Math.floor(Date.now() / 1000) - 60 } as any, // 60s overlap: a re-subscribe must not drop events published in the gap (dedupe absorbs the replays)
           { onevent: (ev: Event) => this.onDM(ev) },
         );
+        // Separate sub for NIP-17 gift wraps: wide `since` (they're backdated),
+        // routed through the same content-blind "New message" path as kind-4.
+        this.wrapSub = this.pool.subscribeMany(
+          this.relays,
+          { kinds: [KIND_GIFT_WRAP], '#p': this.pubkeys, since: Math.floor(Date.now() / 1000) - WRAP_BACKFILL_SEC } as any,
+          { onevent: (ev: Event) => this.onDM(ev) },
+        );
       }
     }
-    console.error(`[notify] watching intents [${this.intentKinds}] + DMs for ${this.pubkeys.length} pubkeys`);
+    console.error(`[notify] watching intents [${this.intentKinds}] + DMs/wraps for ${this.pubkeys.length} pubkeys`);
   }
 
   private async onIntent(ev: Event): Promise<void> {
@@ -212,6 +232,7 @@ export class Watcher {
   close(): void {
     this.intentSub?.close();
     this.dmSub?.close();
+    this.wrapSub?.close();
     this.pool.close(this.relays);
   }
 }
