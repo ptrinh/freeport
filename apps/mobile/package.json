@@ -16,7 +16,7 @@
     "@aptabase/react-native": "^0.5.0",
     "@aptabase/web": "^0.5.0",
     "@breeztech/breez-sdk-spark": "^0.19.0",
-    "@breeztech/breez-sdk-spark-react-native": "^0.18.0",
+    "@breeztech/breez-sdk-spark-react-native": "^0.19.0",
     "@config-plugins/react-native-webrtc": "^13.0.0",
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.3",
