@@ -57,6 +57,30 @@ Native EAS builds exist (App Store + Play), so what remains:
 server; without one, updates are **local only** (while the app is
 running/backgrounded). Acceptable v1. Web never gets this (no browser API).
 
+## Community broadcast channel (admin → members, 1-to-many)
+
+**Context:** the Communities feature (group invite links, shared market, trust
+seeding) shipped. The natural next step for member communication is a
+**one-to-many broadcast/announce channel**, NOT full many-to-many group chat.
+Full group chat fights the architecture: NIP-29 relay-managed groups
+reintroduce a managed relay (= an operator, against the "dumb relays, no
+operator" thesis), and fan-out gift wraps cost N encryptions per message with
+no membership-consistency or ordering guarantee — and would multiply the
+kind-1059 volume the notify server now watches. Group chat stays deferred
+(MLS/NIP-104 still immature); revisit only if real usage demands back-and-forth.
+
+**Sketch (operator-free, low complexity):**
+- Admin publishes to an **addressable kind** keyed on the group id (reuse the
+  admin-signed group descriptor from `packages/protocol/src/group.ts`); members
+  who joined via the invite subscribe to it (they already hold the descriptor).
+- One-way: only the group admin(s) post; members read. No fan-out — a single
+  event per announcement, encrypted to the group if the market is private or
+  left public for open markets.
+- Notifications reuse the existing content-blind push path (a new watched kind),
+  same as the kind-4/1059 friend-chat fix.
+- Membership/leave handling is soft (unsubscribe locally); no key rotation
+  needed because it's broadcast, not a shared secret conversation.
+
 ## Advanced marketplace features (multi-stop, delivery batching, ride pooling)
 
 No central dispatcher in Freeport, so each of these is re-expressed as
