@@ -16,7 +16,7 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSFaceIDUsageDescription": "Face ID confirms it's you before a payment is sent."
       },
-      "buildNumber": "24",
+      "buildNumber": "25",
       "associatedDomains": [
         "webcredentials:freeport.network",
         "applinks:freeport.network"
@@ -67,7 +67,7 @@
           "apiKey": "AIzaSyB70aRYEMJlBtl3LgvnBpGe6dkKuJhwJY4"
         }
       },
-      "versionCode": 26
+      "versionCode": 29
     },
     "web": {
       "bundler": "metro",
