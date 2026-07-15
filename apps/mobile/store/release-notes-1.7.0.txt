@@ -1,0 +1,17 @@
+=== en-US (What's new) ===
+• Sending to Lightning addresses now works, with clearer payment errors
+• Optional Face ID / fingerprint check before payments
+• Swipe chats to archive, mute or delete; clear a chat; send zip files
+• Reliable notifications for messages and calls, with a proper ringtone
+• Communities: bring your whole group in with one invite link
+• Add a verification link to your profile, shown next to your name
+• Cleaner Settings, faster feed, and fixes throughout
+
+=== vi-VN (Có gì mới) ===
+• Gửi tới địa chỉ Lightning đã hoạt động, kèm báo lỗi rõ ràng hơn
+• Tùy chọn xác thực Face ID / vân tay trước khi thanh toán
+• Vuốt để lưu trữ, tắt thông báo hoặc xóa cuộc trò chuyện; xóa nội dung; gửi file nén
+• Thông báo tin nhắn & cuộc gọi ổn định, có nhạc chuông
+• Communities: mời cả nhóm vào chỉ với một liên kết
+• Thêm liên kết xác minh vào hồ sơ, hiển thị cạnh tên bạn
+• Settings gọn hơn, feed nhanh hơn, nhiều sửa lỗi

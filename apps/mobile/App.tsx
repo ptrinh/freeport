@@ -608,9 +608,12 @@ function AppInner() {
   // match the launch splash + native app, instead of following a light OS —
   // otherwise it looks like the theme "flips" dark→light on reopen. In-browser
   // still follows the OS. An explicit dark/light choice always wins.
+  const mm = typeof window !== 'undefined'
+    ? (window as { matchMedia?: (q: string) => { matches: boolean } }).matchMedia
+    : undefined;
   const isStandalonePWA = Platform.OS === 'web' && typeof window !== 'undefined' &&
-    (((window as any).matchMedia && (window as any).matchMedia('(display-mode: standalone)').matches) ||
-      (typeof navigator !== 'undefined' && (navigator as any).standalone === true));
+    ((mm && mm('(display-mode: standalone)').matches) ||
+      (typeof navigator !== 'undefined' && (navigator as { standalone?: boolean }).standalone === true));
   const effectiveTheme: 'dark' | 'light' =
     theme === 'system'
       ? (isStandalonePWA ? 'dark' : (systemScheme === 'light' ? 'light' : 'dark'))
