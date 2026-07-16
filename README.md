@@ -34,19 +34,14 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 - **Nobody profits — including me.** No operator, no cut. A protocol, not a
   platform. Run it or fork it.
 - **No one will protect you here — that's the point, and the price.** No
-  support line, no refunds, no central authority. Your own judgment is the
-  first line of defense — but you're not entirely on your own. The protocol
-  gives you tools to lower the risk, all opt-in and none run by an operator:
-  a robust [reputation system](#what-works-today) (peer karma, co-signed deal
-  receipts, web-of-trust weighting); decentralized escrow **arbitration**
-  ([`examples/arbitrator`](examples/arbitrator)) where a mutually chosen
-  arbitrator resolves disputes and earns only when one is raised;
-  decentralized **ID verification**
-  ([`examples/id-verification`](examples/id-verification)) to prove who you're
-  dealing with; and **insurance**
+  support line, no refunds, no central authority. Your judgment comes first,
+  backed by opt-in safeguards no operator runs: a
+  [reputation system](#what-works-today) (karma, co-signed receipts,
+  web-of-trust), escrow **arbitration**
+  ([`examples/arbitrator`](examples/arbitrator)), **ID verification**
+  ([`examples/id-verification`](examples/id-verification)), and **insurance**
   ([`examples/insurance-store`](examples/insurance-store)) priced from
-  on-chain reputation. Reputation and these safeguards are the safety net —
-  you choose how much of it to use.
+  reputation. You choose how much of the safety net to use.
 
 ## What works today
 
