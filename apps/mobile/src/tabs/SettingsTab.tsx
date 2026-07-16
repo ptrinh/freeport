@@ -321,6 +321,11 @@ function SettingsTab({
   // Whether this device's key is already in the cloud — used to hide the
   // "back it up" reminder once it is. Checked on mount; set after a manual save.
   const [cloudBackedUp, setCloudBackedUp] = useState(false);
+  // Whether the async cloud-backup check above has finished. Until it has, we
+  // don't yet know if the key is backed up — so the Required-actions box must
+  // NOT assume "missing" and flash the reminder for a frame on every Settings
+  // open for users who ARE backed up.
+  const [cloudChecked, setCloudChecked] = useState(false);
   React.useEffect(() => {
     if (!cloudOn) return;
     let cancelled = false;
@@ -333,7 +338,8 @@ function SettingsTab({
         if (!cancelled) setCloudBackedUp(ok);
         // Persist the signal for the app-wide backup reminder banner.
         if (ok) { savePrefs({ backupDone: true }).catch(() => {}); onBackupDone?.(); }
-      } catch { /* leave false */ }
+      } catch { /* leave false — treat as not-backed-up once checked */ }
+      finally { if (!cancelled) setCloudChecked(true); }
     })();
     return () => { cancelled = true; };
   }, [cloudOn]);
@@ -492,7 +498,7 @@ function SettingsTab({
   // Key loss is permanent (identity + karma). The backup UI lives inside the
   // collapsed "Account & Backup" section, so an un-backed-up key gets a spot
   // in the Required-actions box — the one place users actually look.
-  const backupMissing = cloudOn && !cloudBackedUp;
+  const backupMissing = cloudOn && cloudChecked && !cloudBackedUp;
   const hasRequiredActions = !requiredLocOk || !requiredNotifOk || vehicleMissing || backupMissing;
   const [signOutOpen, setSignOutOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
