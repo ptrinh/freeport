@@ -988,5 +988,9 @@ const c: Record<string, string> = {
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "Slå Apple Intelligence til i appen Indstillinger på iOS for at bruge dette.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "AI-modellen på enheden downloades stadig – dette slås til, når den er færdig.",
   "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "Denne enhed understøtter ikke AI på selve enheden (Apple Intelligence kræver en iPhone 15 Pro eller nyere med iOS 26+).",
+  "Scan a friend’s QR": "Scan en vens QR",
+  "Have a friend’s QR instead?": "Har du en vens QR i stedet?",
+  "That QR isn't a Freeport invite.": "Den QR-kode er ikke en Freeport-invitation.",
+  "That's your own invite QR.": "Det er din egen invitations-QR.",
 };
 export default c;

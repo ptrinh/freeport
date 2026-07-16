@@ -985,5 +985,9 @@ const c: Record<string, string> = {
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "ເປີດ Apple Intelligence ໃນແອັບ Settings ຂອງ iOS ເພື່ອໃຊ້ຄຸນສົມບັດນີ້.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "ໂມເດວ AI ໃນເຄື່ອງກຳລັງດາວໂຫລດຢູ່ — ຈະເປີດໃຊ້ໄດ້ເມື່ອດາວໂຫລດແລ້ວ.",
   "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "ອຸປະກອນນີ້ບໍ່ຮອງຮັບ AI ໃນເຄື່ອງ (Apple Intelligence ຕ້ອງໃຊ້ iPhone 15 Pro ຫຼືໃໝ່ກວ່າ, ເທິງ iOS 26 ຂຶ້ນໄປ).",
+  "Scan a friend’s QR": "ສະແກນ QR ຂອງໝູ່",
+  "Have a friend’s QR instead?": "ມີ QR ຂອງໝູ່ບໍ່?",
+  "That QR isn't a Freeport invite.": "QR ນັ້ນບໍ່ແມ່ນຄຳເຊີນ Freeport.",
+  "That's your own invite QR.": "ນັ້ນແມ່ນ QR ຄຳເຊີນຂອງທ່ານເອງ.",
 };
 export default c;

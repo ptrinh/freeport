@@ -73,6 +73,7 @@ export function DealsTab({
   onPayFriend,
   chatTranslateTo,
   onAcceptChatInvite,
+  onScanInvite,
   escrows = [],
   onPayEscrowInvoice,
 }: {
@@ -123,6 +124,8 @@ export function DealsTab({
   chatTranslateTo?: string;
   /** Accepting an invite (also enables the Chat experiment when off). */
   onAcceptChatInvite?: (peer: string) => void;
+  /** A friend's invite code scanned from their QR — resolved like an opened link. */
+  onScanInvite?: (code: string) => void;
   /** HODL escrows (one per deal). */
   escrows?: EscrowState[];
   /** Pay a hold invoice via the wallet Send flow. */
@@ -335,7 +338,7 @@ export function DealsTab({
     <View style={{ flex: 1 }}>
     {/* Friend chat overlays (experimental) */}
     {showInvite && (
-      <InviteSheet client={client} myName={profile.name || undefined} onClose={() => setShowInvite(false)} />
+      <InviteSheet client={client} myName={profile.name || undefined} onClose={() => setShowInvite(false)} onScanCode={onScanInvite} />
     )}
     {openConv && (
       <FriendChatModal

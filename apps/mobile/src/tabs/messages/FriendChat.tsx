@@ -16,7 +16,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { t, tn } from '../../i18n';
 import { MobileClient } from '../../client';
-import { type Conversation, unreadCount, tickFor } from '../../conversations';
+import { type Conversation, unreadCount, tickFor, lastMessageTs } from '../../conversations';
 import { npubFromHex } from '../../identity';
 import { defaultAvatarUrl } from '../../profile';
 import { qrDataUrl } from '../../wallet/qr';
@@ -27,6 +27,8 @@ import { CachedImage } from '../../ui/cachedImage';
 import { confirmAsync } from '../../ui/alerts';
 import { PeerLinkIcon } from '../../ui/peerLink';
 import { copyText, clipboardAvailable } from '../../ui/clipboard';
+import { parseInviteLink } from '@freeport/protocol';
+import { ScanSheet, scanSupported } from '../wallet/ScanSheet';
 import { ChatCore, SAFE_ATTACH_EXTENSIONS, isAudioMsg, isImageMsg, isTripMsg, isDocMsg, isLocationMsg, locationMsg, docMsgName } from './Chat';
 import { matchesKeywords } from '../../browseFilter';
 import { DraggableFab } from '../../ui/DraggableFab';
@@ -136,11 +138,11 @@ export function FriendChatSection({ client, conversations, blockedPubkeys, onOpe
     (c.state === 'active' || c.state === 'pending_out' || (c.state === 'pending_in' && !blockedPubkeys.has(c.peer)))
     && (!kw || matchesKeywords(convText(c), kw)));
   if (visible.length === 0) return null;
-  const pending = archivedView ? [] : visible.filter((c) => c.state === 'pending_in').sort((a, b) => b.updatedAt - a.updatedAt);
+  const pending = archivedView ? [] : visible.filter((c) => c.state === 'pending_in').sort((a, b) => lastMessageTs(b) - lastMessageTs(a));
   // Experiment off: incoming requests must still be visible/answerable —
   // otherwise an invite arrives into a hidden UI (user report).
   const live = chatEnabled
-    ? visible.filter((c) => c.state !== 'pending_in' && (archivedView ? c.archived : !c.archived)).sort((a, b) => b.updatedAt - a.updatedAt)
+    ? visible.filter((c) => c.state !== 'pending_in' && (archivedView ? c.archived : !c.archived)).sort((a, b) => lastMessageTs(b) - lastMessageTs(a))
     : [];
   if (!chatEnabled && pending.length === 0) return null;
   if (archivedView && live.length === 0) return null;
@@ -526,15 +528,32 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
 
 // ─── Invite popup + FAB ──────────────────────────────────────────────────────
 
-export function InviteSheet({ client, myName, onClose }: {
+export function InviteSheet({ client, myName, onClose, onScanCode }: {
   client: MobileClient | null;
   myName?: string;
   onClose: () => void;
+  /** A friend's invite code, scanned from their QR — routed to the same
+   *  resolve/consent flow as an opened /i/<code> link. */
+  onScanCode?: (code: string) => void;
 }) {
   const [code, setCode] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [scanErr, setScanErr] = useState('');
+  // Scan button only where a camera path exists (web getUserMedia, or a native
+  // binary that linked expo-camera). Same probe the wallet Scan uses.
+  const [canScan, setCanScan] = useState(false);
+  useEffect(() => { scanSupported().then(setCanScan).catch(() => {}); }, []);
+  const onScanned = (value: string) => {
+    const scanned = parseInviteLink(value);
+    if (!scanned) { setScanErr(t("That QR isn't a Freeport invite.")); return; }
+    if (scanned === code) { setScanErr(t("That's your own invite QR.")); return; }
+    setScanning(false);
+    onClose();
+    onScanCode?.(scanned);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -600,6 +619,18 @@ export function InviteSheet({ client, myName, onClose }: {
                   <Text style={s.btnGhostText}>{t('Generate new invite link')}</Text>
                 </Pressable>
               </View>
+              {canScan && (
+                <>
+                  <Text style={[s.dim, { textAlign: 'center', marginTop: 14 }]}>{t('Have a friend’s QR instead?')}</Text>
+                  <Pressable style={[s.btnGhost, { marginTop: 8 }]} onPress={() => { setScanErr(''); setScanning(true); }}>
+                    <View style={[s.row, { gap: 6, justifyContent: 'center' }]}>
+                      <Ionicons name="qr-code-outline" size={14} color={palette.text2} />
+                      <Text style={s.btnGhostText}>{t('Scan a friend’s QR')}</Text>
+                    </View>
+                  </Pressable>
+                  {!!scanErr && <Text style={[s.dim, { color: palette.danger, textAlign: 'center', marginTop: 6 }]}>{scanErr}</Text>}
+                </>
+              )}
             </>
           ) : failed ? (
             <Text style={[s.dim, { marginVertical: 16 }]}>{t('Could not connect. Check your internet and try again.')}</Text>
@@ -608,6 +639,7 @@ export function InviteSheet({ client, myName, onClose }: {
           )}
         </Pressable>
       </Pressable>
+      <ScanSheet visible={scanning} onClose={() => setScanning(false)} onCode={onScanned} />
     </Modal>
   );
 }

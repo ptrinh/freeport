@@ -192,6 +192,15 @@ function applyChatInboundUnchecked(
   return null;
 }
 
+/** Timestamp of the most recent message, for chat-list ordering. Falls back to
+ *  updatedAt when there are no messages yet (e.g. a pending invite) — unlike
+ *  updatedAt, this ignores non-message bumps (state/TTL changes, reactions), so
+ *  rows sort by real conversation recency. */
+export function lastMessageTs(conv: Conversation): number {
+  const m = conv.messages;
+  return m.length ? m[m.length - 1].ts : conv.updatedAt;
+}
+
 /** Unread inbound messages (newer than the user's last read mark). */
 export function unreadCount(conv: Conversation): number {
   if (conv.state !== 'active' && conv.state !== 'pending_in') return 0;

@@ -989,5 +989,9 @@ const c: Record<string, string> = {
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "Įjunkite „Apple Intelligence“ iOS nustatymuose, kad galėtumėte tai naudoti.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "Įrenginyje veikiantis DI modelis dar atsisiunčiamas — funkcija įsijungs, kai atsisiuntimas baigsis.",
   "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "Šis įrenginys nepalaiko įrenginyje veikiančio DI („Apple Intelligence“ reikia „iPhone 15 Pro“ ar naujesnio, su iOS 26 ar naujesne versija).",
+  "Scan a friend’s QR": "Nuskaitykite draugo QR",
+  "Have a friend’s QR instead?": "Turite draugo QR?",
+  "That QR isn't a Freeport invite.": "Šis QR nėra Freeport pakvietimas.",
+  "That's your own invite QR.": "Tai jūsų paties pakvietimo QR.",
 };
 export default c;

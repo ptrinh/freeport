@@ -985,5 +985,9 @@ const c: Record<string, string> = {
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "Washa Apple Intelligence katika programu ya Mipangilio ya iOS ili kutumia hili.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "Modeli ya AI ya kifaani bado inapakuliwa — hii itawaka mara tu itakapokamilika.",
   "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "Kifaa hiki hakitumii AI inayoendeshwa ndani ya kifaa (Apple Intelligence inahitaji iPhone 15 Pro au mpya zaidi, yenye iOS 26+).",
+  "Scan a friend’s QR": "Changanua QR ya rafiki",
+  "Have a friend’s QR instead?": "Una QR ya rafiki badala yake?",
+  "That QR isn't a Freeport invite.": "QR hiyo si mwaliko wa Freeport.",
+  "That's your own invite QR.": "Huo ni mwaliko wako mwenyewe wa QR.",
 };
 export default c;

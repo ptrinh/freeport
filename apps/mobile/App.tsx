@@ -1574,7 +1574,7 @@ function AppInner() {
         // Same consent model as opening an invite link: answering YES to a
         // chat request implies wanting the feature.
         client?.chatAccept(peer, profile.name || undefined).catch(() => {});
-      }} chatTranslateTo={chatTranslate && translateToggleVisible(experimentalLlm) ? (language || systemLanguage()) : undefined} />}
+      }} onScanInvite={(code) => setPendingInviteCode(code)} chatTranslateTo={chatTranslate && translateToggleVisible(experimentalLlm) ? (language || systemLanguage()) : undefined} />}
       {tab === 'wallet' && (
         <WalletTab
           unit={walletUnit}

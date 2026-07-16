@@ -1028,5 +1028,9 @@ const c: Record<string, string> = {
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "请在 iOS 的“设置”应用中开启 Apple Intelligence 以使用此功能。",
   "The on-device AI model is still downloading — this turns on once it finishes.": "设备端 AI 模型正在下载 — 下载完成后此功能即会开启。",
   "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "此设备不支持设备端 AI（Apple Intelligence 需要 iPhone 15 Pro 或更新机型，且运行 iOS 26 及以上系统）。",
+  "Scan a friend’s QR": "扫描好友的 QR",
+  "Have a friend’s QR instead?": "有好友的 QR 吗？",
+  "That QR isn't a Freeport invite.": "该 QR 不是 Freeport 邀请。",
+  "That's your own invite QR.": "这是你自己的邀请 QR。",
 };
 export default c;

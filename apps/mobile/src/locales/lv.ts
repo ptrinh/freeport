@@ -988,5 +988,9 @@ const c: Record<string, string> = {
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "Ieslēdz Apple Intelligence iOS iestatījumos, lai to izmantotu.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "Ierīces MI modelis vēl tiek lejupielādēts — funkcija ieslēgsies, tiklīdz lejupielāde būs pabeigta.",
   "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "Šī ierīce neatbalsta ierīcē darbināmu MI (Apple Intelligence nepieciešams iPhone 15 Pro vai jaunāks modelis ar iOS 26 vai jaunāku versiju).",
+  "Scan a friend’s QR": "Skenējiet drauga QR",
+  "Have a friend’s QR instead?": "Vai jums ir drauga QR?",
+  "That QR isn't a Freeport invite.": "Šis QR nav Freeport ielūgums.",
+  "That's your own invite QR.": "Tas ir jūsu paša ielūguma QR.",
 };
 export default c;

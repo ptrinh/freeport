@@ -1028,5 +1028,9 @@ const c: Record<string, string> = {
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "이 기능을 사용하려면 iOS 설정 앱에서 Apple Intelligence를 켜세요.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "기기 내 AI 모델을 아직 다운로드하는 중입니다 — 완료되면 켜집니다.",
   "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "이 기기는 온디바이스 AI를 지원하지 않습니다 (Apple Intelligence는 iOS 26 이상의 iPhone 15 Pro 이상이 필요합니다).",
+  "Scan a friend’s QR": "친구의 QR 스캔",
+  "Have a friend’s QR instead?": "친구의 QR이 있나요?",
+  "That QR isn't a Freeport invite.": "이 QR은 Freeport 초대가 아닙니다.",
+  "That's your own invite QR.": "본인의 초대 QR입니다.",
 };
 export default c;

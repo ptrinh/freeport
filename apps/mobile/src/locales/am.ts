@@ -985,5 +985,9 @@ const c: Record<string, string> = {
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "ይህን ለመጠቀም በ iOS Settings መተግበሪያ ውስጥ Apple Intelligence ን ያብሩ።",
   "The on-device AI model is still downloading — this turns on once it finishes.": "በመሣሪያው ላይ ያለው AI ሞዴል አሁንም እየወረደ ነው — ሲጨርስ ይህ ይበራል።",
   "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "ይህ መሣሪያ በመሣሪያ ላይ የሚሠራ AI አይደግፍም (Apple Intelligence iPhone 15 Pro ወይም ከዚያ አዲስ፣ በiOS 26+ ላይ ያስፈልገዋል)።",
+  "Scan a friend’s QR": "የጓደኛዎን QR ይቃኙ",
+  "Have a friend’s QR instead?": "በምትኩ የጓደኛ QR አለዎት?",
+  "That QR isn't a Freeport invite.": "ያ QR የFreeport ግብዣ አይደለም።",
+  "That's your own invite QR.": "ያ የራስዎ የግብዣ QR ነው።",
 };
 export default c;
