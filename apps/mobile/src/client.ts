@@ -504,14 +504,27 @@ export class MobileClient {
 
   watchMarket(market: string | string[]): () => void {
     const markets = Array.isArray(market) ? market : [market];
-    const now = Math.floor(Date.now() / 1000);
-    const since = Math.max(now - 24 * 3600, this.marketNewestTs - 600);
-    // Paint the feed from the last snapshot before the relay backfill lands, so
-    // the first render isn't built event-by-event. Only on a fresh subscribe
-    // (empty feed) — a resume already has the in-memory feed.
     this.feedKey = FEED_STORE_PREFIX + [...markets].sort().join(',');
-    if (this.marketIntents.size === 0) void this.hydrateFeed(this.feedKey, now - FEED_MAX_AGE_SECONDS);
-    const sub = this.pool.subscribeMany(
+    // Subscribe AFTER hydrating from the snapshot, so the cache's newest
+    // createdAt can serve as the backfill watermark — like dmLastSeen for DMs.
+    // Without it every launch re-downloaded (and schnorr-verified, ~1-2ms per
+    // event on the JS thread) the full 24h intent window, which was the last
+    // big CPU burst behind the sluggish first seconds. The 2h margin covers
+    // cross-relay propagation skew; withdrawals are same-d republishes with a
+    // NEWER created_at, so a watermark never hides a tombstone.
+    let closed = false;
+    let sub: { close: () => void } | null = null;
+    void (async () => {
+      // Fresh subscribe (empty feed) paints from the snapshot first; a resume
+      // already has the in-memory feed (and its session watermark).
+      const cachedNewest = this.marketIntents.size === 0
+        ? await this.hydrateFeed(this.feedKey, Math.floor(Date.now() / 1000) - FEED_MAX_AGE_SECONDS)
+        : 0;
+      if (closed) return;
+      const now = Math.floor(Date.now() / 1000);
+      const watermark = Math.max(this.marketNewestTs - 600, cachedNewest - 2 * 3600);
+      const since = Math.max(now - 24 * 3600, watermark);
+      sub = this.pool.subscribeMany(
       this.relays,
       {
         kinds: [KIND_INTENT_OFFER, KIND_INTENT_REQUEST],
@@ -555,9 +568,11 @@ export class MobileClient {
           if (++this.intentsSincePrune >= PRUNE_EVERY_INTENTS) this.pruneSessionCaches();
         },
       },
-    );
+      );
+    })();
     return () => {
-      sub.close();
+      closed = true;
+      sub?.close();
       if (this.feedPersistTimer) { clearTimeout(this.feedPersistTimer); this.feedPersistTimer = null; }
       void this.persistFeedNow();
     };
@@ -565,11 +580,13 @@ export class MobileClient {
 
   /** Populate the feed from the last snapshot for `key`, skipping stale (older
    *  than the live window), own, or already-present intents. Each survivor goes
-   *  through onIntent, which the app coalesces into a single render. */
-  private async hydrateFeed(key: string, since: number): Promise<void> {
+   *  through onIntent, which the app coalesces into a single render.
+   *  Returns the newest hydrated createdAt (0 if none) — the backfill watermark. */
+  private async hydrateFeed(key: string, since: number): Promise<number> {
+    let newest = 0;
     try {
       const raw = await kvCacheGet(key);
-      if (!raw) return;
+      if (!raw) return 0;
       const arr = JSON.parse(raw) as Intent[];
       for (const intent of arr) {
         if (!intent?.id || !intent.d || !intent.pubkey) continue;
@@ -577,9 +594,11 @@ export class MobileClient {
         if (intent.pubkey === this.pubkey) continue;      // own posts restore via `published`
         if (this.marketIntents.has(intent.id)) continue;  // live backfill already delivered it
         this.marketIntents.set(intent.id, intent);
+        if (intent.createdAt > newest) newest = intent.createdAt;
         this.onIntent?.(intent);
       }
     } catch { /* ignore a corrupt/absent snapshot */ }
+    return newest;
   }
 
   /** Debounced snapshot write (feed churns fast during a backfill). */

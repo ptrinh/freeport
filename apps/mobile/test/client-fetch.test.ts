@@ -126,6 +126,27 @@ describe('feed snapshot cache', () => {
     expect(c2.marketIntents.has('i1')).toBe(true);
   });
 
+  it('uses the cached newest createdAt as the backfill watermark (minus 2h margin)', async () => {
+    const now = Math.floor(Date.now() / 1000);
+    kvStore.set('freeport.feed.demo', JSON.stringify([mk('i1', A, now - 3600)]));
+    const { client, reqs } = makeClient();
+    client.watchMarket('demo');
+    await new Promise((r) => setTimeout(r, 20)); // hydrate → subscribe is async
+    expect(reqs).toHaveLength(1);
+    const since = reqs[0].since;
+    expect(since).toBeGreaterThanOrEqual(now - 3600 - 2 * 3600 - 5); // watermark - margin
+    expect(since).toBeGreaterThan(now - 24 * 3600 + 60);             // NOT the full window
+  });
+
+  it('falls back to the full 24h window when there is no snapshot', async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const { client, reqs } = makeClient();
+    client.watchMarket('demo');
+    await new Promise((r) => setTimeout(r, 20));
+    expect(reqs).toHaveLength(1);
+    expect(reqs[0].since).toBeLessThanOrEqual(now - 24 * 3600 + 5);
+  });
+
   it('hydrate skips intents already delivered by the live backfill', async () => {
     const now = Math.floor(Date.now() / 1000);
     kvStore.set('freeport.feed.demo', JSON.stringify([mk('i1', A, now - 100)]));
