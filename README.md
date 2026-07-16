@@ -20,9 +20,11 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 - **Developers:** [CONTRIBUTING.md](CONTRIBUTING.md) — repo layout, stack
   decisions, quick start, CLI.
 
-## Demo video
+## Demo (2 minutes)
 
 https://github.com/user-attachments/assets/506c82ac-c5eb-415d-b981-ba14c4f165bc
+
+_Also on the [landing page](https://freeport.network/intro/)._
 
 ## Why Freeport exists
 
