@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import type { MobileClient } from '../client';
+import { startPerfProbe } from '../perfProbe';
 
 /**
  * AppState "active" listener: reconnects the relays the OS killed while
@@ -19,6 +20,9 @@ export function useResumeReconnect(client: MobileClient | null) {
   useEffect(() => {
     const sub = AppState.addEventListener('change', (state) => {
       if (state !== 'active') return;
+      // Measure JS-thread stalls for the next 8s and report [fp-perf] to
+      // GlitchTip (diagnostics opt-in) — hard numbers for "resume feels laggy".
+      startPerfProbe('resume');
       alertsMutedUntil.current = Date.now() + 5000;
       // Re-open any sockets the OS killed while we were backgrounded, then
       // nudge the feeds to re-subscribe (fresh REQ → backfills the gap).

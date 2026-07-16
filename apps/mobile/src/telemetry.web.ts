@@ -67,6 +67,12 @@ export function setTelemetryEnabled(on: boolean): void {
   enabled = on;
 }
 
+/** The live Sentry module, or null when diagnostics are off. Same contract as
+ *  the native variant (perfProbe needs captureMessage). */
+export function getSentry(): any {
+  return enabled ? Sentry : null;
+}
+
 export function captureError(err: unknown, context?: Record<string, unknown>): void {
   if (!enabled) return;
   try { Sentry.captureException(err, context ? { extra: sanitizeProps(context) } : undefined); } catch { /* ignore */ }

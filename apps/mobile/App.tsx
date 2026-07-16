@@ -69,6 +69,7 @@ import { locationGranted, requestLocationPermission, detectRawLocationGPS, detec
 import { messagesViewForNewActivity, walletContacts, repostDraft, type RepostDraft } from './src/deals';
 import { newlyConfirmed } from './src/quickReplies';
 import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
+import { startPerfProbe } from './src/perfProbe';
 import { loadPrefs, savePrefs, type UserLocation } from './src/prefs';
 import { systemLanguage, systemCountry } from './src/language';
 import { RIDESHARE_CATEGORY, categoryOf, subcategoryOf } from './src/categories';
@@ -680,7 +681,7 @@ function AppInner() {
       setCustomMessage(p.customMessage);
       setAutoSendCustomMessage(p.autoSendCustomMessage);
       setTelemetryOn(p.telemetryEnabled);
-      initTelemetry(p.telemetryEnabled).then(() => trackEvent('app_opened')).catch(() => {});
+      initTelemetry(p.telemetryEnabled).then(() => { trackEvent('app_opened'); startPerfProbe('launch'); }).catch(() => {});
       setRole(p.role);
       setLanguage(p.language || systemLanguage()); // '' pref = follow the device language
       setFareConfigState(p.fareConfig);
