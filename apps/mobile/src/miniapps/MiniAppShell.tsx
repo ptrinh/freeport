@@ -105,6 +105,11 @@ export function MiniAppShell({
         const safe = name.replace(/[^\w.() -]/g, '_').slice(0, 100) || 'file';
         const uri = FileSystem.cacheDirectory + safe;
         await FileSystem.writeAsStringAsync(uri, dataBase64, { encoding: FileSystem.EncodingType.Base64 });
+        // saveFile is always approval-gated, and the ApprovalDialog is its own
+        // <Modal>: on iOS, presenting the share sheet while that modal is still
+        // animating out is silently refused (no sheet, no error — "Download
+        // Certificate does nothing"). Let the dismissal transition settle first.
+        if (Platform.OS === 'ios') await new Promise((r) => setTimeout(r, 500));
         if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(uri, { mimeType, UTI: mimeType === 'application/pdf' ? 'com.adobe.pdf' : undefined });
       },
       persist: persistFirewall,
