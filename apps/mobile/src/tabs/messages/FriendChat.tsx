@@ -342,7 +342,7 @@ export function FriendChatModal({ client, conv, receiptsOn, blocked, onToggleBlo
     }
     setAttaching(true);
     try {
-      const url = await uploadFile((a as any).file ?? a.uri, a.name ?? `file.${ext}`, a.mimeType ?? 'application/octet-stream');
+      const url = await uploadFile((a as { file?: File }).file ?? a.uri, a.name ?? `file.${ext}`, a.mimeType ?? 'application/octet-stream');
       await client?.chatSend(conv.peer, url);
     } catch (e) {
       Alert.alert('Upload failed', e instanceof UploadError ? e.message : 'Try again.');

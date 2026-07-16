@@ -190,7 +190,7 @@ export function suggestPrice(
     const out: { v: number; w: number }[] = [];
     for (const i of intents) {
       if (!i.content.schema.startsWith(input.schemaPrefix)) continue;
-      const pl = i.content.payload as Record<string, any>;
+      const pl = i.content.payload;
       if (categoryOf(i.content.schema, pl) !== input.category) continue;
       if (matchSub && input.subcategory && subcategoryOf(i.content.schema, pl) !== input.subcategory) continue;
       const pay = pl.payment;
@@ -199,7 +199,7 @@ export function suggestPrice(
       let amt = parseAmount(pay, input.currency);
       if (amt <= 0) continue;
       if (perHour) {
-        const dur = pl.duration_minutes;
+        const dur = Number(pl.duration_minutes ?? 0);
         if (!dur || dur <= 0) continue;
         amt = amt / (dur / 60); // normalise to price/hour
       }

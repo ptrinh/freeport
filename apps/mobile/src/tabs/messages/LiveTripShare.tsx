@@ -121,10 +121,10 @@ export function LiveTripShare({ client, info, onShare, auto, dealId, alreadyShar
   };
 
   const shareLink = async () => {
-    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && (navigator as any).clipboard) {
-      try { await (navigator as any).clipboard.writeText(link); setCopied(true); return; } catch {}
+    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && (navigator as Navigator & { clipboard?: { writeText?: (t: string) => Promise<void>; readText?: () => Promise<string> } }).clipboard) {
+      try { await (navigator as Navigator & { clipboard?: { writeText?: (t: string) => Promise<void>; readText?: () => Promise<string> } }).clipboard?.writeText?.(link); setCopied(true); return; } catch { /* ignore */ }
     }
-    try { await Share.share({ message: link }); } catch {}
+    try { await Share.share({ message: link }); } catch { /* ignore */ }
   };
 
   useEffect(() => () => {

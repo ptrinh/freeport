@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- navigator vibration/gamepad haptics are untyped vendor APIs */
 /**
  * Tactile + audible feedback (web).
  *

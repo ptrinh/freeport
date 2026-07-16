@@ -21,7 +21,7 @@ export function query(
       sub.close();
       resolve(events);
     };
-    const sub = pool.subscribeMany(relays, filter as any, {
+    const sub = pool.subscribeMany(relays, filter as Parameters<typeof pool.subscribeMany>[1], {
       onevent: (ev: Event) => events.push(ev),
       oneose: finish,
     });

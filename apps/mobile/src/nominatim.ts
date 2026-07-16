@@ -13,6 +13,17 @@
  * no per-request override — that's why addresses came back in English. Routing
  * through Nominatim lets us control the language.
  */
+/** The slice of a Nominatim place result this module reads. */
+interface NmPlace {
+  name?: string;
+  display_name?: string;
+  lat?: string;
+  lon?: string;
+  address?: Record<string, string | undefined>;
+  [k: string]: unknown;
+}
+type NmJson = NmPlace | NmPlace[] | null;
+
 export interface Coords { latitude: number; longitude: number }
 export interface RawPlace { countryCode?: string; region?: string; city?: string }
 export interface Suggestion { label: string; latitude: number; longitude: number }
@@ -45,10 +56,10 @@ const COUNTRY_LANG: Record<string, string> = {
 // address in minutes, and Nominatim's usage policy asks callers to cache.
 const CACHE_TTL_MS = 5 * 60_000;
 const CACHE_MAX = 64;
-const cache = new Map<string, { at: number; data: any | null }>();
-const inflight = new Map<string, Promise<any | null>>();
+const cache = new Map<string, { at: number; data: NmJson }>();
+const inflight = new Map<string, Promise<NmJson>>();
 
-async function fetchJson(path: string, acceptLang?: string): Promise<any | null> {
+async function fetchJson(path: string, acceptLang?: string): Promise<NmJson> {
   const key = `${acceptLang ?? ''}|${path}`;
   const hit = cache.get(key);
   if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.data;
@@ -66,7 +77,7 @@ async function fetchJson(path: string, acceptLang?: string): Promise<any | null>
   return p;
 }
 
-async function fetchJsonUncached(path: string, acceptLang?: string): Promise<any | null> {
+async function fetchJsonUncached(path: string, acceptLang?: string): Promise<NmJson> {
   try {
     const ctrl = new AbortController();
     const tmr = setTimeout(() => ctrl.abort(), 6000);
@@ -90,15 +101,16 @@ async function fetchJsonUncached(path: string, acceptLang?: string): Promise<any
  * the street — e.g. "453 Sukhumvit" where OSM has no exact house 453, so the
  * driver still sees the number rather than just "Sukhumvit, …".
  */
-function addressLine(a: any, fallbackName?: string, houseNumber?: string): string {
+function addressLine(addr: NmPlace['address'], fallbackName?: string, houseNumber?: string): string {
+  const a = addr ?? {};
   const street = a.road || fallbackName; // primary line (road, else the place name)
   const hn = a.house_number || (houseNumber && street ? houseNumber : undefined);
   const parts = [
     [hn, street].filter(Boolean).join(' '),
     a.suburb || a.city_district || a.district || a.neighbourhood,
     a.city || a.town || a.village || a.state,
-  ].filter((p: any) => p && String(p).trim().length > 0);
-  return [...new Set(parts.map((p: any) => String(p)))].join(', ');
+  ].filter((p) => p && String(p).trim().length > 0);
+  return [...new Set(parts.map((p) => String(p)))].join(', ');
 }
 
 /**
@@ -106,12 +118,12 @@ function addressLine(a: any, fallbackName?: string, houseNumber?: string): strin
  * step 2 re-queries in that country's language so the local driver can read it.
  */
 export async function reverseLine(latitude: number, longitude: number): Promise<string> {
-  const d0 = await fetchJson(`reverse?lat=${latitude}&lon=${longitude}`, 'en');
+  const d0 = await fetchJson(`reverse?lat=${latitude}&lon=${longitude}`, 'en') as NmPlace | null;
   if (!d0?.address) return d0?.display_name ?? '';
   const cc = d0.address.country_code ? String(d0.address.country_code).toUpperCase() : '';
   const lang = COUNTRY_LANG[cc];
   if (lang && lang !== 'en') {
-    const d1 = await fetchJson(`reverse?lat=${latitude}&lon=${longitude}`, lang);
+    const d1 = await fetchJson(`reverse?lat=${latitude}&lon=${longitude}`, lang) as NmPlace | null;
     if (d1?.address) return addressLine(d1.address);
   }
   return addressLine(d0.address);
@@ -119,7 +131,7 @@ export async function reverseLine(latitude: number, longitude: number): Promise<
 
 /** Country/region/city in ENGLISH, for matching the curated location DB. */
 export async function reverseRaw(latitude: number, longitude: number): Promise<RawPlace | null> {
-  const d = await fetchJson(`reverse?lat=${latitude}&lon=${longitude}`, 'en');
+  const d = await fetchJson(`reverse?lat=${latitude}&lon=${longitude}`, 'en') as NmPlace | null;
   if (!d?.address) return null;
   const a = d.address;
   return {
@@ -132,7 +144,7 @@ export async function reverseRaw(latitude: number, longitude: number): Promise<R
 export async function forwardOne(name: string): Promise<Coords | null> {
   const d = await fetchJson(`search?q=${encodeURIComponent(name)}&limit=1`);
   const r = Array.isArray(d) ? d[0] : null;
-  return r ? { latitude: parseFloat(r.lat), longitude: parseFloat(r.lon) } : null;
+  return r ? { latitude: parseFloat(r.lat ?? ''), longitude: parseFloat(r.lon ?? '') } : null;
 }
 
 /**
@@ -171,10 +183,10 @@ export async function suggest(
   // label when the matched result is just the street.
   const typedHouseNo = (query.match(/^\s*(\d{1,5}[A-Za-z]?)\b/) || [])[1];
   const out = arr
-    .map((r: any) => ({
+    .map((r: NmPlace) => ({
       label: addressLine(r.address || {}, r.name, typedHouseNo) || r.display_name || '',
-      latitude: parseFloat(r.lat),
-      longitude: parseFloat(r.lon),
+      latitude: parseFloat(r.lat ?? ''),
+      longitude: parseFloat(r.lon ?? ''),
     }))
     .filter((s: Suggestion) => s.label && !Number.isNaN(s.latitude));
   if (near) {

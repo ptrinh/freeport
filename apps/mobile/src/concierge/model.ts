@@ -28,7 +28,7 @@ export type ConciergeAvailability =
  *  stable Gemini Nano surface. */
 export function conciergeModulePresent(): boolean {
   if (Platform.OS === 'web') {
-    return typeof (globalThis as any).LanguageModel?.create === 'function';
+    return typeof (globalThis as { LanguageModel?: { create?: unknown } }).LanguageModel?.create === 'function';
   }
   if (Platform.OS === 'android') {
     // Gemini Nano via AICore (react-native-gemini-nano) — Pixel 8+ hardware;
@@ -53,7 +53,7 @@ export async function conciergeAvailability(): Promise<ConciergeAvailability> {
     try {
       // Conservative: 'downloadable' means a multi-GB pull on first create —
       // only light the button up once the model is actually on disk.
-      switch (await (globalThis as any).LanguageModel.availability()) {
+      switch (await (globalThis as { LanguageModel?: { availability: () => Promise<string> } }).LanguageModel?.availability?.()) {
         case 'available': return 'available';
         case 'downloadable':
         case 'downloading': return 'model_not_ready';
@@ -165,7 +165,7 @@ function conciergeInstructions(ctx: ConciergeContext): string {
 }
 
 async function draftIntentWeb(text: string, ctx: ConciergeContext): Promise<RepostDraft | null> {
-  const g = globalThis as any;
+  const g = globalThis as unknown as { LanguageModel: { create: (o: Record<string, unknown>) => Promise<{ prompt: (p: string, o?: Record<string, unknown>) => Promise<string>; destroy?: () => void }> } };
   const session = await g.LanguageModel.create({
     initialPrompts: [{ role: 'system', content: conciergeInstructions(ctx) }],
   });

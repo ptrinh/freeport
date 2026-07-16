@@ -7,13 +7,13 @@
 import React from 'react';
 import { Image as RNImage, Platform, type ImageStyle, type StyleProp } from 'react-native';
 
-let ExpoImage: React.ComponentType<any> | null = null;
+let ExpoImage: React.ComponentType<Record<string, unknown>> | null = null;
 try {
   // Probe the native registry BEFORE importing: expo-image resolves its
   // native view at module load, so on binaries without the pod the import
   // itself throws inside Metro's module loader (see passkey.ts). The web
   // implementation is pure JS and always available.
-  const core: any = require('expo-modules-core');
+  const core = require('expo-modules-core');
   if (Platform.OS === 'web' || core?.requireOptionalNativeModule?.('ExpoImage')) {
     ExpoImage = require('expo-image').Image;
   }

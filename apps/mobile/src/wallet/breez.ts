@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- the Breez SDK ships two builds (WASM/uniffi) with incompatible generated types; this layer bridges them dynamically */
 /**
  * Breez SDK Spark provider — the built-in self-custodial wallet (default).
  *

@@ -57,7 +57,7 @@ export async function publishGuestRide(deps: PublishDeps, guest: GuestRecord, dr
   const sk = deps.guests.decryptKey(guest);
   let ev;
   try {
-    let mined: any = { ...tmpl, pubkey: guest.pubkey };
+    let mined: { kind: number; created_at: number; tags: string[][]; content: string; pubkey: string } = { ...tmpl, pubkey: guest.pubkey };
     try { mined = minePow(mined, deps.powBits); } catch { /* best-effort — publish unmined */ }
     ev = finalizeEvent({ kind: mined.kind, created_at: mined.created_at, tags: mined.tags, content: mined.content }, sk);
   } finally {

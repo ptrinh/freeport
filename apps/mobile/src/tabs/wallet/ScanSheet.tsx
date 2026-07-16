@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+
+type BarcodeWindow = Window & { BarcodeDetector?: new (opts?: object) => { detect: (src: unknown) => Promise<Array<{ rawValue?: string }>> } };
 import { Modal, Platform, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
@@ -16,7 +18,7 @@ import { importCamera } from './cameraModule';
 export { scanSupported } from './cameraModule';
 
 function WebScanner({ onCode }: { onCode: (v: string) => void }) {
-  const videoRef = useRef<any>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [err, setErr] = useState('');
 
   useEffect(() => {
@@ -25,7 +27,7 @@ function WebScanner({ onCode }: { onCode: (v: string) => void }) {
     let stopped = false;
     const start = async () => {
       try {
-        stream = await (navigator as any).mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        stream = await (navigator as Navigator & { mediaDevices: { getUserMedia: (c: object) => Promise<MediaStream> } }).mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       } catch {
         setErr(t('Camera access was denied'));
         return;
@@ -34,11 +36,11 @@ function WebScanner({ onCode }: { onCode: (v: string) => void }) {
       if (!video || stopped) { stream?.getTracks().forEach((t2) => t2.stop()); return; }
       video.srcObject = stream;
       await video.play().catch(() => {});
-      const Detector = (window as any).BarcodeDetector;
+      const Detector = (window as BarcodeWindow).BarcodeDetector;
       const detector = Detector ? new Detector({ formats: ['qr_code'] }) : null;
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      let jsqr: any = null;
+      let jsqr: typeof import('jsqr').default | null = null;
       if (!detector) jsqr = (await import('jsqr')).default;
       const tick = async () => {
         if (stopped) return;
@@ -78,7 +80,7 @@ function WebScanner({ onCode }: { onCode: (v: string) => void }) {
 }
 
 function NativeScanner({ onCode }: { onCode: (v: string) => void }) {
-  const [Camera, setCamera] = useState<any>(null);
+  const [Camera, setCamera] = useState<React.ComponentType<Record<string, unknown>> | null>(null);
   const [err, setErr] = useState('');
   const fired = useRef(false);
 
@@ -86,7 +88,7 @@ function NativeScanner({ onCode }: { onCode: (v: string) => void }) {
     let dead = false;
     (async () => {
       try {
-        const cam: any = await importCamera();
+        const cam = await importCamera();
         if (!cam) { if (!dead) setErr(t('Not available for this wallet')); return; } // module not in this binary
         const perm = await cam.Camera.requestCameraPermissionsAsync();
         if (dead) return;
@@ -142,7 +144,7 @@ export function ScanSheet({
         canvas.width = bmp.width; canvas.height = bmp.height;
         const ctx = canvas.getContext('2d')!;
         ctx.drawImage(bmp, 0, 0);
-        const Detector = (window as any).BarcodeDetector;
+        const Detector = (window as BarcodeWindow).BarcodeDetector;
         if (Detector) {
           const codes = await new Detector({ formats: ['qr_code'] }).detect(canvas);
           if (codes?.[0]?.rawValue) { onCode(codes[0].rawValue); return; }
@@ -155,11 +157,11 @@ export function ScanSheet({
         setPickErr(t('No QR code found in that photo'));
         return;
       }
-      const picker: any = await import('expo-image-picker');
+      const picker = await import('expo-image-picker');
       const res = await picker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 });
       const uri = res?.assets?.[0]?.uri;
       if (!uri) return;
-      const cam: any = await importCamera();
+      const cam = await importCamera();
       if (!cam) { setPickErr(t('No QR code found in that photo')); return; }
       const codes = await cam.Camera.scanFromURLAsync(uri, ['qr']);
       if (codes?.[0]?.data) { onCode(codes[0].data); return; }

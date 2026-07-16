@@ -21,11 +21,11 @@ import { Platform } from 'react-native';
 import { loadPrefs } from './prefs';
 import { passkeySupported, hasLocalPasskeyHint } from './passkey';
 
-async function nativeAuthModule(): Promise<any | null> {
+async function nativeAuthModule(): Promise<typeof import('expo-local-authentication') | null> {
   try {
     // Probe the registry before importing so binaries without the module
     // linked don't blow up inside Metro's loader (see passkey.ts).
-    const core: any = await import('expo-modules-core').catch(() => null);
+    const core = await import('expo-modules-core').catch(() => null);
     if (!core?.requireOptionalNativeModule?.('ExpoLocalAuthentication')) return null;
     return await import('expo-local-authentication');
   } catch { return null; }
@@ -54,7 +54,7 @@ export async function requireAuth(reason: string): Promise<boolean> {
     try {
       // Any user-verified assertion counts — we don't need the PRF here, just
       // "the passkey owner is present". rpId defaults to this origin's domain.
-      await (navigator as any).credentials.get({
+      await (navigator as unknown as { credentials: { get: (o: { publicKey: Record<string, unknown> }) => Promise<unknown> } }).credentials.get({
         publicKey: {
           challenge: crypto.getRandomValues(new Uint8Array(32)),
           userVerification: 'required',

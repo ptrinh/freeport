@@ -69,7 +69,7 @@ export async function uploadImage(input: string | PickedImage): Promise<string> 
     form.append('file', new File([blob], filename, { type: mimeType }));
   } else {
     // Native: React Native FormData accepts the {uri, name, type} object shape.
-    form.append('file', { uri, name: filename, type: mimeType } as any);
+    form.append('file', { uri, name: filename, type: mimeType } as unknown as Blob);
   }
   return postForm(form);
 }
@@ -82,7 +82,7 @@ export async function uploadImage(input: string | PickedImage): Promise<string> 
 export async function uploadFile(file: string | Blob, filename: string, mimeType: string): Promise<string> {
   const form = new FormData();
   if (typeof file === 'string') {
-    form.append('file', { uri: file, name: filename, type: mimeType } as any);
+    form.append('file', { uri: file, name: filename, type: mimeType } as unknown as Blob);
   } else {
     form.append('file', file, filename); // web: Blob/File
   }
@@ -114,7 +114,7 @@ async function postForm(form: FormData): Promise<string> {
     throw new UploadError(`Upload failed (HTTP ${resp.status})`, resp.status);
   }
 
-  let json: any;
+  let json: { nip94_event?: { tags?: string[][] }; data?: Array<{ url?: string }>; message?: string } | null;
   try {
     json = await resp.json();
   } catch {

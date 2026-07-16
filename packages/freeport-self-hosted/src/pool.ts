@@ -70,7 +70,7 @@ export class RelayPool {
    */
   async publish(event: Event, relays?: string[]): Promise<{ ok: string[]; failed: string[] }> {
     const useRelays = relays?.length ? relays : this.relays;
-    const results = await Promise.allSettled(this.pool.publish(useRelays, event as any));
+    const results = await Promise.allSettled(this.pool.publish(useRelays, event));
     const ok: string[] = [];
     const failed: string[] = [];
     results.forEach((r, i) => (r.status === 'fulfilled' ? ok : failed).push(useRelays[i]));
@@ -95,7 +95,7 @@ export class RelayPool {
         resolve([...byId.values()]);
       };
       const timer = setTimeout(finish, timeoutMs);
-      const sub = this.pool.subscribeMany(relays, filter as any, {
+      const sub = this.pool.subscribeMany(relays, filter, {
         onevent: (ev: Event) => {
           byId.set(ev.id, ev);
         },
@@ -132,10 +132,11 @@ export class RelayPool {
 
 /** Stable key form: sort tag-value arrays so order doesn't fragment the cache. */
 function normalizeFilter(filter: Filter): Filter {
-  const out: any = {};
-  for (const k of Object.keys(filter).sort()) {
-    const v = (filter as any)[k];
+  const out: Record<string, unknown> = {};
+  const rec = filter as unknown as Record<string, unknown>;
+  for (const k of Object.keys(rec).sort()) {
+    const v = rec[k];
     out[k] = Array.isArray(v) ? [...v].sort() : v;
   }
-  return out;
+  return out as Filter;
 }

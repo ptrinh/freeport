@@ -25,5 +25,5 @@ export interface MineTemplate {
  *  build can yield to the UI; native resolves synchronously under the hood. */
 export async function minePowAsync<T extends MineTemplate>(template: T, difficulty: number): Promise<T> {
   if (!difficulty || difficulty <= 0) return template;
-  return minePow(template as any, difficulty) as unknown as T;
+  return minePow(template as unknown as Parameters<typeof minePow>[0], difficulty) as unknown as T;
 }

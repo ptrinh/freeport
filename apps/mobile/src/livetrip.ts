@@ -134,7 +134,7 @@ export function subscribeTrip(pool: SimplePool, view: TripView, onUpdate: (u: Tr
     view.relays,
     { kinds: [TRIP_KIND], authors: [view.pk], '#d': [view.id] },
     {
-      onevent: async (ev: any) => {
+      onevent: async (ev: { content: string; created_at: number }) => {
         try {
           const u = JSON.parse(await nip04.decrypt(view.sk, view.pk, ev.content));
           if (typeof u?.lat !== 'number' || typeof u?.lon !== 'number') return;

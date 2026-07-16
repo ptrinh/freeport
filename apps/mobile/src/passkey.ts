@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- WebAuthn browser API vs native passkey module — structurally different, no shared types */
 /**
  * Passkey identity — the account key derived from a WebAuthn PRF secret.
  *

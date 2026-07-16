@@ -44,7 +44,7 @@ interface Nip07Provider {
 }
 
 function getProvider(): Nip07Provider | null {
-  return (globalThis as any)?.nostr ?? null;
+  return ((globalThis as { nostr?: unknown })?.nostr as Nip07Provider | undefined) ?? null;
 }
 
 /** True if a NIP-07 extension is present (web only). */

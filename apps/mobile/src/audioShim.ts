@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- expo-av vs expo-audio dual API loaded by binary capability */
 /**
  * Audio backend shim — expo-audio when its native module is in the binary,
  * expo-av otherwise.

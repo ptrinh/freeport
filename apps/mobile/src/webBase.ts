@@ -17,7 +17,7 @@ import Constants from 'expo-constants';
 const FALLBACK = 'https://freeport.network';
 
 function configured(): string {
-  const v = (Constants.expoConfig?.extra as any)?.webBase;
+  const v = (Constants.expoConfig?.extra as { webBase?: string } | undefined)?.webBase;
   return (typeof v === 'string' && v ? v : FALLBACK).replace(/\/+$/, '');
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- uniffi/WASM dual-dialect SDK enums are opaque, deliberately untyped shapes */
 /**
  * The two Breez SDK builds speak different dialects for the SAME API:
  *

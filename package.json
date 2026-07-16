@@ -11,7 +11,7 @@
   "scripts": {
     "build": "npm run build -w @freeport/protocol -w @freeport/agent -w freeport-self-hosted",
     "test": "npm run test -w @freeport/protocol -w @freeport/agent -w freeport-self-hosted && npm run test --prefix apps/mobile",
-    "lint": "eslint . --max-warnings 318",
+    "lint": "eslint . --max-warnings 0",
     "demo": "bash demo/run-demo.sh"
   },
   "devDependencies": {

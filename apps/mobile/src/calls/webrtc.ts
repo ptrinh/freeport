@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- react-native-webrtc and browser WebRTC expose divergent APIs; this layer is the dynamic bridge */
 /**
  * WebRTC platform shim. Web uses the browser globals; native probes for the
  * react-native-webrtc module BEFORE importing it — the module only exists in

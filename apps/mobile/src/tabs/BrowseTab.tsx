@@ -11,6 +11,9 @@ import {
   View,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { payloadOf } from '../payloadShape';
+
+type MCIName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 import { type Intent, type Product, type ProposedTerms, matchSameGroup } from '@freeport/protocol';
 import { AreaMap } from '../Map';
 import { t, tn } from '../i18n';
@@ -65,7 +68,7 @@ export function MarketTab({
   defaultCategory: string;
   defaultSubcategory: string;
   maxDistance: number;
-  onScroll?: (e: any) => void;
+  onScroll?: (e: { nativeEvent: { contentOffset: { y: number } } }) => void;
   /** Zaps (NIP-57): tip the poster — shown when their profile carries lud16. */
   walletEnabled?: boolean;
   onZap?: (intent: Intent) => void;
@@ -204,7 +207,7 @@ export function MarketTab({
     // requested time has already passed. Client-side so it's consistent
     // regardless of whether relays honor the NIP-40 expiration tag.
     const live = intents.filter((i) => {
-      if ((i.content.payload as any)?.withdrawn) return false; // deal closed → withdrawn
+      if (payloadOf(i).withdrawn) return false; // deal closed → withdrawn
       if (i.content.expires_at < nowTick) return false;
       if (doneListingKeys.has(i.pubkey + '|' + i.d)) return false; // our deal on it is done (completed/cancelled)
       const start = i.content.window?.start;
@@ -216,7 +219,7 @@ export function MarketTab({
     // Category + subcategory filter (see browseFilter.ts) — the subcategory
     // (vehicle class) applies even with the Service/Product vertical off.
     const byCategory = visible.filter((i) =>
-      passesCategory(i.content.schema, i.content.payload as any, servicesEnabled, filterCat, filterSub));
+      passesCategory(i.content.schema, i.content.payload, servicesEnabled, filterCat, filterSub));
     // Distance filter (see src/browseFilter.ts): rides default to NEAR_KM, but
     // the user's explicit Max distance preference overrides it in BOTH
     // directions — raising it to 1000 km must actually show farther rides.
@@ -224,7 +227,7 @@ export function MarketTab({
     // never hidden — so discovery never silently breaks.
     const withinMax = ref
       ? byCategory.filter((i) => {
-          const pl = i.content.payload as any;
+          const pl = payloadOf(i);
           const isRide = i.content.schema.startsWith('rideshare');
           const gh = isRide ? pl?.from?.geohash : pl?.location?.geohash;
           return passesDistance(isRide, gh ? distKm(gh) : null, maxDistance, distanceUnit);
@@ -241,7 +244,7 @@ export function MarketTab({
       const kept = new Set(withinMax.map((i) => i.id));
       for (const i of byCategory) {
         if (kept.has(i.id)) continue;
-        const pl = i.content.payload as any;
+        const pl = payloadOf(i);
         const gh = i.content.schema.startsWith('rideshare') ? pl?.from?.geohash : pl?.location?.geohash;
         const km = distKm(gh);
         if (km != null && (nearestHiddenKm == null || km < nearestHiddenKm)) nearestHiddenKm = km;
@@ -363,7 +366,7 @@ export function MarketTab({
               onPress={() => setFilterSub(filterSub === sub ? null : sub)}
             >
               <MaterialCommunityIcons
-                name={subcategoryIcon(sub) as any}
+                name={subcategoryIcon(sub) as MCIName}
                 size={14}
                 color={filterSub === sub ? 'white' : palette.chipText}
                 style={s.catChipIcon}
@@ -395,7 +398,7 @@ export function MarketTab({
                   onPress={() => setFilterSub(sub)}
                 >
                   <MaterialCommunityIcons
-                    name={subcategoryIcon(sub) as any}
+                    name={subcategoryIcon(sub) as MCIName}
                     size={14}
                     color={filterSub === sub ? 'white' : palette.chipText}
                     style={s.catChipIcon}
@@ -418,7 +421,7 @@ export function MarketTab({
                 }}
               >
                 <MaterialCommunityIcons
-                  name={categoryIcon(c) as any}
+                  name={categoryIcon(c) as MCIName}
                   size={14}
                   color={filterCat === c ? 'white' : palette.chipText}
                   style={s.catChipIcon}
@@ -479,7 +482,7 @@ export function MarketTab({
         ) : null
       }
       renderItem={({ item }) => {
-        const p = item.content.payload as Record<string, any>;
+        const p = payloadOf(item);
         const isRide = item.content.schema.startsWith('rideshare');
         const prof = client?.profiles.get(item.pubkey);
         return (
@@ -560,7 +563,7 @@ function compareBy(key: SortKey, a: Intent, b: Intent, client: MobileClient | nu
         const rep = client?.reputations.get(i.pubkey);
         const hoursAgo = (now - i.createdAt) / 3600;
         let pow = 0;
-        try { pow = getPow(i.id); } catch {}
+        try { pow = getPow(i.id); } catch { /* ignore */ }
         return (rep?.score ?? 0) * 60        // avg karma (-1..2)
           + (rep?.partnersInNetwork ?? 0) * 40 // proven deals in your network
           + (rep?.verifiedBy ?? 0) * 20        // peer-verified contact
@@ -572,7 +575,7 @@ function compareBy(key: SortKey, a: Intent, b: Intent, client: MobileClient | nu
     case 'time': // newest first
       return b.createdAt - a.createdAt;
     case 'amount': { // highest first (cross-currency compared by raw magnitude)
-      const amt = (i: Intent) => parsePayment((i.content.payload as any).payment, 'SGD').amount;
+      const amt = (i: Intent) => parsePayment(payloadOf(i).payment ?? '', 'SGD').amount;
       return amt(b) - amt(a);
     }
     case 'karma': { // highest score first
@@ -692,7 +695,7 @@ const PostCard = React.memo(function PostCard({
   onRespondCancel: () => void;
   onRespondSend: (i: Intent, terms: ProposedTerms, accepting: boolean) => Promise<void>;
 }) {
-  const p = item.content.payload as Record<string, any>;
+  const p = payloadOf(item);
   const isRide = item.content.schema.startsWith('rideshare');
   const isSvc = item.content.schema.startsWith('service');
   return (
@@ -704,7 +707,7 @@ const PostCard = React.memo(function PostCard({
         </Text>
         {isRide && p.category ? (
           <View style={s.vehicleChip}>
-            <MaterialCommunityIcons name={(VEHICLE_ICONS[p.category] ?? 'car') as any} size={13} color={palette.chipText} style={{ marginEnd: 4 }} />
+            <MaterialCommunityIcons name={(VEHICLE_ICONS[p.category ?? ''] ?? 'car') as MCIName} size={13} color={palette.chipText} style={{ marginEnd: 4 }} />
             <Text style={s.vehicleChipText}>{t(p.category)}</Text>
           </View>
         ) : p.category ? <Text style={s.chip}>{t(p.category)}</Text> : null}
@@ -775,7 +778,7 @@ const PostCard = React.memo(function PostCard({
         </View>
       )}
       {isRide && p.from?.name && p.to?.name && (
-        <Pressable style={s.mapLink} onPress={() => openMaps(routeUrl(placeParam(p.from?.geohash, p.from.name), placeParam(p.to?.geohash, p.to.name)))}>
+        <Pressable style={s.mapLink} onPress={() => openMaps(routeUrl(placeParam(p.from?.geohash, p.from?.name ?? ''), placeParam(p.to?.geohash, p.to?.name ?? '')))}>
           <Text style={s.mapLinkText}>{'🗺 ' + t('View route in Google Maps')}</Text>
         </Pressable>
       )}
@@ -854,7 +857,7 @@ function RespondEditor({
   onCancel: () => void;
 }) {
   const isRide = intent.content.schema.startsWith('rideshare');
-  const p = intent.content.payload as Record<string, any>;
+  const p = payloadOf(intent);
   const intentWindow = intent.content.window;
   // Unpriced posts default the offer to the POST's market currency (a Bangkok
   // ride → THB) — a responder from another country was getting their own currency.

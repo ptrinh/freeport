@@ -16,7 +16,7 @@ import { isTauri } from './desktopNative';
 let desktopVersion: string | null = null;
 if (isTauri()) {
   try {
-    (globalThis as any).__TAURI__?.app?.getVersion?.()
+    (globalThis as { __TAURI__?: { app?: { getVersion?: () => Promise<string> } } }).__TAURI__?.app?.getVersion?.()
       .then((v: string) => { desktopVersion = v; })
       .catch(() => {});
   } catch { /* ignore */ }
@@ -53,10 +53,10 @@ export async function checkForUpdate(): Promise<UpdateResult> {
       if (!update) return { outcome: 'up-to-date' };
       pendingDesktopUpdate = update;
       return { outcome: 'updated' };
-    } catch (e: any) {
+    } catch (e) {
       // Linux .deb installs have no updater backend (AppImage-only) — surface
       // as unsupported-ish error rather than pretending we checked.
-      return { outcome: 'error', message: e?.message ?? String(e) };
+      return { outcome: 'error', message: e instanceof Error ? e.message : String(e) };
     }
   }
   // Nothing to pre-download on web; the reload itself fetches the new build.

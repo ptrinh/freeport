@@ -69,8 +69,8 @@ export function SendSheet({
 
   const paste = async () => {
     try {
-      if (Platform.OS === 'web' && (navigator as any)?.clipboard?.readText) {
-        setInput(await (navigator as any).clipboard.readText());
+      if (Platform.OS === 'web' && typeof (navigator as Navigator & { clipboard?: { readText?: () => Promise<string> } })?.clipboard?.readText === 'function') {
+        setInput(await (navigator as Navigator & { clipboard?: { writeText?: (t: string) => Promise<void>; readText?: () => Promise<string> } }).clipboard!.readText!());
       }
     } catch { /* permission denied — user types instead */ }
   };

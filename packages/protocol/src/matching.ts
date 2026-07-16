@@ -59,7 +59,7 @@ export function ruleWindowOn(date: Date, rule: MatchRule): TimeWindow | null {
 
   const windowFor = (d: Date): TimeWindow | null => {
     const day = DAY_KEYS[d.getDay()];
-    if (rule.days && !rule.days.includes(day as any)) return null;
+    if (rule.days && !(rule.days as readonly string[]).includes(day)) return null;
     const base = new Date(d);
     base.setHours(0, 0, 0, 0);
     const t0 = Math.floor(base.getTime() / 1000);

@@ -29,7 +29,7 @@ function getGeoFlag(): boolean | null {
 // mobile-only). In those cases callers fall back to IP-based location + the
 // manual picker, and the "grant location" nag is suppressed.
 function geoUnavailable(): boolean {
-  const g = globalThis as any;
+  const g = globalThis as { navigator?: Navigator; __TAURI__?: unknown; isSecureContext?: boolean };
   // NOTE (offline single-file build): Chrome does not persist geolocation
   // grants for file:// origins, so each GPS call may re-prompt. We keep real
   // GPS anyway — owner prefers accurate location over the IP fallback there.
@@ -78,7 +78,7 @@ export async function requestLocationPermission(): Promise<boolean> {
 export async function locationGranted(): Promise<boolean> {
   if (geoUnavailable()) return true; // suppress the nag where geolocation can't work
   try {
-    const p = await (globalThis.navigator as any)?.permissions?.query?.({ name: 'geolocation' });
+    const p = await (globalThis.navigator as Navigator & { permissions?: { query?: (o: { name: string }) => Promise<{ state?: string }> } })?.permissions?.query?.({ name: 'geolocation' });
     if (p?.state === 'granted') return true;
     if (p?.state === 'denied') return false;
     // 'prompt' (or no Permissions API): trust what actually happened before.

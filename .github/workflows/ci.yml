@@ -26,8 +26,8 @@ jobs:
       - name: Build packages
         run: npm run build
       # Backstop for swallowed-catch / `as any` regressions (both have caused
-      # real field bugs). --max-warnings is the count at introduction —
-      # ratchet it DOWN in package.json as warnings are fixed; never up.
+      # real field bugs). Warnings are at ZERO — any new one fails CI. Platform
+      # interop shims carry per-file justified eslint-disables instead.
       - name: Lint
         run: npm run lint
       - name: Check Breez SDK versions stay aligned (web wasm vs native)

@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { payloadOf } from '../payloadShape';
 import { Ionicons } from '@expo/vector-icons';
 import { type Negotiation } from '@freeport/protocol';
 import { t, tn } from '../i18n';
@@ -93,7 +94,7 @@ export function DealsTab({
   onReceiveDeal?: (n: Negotiation) => void;
   /** Poster of a completed deal: prefill New Post with this intent (sans time). */
   onRepost?: (n: Negotiation) => void;
-  onScroll?: (e: any) => void;
+  onScroll?: (e: { nativeEvent: { contentOffset: { y: number } } }) => void;
   view: 'active' | 'completed';
   onViewChange: (v: 'active' | 'completed') => void;
   /** Posts that expired with no confirmed deal — shown as System notifications. */
@@ -145,7 +146,7 @@ export function DealsTab({
   useEffect(() => {
     kvGet('freeport.rated').then((raw) => {
       if (!raw) return;
-      try { setRatedIds(new Set(JSON.parse(raw) as string[])); } catch {}
+      try { setRatedIds(new Set(JSON.parse(raw) as string[])); } catch { /* ignore */ }
     });
   }, []);
   const markRated = useCallback((id: string) =>
@@ -173,7 +174,7 @@ export function DealsTab({
   useEffect(() => {
     kvGet('freeport.ratingSkipped').then((raw) => {
       if (!raw) return;
-      try { setSkippedRating(new Set(JSON.parse(raw) as string[])); } catch {}
+      try { setSkippedRating(new Set(JSON.parse(raw) as string[])); } catch { /* ignore */ }
     });
   }, []);
   const [reportingId, setReportingId] = useState<string | null>(null);
@@ -564,7 +565,7 @@ const DealCard = React.memo(function DealCard({
     <View style={[s.card, needsAction && s.cardHighlight]}>
       {(() => {
         const isRide = item.intent.content.schema.startsWith('rideshare');
-        const p = item.intent.content.payload as Record<string, any>;
+        const p = payloadOf(item.intent);
         // My role in this deal
         let roleLabel: string;
         if (isRide) roleLabel = item.weInitiated ? t('Driver') : t('Passenger');
@@ -619,7 +620,7 @@ const DealCard = React.memo(function DealCard({
 
       {/* Route / area shortcuts from the underlying intent */}
       {(() => {
-        const p = item.intent.content.payload as Record<string, any>;
+        const p = payloadOf(item.intent);
         if (item.intent.content.schema.startsWith('rideshare') && p.from?.name && p.to?.name) {
           // Route to the EXACT pinned coordinates (now a high-precision
           // geohash), unless the route was renegotiated to a different label
@@ -750,7 +751,7 @@ const DealCard = React.memo(function DealCard({
                     passenger is aboard; for a service/product deal, either
                     side can route to the agreed meeting point. */}
                 {st !== 'completed' && (() => {
-                  const p = item.intent.content.payload as Record<string, any>;
+                  const p = payloadOf(item.intent);
                   const iAmDriver = item.weInitiated;
                   // Navigation prefers the human ADDRESS over the geohash: a 6-char
                   // geohash (~±600m) decodes to a centre Google snaps to the nearest
@@ -892,7 +893,7 @@ const DealCard = React.memo(function DealCard({
                     posted into the chat so the other just taps "Track live location".
                     No button to press; the share UI is a passive status line. */}
                 {st !== 'completed' && sendLocationOnDeal && (() => {
-                  const p = item.intent.content.payload as Record<string, any>;
+                  const p = payloadOf(item.intent);
                   const iAmDriver = item.weInitiated; // rideshare responder = driver
                   // BOTH sides auto-share once the deal is confirmed (no role gate),
                   // so passenger+driver / customer+provider can each follow the other.
@@ -1026,7 +1027,7 @@ const DealCard = React.memo(function DealCard({
             const onPress = () => {
               if (peerBlocked) { doBlock(); return; } // unblock needs no confirm
               if (Platform.OS === 'web') {
-                if ((globalThis as any).confirm?.(`${t('Block this person?')}\n\n${t('You will not receive any more messages from them.')}`)) doBlock();
+                if ((globalThis as { confirm?: (m: string) => boolean }).confirm?.(`${t('Block this person?')}\n\n${t('You will not receive any more messages from them.')}`)) doBlock();
               } else {
                 Alert.alert(t('Block this person?'), t('You will not receive any more messages from them.'), [
                   { text: t('Cancel'), style: 'cancel' },

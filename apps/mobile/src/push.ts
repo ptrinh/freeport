@@ -26,7 +26,7 @@ export interface PushFilters {
 }
 
 const TOKEN_KEY = 'freeport.expoPushToken';
-const projectId = (Constants.expoConfig?.extra as any)?.eas?.projectId as string | undefined;
+const projectId = (Constants.expoConfig?.extra as { eas?: { projectId?: string } } | undefined)?.eas?.projectId;
 
 export function pushSupported(): boolean {
   return Platform.OS === 'ios' || Platform.OS === 'android';

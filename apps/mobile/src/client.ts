@@ -375,7 +375,7 @@ export class MobileClient {
     let n = 0;
     try {
       for (const ok of this.pool.listConnectionStatus().values()) if (ok) n++;
-    } catch {}
+    } catch { /* ignore */ }
     return n;
   }
 
@@ -671,7 +671,7 @@ export class MobileClient {
             return;
           }
           // Self-policing: hide prohibited (illegal) listings from the feed.
-          if (!screenIntentContent(intent.content.schema, intent.content.title, intent.content.payload as any).allowed) return;
+          if (!screenIntentContent(intent.content.schema, intent.content.title, intent.content.payload).allowed) return;
           // Spam floor: drop intents below the PoW threshold (off by default).
           if (MIN_INTENT_POW > 0 && getPow(ev.id) < MIN_INTENT_POW) return;
           // Anti-flood: cap distinct listings per author. Updates to an
@@ -820,7 +820,7 @@ export class MobileClient {
               this.profileTs.set(ev.pubkey, ev.created_at);
               this.profiles.set(ev.pubkey, { name: meta.name, picture: meta.picture, about: meta.about, phone: meta.phone, vehicleModel: meta.vehicle_model, plate: meta.plate, lud16: meta.lud16, link: meta.link || (httpsLinkOrNull(meta.website) ?? undefined) });
               this.onProfileFetched?.(ev.pubkey);
-            } catch {}
+            } catch { /* ignore */ }
           },
           oneose: () => sub.close(),
         },
@@ -1683,7 +1683,7 @@ export class MobileClient {
   }
 
   /** Mutual cancellation of a confirmed deal. */
-  private async sendCancelStep(negoId: string, make: (n: Negotiation) => any): Promise<void> {
+  private async sendCancelStep(negoId: string, make: (n: Negotiation) => Parameters<typeof applyOutbound>[1]): Promise<void> {
     const nego = this.negotiations.get(negoId);
     if (!nego) return;
     const msg = make(nego);

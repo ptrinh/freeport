@@ -23,7 +23,7 @@ export function eventGeohash(ev: Event): string | undefined {
   const g = ev.tags.find((t) => t[0] === 'g')?.[1];
   if (g) return g;
   const intent = parseIntentEvent(ev);
-  const p = intent?.content.payload as any;
+  const p = intent?.content.payload as { from?: { geohash?: string }; location?: { geohash?: string } } | undefined;
   return p?.from?.geohash || p?.location?.geohash || undefined;
 }
 

@@ -43,7 +43,7 @@ export async function minePowAsync<T extends MineTemplate>(template: T, difficul
   if (!difficulty || difficulty <= 0) return template;
   let hasher: IHasher;
   try { hasher = await getHasher(); }
-  catch { return minePowJs(template as any, difficulty) as unknown as T; } // no WASM → JS fallback
+  catch { return minePowJs(template as unknown as Parameters<typeof minePowJs>[0], difficulty) as unknown as T; } // no WASM → JS fallback
 
   const evt = template;
   const tag = ['nonce', '0', String(difficulty)];

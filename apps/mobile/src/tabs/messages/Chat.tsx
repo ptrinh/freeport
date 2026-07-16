@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { payloadOf } from '../../payloadShape';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { type Negotiation, type ProposedTerms } from '@freeport/protocol';
@@ -123,7 +124,7 @@ function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
     uiAlert(t('Voice memo'), e instanceof Error ? e.message : undefined);
   };
   const waveWidth = useRef(0);
-  const waveRef = useRef<any>(null);
+  const waveRef = useRef<View | null>(null);
   const rate = st.rate ?? 1;
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, minWidth: 190, paddingVertical: 2 }}>
@@ -157,11 +158,12 @@ function VoiceMessage({ url, dir }: { url: string; dir: 'in' | 'out' }) {
           // RN-web clicks carry no locationX (it read as 0 → every tap
           // restarted the clip, user report). Fall back to the DOM offsetX,
           // then to pageX minus the measured container edge.
-          const ne = e.nativeEvent as any;
+          const ne = e.nativeEvent as { locationX?: number; offsetX?: number; pageX?: number };
           if (typeof ne.locationX === 'number' && ne.locationX > 0) jump(ne.locationX);
           else if (typeof ne.offsetX === 'number' && ne.offsetX > 0) jump(ne.offsetX);
-          else if (typeof ne.pageX === 'number' && (waveRef.current as any)?.measureInWindow) {
-            (waveRef.current as any).measureInWindow((wx: number) => jump(ne.pageX - wx));
+          else if (typeof ne.pageX === 'number' && waveRef.current?.measureInWindow) {
+            const px = ne.pageX;
+            waveRef.current.measureInWindow((wx: number) => jump(px - wx));
           }
         }}
       >
@@ -602,7 +604,7 @@ export function CounterEditor({
   const [payAmount, setPayAmount] = useState(existingPay.amount);
   const [payCurrency, setPayCurrency] = useState<Currency>(existingPay.currency);
   // Ride route is locked to the original request — display only, never edited.
-  const ridePayload = nego.intent.content.payload as any;
+  const ridePayload = payloadOf(nego.intent);
   const routeFrom = String(existing.from ?? ridePayload?.from?.name ?? '');
   const routeTo = String(existing.to ?? ridePayload?.to?.name ?? '');
   const [location, setLocation] = useState(existing.location ?? '');

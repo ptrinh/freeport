@@ -170,7 +170,7 @@ export function ShopsView({ client, products, myPubkey, market, defaultCurrency,
   defaultCurrency: string;
   /** Start a chat request with a seller (the conversational checkout). */
   onChatSeller: (pubkey: string) => void;
-  onScroll?: (e: any) => void;
+  onScroll?: (e: { nativeEvent: { contentOffset: { y: number } } }) => void;
 }) {
   const [showMyShop, setShowMyShop] = useState(false);
   const myProducts = useMemo(() => products.filter((p) => p.pubkey === myPubkey).sort((a, b) => b.createdAt - a.createdAt), [products, myPubkey]);

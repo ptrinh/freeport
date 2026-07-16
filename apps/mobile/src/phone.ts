@@ -146,6 +146,6 @@ async function detectDialCodeUncached(): Promise<string | null> {
     // Fall back to deriving the dial code from the ISO country code if present.
     const fromCode = dialForCountry(typeof data.country_code === 'string' ? data.country_code : undefined);
     if (fromCode) return fromCode;
-  } catch {}
+  } catch { /* ignore */ }
   return null;
 }

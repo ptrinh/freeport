@@ -187,13 +187,13 @@ function makeApi(): FreeportDebug {
  * the document title to the profile id so multiple tabs are easy to tell apart.
  */
 export function installDebugApi(): void {
-  if (typeof globalThis === 'undefined' || !(globalThis as any).document) return;
-  const w = globalThis as any;
+  if (typeof globalThis === 'undefined' || !(globalThis as { document?: unknown }).document) return;
+  const w = globalThis as { document?: { title?: string }; [k: string]: unknown };
   if (!w.freeport) {
     w.freeport = makeApi();
     const id = profileId();
     if (id) {
-      try { w.document.title = `Freeport · P${id}`; } catch {}
+      try { if (w.document) w.document.title = `Freeport · P${id}`; } catch { /* ignore */ }
     }
     // eslint-disable-next-line no-console
     console.log(

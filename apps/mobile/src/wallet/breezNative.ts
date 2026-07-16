@@ -14,9 +14,9 @@ import { TurboModuleRegistry } from 'react-native';
  * (null) → throw, GlitchTip #15). A static named import only touches the one
  * property.
  */
-export async function importBreezNative(): Promise<any | null> {
+export async function importBreezNative(): Promise<typeof import('@breeztech/breez-sdk-spark-react-native') | null> {
   try {
-    if (!(TurboModuleRegistry as any)?.get?.('BreezSdkSparkReactNative')) return null;
+    if (!(TurboModuleRegistry as { get?: (n: string) => unknown })?.get?.('BreezSdkSparkReactNative')) return null;
     return await import('@breeztech/breez-sdk-spark-react-native');
   } catch {
     return null;

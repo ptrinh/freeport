@@ -68,9 +68,10 @@ import { normalizePhone } from './src/phone';
 import { locationGranted, requestLocationPermission, detectRawLocationGPS, detectRawLocationIP, effectiveUnit } from './src/maps';
 import { messagesViewForNewActivity, walletContacts, repostDraft, type RepostDraft } from './src/deals';
 import { newlyConfirmed } from './src/quickReplies';
-import { initTelemetry, setTelemetryEnabled, trackEvent, getSentry } from './src/telemetry';
+import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
 import { startPerfProbe } from './src/perfProbe';
 import { timeAsync, mark } from './src/perfSpans';
+import { payloadOf } from './src/payloadShape';
 import { loadPrefs, savePrefs, type UserLocation } from './src/prefs';
 import { systemLanguage, systemCountry } from './src/language';
 import { RIDESHARE_CATEGORY, categoryOf, subcategoryOf } from './src/categories';
@@ -162,7 +163,7 @@ export default function App() {
     const el = document.getElementById('ft-splash');
     if (!el) return;
     el.style.opacity = '0';
-    const t = setTimeout(() => { try { el.remove(); } catch {} }, 350);
+    const t = setTimeout(() => { try { el.remove(); } catch { /* ignore */ } }, 350);
     return () => clearTimeout(t);
   }, []);
   return (
@@ -184,7 +185,7 @@ function TripViewer({ view }: { view: TripView }) {
     const pool = new SimplePool();
     const unsub = subscribeTrip(pool, view, setLoc);
     const tick = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 1000);
-    return () => { unsub(); clearInterval(tick); try { pool.close(view.relays); } catch {} };
+    return () => { unsub(); clearInterval(tick); try { pool.close(view.relays); } catch { /* ignore */ } };
   }, []);
   const ended = loc?.status === 'ended';
   const info = loc?.info;
@@ -303,7 +304,7 @@ function AppInner() {
   const celebratedLoaded = useRef(false);
   useEffect(() => {
     kvGet('freeport.celebrated').then((raw) => {
-      if (raw) { try { celebratedIds.current = new Set(JSON.parse(raw) as string[]); } catch {} }
+      if (raw) { try { celebratedIds.current = new Set(JSON.parse(raw) as string[]); } catch { /* ignore */ } }
       celebratedLoaded.current = true;
     });
   }, []);
@@ -390,7 +391,7 @@ function AppInner() {
   const callPrefsRef = useRef({ callsEnabled: false, turnEnabled: false });
   useEffect(() => { callPrefsRef.current = { callsEnabled: chatCallsEnabled, turnEnabled: chatCallsTurn }; }, [chatCallsEnabled, chatCallsTurn]);
   const [callState, setCallState] = useState<CallState>({ phase: 'idle' });
-  const [callStreams, setCallStreams] = useState<{ local: any; remote: any }>({ local: null, remote: null });
+  const [callStreams, setCallStreams] = useState<{ local: unknown; remote: unknown }>({ local: null, remote: null });
   const callManagerRef = useRef<CallManager | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   // An opened invite link (/i/<code> path or legacy #invite= hash), waiting for
@@ -688,14 +689,7 @@ function AppInner() {
       setCustomMessage(p.customMessage);
       setAutoSendCustomMessage(p.autoSendCustomMessage);
       setTelemetryOn(p.telemetryEnabled);
-      initTelemetry(p.telemetryEnabled).then(() => {
-        trackEvent('app_opened');
-        // [fp-boot] beacon: proves the Sentry transport works on THIS bundle
-        // independent of the probe (events went silent on the previous OTA —
-        // this splits "probe broken" from "transport broken").
-        try { getSentry()?.captureMessage('[fp-boot] telemetry up', { level: 'info' }); } catch { /* best-effort */ }
-        startPerfProbe('launch');
-      }).catch(() => {});
+      initTelemetry(p.telemetryEnabled).then(() => { trackEvent('app_opened'); startPerfProbe('launch'); }).catch(() => {});
       setRole(p.role);
       setLanguage(p.language || systemLanguage()); // '' pref = follow the device language
       setFareConfigState(p.fareConfig);
@@ -752,7 +746,7 @@ function AppInner() {
       const { role: r, tab: tb, myIntents: mi, negos: ng } = autoMsgState.current;
       if (r !== 'passenger' || tb !== 'post') return;
       const nowSec = Math.floor(Date.now() / 1000);
-      const hasLiveRequest = mi.some((i) => !(i.content.payload as any)?.withdrawn
+      const hasLiveRequest = mi.some((i) => !payloadOf(i).withdrawn
         && i.content.expires_at >= nowSec
         && !(i.content.window && i.content.window.start < nowSec));
       const hasConversation = ng.some((n) => n.state !== 'cancelled' && n.state !== 'expired');
@@ -828,7 +822,7 @@ function AppInner() {
         // (also when backgrounded) — both opt-in in Settings.
         if (isNewLive) {
           const bp = browseAlertRef.current;
-          const pl = i.content.payload as any;
+          const pl = payloadOf(i);
           const matches = bp.subcategory
             && categoryOf(i.content.schema, pl) === bp.category
             && subcategoryOf(i.content.schema, pl) === bp.subcategory;
@@ -950,7 +944,7 @@ function AppInner() {
     let cancelled = false;
     (async () => {
       let rated = new Set<string>();
-      try { const raw = await kvGet('freeport.rated'); if (raw) rated = new Set(JSON.parse(raw) as string[]); } catch {}
+      try { const raw = await kvGet('freeport.rated'); if (raw) rated = new Set(JSON.parse(raw) as string[]); } catch { /* ignore */ }
       if (cancelled) return;
       const fresh = candidates.filter((n) => !rated.has(n.id));
       if (fresh.length === 0) return;
@@ -975,7 +969,7 @@ function AppInner() {
   const autoMsgLoaded = useRef(false);
   useEffect(() => {
     kvGet('freeport.autoMsgSent').then((raw) => {
-      if (raw) { try { autoMsgHandled.current = new Set(JSON.parse(raw) as string[]); } catch {} }
+      if (raw) { try { autoMsgHandled.current = new Set(JSON.parse(raw) as string[]); } catch { /* ignore */ } }
       autoMsgLoaded.current = true;
     }).catch(() => { autoMsgLoaded.current = true; });
   }, []);
@@ -1039,13 +1033,13 @@ function AppInner() {
   const [expiredLog, setExpiredLog] = useState<{ d: string; title: string }[]>([]);
   const [expiredSeen, setExpiredSeen] = useState<Set<string>>(new Set());
   useEffect(() => {
-    kvGet('freeport.expiredLog').then((raw) => { if (raw) try { setExpiredLog(JSON.parse(raw)); } catch {} });
-    kvGet('freeport.expiredSeen').then((raw) => { if (raw) try { setExpiredSeen(new Set(JSON.parse(raw) as string[])); } catch {} });
+    kvGet('freeport.expiredLog').then((raw) => { if (raw) try { setExpiredLog(JSON.parse(raw)); } catch { /* ignore */ } });
+    kvGet('freeport.expiredSeen').then((raw) => { if (raw) try { setExpiredSeen(new Set(JSON.parse(raw) as string[])); } catch { /* ignore */ } });
   }, []);
   useEffect(() => {
     const nowSec = Math.floor(Date.now() / 1000);
     const dead = (i: Intent) =>
-      !(i.content.payload as any)?.withdrawn
+      !payloadOf(i).withdrawn
       && (i.content.expires_at < nowSec || (!!i.content.window && i.content.window.start < nowSec))
       && !negos.some((n) => n.intent.id === i.id && n.state === 'confirmed');
     setExpiredLog((prev) => {
@@ -1825,13 +1819,13 @@ function AppInner() {
             // others stop seeing me, then remove off-device copies.
             try {
               if (client) {
-                for (const i of myIntents) { try { await client.withdrawIntent(i); } catch {} }
+                for (const i of myIntents) { try { await client.withdrawIntent(i); } catch { /* ignore */ } }
                 const blank: UserProfile = { name: '', picture: '', about: '', gallery: [], phone: '', phoneDisplay: 'full', link: '', vehicleModel: '', plateNumber: '', plateDisplay: 'masked' };
-                try { await client.publishProfile(blank); } catch {}
+                try { await client.publishProfile(blank); } catch { /* ignore */ }
               }
-            } catch {}
-            try { await cloudClear(); } catch {}                       // delete cloud backup of the key
-            try { const p = await loadPrefs(); await disablePush(client?.pubkey ?? '', (p.notifyEndpoint || '').trim()); } catch {} // unsubscribe push
+            } catch { /* ignore */ }
+            try { await cloudClear(); } catch { /* ignore */ }                       // delete cloud backup of the key
+            try { const p = await loadPrefs(); await disablePush(client?.pubkey ?? '', (p.notifyEndpoint || '').trim()); } catch { /* ignore */ } // unsubscribe push
             await kvSet('freeport.pushOn', '0').catch(() => {});
             // Erase EVERYTHING on this device (key, profile, settings, posts, deals…).
             await wipeAllLocalData();

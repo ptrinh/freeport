@@ -50,6 +50,7 @@ import { confirmAsync } from '../../ui/alerts';
 import { s, palette } from '../../ui/theme';
 
 const DONATION_BTC = 'bc1ps44wjx3wpu4s0xj746gz2lu45nspsm9059d3ym8xz0nrhu4psyasdgwwhx';
+type NavClip = Navigator & { clipboard?: { writeText: (t: string) => Promise<void> }; standalone?: boolean; platform?: string; maxTouchPoints?: number };
 
 function AboutSection({
   onReplayTour,
@@ -66,11 +67,11 @@ function AboutSection({
   // suggest the native app — shown as a passive notice in About.
   const nativeOS = useMemo<'ios' | 'android' | null>(() => {
     if (Platform.OS !== 'web' || typeof navigator === 'undefined') return null;
-    const w: any = typeof window !== 'undefined' ? window : undefined;
-    const standalone = !!(w?.matchMedia?.('(display-mode: standalone)')?.matches) || (navigator as any).standalone === true;
+    const w = typeof window !== 'undefined' ? (window as Window & { matchMedia?: (q: string) => { matches: boolean } }) : undefined;
+    const standalone = !!(w?.matchMedia?.('(display-mode: standalone)')?.matches) || (navigator as NavClip).standalone === true;
     if (standalone) return null;
     const ua = navigator.userAgent || '';
-    if (/iPhone|iPad|iPod/.test(ua) || ((navigator as any).platform === 'MacIntel' && (navigator as any).maxTouchPoints > 1)) return 'ios';
+    if (/iPhone|iPad|iPod/.test(ua) || ((navigator as NavClip).platform === 'MacIntel' && ((navigator as NavClip).maxTouchPoints ?? 0) > 1)) return 'ios';
     if (/Android/.test(ua)) return 'android';
     return null;
   }, []);
@@ -176,8 +177,8 @@ function AboutSection({
               onPress={async () => {
                 try {
                   // expo-clipboard isn't in the binary — Share is the native copy path.
-                  if (Platform.OS === 'web' && (navigator as any)?.clipboard) {
-                    await (navigator as any).clipboard.writeText(DONATION_BTC);
+                  if (Platform.OS === 'web' && (navigator as NavClip)?.clipboard) {
+                    await (navigator as NavClip).clipboard?.writeText(DONATION_BTC);
                     setDonationCopied(true);
                   } else await Share.share({ message: DONATION_BTC });
                 } catch { /* ignore */ }

@@ -99,7 +99,7 @@ export function receiptSats(ev: Event): number {
  * update once on EOSE. Receipts are deduped by event id across relays.
  */
 export function fetchZapTotals(
-  pool: { subscribeMany: (relays: string[], filter: any, handlers: any) => { close: () => void } },
+  pool: { subscribeMany: (relays: string[], filter: { kinds: number[]; ['#e']: string[] }, handlers: { onevent: (ev: Event) => void; oneose?: () => void }) => { close: () => void } },
   relays: string[],
   eventIds: string[],
   cb: (totals: Map<string, number>) => void,

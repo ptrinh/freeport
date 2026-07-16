@@ -98,13 +98,13 @@ export function languageLabel(code: string): string {
 /** Raw device locale, e.g. "vi-VN" / "en-US". Best-effort across web + native. */
 function detectLocale(): string {
   try {
-    const nav: any = typeof navigator !== 'undefined' ? navigator : undefined;
+    const nav = typeof navigator !== 'undefined' ? (navigator as Navigator & { languages?: string[]; userLanguage?: string }) : undefined;
     if (nav?.language) return String(nav.language);
     if (nav?.languages?.length) return String(nav.languages[0]);
-  } catch {}
+  } catch { /* ignore */ }
   try {
     return Intl.DateTimeFormat().resolvedOptions().locale;
-  } catch {}
+  } catch { /* ignore */ }
   return 'en';
 }
 

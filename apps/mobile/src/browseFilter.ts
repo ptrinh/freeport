@@ -37,7 +37,7 @@ export const NEAR_KM = 200;
  *  already narrowed by schema). */
 export function passesCategory(
   schema: string,
-  payload: Record<string, any>,
+  payload: Record<string, unknown>,
   servicesEnabled: boolean,
   filterCat: string,
   filterSub: string | null,

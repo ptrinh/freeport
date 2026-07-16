@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- MediaStream is a different class on native (react-native-webrtc) vs web; the overlay renders both */
 /**
  * Full-screen call UI: incoming ring (Accept/Decline), outgoing ring,
  * in-call controls (mute, camera, hang up), remote video + local PiP.

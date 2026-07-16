@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- beforeSend/beforeBreadcrumb bridge scrubbers over @sentry/browser generics */
 /**
  * Telemetry — WEB / PWA. Same API as the native variant: Sentry browser SDK
  * (pointed at self-hosted GlitchTip) + self-hosted Aptabase web analytics. PII

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { KIND_KARMA } from '@freeport/protocol';
+import type { Event } from 'nostr-tools/pure';
 import { t } from '../../i18n';
 import { MobileClient } from '../../client';
 import { karmaLabel, type KarmaScore } from '../../karma';
@@ -64,7 +65,7 @@ export function KarmaReceived({ client }: { client: MobileClient }) {
     // Keep the latest karma event per (rater, d-tag). Backfill once, then keep
     // a live subscription open so a rating that lands while this screen is open
     // shows up without a reload (previously it only fetched once on mount).
-    const latest = new Map<string, any>();
+    const latest = new Map<string, Event>();
     const recompute = () => {
       if (cancelled) return;
       const parsed = [...latest.values()]
@@ -78,7 +79,7 @@ export function KarmaReceived({ client }: { client: MobileClient }) {
         .sort((a, b) => b.ts - a.ts);
       setRatings(parsed);
     };
-    const ingest = (ev: any) => {
+    const ingest = (ev: Event) => {
       const d = ev.tags.find((t: string[]) => t[0] === 'd')?.[1] ?? '';
       const k = `${ev.pubkey}|${d}`;
       const prev = latest.get(k);
@@ -92,7 +93,7 @@ export function KarmaReceived({ client }: { client: MobileClient }) {
     const sub = client.pool.subscribeMany(
       client.relays,
       { kinds: [KIND_KARMA], '#p': [client.pubkey], since: Math.floor(Date.now() / 1000) },
-      { onevent: (ev: any) => { if (ingest(ev)) recompute(); } },
+      { onevent: (ev: Event) => { if (ingest(ev)) recompute(); } },
     );
     return () => { cancelled = true; sub.close(); };
   }, [client]);

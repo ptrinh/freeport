@@ -81,7 +81,7 @@ export function placeUrl(name: string, geohash?: string): string {
     try {
       const { lat, lon } = geohashDecode(geohash);
       return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-    } catch {}
+    } catch { /* ignore */ }
   }
   return 'https://www.google.com/maps';
 }
@@ -197,7 +197,7 @@ interface IpInfo { countryCode?: string; region?: string; city?: string; latitud
 let ipCache: IpInfo | null = null;
 async function ipLookup(): Promise<IpInfo | null> {
   if (ipCache) return ipCache;
-  const providers: { url: string; map: (d: any) => IpInfo | null }[] = [
+  const providers: { url: string; map: (d: { success?: boolean; error?: unknown; country_code?: string; region?: string; city?: string; latitude?: number; longitude?: number } | null) => IpInfo | null }[] = [
     { url: 'https://ipwho.is/', map: (d) => (d && d.success !== false && d.country_code)
         ? { countryCode: d.country_code, region: d.region, city: d.city, latitude: d.latitude, longitude: d.longitude } : null },
     { url: 'https://ipapi.co/json/', map: (d) => (d && !d.error && typeof d.country_code === 'string')

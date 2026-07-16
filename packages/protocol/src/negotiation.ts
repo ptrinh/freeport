@@ -416,7 +416,7 @@ export function parseNegotiationMessage(json: string): NegotiationMessage | null
   if (typeof msg !== 'object' || msg === null) return null;
   if (msg.v !== SCHEMA_VERSION) return null;
   const VALID = [MSG_COUNTER, MSG_ACCEPT, MSG_CANCEL, MSG_CHAT, MSG_CANCEL_REQUEST, MSG_CANCEL_AGREE, MSG_CANCEL_DECLINE, MSG_STATUS];
-  if (!VALID.includes(msg.type as any)) return null;
+  if (!(VALID as readonly string[]).includes(msg.type)) return null;
   if (typeof msg.nego !== 'string' || typeof msg.intent_id !== 'string') return null;
   return msg;
 }

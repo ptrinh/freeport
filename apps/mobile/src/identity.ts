@@ -162,7 +162,7 @@ export async function parseBackupBundle(
   passphrase: string,
 ): Promise<{ sk: Uint8Array } & BackupExtras> {
   const t = text.trim();
-  let o: any;
+  let o: Record<string, unknown> | undefined;
   try { o = JSON.parse(t); } catch { /* not JSON → bare key below */ }
 
   // v2: the whole bundle is encrypted under the passphrase — unwrap first. A

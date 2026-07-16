@@ -239,7 +239,7 @@ function SettingsTab({
   onFareConfigChange: (cfg: FareConfig | null) => void;
   onSignOut: () => void | Promise<void>;
   onDeleteAccount: () => void | Promise<void>;
-  onScroll?: (e: any) => void;
+  onScroll?: (e: { nativeEvent: { contentOffset: { y: number } } }) => void;
 }) {
   const [name, setName] = useState(profile.name);
   const [about, setAbout] = useState(profile.about);
@@ -414,8 +414,8 @@ function SettingsTab({
         // in the same session fails silently, but reloading re-shows the prompt.
         // (Verified in simulator: deny → reload → Allow restores location.)
         try {
-          if ((globalThis as any).confirm?.(t('Location was blocked. Reload the page now and tap Allow when asked?'))) {
-            (globalThis as any).location?.reload?.();
+          if ((globalThis as { confirm?: (m: string) => boolean }).confirm?.(t('Location was blocked. Reload the page now and tap Allow when asked?'))) {
+            (globalThis as { location?: { reload?: () => void } }).location?.reload?.();
           }
         } catch { /* ignore */ }
       } else {
@@ -544,8 +544,8 @@ function SettingsTab({
         plateDisplay: isDriver ? plateDisplay : (profile.plateDisplay ?? 'masked'),
       });
       uiAlert(t('Saved'), t('Profile published to relays.'));
-    } catch (e: any) {
-      uiAlert(t('Could not save'), e?.message ?? '');
+    } catch (e) {
+      uiAlert(t('Could not save'), (e instanceof Error ? e.message : undefined) ?? '');
     } finally { setSaving(false); }
   };
 
@@ -578,8 +578,8 @@ function SettingsTab({
       if (savedPath) Alert.alert(t('Account exported'), savedPath);
       savePrefs({ backupDone: true }).catch(() => {}); // stop the backup reminder
       onBackupDone?.();
-    } catch (e: any) {
-      Alert.alert(t('Backup failed'), e?.message ?? 'Try again.');
+    } catch (e) {
+      Alert.alert(t('Backup failed'), (e instanceof Error ? e.message : undefined) ?? 'Try again.');
     } finally { setBackingUp(false); }
   };
 

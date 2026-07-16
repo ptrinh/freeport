@@ -6,7 +6,7 @@
  */
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import type { Event } from 'nostr-tools';
+import type { Event, Filter } from 'nostr-tools';
 import {
   KIND_INTENT_OFFER,
   KIND_INTENT_REQUEST,
@@ -48,7 +48,7 @@ export function latestByAddress(events: Event[]): Event[] {
 }
 
 /** Best geohash for an intent: the published `g` tag, else the payload pin. */
-function intentGeohash(ev: Event, payload: any): string | undefined {
+function intentGeohash(ev: Event, payload: { from?: { geohash?: string }; location?: { geohash?: string }; geohash?: string }): string | undefined {
   return (
     tagVal(ev, 'g') ||
     payload?.from?.geohash ||
@@ -87,7 +87,7 @@ export function registerTools(server: McpServer, pool: RelayPool): void {
         args.side === 'offer' ? [KIND_INTENT_OFFER]
         : args.side === 'request' ? [KIND_INTENT_REQUEST]
         : [KIND_INTENT_OFFER, KIND_INTENT_REQUEST];
-      const filter: any = { kinds, limit: args.limit };
+      const filter: Filter = { kinds, limit: args.limit };
       if (args.topics?.length) filter['#t'] = args.topics;
       if (args.since) filter.since = args.since;
       if (args.until) filter.until = args.until;
@@ -101,7 +101,7 @@ export function registerTools(server: McpServer, pool: RelayPool): void {
         .map((ev) => {
           const intent = parseIntentEvent(ev);
           if (!intent) return null;
-          const payload = intent.content.payload as any;
+          const payload = intent.content.payload as { withdrawn?: boolean; from?: { geohash?: string; name?: string }; to?: { name?: string }; location?: { geohash?: string; name?: string }; payment?: string; service?: string; [k: string]: unknown };
           // Withdrawal tombstone (latest version has an empty payload) — the
           // listing is gone; don't surface it.
           if (!payload || Object.keys(payload).length === 0) return null;
@@ -197,7 +197,7 @@ export function registerTools(server: McpServer, pool: RelayPool): void {
       }
       const profiles = args.pubkeys.map((pk) => {
         const ev = latest.get(pk);
-        let metadata: any = null;
+        let metadata: Record<string, unknown> | null = null;
         if (ev) { try { metadata = JSON.parse(ev.content); } catch { metadata = null; } }
         return {
           pubkey: pk,
@@ -228,7 +228,7 @@ export function registerTools(server: McpServer, pool: RelayPool): void {
       relays: relaysField,
     },
     async (args) => {
-      const filter: any = { limit: args.limit };
+      const filter: Filter = { limit: args.limit };
       if (args.kinds) filter.kinds = args.kinds;
       if (args.authors) filter.authors = args.authors;
       if (args.ids) filter.ids = args.ids;

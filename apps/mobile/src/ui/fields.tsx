@@ -15,6 +15,8 @@ import {
   View,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+
+type MCIName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { TimeSpinner } from '../TimeSpinner';
@@ -226,7 +228,7 @@ function SelectField({ value, options, onChange, icons, iconFor, labelFor, place
       {options.map((o) => (
         <Pressable key={o} style={s.selectOption} onPress={() => { onChange(o); setOpen(false); }}>
           <View style={s.row}>
-            {glyph(o) ? <MaterialCommunityIcons name={glyph(o) as any} size={20} color={o === value ? palette.accent : palette.text3} style={{ marginEnd: 10 }} /> : null}
+            {glyph(o) ? <MaterialCommunityIcons name={glyph(o) as MCIName} size={20} color={o === value ? palette.accent : palette.text3} style={{ marginEnd: 10 }} /> : null}
             <Text style={[s.selectOptionText, o === value && s.selectOptionOn]}>{labelOf(o)}</Text>
           </View>
           {o === value && <Ionicons name="checkmark" size={18} color={palette.accent} />}
@@ -238,7 +240,7 @@ function SelectField({ value, options, onChange, icons, iconFor, labelFor, place
     <>
       <Pressable style={s.selectField} onPress={() => setOpen(true)}>
         <View style={s.row}>
-          {glyph(value) ? <MaterialCommunityIcons name={glyph(value) as any} size={18} color={palette.text2} style={{ marginEnd: 8 }} /> : null}
+          {glyph(value) ? <MaterialCommunityIcons name={glyph(value) as MCIName} size={18} color={palette.text2} style={{ marginEnd: 8 }} /> : null}
           <Text style={[s.selectValue, !value && { color: palette.placeholder }]}>{value ? labelOf(value) : (placeholder ?? 'Select…')}</Text>
         </View>
         <Ionicons name="chevron-down" size={16} color={palette.text3} />
@@ -258,7 +260,7 @@ function Field({
   label, value, onChange, placeholder = '', multiline = false, keyboardType = 'default', secure = false, onBlur, onFocus, maxLength,
 }: {
   label: string; value: string; onChange: (v: string) => void;
-  placeholder?: string; multiline?: boolean; keyboardType?: any; secure?: boolean;
+  placeholder?: string; multiline?: boolean; keyboardType?: React.ComponentProps<typeof TextInput>['keyboardType']; secure?: boolean;
   onBlur?: () => void; onFocus?: () => void; maxLength?: number;
 }) {
   const [focused, setFocused] = useState(false);
@@ -272,14 +274,15 @@ function Field({
         style={[s.input, multiline && { height: 80, textAlignVertical: 'top' }, focused && s.inputFocused]}
         value={value}
         onChangeText={onChange}
-        onFocus={(e: any) => {
+        onFocus={(e) => {
           setFocused(true);
           onFocus?.();
           // Web: the OS keyboard overlays the page and can hide a low field.
           // Scroll it to the middle once the keyboard/viewport has settled.
           if (Platform.OS === 'web') {
-            const el = e?.target;
-            if (el?.scrollIntoView) setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+            const el = e?.target as unknown as { scrollIntoView?: (o: object) => void } | undefined;
+            const siv = el?.scrollIntoView?.bind(el);
+            if (siv) setTimeout(() => siv({ block: 'center', behavior: 'smooth' }), 300);
           }
         }}
         onBlur={() => { setFocused(false); onBlur?.(); }}
@@ -324,10 +327,11 @@ function NumberField({ label, value, onCommit }: { label: string; value: number;
         value={text}
         onChangeText={setText}
         onBlur={() => { const n = parseFloat(text.replace(',', '.')); onCommit(Number.isFinite(n) && n >= 0 ? n : value); }}
-        onFocus={(e: any) => {
+        onFocus={(e) => {
           if (Platform.OS === 'web') {
-            const el = e?.target;
-            if (el?.scrollIntoView) setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+            const el = e?.target as unknown as { scrollIntoView?: (o: object) => void } | undefined;
+            const siv = el?.scrollIntoView?.bind(el);
+            if (siv) setTimeout(() => siv({ block: 'center', behavior: 'smooth' }), 300);
           }
         }}
         keyboardType="numeric"
@@ -636,7 +640,7 @@ function AmountWheel({ amount, currency, onChange }: {
     }
   }, [amount, w, step]);
 
-  const snapTimer = useRef<any>(null);
+  const snapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const settling = useRef(false);
   // Snap to the exact nearest detent and commit the final value once. We do NOT
   // use snapToInterval — it fights the momentum near a detent boundary, flipping
@@ -654,7 +658,7 @@ function AmountWheel({ amount, currency, onChange }: {
     onChange(idxToValue(idx));
     setTimeout(() => { settling.current = false; }, 320);
   };
-  const onScroll = (e: any) => {
+  const onScroll = (e: { nativeEvent: { contentOffset: { x: number } } }) => {
     if (realigning.current) return; // programmatic re-align — must not overwrite a typed value
     const x = e.nativeEvent.contentOffset.x;
     const idx = Math.max(0, Math.round(x / TICK));
@@ -698,10 +702,10 @@ function AmountWheel({ amount, currency, onChange }: {
   // pans via touch/trackpad on web). Dragging sets scrollLeft directly; the
   // native onScroll above then updates the value + fires the detent tick.
   const drag = useRef({ active: false, startX: 0, startScroll: 0 });
-  const scrollNode = () => (scroller.current as any)?.getScrollableNode?.() as HTMLElement | undefined;
+  const scrollNode = () => (scroller.current as unknown as { getScrollableNode?: () => HTMLElement } | null)?.getScrollableNode?.();
   const webDrag = Platform.OS === 'web' ? {
-    onMouseDown: (e: any) => { const n = scrollNode(); if (!n) return; drag.current = { active: true, startX: e.clientX, startScroll: n.scrollLeft }; },
-    onMouseMove: (e: any) => { if (!drag.current.active) return; const n = scrollNode(); if (n) n.scrollLeft = drag.current.startScroll - (e.clientX - drag.current.startX); },
+    onMouseDown: (e: { clientX: number }) => { const n = scrollNode(); if (!n) return; drag.current = { active: true, startX: e.clientX, startScroll: n.scrollLeft }; },
+    onMouseMove: (e: { clientX: number }) => { if (!drag.current.active) return; const n = scrollNode(); if (n) n.scrollLeft = drag.current.startScroll - (e.clientX - drag.current.startX); },
     onMouseUp: () => { drag.current.active = false; },
     onMouseLeave: () => { drag.current.active = false; },
   } : {};
@@ -730,7 +734,7 @@ function AmountWheel({ amount, currency, onChange }: {
       <Animated.View
         style={[
           s.wheelWrap,
-          Platform.OS === 'web' ? ({ cursor: 'grab' } as any) : null,
+          Platform.OS === 'web' ? ({ cursor: 'grab' } as unknown as Record<string, unknown>) : null,
           demoActive ? {
             borderRadius: 10, borderWidth: 1.5,
             borderColor: demoGlow.interpolate({ inputRange: [0, 1], outputRange: ['rgba(251,191,36,0)', 'rgba(251,191,36,1)'] }),
@@ -746,9 +750,9 @@ function AmountWheel({ amount, currency, onChange }: {
           decelerationRate="normal"
           scrollEventThrottle={16}
           onScroll={onScroll}
-          onScrollBeginDrag={() => { interacting.current = true; clearTimeout(snapTimer.current); }}
-          onScrollEndDrag={() => { clearTimeout(snapTimer.current); snapTimer.current = setTimeout(settle, 90); }}
-          onMomentumScrollBegin={() => clearTimeout(snapTimer.current)}
+          onScrollBeginDrag={() => { interacting.current = true; clearTimeout(snapTimer.current ?? undefined); }}
+          onScrollEndDrag={() => { clearTimeout(snapTimer.current ?? undefined); snapTimer.current = setTimeout(settle, 90); }}
+          onMomentumScrollBegin={() => clearTimeout(snapTimer.current ?? undefined)}
           onMomentumScrollEnd={settle}
           contentContainerStyle={{ paddingHorizontal: Math.max(0, (w - TICK) / 2), alignItems: 'flex-end' }}
         >

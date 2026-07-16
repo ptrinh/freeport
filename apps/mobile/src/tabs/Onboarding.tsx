@@ -223,8 +223,8 @@ export function Onboarding({
         return;
       }
       await onRestore(text, '');
-    } catch (e: any) {
-      uiAlert(t('Restore failed'), e?.message ?? t('Invalid backup file.'));
+    } catch (e) {
+      uiAlert(t('Restore failed'), (e instanceof Error ? e.message : undefined) ?? t('Invalid backup file.'));
     } finally {
       setBusy(null);
     }
@@ -237,8 +237,8 @@ export function Onboarding({
       await onRestore(pendingRestore, restorePass);
       setPendingRestore(null);
       setRestorePass('');
-    } catch (e: any) {
-      uiAlert(t('Restore failed'), e?.message ?? t('Wrong passphrase?'));
+    } catch (e) {
+      uiAlert(t('Restore failed'), (e instanceof Error ? e.message : undefined) ?? t('Wrong passphrase?'));
     } finally {
       setBusy(null);
     }
@@ -249,8 +249,8 @@ export function Onboarding({
     try {
       const found = await onCloudRestore();
       if (!found) uiAlert(t('No cloud backup found.'));
-    } catch (e: any) {
-      uiAlert(t('Restore failed'), e?.message ?? t('Invalid backup.'));
+    } catch (e) {
+      uiAlert(t('Restore failed'), (e instanceof Error ? e.message : undefined) ?? t('Invalid backup.'));
     } finally {
       setBusy(null);
     }
@@ -292,9 +292,9 @@ export function Onboarding({
       startPrep();                 // defensive: ensure prep ran even if not pre-started
       await prepRef.current;       // resolves immediately if already finished
       onFinish();
-    } catch (e: any) {
+    } catch (e) {
       prepRef.current = null;      // allow a retry on failure
-      uiAlert(t('Could not create account'), e?.message ?? '');
+      uiAlert(t('Could not create account'), (e instanceof Error ? e.message : undefined) ?? '');
     } finally {
       setBusy(null);
     }

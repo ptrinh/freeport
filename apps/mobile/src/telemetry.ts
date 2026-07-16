@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Sentry SDK is lazy-required so old binaries without the native module survive; the module object is untyped by design */
 /**
  * Telemetry — NATIVE (iOS/Android). Crash/error reporting via Sentry (pointed at
  * our self-hosted GlitchTip) + anonymous product analytics via self-hosted

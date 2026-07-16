@@ -22,7 +22,7 @@ export function openMaps(httpsUrl: string): void {
 // web code path must fall back to the browser's own dialog.
 export function uiAlert(title: string, body?: string): void {
   if (Platform.OS === 'web') {
-    try { (globalThis as any).alert?.(body ? `${title}\n\n${body}` : title); } catch { /* best-effort */ }
+    try { (globalThis as { alert?: (m: string) => void }).alert?.(body ? `${title}\n\n${body}` : title); } catch { /* best-effort */ }
   } else {
     Alert.alert(title, body);
   }

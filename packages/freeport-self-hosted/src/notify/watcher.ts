@@ -12,6 +12,7 @@
  */
 import { SimplePool } from 'nostr-tools/pool';
 import type { Event } from 'nostr-tools';
+import type { Filter } from 'nostr-tools';
 import webpush from 'web-push';
 import { Expo } from 'expo-server-sdk';
 import { eventGeohash, matches, unionKinds } from './match.js';
@@ -96,7 +97,7 @@ export class Watcher {
       this.intentSub?.close();
       this.intentSub = this.pool.subscribeMany(
         this.relays,
-        { kinds: this.intentKinds, since: Math.floor(Date.now() / 1000) - 60 } as any, // 60s overlap: a re-subscribe must not drop events published in the gap (dedupe absorbs the replays)
+        { kinds: this.intentKinds, since: Math.floor(Date.now() / 1000) - 60 } as Filter, // 60s overlap: a re-subscribe must not drop events published in the gap (dedupe absorbs the replays)
         { onevent: (ev: Event) => this.onIntent(ev) },
       );
     }
@@ -111,14 +112,14 @@ export class Watcher {
       if (this.pubkeys.length) {
         this.dmSub = this.pool.subscribeMany(
           this.relays,
-          { kinds: [KIND_DM], '#p': this.pubkeys, since: Math.floor(Date.now() / 1000) - 60 } as any, // 60s overlap: a re-subscribe must not drop events published in the gap (dedupe absorbs the replays)
+          { kinds: [KIND_DM], '#p': this.pubkeys, since: Math.floor(Date.now() / 1000) - 60 } as Filter, // 60s overlap: a re-subscribe must not drop events published in the gap (dedupe absorbs the replays)
           { onevent: (ev: Event) => this.onDM(ev) },
         );
         // Separate sub for NIP-17 gift wraps: wide `since` (they're backdated),
         // routed through the same content-blind "New message" path as kind-4.
         this.wrapSub = this.pool.subscribeMany(
           this.relays,
-          { kinds: [KIND_GIFT_WRAP], '#p': this.pubkeys, since: Math.floor(Date.now() / 1000) - WRAP_BACKFILL_SEC } as any,
+          { kinds: [KIND_GIFT_WRAP], '#p': this.pubkeys, since: Math.floor(Date.now() / 1000) - WRAP_BACKFILL_SEC } as Filter,
           { onevent: (ev: Event) => this.onDM(ev) },
         );
       }
@@ -204,7 +205,7 @@ export class Watcher {
       const [ticket] = await this.expo.sendPushNotificationsAsync([
         { to: token, title: 'Freeport', body: body.body, data: body.data, sound: 'default' },
       ]);
-      if (ticket.status === 'error' && (ticket.details as any)?.error === 'DeviceNotRegistered') {
+      if (ticket.status === 'error' && (ticket.details as { error?: string } | undefined)?.error === 'DeviceNotRegistered') {
         this.store.remove(rec.id); // token revoked — prune
         this.refresh();
       }
@@ -216,9 +217,9 @@ export class Watcher {
   private async pushWeb(rec: SubRecord, body: { body: string; tag: string; data: Record<string, unknown> }): Promise<void> {
     const payload = JSON.stringify({ title: 'Freeport', ...body });
     try {
-      await webpush.sendNotification(rec.subscription as any, payload);
-    } catch (err: any) {
-      const code = err?.statusCode;
+      await webpush.sendNotification(rec.subscription as unknown as webpush.PushSubscription, payload);
+    } catch (err) {
+      const code = (err as { statusCode?: number } | null)?.statusCode;
       if (code === 404 || code === 410) {
         this.store.remove(rec.id); // subscription expired/unsubscribed
         console.error(`[notify] pruned dead subscription ${rec.id}`);

@@ -42,7 +42,7 @@ function WalletTab({
    *  the agreed price. fiatAmount/fiatCurrency come parsed from the deal. */
   prefill?: { mode?: 'send' | 'receive'; dest?: string; hint?: string; fiatAmount?: number; fiatCurrency?: string; memo?: string } | null;
   onPrefillConsumed?: () => void;
-  onScroll?: (e: any) => void;
+  onScroll?: (e: { nativeEvent: { contentOffset: { y: number } } }) => void;
 }) {
   const provider = useRef<WalletProvider | null>(null);
   const [connected, setConnected] = useState(false);

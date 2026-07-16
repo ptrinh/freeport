@@ -50,11 +50,11 @@ export async function kvGet(key: string): Promise<string | null> {
 export async function kvSet(key: string, value: string): Promise<void> {
   try {
     globalThis.localStorage?.setItem(storageKey(key), value);
-  } catch {}
+  } catch { /* ignore */ }
 }
 
 export async function kvDelete(key: string): Promise<void> {
   try {
     globalThis.localStorage?.removeItem(storageKey(key));
-  } catch {}
+  } catch { /* ignore */ }
 }

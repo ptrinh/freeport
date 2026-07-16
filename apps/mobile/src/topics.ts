@@ -44,7 +44,7 @@ export function intentTopics(location: UserLocation, category: string, subcatego
 }
 
 /** Same derivation, but from an intent's schema + payload (for any consumer). */
-export function intentTopicsFor(location: UserLocation, schema: string, payload: Record<string, any>): string[] {
+export function intentTopicsFor(location: UserLocation, schema: string, payload: Record<string, unknown>): string[] {
   return intentTopics(location, categoryOf(schema, payload), subcategoryOf(schema, payload));
 }
 

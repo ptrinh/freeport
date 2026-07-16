@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- ML Kit / Chrome built-in Translator are untyped platform globals */
 /**
  * In-chat auto-translate — ON-DEVICE only, riding the same Apple Foundation
  * Models layer as the concierge (roadmap: "a cloud API must be explicit

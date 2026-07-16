@@ -80,7 +80,7 @@ export class NwcProvider implements WalletProvider {
       // answer into the void.
       const sub = this.pool.subscribeMany(this.conn.relays, {
         kinds: [RESPONSE_KIND], authors: [this.conn.walletPubkey], '#e': [ev.id],
-      } as any, {
+      } as Parameters<typeof this.pool.subscribeMany>[1], {
         onevent: async (resp: Event) => {
           try {
             const plain = await nip04Decrypt(this.sk, this.conn.walletPubkey, resp.content);

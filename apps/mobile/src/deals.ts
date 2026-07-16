@@ -2,6 +2,7 @@
  * Pure deal/negotiation helpers shared by the Messages UI. Kept out of App.tsx
  * so they are unit-testable without the React Native runtime.
  */
+import { payloadOf } from './payloadShape';
 import type { Intent, Negotiation } from '@freeport/protocol';
 import type { MobileClient } from './client';
 
@@ -88,7 +89,7 @@ export function shouldPokeForContact(
  * (from/to), service, location, notes, payment, category, subcategory.
  */
 export function searchableText(i: Intent, client: MobileClient | null): string {
-  const p = i.content.payload as Record<string, any>;
+  const p = payloadOf(i);
   const author = client?.profiles.get(i.pubkey)?.name ?? '';
   return [
     i.content.title, author, p.from?.name, p.to?.name, p.service,
@@ -140,7 +141,7 @@ export interface RepostDraft {
 }
 
 export function repostDraft(intent: Intent): RepostDraft {
-  const p = (intent.content.payload ?? {}) as Record<string, any>;
+  const p = payloadOf(intent);
   const base = {
     schema: intent.content.schema,
     category: p.category,

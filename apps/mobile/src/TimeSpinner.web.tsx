@@ -23,7 +23,7 @@ export function TimeSpinner({
     step: 900,
     value: local,
     max,
-    onChange: (e: any) => {
+    onChange: (e: { target: { value: string } }) => {
       const v = String(e.target.value);
       if (!v) return;
       const [datePart, timePart] = v.split('T');

@@ -110,8 +110,8 @@ export async function checkForUpdate(): Promise<UpdateResult> {
     if (!check.isAvailable) return { outcome: 'up-to-date' };
     const fetched = await Updates.fetchUpdateAsync();
     return fetched.isNew ? { outcome: 'updated' } : { outcome: 'up-to-date' };
-  } catch (e: any) {
-    return { outcome: 'error', message: e?.message };
+  } catch (e) {
+    return { outcome: 'error', message: e instanceof Error ? e.message : undefined };
   }
 }
 

@@ -68,7 +68,7 @@ export async function publishKarma(
   if (note) content.note = note;
   if (contactVerified) content.contact_verified = true;
   if (contactVerified && contactMasked) content.contact_masked = contactMasked;
-  let template: any = {
+  let template: { kind: number; created_at: number; tags: string[][]; content: string; pubkey: string } = {
     kind: KIND_KARMA,
     created_at: Math.floor(Date.now() / 1000),
     tags: [

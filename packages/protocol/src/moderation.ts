@@ -117,7 +117,7 @@ export function screenIntent(category: string | undefined, ...textParts: (string
 }
 
 /** Convenience for screening a parsed intent's content+payload. */
-export function screenIntentContent(schema: string, title: string, payload: Record<string, any>): ModerationVerdict {
+export function screenIntentContent(schema: string, title: string, payload: { category?: string; subcategory?: string; service?: string; notes?: string; note?: string; from?: { name?: string }; to?: { name?: string }; location?: { name?: string }; [k: string]: unknown }): ModerationVerdict {
   return screenIntent(
     payload?.category,
     title,

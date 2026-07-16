@@ -188,7 +188,7 @@ export const SERVICE_SUBCATEGORIES: Record<string, string[]> = {
 export const SERVICE_CATEGORIES = Object.keys(SERVICE_SUBCATEGORIES);
 
 /** The category an intent belongs to (rideshare → Ridesharing; service → payload.category). */
-export function categoryOf(schema: string, payload: Record<string, any>): string {
+export function categoryOf(schema: string, payload: Record<string, unknown>): string {
   if (schema.startsWith('rideshare')) return RIDESHARE_CATEGORY;
   return (payload?.category as string) || 'Other';
 }
@@ -204,7 +204,7 @@ export function subcategoriesFor(category: string): string[] {
 }
 
 /** The subcategory an intent belongs to. */
-export function subcategoryOf(schema: string, payload: Record<string, any>): string | undefined {
+export function subcategoryOf(schema: string, payload: Record<string, unknown>): string | undefined {
   // Rideshare keeps the vehicle in payload.category; service keeps it in payload.subcategory.
   return schema.startsWith('rideshare') ? (payload?.category as string) : (payload?.subcategory as string);
 }

@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import { t, tn, getI18nLang } from '../i18n';
+import { payloadOf } from '../payloadShape';
 import { currencyFractionDigits, fmtMoney, type Currency } from '../locations';
 import { parseAmountWithK } from '../money';
 import { VEHICLE_SEATERS } from '../categories';
@@ -19,13 +20,13 @@ export function isIOSWeb(): boolean {
 export function isStandalonePWA(): boolean {
   if (Platform.OS !== 'web' || typeof navigator === 'undefined') return false;
   try {
-    return (navigator as any).standalone === true
+    return (navigator as { standalone?: boolean }).standalone === true
       || (typeof matchMedia !== 'undefined' && matchMedia('(display-mode: standalone)').matches);
   } catch { return false; }
 }
 
 export function primaryGeohash(i: Intent): string | undefined {
-  const p = i.content.payload as Record<string, any>;
+  const p = payloadOf(i);
   return i.content.schema.startsWith('rideshare') ? p.from?.geohash : p.location?.geohash;
 }
 
@@ -58,7 +59,7 @@ export function vehicleLabel(v: string): string {
  */
 export function myPostTitle(intent: Intent): string {
   if (!intent.content.schema.startsWith('rideshare')) return intent.content.title;
-  const p = intent.content.payload as Record<string, any>;
+  const p = payloadOf(intent);
   const from = shortPlace(String(p.from?.name ?? '').trim());
   const to = String(p.to?.name ?? '').trim();
   if (!from && !to) return intent.content.title;

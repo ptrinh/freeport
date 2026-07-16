@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- optional expo-camera probing across binaries that may not link it */
 import { Platform } from 'react-native';
 // Static import (namespace): a dynamic import('…') namespace copy can fire
 // lazy getters on the module object (see breezNative.ts / GlitchTip #15).

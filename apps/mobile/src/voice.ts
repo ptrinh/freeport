@@ -145,7 +145,7 @@ export async function toggleVoice(url: string, onStatus: (st: VoicePlayback) => 
 export async function playAudio(url: string): Promise<void> {
   try {
     if (sound) { await sound.unload(); sound = null; }
-  } catch {}
+  } catch { /* ignore */ }
   const s = await createSound({ uri: url }, { shouldPlay: true });
   sound = s;
   s.setOnStatus((st) => {

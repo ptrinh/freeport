@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Web Speech API (webkitSpeechRecognition) has no lib.dom types in this config */
 /**
  * Concierge input sheet: describe what you need in plain language → the
  * on-device model drafts the Post form. The human always reviews and posts —

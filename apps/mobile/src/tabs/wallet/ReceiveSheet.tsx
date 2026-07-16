@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+
+type NavClip = Navigator & { clipboard?: { writeText: (t: string) => Promise<void> } };
 import { ActivityIndicator, KeyboardAvoidingView, Image, Modal, Platform, Pressable, ScrollView, Share, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
@@ -173,8 +175,8 @@ export function ReceiveSheet({
 
   const copy = async () => {
     try {
-      if (Platform.OS === 'web' && (navigator as any)?.clipboard) {
-        await (navigator as any).clipboard.writeText(value);
+      if (Platform.OS === 'web' && (navigator as NavClip)?.clipboard) {
+        await (navigator as NavClip).clipboard?.writeText(value);
         setCopied(true);
       } else {
         await Share.share({ message: value });
@@ -184,7 +186,7 @@ export function ReceiveSheet({
   const share = async () => { try { await Share.share({ message: value }); } catch { /* ignore */ } };
 
   const TAB_LABEL: Record<Tab, string> = { lightning: 'Lightning', spark: 'Spark', bitcoin: 'Bitcoin' };
-  const TAB_ICON: Record<Tab, any> = { lightning: 'flash', spark: 'sparkles-outline', bitcoin: 'logo-bitcoin' };
+  const TAB_ICON: Record<Tab, React.ComponentProps<typeof Ionicons>['name']> = { lightning: 'flash', spark: 'sparkles-outline', bitcoin: 'logo-bitcoin' };
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -255,7 +257,7 @@ export function ReceiveSheet({
                 <Pressable
                   onPress={async () => {
                     try {
-                      if (Platform.OS === 'web' && (navigator as any)?.clipboard) { await (navigator as any).clipboard.writeText(lnAddr.address); setCopied(true); }
+                      if (Platform.OS === 'web' && (navigator as NavClip)?.clipboard) { await (navigator as NavClip).clipboard?.writeText(lnAddr.address); setCopied(true); }
                       else await Share.share({ message: lnAddr.address });
                     } catch { /* ignore */ }
                   }}

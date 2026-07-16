@@ -15,7 +15,7 @@ export interface SparkPayment {
   /** unix seconds */
   timestamp: number;
   /** WASM: plain {type, …fields}; native: uniffi enum (tag + inner[0]) */
-  details?: any;
+  details?: unknown;
 }
 
 export function mapSparkPayments(payments: SparkPayment[]): WalletTx[] {

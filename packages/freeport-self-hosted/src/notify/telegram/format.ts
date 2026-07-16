@@ -33,7 +33,7 @@ export function intentCard(
   const intent = parseIntentEvent(ev);
   if (!intent) return null;
   const c = intent.content;
-  const payload = c.payload as Record<string, any>;
+  const payload = c.payload as { from?: { name?: string }; to?: { name?: string }; location?: { name?: string }; service?: string; payment?: string; pax?: number; when?: string; [k: string]: unknown };
   if (!payload || Object.keys(payload).length === 0) return null; // withdrawn tombstone — no card
   const offer = ev.kind === KIND_INTENT_OFFER;
 

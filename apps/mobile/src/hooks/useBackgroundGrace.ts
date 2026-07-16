@@ -51,7 +51,7 @@ export function useBackgroundGrace(
       beginBackgroundTask();
       const nowSec = Math.floor(Date.now() / 1000);
       const hasOpenPost = myIntents.some(
-        (i) => !(i.content.payload as any)?.withdrawn
+        (i) => !i.content.payload?.withdrawn
           && i.content.expires_at >= nowSec
           && !(i.content.window && i.content.window.start < nowSec)
           && !negos.some((n) => n.intent.id === i.id && n.state === 'confirmed'),

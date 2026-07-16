@@ -28,7 +28,7 @@ async function nativeClipboard() {
  *  binary that pre-linked expo-clipboard. Lets a button label itself "Copy"
  *  vs "Share" honestly. */
 export async function clipboardAvailable(): Promise<boolean> {
-  if (Platform.OS === 'web') return !!(globalThis.navigator as any)?.clipboard?.writeText;
+  if (Platform.OS === 'web') return !!(globalThis.navigator as Navigator & { clipboard?: { writeText?: (t: string) => Promise<void> } })?.clipboard?.writeText;
   return !!(await nativeClipboard());
 }
 
@@ -39,7 +39,7 @@ export async function clipboardAvailable(): Promise<boolean> {
  */
 export async function copyText(text: string, shareFallback?: () => void): Promise<boolean> {
   if (Platform.OS === 'web') {
-    try { await (globalThis.navigator as any)?.clipboard?.writeText(text); return true; } catch { return false; }
+    try { await (globalThis.navigator as Navigator & { clipboard?: { writeText?: (t: string) => Promise<void> } })?.clipboard?.writeText?.(text); return true; } catch { return false; }
   }
   const cb = await nativeClipboard();
   if (cb) { try { await cb.setStringAsync(text); return true; } catch { /* fall through to share */ } }

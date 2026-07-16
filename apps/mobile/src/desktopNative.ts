@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Tauri IPC bridge globals are untyped */
 /**
  * Bridge to Tauri desktop plugins (notification + geolocation) via the
  * `window.__TAURI__` global — NO @tauri-apps imports, so the web/native RN

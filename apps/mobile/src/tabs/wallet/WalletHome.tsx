@@ -47,7 +47,7 @@ export function WalletHome({
   onScan?: () => void;
   onReceive: () => void;
   footer?: React.ReactNode;
-  onScroll?: (e: any) => void;
+  onScroll?: (e: { nativeEvent: { contentOffset: { y: number } } }) => void;
 }) {
   // Fiat modes total the whole portfolio (BTC + USD-pegged stablecoins);
   // sats mode stays BTC-only — summing tokens into sats would mislead.

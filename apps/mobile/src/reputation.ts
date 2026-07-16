@@ -90,7 +90,7 @@ export async function fetchReputation(
     try {
       const meta = JSON.parse(profileEv.content);
       if (typeof meta.phone === 'string' && meta.phone) subjectMask = canonicalMask(meta.phone);
-    } catch {}
+    } catch { /* ignore */ }
   }
 
   // Proven deals: negoId → counterparty (both halves signed). Drives the

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- react-native-webrtc and browser WebRTC expose divergent APIs; this layer is the dynamic bridge */
 /**
  * Call manager — the state machine between call.* DM signaling (client.ts)
  * and a WebRTC peer connection (webrtc.ts). One call at a time.

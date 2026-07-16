@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { timeSync } from '../perfSpans';
+import { payloadOf } from '../payloadShape';
 import {
   ActivityIndicator,
   Animated,
@@ -73,7 +74,7 @@ export function PostTab({
   /** Repost: prefill the form from a completed post (time excluded). */
   draft?: import('../deals').RepostDraft | null;
   onDraftConsumed?: () => void;
-  onScroll?: (e: any) => void;
+  onScroll?: (e: { nativeEvent: { contentOffset: { y: number } } }) => void;
 }) {
   // Repost draft: land on the matching form type with it open.
   useEffect(() => {
@@ -124,7 +125,7 @@ export function PostTab({
           //  - posts past their expiry / requested time (surface as a System
           //    notice in Messages instead). Re-evaluated on the minute tick.
           const posts = myIntents.filter((i) => {
-            if ((i.content.payload as any)?.withdrawn) return false;
+            if (payloadOf(i).withdrawn) return false;
             const confirmed = negos.some((n) => n.intent.id === i.id && n.state === 'confirmed');
             if (confirmed) return false;
             const deadByTime = i.content.expires_at < nowSec || (!!i.content.window && i.content.window.start < nowSec);
@@ -203,7 +204,7 @@ function MyPostCard({ intent, negos, client }: { intent: Intent; negos: Negotiat
   // inline confirm (Alert is a no-op on react-native-web).
   const [confirming, setConfirming] = useState(false);
   const [cancelling, setCancelling] = useState(false);
-  const canCancel = confirmed === 0 && !expired && !(intent.content.payload as any)?.withdrawn;
+  const canCancel = confirmed === 0 && !expired && !payloadOf(intent).withdrawn;
   const doCancel = async () => {
     if (!client) return;
     setCancelling(true);
@@ -228,7 +229,7 @@ function MyPostCard({ intent, negos, client }: { intent: Intent; negos: Negotiat
           {t(intent.content.side)}
         </Text>
         {(() => {
-          const pl = intent.content.payload as any;
+          const pl = payloadOf(intent);
           const cat = categoryOf(intent.content.schema, pl);
           const sub = subcategoryOf(intent.content.schema, pl);
           return (
@@ -321,7 +322,7 @@ function useRequiredFields(scrollRef?: React.RefObject<ScrollView | null>) {
     setTimeout(() => {
       scrollNodeIntoView(node as unknown as ScrollableNode, scrollRef?.current ?? null, {
         isWeb: Platform.OS === 'web',
-        findHandle: (sv) => findNodeHandle(sv as any),
+        findHandle: (sv) => findNodeHandle(sv as unknown as React.Component),
       });
     }, 60);
   };
@@ -432,7 +433,7 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
     const nowChk = Math.floor(Date.now() / 1000);
     const liveRides = myIntents.filter((i) =>
       i.content.schema.startsWith('rideshare') &&
-      !(i.content.payload as any)?.withdrawn &&
+      !payloadOf(i).withdrawn &&
       i.content.expires_at >= nowChk &&
       !(i.content.window && i.content.window.start < nowChk) &&
       !negos.some((n) => n.intent.id === i.id && n.state === 'confirmed'),
@@ -483,8 +484,8 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
       setTo(''); setNote(''); setImages([]);
       onPosted?.(); // collapse the form, reveal My Requests
       uiAlert(t('Posted'), t('Your ride request is live.'));
-    } catch (e: any) {
-      uiAlert(t('Not allowed'), e?.message ?? t('Could not post.'));
+    } catch (e) {
+      uiAlert(t('Not allowed'), (e instanceof Error ? e.message : undefined) ?? t('Could not post.'));
     } finally { setPosting(false); }
   };
 
@@ -611,8 +612,8 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
       setService(''); setNotes(''); setImages([]);
       onPosted?.(); // collapse the form, reveal My Posts
       uiAlert(t('Posted'), side === 'offer' ? t('Your service offer is live.') : t('Your service request is live.'));
-    } catch (e: any) {
-      uiAlert(t('Not allowed'), e?.message ?? t('Could not post.'));
+    } catch (e) {
+      uiAlert(t('Not allowed'), (e instanceof Error ? e.message : undefined) ?? t('Could not post.'));
     } finally { setPosting(false); }
   };
 

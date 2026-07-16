@@ -16,7 +16,7 @@ export function DraggableFab({ storageKey, onPress, children, style, anchor, acc
   onPress: () => void;
   children: React.ReactNode;
   /** The button's own look (size/color); position comes from the drag. */
-  style?: any;
+  style?: object;
   /** Resting spot (offset from the bottom-right corner) the drag is measured from. */
   anchor?: { end?: number; bottom?: number };
   accessibilityLabel?: string;

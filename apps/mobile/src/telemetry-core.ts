@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- scrubbers walk schemaless Sentry event payloads */
 /**
  * Telemetry config + privacy core, shared by the native and web variants.
  *

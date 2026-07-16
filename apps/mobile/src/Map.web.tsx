@@ -52,7 +52,7 @@ export function AreaMap({
 }: {
   center: LatLng;
   radiusMeters?: number;
-  style?: any;
+  style?: object;
   /** Pan to keep `center` in view as it changes (live tracking). */
   follow?: boolean;
   /** When set (live mode), render a pulsing dot in this color instead of a static dot. */
@@ -102,7 +102,7 @@ export function PickerMap({
 }: {
   initial: LatLng;
   onCenterChange: (c: LatLng) => void;
-  style?: any;
+  style?: object;
 }) {
   const c: [number, number] = [initial.latitude, initial.longitude];
   return (

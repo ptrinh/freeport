@@ -4,7 +4,7 @@
  * conversation state (in-memory) and delegates negotiation to the guest's
  * FreeportAgent via GuestAgentManager.
  */
-import type { TelegramApi, TgMessage, TgCallbackQuery } from './api.js';
+import type { TelegramApi, TgMessage, TgCallbackQuery, InlineButton } from './api.js';
 import type { SendQueue } from './queue.js';
 import type { GuestStore } from './guests.js';
 import type { NegoMap } from './negomap.js';
@@ -32,7 +32,7 @@ export class GuestRouter {
 
   constructor(private readonly deps: GuestDeps) {}
 
-  private reply(chatId: number, text: string, buttons?: any) {
+  private reply(chatId: number, text: string, buttons?: InlineButton[][]) {
     return this.deps.queue.enqueue(chatId, () => this.deps.api.sendMessage(chatId, text, { parseMode: 'HTML', disablePreview: true, ...(buttons ? { buttons } : {}) })).catch(() => {});
   }
 

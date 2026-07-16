@@ -29,7 +29,7 @@ function notifUnavailable(): boolean {
   // Web Push / Notification API needs a secure context (HTTPS/localhost).
   // On the Tauri desktop we instead use the native notification plugin (below),
   // so it is NOT "unavailable" there.
-  const g = globalThis as any;
+  const g = globalThis as { Notification?: { permission: string; requestPermission?: () => Promise<string> }; location?: { protocol?: string }; isSecureContext?: boolean };
   // file:// (offline single-file build): no service worker, and permission
   // grants aren't persisted — suppress the notifications nag entirely.
   const isFile = g.location?.protocol === 'file:';
