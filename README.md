@@ -20,6 +20,10 @@ matching server — relays are dumb pub/sub, all logic is client-side.
 - **Developers:** [CONTRIBUTING.md](CONTRIBUTING.md) — repo layout, stack
   decisions, quick start, CLI.
 
+## Demo video
+
+https://github.com/user-attachments/assets/506c82ac-c5eb-415d-b981-ba14c4f165bc
+
 ## Why Freeport exists
 
 - **It's a research project.** How far can pure P2P infrastructure go? Buyers,
