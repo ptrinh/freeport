@@ -215,6 +215,23 @@ export class MobileClient {
   private wrapQueue: Array<() => void | Promise<void>> = [];
   private wrapDraining = false;
   /**
+   * Event ids already handled this session. Passed to subscriptions as
+   * nostr-tools' `alreadyHaveEvent`, which is checked BEFORE signature
+   * verification — so when a foreground resume re-issues the REQs and the
+   * relays replay the whole window, known events are dropped for the cost of
+   * a Set lookup instead of a schnorr verify + ECDH decrypt each. (The old
+   * replay guards sat after decrypt, which is why a quick background→resume
+   * still burned seconds of CPU.) Bounded; trimming oldest-first.
+   */
+  private seenInboundIds = new Set<string>();
+  private markSeen(id: string): void {
+    this.seenInboundIds.add(id);
+    if (this.seenInboundIds.size > 20000) {
+      let drop = 5000;
+      for (const k of this.seenInboundIds) { this.seenInboundIds.delete(k); if (--drop <= 0) break; }
+    }
+  }
+  /**
    * How the FIRST wrap-drain of a burst is scheduled. Defaults to a macrotask;
    * the app overrides it (setWrapKick) to run after the initial UI interactions
    * settle so first paint / taps during the connect burst aren't competing with
@@ -532,6 +549,11 @@ export class MobileClient {
         since,
       },
       {
+        // Resume resubscribes replay the window — skip events the feed (or our
+        // own `published`) already holds before they're signature-verified.
+        // Intent.id IS the event id (parseIntentEvent), so the maps double as
+        // the seen-set; hydrateFeed entries count too.
+        alreadyHaveEvent: (id: string) => this.marketIntents.has(id) || this.published.has(id),
         onevent: (ev: Event) => {
           if (ev.created_at > this.marketNewestTs) this.marketNewestTs = ev.created_at;
           const intent = parseIntentEvent(ev);
@@ -1048,7 +1070,9 @@ export class MobileClient {
       this.relays,
       { kinds: [4], '#p': [this.pubkey], since },
       {
+        alreadyHaveEvent: (id: string) => this.seenInboundIds.has(id),
         onevent: async (ev: Event) => {
+          this.markSeen(ev.id);
           if (ev.created_at > this.dmLastSeenTs && ev.created_at <= this.watchStartTs + 300) {
             this.dmLastSeenTs = ev.created_at;
             void this.persistNegotiations(); // debounced; also writes dmLastSeen
@@ -1072,7 +1096,10 @@ export class MobileClient {
       ? this.pool.subscribeMany(
           this.relays,
           { kinds: [1059], '#p': [this.pubkey], since: since - 2 * 24 * 3600 },
-          { onevent: (ev: Event) => this.enqueueDecrypt(() => this.processWrap(ev)) },
+          {
+            alreadyHaveEvent: (id: string) => this.seenInboundIds.has(id),
+            onevent: (ev: Event) => { this.markSeen(ev.id); this.enqueueDecrypt(() => this.processWrap(ev)); },
+          },
         )
       : null;
     return () => { clearInterval(sweepTimer); dmSub.close(); wrapSub?.close(); this.wrapQueue = []; };

@@ -51,7 +51,12 @@ function makeClient() {
     ensureRelay: async () => {},
     listConnectionStatus: () => new Map(),
   };
-  return { client, reqs, deliver: (ev: any) => handlers?.onevent(ev), eose: () => handlers?.oneose?.() };
+  return {
+    client, reqs,
+    deliver: (ev: any) => handlers?.onevent(ev),
+    eose: () => handlers?.oneose?.(),
+    lastHandlers: () => handlers,
+  };
 }
 
 describe('batched profile fetches', () => {
@@ -184,6 +189,19 @@ describe('DM backfill window (dmLastSeen)', () => {
     const since = dmFilter(second.reqs.at(-1)).since;
     expect(since).toBeGreaterThan(now - 2 * 24 * 3600); // way inside 7d
     expect(since).toBeLessThanOrEqual(now - 3600 - 24 * 3600 + 5); // behind lastSeen by the margin
+  });
+
+  it('marks delivered DMs as seen so a resume replay is skipped pre-verify', async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const { client, deliver, lastHandlers } = makeClient();
+    await client.loadNegotiations();
+    client.watchDMs();
+    const h = lastHandlers();
+    expect(h.alreadyHaveEvent('ev1')).toBe(false); // not seen yet
+    deliver({ kind: 4, pubkey: A, created_at: now - 60, content: 'x', id: 'ev1', tags: [] });
+    expect(h.alreadyHaveEvent('ev1')).toBe(true);  // replay now drops before verify/decrypt
+    expect(h.alreadyHaveEvent('ev2')).toBe(false);
+    await new Promise((r) => setTimeout(r, 400)); // let the debounced lastSeen write land HERE, not in the next test
   });
 
   it('ignores far-future created_at when tracking lastSeen', async () => {
