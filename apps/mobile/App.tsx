@@ -758,6 +758,13 @@ function AppInner() {
 
   useEffect(() => {
     let cancelled = false;
+    // Coalesce the high-frequency client→state syncs (negotiations, chats,
+    // products, escrows). During the connect backfill each routed DM used to
+    // fire its own setState → a full AppInner re-render per event, which made
+    // the first few seconds janky. Batch dirty slices into one render per
+    // ~100ms, mirroring the intent-feed flush above.
+    let syncTimer: ReturnType<typeof setTimeout> | null = null;
+    const syncDirty = { negos: false, convs: false, prods: false, escrows: false };
     (async () => {
       // Pick the signer: NIP-07 extension if opted in and available, else local key.
       const prefs = await loadPrefs();
@@ -825,11 +832,21 @@ function AppInner() {
           if (existing && existing.createdAt >= i.createdAt) return prev;
           return [i, ...prev.filter((p) => p.d !== i.d)];
         });
-      c.onNegotiationUpdate = () => setNegos([...c.negotiations.values()]);
-      c.onConversationUpdate = () => setConversations([...c.conversations.values()]);
-      c.onProduct = () => setProducts([...c.products.values()]);
-      c.onProductRemoved = () => setProducts([...c.products.values()]);
-      c.onEscrowUpdate = () => setEscrows([...c.escrows.values()]);
+      const scheduleSync = () => {
+        if (syncTimer) return;
+        syncTimer = setTimeout(() => {
+          syncTimer = null;
+          if (syncDirty.negos) { syncDirty.negos = false; setNegos([...c.negotiations.values()]); }
+          if (syncDirty.convs) { syncDirty.convs = false; setConversations([...c.conversations.values()]); }
+          if (syncDirty.prods) { syncDirty.prods = false; setProducts([...c.products.values()]); }
+          if (syncDirty.escrows) { syncDirty.escrows = false; setEscrows([...c.escrows.values()]); }
+        }, 100);
+      };
+      c.onNegotiationUpdate = () => { syncDirty.negos = true; scheduleSync(); };
+      c.onConversationUpdate = () => { syncDirty.convs = true; scheduleSync(); };
+      c.onProduct = () => { syncDirty.prods = true; scheduleSync(); };
+      c.onProductRemoved = () => { syncDirty.prods = true; scheduleSync(); };
+      c.onEscrowUpdate = () => { syncDirty.escrows = true; scheduleSync(); };
       // Hold the CPU-heavy gift-wrap unwrap until the first paint / launch
       // interactions settle, so the connect-burst doesn't make the initial
       // seconds feel sluggish. Race a 2.5s cap so a stuck interaction handle
@@ -898,7 +915,7 @@ function AppInner() {
       // Let the initial relay backfill settle before "new request" alerts arm.
       setTimeout(() => { feedReady.current = true; }, 5000);
     })();
-    return () => { cancelled = true; feedReady.current = false; };
+    return () => { cancelled = true; feedReady.current = false; if (syncTimer) clearTimeout(syncTimer); };
   }, [initVersion]);
 
   // Deal-completion celebration. Fires when a deal is confirmed + completed, not yet
