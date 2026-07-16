@@ -68,7 +68,7 @@ import { normalizePhone } from './src/phone';
 import { locationGranted, requestLocationPermission, detectRawLocationGPS, detectRawLocationIP, effectiveUnit } from './src/maps';
 import { messagesViewForNewActivity, walletContacts, repostDraft, type RepostDraft } from './src/deals';
 import { newlyConfirmed } from './src/quickReplies';
-import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
+import { initTelemetry, setTelemetryEnabled, trackEvent, getSentry } from './src/telemetry';
 import { startPerfProbe } from './src/perfProbe';
 import { timeAsync, mark } from './src/perfSpans';
 import { loadPrefs, savePrefs, type UserLocation } from './src/prefs';
@@ -688,7 +688,14 @@ function AppInner() {
       setCustomMessage(p.customMessage);
       setAutoSendCustomMessage(p.autoSendCustomMessage);
       setTelemetryOn(p.telemetryEnabled);
-      initTelemetry(p.telemetryEnabled).then(() => { trackEvent('app_opened'); startPerfProbe('launch'); }).catch(() => {});
+      initTelemetry(p.telemetryEnabled).then(() => {
+        trackEvent('app_opened');
+        // [fp-boot] beacon: proves the Sentry transport works on THIS bundle
+        // independent of the probe (events went silent on the previous OTA —
+        // this splits "probe broken" from "transport broken").
+        try { getSentry()?.captureMessage('[fp-boot] telemetry up', { level: 'info' }); } catch { /* best-effort */ }
+        startPerfProbe('launch');
+      }).catch(() => {});
       setRole(p.role);
       setLanguage(p.language || systemLanguage()); // '' pref = follow the device language
       setFareConfigState(p.fareConfig);
