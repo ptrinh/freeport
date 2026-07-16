@@ -10,6 +10,7 @@ import {
   AppState,
   Easing,
   Image,
+  InteractionManager,
   LayoutAnimation,
   Linking,
   Modal,
@@ -829,6 +830,16 @@ function AppInner() {
       c.onProduct = () => setProducts([...c.products.values()]);
       c.onProductRemoved = () => setProducts([...c.products.values()]);
       c.onEscrowUpdate = () => setEscrows([...c.escrows.values()]);
+      // Hold the CPU-heavy gift-wrap unwrap until the first paint / launch
+      // interactions settle, so the connect-burst doesn't make the initial
+      // seconds feel sluggish. Race a 2.5s cap so a stuck interaction handle
+      // can never stall DM delivery; whichever fires first wins (once).
+      c.setWrapKick((run) => {
+        let fired = false;
+        const go = () => { if (!fired) { fired = true; run(); } };
+        const t = setTimeout(go, 2500);
+        InteractionManager.runAfterInteractions(() => { clearTimeout(t); go(); });
+      });
       // Friend chat alerts: ding in the foreground, notify when backgrounded
       // (mirrors onIncomingMessage; the push server doesn't know about chat
       // DMs' content either way — envelopes are indistinguishable kind-4s).

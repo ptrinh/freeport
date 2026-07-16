@@ -208,6 +208,13 @@ export class MobileClient {
   private wrapQueue: Event[] = [];
   private wrapDraining = false;
   /**
+   * How the FIRST wrap-drain of a burst is scheduled. Defaults to a macrotask;
+   * the app overrides it (setWrapKick) to run after the initial UI interactions
+   * settle so first paint / taps during the connect burst aren't competing with
+   * the unwrap CPU. Later batches always re-schedule on a plain macrotask.
+   */
+  private wrapKick: (fn: () => void) => void = (fn) => { setTimeout(fn, 0); };
+  /**
    * Signed DMs that could not reach ANY relay (offline, all relays down).
    * Local negotiation state commits optimistically, so these MUST eventually
    * deliver or the two parties diverge — a deal card reading "Confirmed" while
@@ -1144,11 +1151,14 @@ export class MobileClient {
    * relay callback returns immediately; the expensive unwrap happens in
    * drainWraps, spread across macrotasks.
    */
+  /** Override how the first wrap-drain of a burst is scheduled (see wrapKick). */
+  setWrapKick(fn: (cb: () => void) => void): void { this.wrapKick = fn; }
+
   private enqueueWrap(ev: Event): void {
     this.wrapQueue.push(ev);
     if (!this.wrapDraining) {
       this.wrapDraining = true;
-      setTimeout(() => this.drainWraps(), 0);
+      this.wrapKick(() => this.drainWraps());
     }
   }
 
@@ -1158,7 +1168,7 @@ export class MobileClient {
    * backfill burst. Drains to empty, re-scheduling itself with setTimeout(0).
    */
   private drainWraps(): void {
-    const BATCH = 4;
+    const BATCH = 2;
     for (let i = 0; i < BATCH; i++) {
       const ev = this.wrapQueue.shift();
       if (!ev) { this.wrapDraining = false; return; }
