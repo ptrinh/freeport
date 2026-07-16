@@ -204,14 +204,15 @@ export class MobileClient {
   /** Peer pubkeys (hex) the user has blocked — inbound DMs from them are dropped. */
   private blocked = new Set<string>();
   /**
-   * Inbound NIP-59 gift wraps awaiting unwrap. Each unwrap is ~3 secp256k1 ops
-   * + 2 NIP-44 decrypts on the JS thread (see unwrapVerified) — a synchronous
-   * onevent handler processing the whole connect-time backfill back-to-back
-   * froze the UI for seconds until "Connected". We instead queue and drain a
-   * few per macrotask, yielding the thread between batches so the app stays
-   * responsive. Verification logic is unchanged; only the schedule is.
+   * Inbound encrypted DMs awaiting decrypt — BOTH kind-4 (one secp256k1 ECDH
+   * each) and kind-1059 gift wraps (~3 secp256k1 ops + 2 NIP-44 decrypts, see
+   * unwrapVerified). A synchronous onevent handler processing the whole
+   * connect-time backfill back-to-back froze the UI for seconds until
+   * "Connected". We instead queue and drain a couple per macrotask, yielding
+   * the thread between batches so the app stays responsive. Decrypt/verify
+   * logic is unchanged; only the schedule is.
    */
-  private wrapQueue: Event[] = [];
+  private wrapQueue: Array<() => void | Promise<void>> = [];
   private wrapDraining = false;
   /**
    * How the FIRST wrap-drain of a burst is scheduled. Defaults to a macrotask;
@@ -1034,12 +1035,17 @@ export class MobileClient {
             void this.persistNegotiations(); // debounced; also writes dmLastSeen
           }
           if (this.blocked.has(ev.pubkey)) return; // blocked peer — drop without decrypting
-          try {
-            const plain = await this.signer.nip04Decrypt(ev.pubkey, ev.content);
-            this.routePlaintext(plain, ev.pubkey, ev.created_at, ev.id);
-          } catch {
-            /* not a Freeport DM */
-          }
+          // Decrypt via the shared queue — each nip04Decrypt is a secp256k1
+          // ECDH on the JS thread; the backfill burst must not run them
+          // back-to-back (same treatment as the kind-1059 wraps below).
+          this.enqueueDecrypt(async () => {
+            try {
+              const plain = await this.signer.nip04Decrypt(ev.pubkey, ev.content);
+              this.routePlaintext(plain, ev.pubkey, ev.created_at, ev.id);
+            } catch {
+              /* not a Freeport DM */
+            }
+          });
         },
       },
     );
@@ -1047,7 +1053,7 @@ export class MobileClient {
       ? this.pool.subscribeMany(
           this.relays,
           { kinds: [1059], '#p': [this.pubkey], since: since - 2 * 24 * 3600 },
-          { onevent: (ev: Event) => this.enqueueWrap(ev) },
+          { onevent: (ev: Event) => this.enqueueDecrypt(() => this.processWrap(ev)) },
         )
       : null;
     return () => { clearInterval(sweepTimer); dmSub.close(); wrapSub?.close(); this.wrapQueue = []; };
@@ -1209,8 +1215,8 @@ export class MobileClient {
   /** Override how the first wrap-drain of a burst is scheduled (see wrapKick). */
   setWrapKick(fn: (cb: () => void) => void): void { this.wrapKick = fn; }
 
-  private enqueueWrap(ev: Event): void {
-    this.wrapQueue.push(ev);
+  private enqueueDecrypt(task: () => void | Promise<void>): void {
+    this.wrapQueue.push(task);
     if (!this.wrapDraining) {
       this.wrapDraining = true;
       this.wrapKick(() => this.drainWraps());
@@ -1218,16 +1224,16 @@ export class MobileClient {
   }
 
   /**
-   * Process a small batch of queued wraps, then yield the JS thread before the
-   * next batch so the UI (and relay I/O) stays responsive during the connect
-   * backfill burst. Drains to empty, re-scheduling itself with setTimeout(0).
+   * Process a small batch of queued decrypts, then yield the JS thread before
+   * the next batch so the UI (and relay I/O) stays responsive during the
+   * connect backfill burst. Drains to empty, re-scheduling with setTimeout(0).
    */
   private drainWraps(): void {
     const BATCH = 2;
     for (let i = 0; i < BATCH; i++) {
-      const ev = this.wrapQueue.shift();
-      if (!ev) { this.wrapDraining = false; return; }
-      this.processWrap(ev);
+      const task = this.wrapQueue.shift();
+      if (!task) { this.wrapDraining = false; return; }
+      try { void task(); } catch { /* task guards itself; never stall the queue */ }
     }
     if (this.wrapQueue.length) setTimeout(() => this.drainWraps(), 0);
     else this.wrapDraining = false;
