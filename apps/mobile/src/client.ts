@@ -1149,12 +1149,13 @@ export class MobileClient {
           // ECDH on the JS thread; the backfill burst must not run them
           // back-to-back (same treatment as the kind-1059 wraps below).
           this.enqueueDecrypt(async () => {
+            const t0 = Date.now();
             try {
               const plain = await this.signer.nip04Decrypt(ev.pubkey, ev.content);
               this.routePlaintext(plain, ev.pubkey, ev.created_at, ev.id);
             } catch {
               /* not a Freeport DM */
-            }
+            } finally { perfCounters.decryptCount++; perfCounters.decryptMs += Date.now() - t0; }
           });
         },
       },
@@ -1353,6 +1354,7 @@ export class MobileClient {
   }
 
   private processWrap(ev: Event): void {
+    const t0 = Date.now();
     try {
       const rumor = this.unwrapVerified(ev);
       if (!rumor?.pubkey || typeof rumor.content !== 'string') return;
@@ -1361,7 +1363,7 @@ export class MobileClient {
       this.routePlaintext(rumor.content, rumor.pubkey, rumor.created_at, rumor.id);
     } catch {
       /* not addressed to us / junk / FORGED wrap — dropped */
-    }
+    } finally { perfCounters.decryptCount++; perfCounters.decryptMs += Date.now() - t0; }
   }
 
   /**

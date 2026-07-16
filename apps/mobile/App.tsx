@@ -582,6 +582,10 @@ function AppInner() {
 
   // Live relay connectivity for the header status pill.
   const { netStatus, netSteady } = useRelayStatus(client, resumeTick);
+  // [fp-perf] timeline: gap between client.set and this effect ≈ the initial
+  // mount/commit of the whole main tree — the current suspect for the cold-
+  // start stall (fixed ~3.6s starting right after the client lands).
+  useEffect(() => { if (client) mark('render.main.committed'); }, [client]);
 
   // Scroll-driven collapse of the header + tab bar. These are LAYOUT props
   // (padding/size/font), which the native animation driver can't touch — the
@@ -917,7 +921,7 @@ function AppInner() {
       // re-subscribed on app resume to backfill DMs missed while offline.
       // Expose this profile's live client to the window.freeport debug API (web only).
       registerDebugClient(c, npubFromHex(signer.pubkey));
-      if (!cancelled) setClient(c);
+      if (!cancelled) { mark('client.set'); setClient(c); }
       // Let the initial relay backfill settle before "new request" alerts arm.
       setTimeout(() => { feedReady.current = true; }, 5000);
     })();

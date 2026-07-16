@@ -44,4 +44,4 @@ export function mark(label: string): void {
  * call is tiny, the batch is the stall). The probe snapshots these at start
  * and reports the delta.
  */
-export const perfCounters = { verifyCount: 0, verifyMs: 0 };
+export const perfCounters = { verifyCount: 0, verifyMs: 0, decryptCount: 0, decryptMs: 0 };

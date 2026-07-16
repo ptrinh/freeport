@@ -40,12 +40,14 @@ export function startPerfProbe(tag: 'launch' | 'resume'): void {
     report(tag, blocked, stalls, now - started, started, {
       verifyCount: perfCounters.verifyCount - verify0.verifyCount,
       verifyMs: perfCounters.verifyMs - verify0.verifyMs,
+      decryptCount: perfCounters.decryptCount - verify0.decryptCount,
+      decryptMs: perfCounters.decryptMs - verify0.decryptMs,
     });
   };
   setTimeout(tick, TICK_MS);
 }
 
-function report(tag: string, blockedMs: number, stalls: Array<{ ms: number; at: number }>, windowMs: number, startedAt: number, verify: { verifyCount: number; verifyMs: number }): void {
+function report(tag: string, blockedMs: number, stalls: Array<{ ms: number; at: number }>, windowMs: number, startedAt: number, verify: { verifyCount: number; verifyMs: number; decryptCount: number; decryptMs: number }): void {
   try {
     const S = getSentry();
     if (!S) return;
@@ -67,6 +69,8 @@ function report(tag: string, blockedMs: number, stalls: Array<{ ms: number; at: 
         topStallsMs: stalls.slice(0, 10).map((st) => `${st.ms}ms@+${st.at}`),
         verifyCount: verify.verifyCount,
         verifyMs: verify.verifyMs,
+        decryptCount: verify.decryptCount,
+        decryptMs: verify.decryptMs,
         spans,
       },
     });
