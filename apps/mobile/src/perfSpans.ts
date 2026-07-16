@@ -37,3 +37,11 @@ export function mark(label: string): void {
   perfSpans.push({ l: label, ms: 0, at: Date.now() });
   if (perfSpans.length > CAP) perfSpans.shift();
 }
+
+/**
+ * Cumulative counters for work too fine-grained for spans (thousands of
+ * ~1-3ms schnorr verifies land in contiguous websocket bridge batches — each
+ * call is tiny, the batch is the stall). The probe snapshots these at start
+ * and reports the delta.
+ */
+export const perfCounters = { verifyCount: 0, verifyMs: 0 };

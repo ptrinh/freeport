@@ -18,7 +18,7 @@ import { buildTrustMap } from './wot';
 import { kvGet, kvSet, kvDelete } from './kv';
 import { query } from './query';
 import { kvCacheGet, kvCacheSet, kvCacheDelete } from './kvCache';
-import { timeSync, timeAsync } from './perfSpans';
+import { timeSync, timeAsync, mark, perfCounters } from './perfSpans';
 import type { Signer } from './signer';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { applyChatInbound, applyChatOutbound, newConversation, sweepExpired, type Conversation } from './conversations';
@@ -166,12 +166,21 @@ export interface EscrowState {
   seenEventIds?: string[];
 }
 
+/** nostr-tools' verifier + [fp-perf] counters (count + cumulative ms). */
+function countedVerifyEvent(ev: Event): boolean {
+  const t0 = Date.now();
+  try { return verifyEvent(ev); } finally { perfCounters.verifyCount++; perfCounters.verifyMs += Date.now() - t0; }
+}
+
 export class MobileClient {
+  // verifyEvent: the stock verifier wrapped with [fp-perf] counters — schnorr
+  // verification of relay floods is the standing suspect for the cold-start
+  // stall (thousands of small calls inside contiguous ws bridge batches).
   // enableReconnect: SimplePool transparently re-opens a dropped relay socket
   // and replays active subscriptions (so an offer sent while we were offline is
   // re-delivered on reconnect). enablePing: detect a silently-dead socket (e.g.
   // after the OS froze us in the background) so reconnect actually triggers.
-  readonly pool = new SimplePool({ enableReconnect: true, enablePing: true });
+  readonly pool = new SimplePool({ enableReconnect: true, enablePing: true, verifyEvent: countedVerifyEvent } as ConstructorParameters<typeof SimplePool>[0]);
   readonly pubkey: string;
   /** Per-author set of accepted d-tags, to enforce the listing cap. */
   private authorListings = new Map<string, Set<string>>();
@@ -605,6 +614,7 @@ export class MobileClient {
         // Intent.id IS the event id (parseIntentEvent), so the maps double as
         // the seen-set; hydrateFeed entries count too.
         alreadyHaveEvent: (id: string) => this.marketIntents.has(id) || this.published.has(id),
+        oneose: () => mark('feed.eose'),
         onevent: (ev: Event) => {
           if (ev.created_at > this.marketNewestTs) this.marketNewestTs = ev.created_at;
           const intent = parseIntentEvent(ev);
@@ -1127,6 +1137,7 @@ export class MobileClient {
       { kinds: [4], '#p': [this.pubkey], since },
       {
         alreadyHaveEvent: (id: string) => this.seenInboundIds.has(id),
+        oneose: () => mark('dm.eose'),
         onevent: async (ev: Event) => {
           this.markSeen(ev.id);
           if (ev.created_at > this.dmLastSeenTs && ev.created_at <= this.watchStartTs + 300) {

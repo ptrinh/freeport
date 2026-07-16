@@ -11,7 +11,7 @@
  * Deliberately dumb and allocation-free in the hot path; ~80 ticks per run.
  */
 import { getSentry } from './telemetry';
-import { perfSpans } from './perfSpans';
+import { perfSpans, perfCounters } from './perfSpans';
 
 const TICK_MS = 100;
 const RUN_MS = 8_000;
@@ -27,6 +27,7 @@ export function startPerfProbe(tag: 'launch' | 'resume'): void {
   let blocked = 0;
   let last = Date.now();
   const started = last;
+  const verify0 = { ...perfCounters };
   const tick = () => {
     const now = Date.now();
     const drift = now - last - TICK_MS;
@@ -36,12 +37,15 @@ export function startPerfProbe(tag: 'launch' | 'resume'): void {
     last = now;
     if (now - started < RUN_MS) { setTimeout(tick, TICK_MS); return; }
     running = false;
-    report(tag, blocked, stalls, now - started, started);
+    report(tag, blocked, stalls, now - started, started, {
+      verifyCount: perfCounters.verifyCount - verify0.verifyCount,
+      verifyMs: perfCounters.verifyMs - verify0.verifyMs,
+    });
   };
   setTimeout(tick, TICK_MS);
 }
 
-function report(tag: string, blockedMs: number, stalls: Array<{ ms: number; at: number }>, windowMs: number, startedAt: number): void {
+function report(tag: string, blockedMs: number, stalls: Array<{ ms: number; at: number }>, windowMs: number, startedAt: number, verify: { verifyCount: number; verifyMs: number }): void {
   try {
     const S = getSentry();
     if (!S) return;
@@ -61,6 +65,8 @@ function report(tag: string, blockedMs: number, stalls: Array<{ ms: number; at: 
         windowMs: Math.round(windowMs),
         stallCount: stalls.length,
         topStallsMs: stalls.slice(0, 10).map((st) => `${st.ms}ms@+${st.at}`),
+        verifyCount: verify.verifyCount,
+        verifyMs: verify.verifyMs,
         spans,
       },
     });
