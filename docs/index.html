@@ -70,6 +70,8 @@
   .shots{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:8px}
   .shots img{width:248px;border-radius:26px;border:1px solid var(--border);
     box-shadow:0 24px 60px rgba(0,0,0,.55)}
+  .shots video{width:248px;border-radius:26px;border:1px solid var(--border);
+    box-shadow:0 24px 60px rgba(0,0,0,.55)}
 
   /* Footer */
   footer{border-top:1px solid var(--border);padding:40px 0 56px;text-align:center;color:var(--text3)}
@@ -171,6 +173,10 @@
     <h2 data-i18n="see_h">See it in action</h2>
     <p class="lead" style="margin-left:auto;margin-right:auto" data-i18n="see_lead">Request a ride, set your price, and negotiate directly — right from your browser.</p>
     <div class="shots">
+      <!-- 2-minute silent walkthrough (no audio track). muted+playsinline keep
+           mobile browsers happy; preload=metadata so the 3.3MB file doesn't
+           load until the user hits play. -->
+      <video src="demo.mp4" controls muted playsinline preload="metadata" aria-label="Two-minute Freeport demo video"></video>
       <img src="shot-request.png" alt="Posting a ride request in Freeport" />
       <img src="shot-deals.png" alt="A passenger's requests and a confirmed deal" />
     </div>

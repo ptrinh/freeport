@@ -250,6 +250,7 @@ echo "▸ Publishing landing page at /intro…"
 mkdir -p dist/intro
 cp ../../docs/index.html dist/intro/index.html
 cp ../../docs/favicon.png ../../docs/icon.png ../../docs/shot-deals.png ../../docs/shot-request.png \
+   ../../docs/demo.mp4 \
    ../../docs/whitepaper.pdf ../../docs/whitepaper.vi.pdf dist/intro/
 
 echo "▸ Publishing /llms.txt (agent-readable site guide)…"
