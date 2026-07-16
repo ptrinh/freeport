@@ -150,6 +150,11 @@ const FEED_MAX_AGE_SECONDS = 24 * 3600;
 const WOT_STORE_PREFIX = 'freeport.wot.';
 const WOT_MAX_AGE_MS = 24 * 3600 * 1000;
 const WOT_REBUILD_DELAY_MS = 20_000;
+/** Gap between queued decrypts. On RN this MUST be > 0 — 0ms timers are
+ *  immediates (no yield); 16ms ≈ one frame. Under vitest (Node), 0ms IS a
+ *  real macrotask and the mocked decrypts are instant, so keep the fast path
+ *  there — message-chain tests would otherwise accumulate 16ms per hop. */
+const DECRYPT_YIELD_MS = typeof process !== 'undefined' && (process as { env?: Record<string, string> }).env?.VITEST ? 0 : 16;
 
 /** One escrow per deal. The buyer's `preimage` is the money key — persisted. */
 export interface EscrowState {
@@ -247,12 +252,18 @@ export class MobileClient {
     }
   }
   /**
-   * How the FIRST wrap-drain of a burst is scheduled. Defaults to a macrotask;
+   * How the FIRST wrap-drain of a burst is scheduled. Defaults to a real timer;
    * the app overrides it (setWrapKick) to run after the initial UI interactions
    * settle so first paint / taps during the connect burst aren't competing with
-   * the unwrap CPU. Later batches always re-schedule on a plain macrotask.
+   * the unwrap CPU.
+   *
+   * ⚠ Never setTimeout(fn, 0) here: React Native special-cases 0ms timers as
+   * IMMEDIATES — they run at the end of the current JS block without yielding
+   * to frames or other timers. The original "yield" queue used 0ms and
+   * therefore never yielded: [fp-perf] showed all 29 connect-burst decrypts
+   * (~103ms each on Hermes) executing as one contiguous ~3s stall.
    */
-  private wrapKick: (fn: () => void) => void = (fn) => { setTimeout(fn, 0); };
+  private wrapKick: (fn: () => void) => void = (fn) => { setTimeout(fn, DECRYPT_YIELD_MS); };
   /**
    * Signed DMs that could not reach ANY relay (offline, all relays down).
    * Local negotiation state commits optimistically, so these MUST eventually
@@ -1338,18 +1349,16 @@ export class MobileClient {
   }
 
   /**
-   * Process a small batch of queued decrypts, then yield the JS thread before
-   * the next batch so the UI (and relay I/O) stays responsive during the
-   * connect backfill burst. Drains to empty, re-scheduling with setTimeout(0).
+   * Process ONE queued decrypt, then yield a real frame before the next.
+   * A single nip04/gift-wrap decrypt is ~100ms of secp256k1 on Hermes — one
+   * per frame-timer keeps the UI interactive through the connect backfill.
+   * (See wrapKick: the delay must be > 0 or RN runs it as an immediate.)
    */
   private drainWraps(): void {
-    const BATCH = 2;
-    for (let i = 0; i < BATCH; i++) {
-      const task = this.wrapQueue.shift();
-      if (!task) { this.wrapDraining = false; return; }
-      try { void task(); } catch { /* task guards itself; never stall the queue */ }
-    }
-    if (this.wrapQueue.length) setTimeout(() => this.drainWraps(), 0);
+    const task = this.wrapQueue.shift();
+    if (!task) { this.wrapDraining = false; return; }
+    try { void task(); } catch { /* task guards itself; never stall the queue */ }
+    if (this.wrapQueue.length) setTimeout(() => this.drainWraps(), DECRYPT_YIELD_MS);
     else this.wrapDraining = false;
   }
 
