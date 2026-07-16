@@ -20,6 +20,10 @@ const STALL_MIN_MS = 120;
 
 let running = false;
 
+/** Last completed probe report, human-readable — shown in Settings → About so
+ *  the numbers are readable ON DEVICE even when the Sentry transport is down. */
+export let lastPerfReport = '';
+
 export function startPerfProbe(tag: 'launch' | 'resume'): void {
   if (running) return; // one probe at a time; overlapping AppState flips are noise
   running = true;
@@ -48,10 +52,14 @@ export function startPerfProbe(tag: 'launch' | 'resume'): void {
 }
 
 function report(tag: string, blockedMs: number, stalls: Array<{ ms: number; at: number }>, windowMs: number, startedAt: number, verify: { verifyCount: number; verifyMs: number; decryptCount: number; decryptMs: number }): void {
+  stalls.sort((a, b) => b.ms - a.ms);
+  lastPerfReport =
+    `${tag}: blocked ${Math.round(blockedMs)}ms/${Math.round(windowMs)}ms · ` +
+    `vfy ${verify.verifyCount}/${verify.verifyMs}ms · dec ${verify.decryptCount}/${verify.decryptMs}ms · ` +
+    `stalls ${stalls.slice(0, 4).map((st) => `${st.ms}@+${st.at}`).join(' ') || '—'}`;
   try {
     const S = getSentry();
     if (!S) return;
-    stalls.sort((a, b) => b.ms - a.ms);
     // Named spans that overlapped the probe window (small lead-in included —
     // launch work often starts just before the probe does): the "who".
     const spans = perfSpans

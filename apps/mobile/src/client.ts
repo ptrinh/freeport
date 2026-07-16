@@ -150,6 +150,13 @@ const FEED_MAX_AGE_SECONDS = 24 * 3600;
 const WOT_STORE_PREFIX = 'freeport.wot.';
 const WOT_MAX_AGE_MS = 24 * 3600 * 1000;
 const WOT_REBUILD_DELAY_MS = 20_000;
+/** Persisted inbound-event seen-set (see seenInboundIds): without it every
+ *  cold start re-verified + re-decrypted the whole wrap window (~30 × ~125ms
+ *  of secp256k1 on Hermes = the 3.7s launch stall — wrap timestamps are
+ *  randomized up to 2 days back, so the dmLastSeen watermark can't skip
+ *  them; only remembering their ids can). */
+const SEEN_STORE_KEY = 'freeport.seenDmIds';
+const SEEN_PERSIST_MAX = 3000;
 /** Gap between queued decrypts. On RN this MUST be > 0 — 0ms timers are
  *  immediates (no yield); 16ms ≈ one frame. Under vitest (Node), 0ms IS a
  *  real macrotask and the mocked decrypts are instant, so keep the fast path
@@ -244,12 +251,35 @@ export class MobileClient {
    * still burned seconds of CPU.) Bounded; trimming oldest-first.
    */
   private seenInboundIds = new Set<string>();
+  private seenPersistTimer: ReturnType<typeof setTimeout> | null = null;
   private markSeen(id: string): void {
     this.seenInboundIds.add(id);
     if (this.seenInboundIds.size > 20000) {
       let drop = 5000;
       for (const k of this.seenInboundIds) { this.seenInboundIds.delete(k); if (--drop <= 0) break; }
     }
+    // Persist (debounced) so the NEXT cold start skips these before verify —
+    // without this the whole wrap window was re-verified + re-decrypted on
+    // every launch (the 3.7s stall).
+    if (!this.seenPersistTimer) {
+      this.seenPersistTimer = setTimeout(() => {
+        this.seenPersistTimer = null;
+        const ids = [...this.seenInboundIds];
+        kvCacheSet(SEEN_STORE_KEY, JSON.stringify(ids.slice(-SEEN_PERSIST_MAX))).catch(() => {});
+      }, 1000);
+    }
+  }
+
+  /** Restore the persisted seen-set (called from loadNegotiations, before
+   *  watchDMs subscribes). Insertion order keeps newest ids at the tail. */
+  private async loadSeenIds(): Promise<void> {
+    try {
+      const raw = await kvCacheGet(SEEN_STORE_KEY);
+      if (!raw) return;
+      for (const id of JSON.parse(raw) as string[]) {
+        if (typeof id === 'string') this.seenInboundIds.add(id);
+      }
+    } catch { /* corrupt/absent → start empty */ }
   }
   /**
    * How the FIRST wrap-drain of a burst is scheduled. Defaults to a real timer;
@@ -498,6 +528,7 @@ export class MobileClient {
     try { await kvCacheDelete(CHAT_STORE_KEY); } catch { /* best-effort */ }
     try { await kvDelete(CHAT_INVITE_KEY); } catch { /* best-effort */ }
     try { await kvCacheDelete(ESCROW_STORE_KEY); } catch { /* best-effort */ }
+    try { await kvCacheDelete(SEEN_STORE_KEY); } catch { /* best-effort */ }
   }
 
   async loadNegotiations(): Promise<void> {
@@ -505,6 +536,7 @@ export class MobileClient {
       const ts = Number(await kvCacheGet(DM_LAST_SEEN_KEY));
       if (Number.isFinite(ts) && ts > 0) this.dmLastSeenTs = ts;
     } catch { /* first launch */ }
+    await this.loadSeenIds(); // skip re-verify/re-decrypt of already-seen DMs
     await this.loadOutbox(); // undelivered DMs from the previous session retry first
     await this.loadPublished(); // restore own posts first so inbound accepts can match
     await this.loadConversations(); // friend chats (experimental Chat feature)

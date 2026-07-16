@@ -3,6 +3,7 @@ import { ActivityIndicator, Platform, Pressable, Share, Text, View } from 'react
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { versionLabel, checkForUpdate, applyUpdate, getTrack, setTrack, trackSupported, type UpdateTrack } from '../../updates';
+import { lastPerfReport } from '../../perfProbe';
 import { confirmAsync } from '../../ui/alerts';
 import { s, palette } from '../../ui/theme';
 
@@ -90,6 +91,9 @@ function AboutSection({
             </Pressable>
           </View>
           {!!updMsg && <Text style={s.dim}>{updMsg}</Text>}
+          {/* Last [fp-perf] probe result — on-device readout (survives a down
+              telemetry transport). Dev/diagnostic aid; intentionally untranslated. */}
+          {!!lastPerfReport && <Text style={[s.mono, { fontSize: 11, marginTop: 4 }]} selectable>{lastPerfReport}</Text>}
           {trackSupported() && (
             <View style={{ marginTop: 12 }}>
               <Text style={s.label}>{t('Update track')}</Text>
