@@ -69,6 +69,11 @@ export function getSentry(): any {
   return enabled ? sentry : null;
 }
 
+/** Init-state snapshot for the About diagnostics tester. */
+export function telemetryStatus(): { enabled: boolean; started: boolean; native: boolean; sdk: boolean } {
+  return { enabled, started, native: sentryNativeAvailable(), sdk: !!sentry };
+}
+
 export function captureError(err: unknown, context?: Record<string, unknown>): void {
   if (!enabled || !sentry) return;
   try { sentry.captureException(err, context ? { extra: sanitizeProps(context) } : undefined); } catch { /* ignore */ }

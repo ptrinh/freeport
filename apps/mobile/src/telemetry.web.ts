@@ -63,6 +63,12 @@ export async function initTelemetry(on: boolean): Promise<void> {
   try { aptabaseInit(APTABASE_APP_KEY, { host: APTABASE_HOST }); } catch { /* ignore */ }
 }
 
+/** Init-state snapshot for the About diagnostics tester (native has a real
+ *  native-module check; on web "native" just means the SDK object exists). */
+export function telemetryStatus(): { enabled: boolean; started: boolean; native: boolean; sdk: boolean } {
+  return { enabled, started, native: true, sdk: true };
+}
+
 export function setTelemetryEnabled(on: boolean): void {
   enabled = on;
 }
