@@ -16,7 +16,7 @@
  * draw over it) with delayed-arm Allow buttons against bait-click timing.
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '../i18n';
 import { s, palette } from '../ui/theme';
@@ -53,6 +53,9 @@ export function MiniAppShell({
   const approvalChain = useRef<Promise<unknown>>(Promise.resolve());
   // Liveness: flips when the SDK acks the handshake (or any bridge traffic).
   const [alive, setAlive] = useState(false);
+  /** First iframe load done — until then a themed loading view covers the
+   *  frame so opening a mini-app doesn't flash white in dark mode. */
+  const [frameLoaded, setFrameLoaded] = useState(false);
   // Re-probe the manifest on open so an app that shipped one after being added
   // stops showing Unverified. A verified (manifest-declared) app is a mini-app
   // by definition, so it never needs the liveness heuristic banner.
@@ -148,18 +151,30 @@ export function MiniAppShell({
               {t("It's hosted on Freeport's own domain, which the web sandbox can't isolate. Open it in the Freeport mobile app instead.")}
             </Text>
           </View>
-        ) : React.createElement('iframe', {
-          ref: frameRef,
-          src: app.url || app.origin,
-          // No popups, no top navigation, no modals — scripts + forms +
-          // downloads only (downloads let a mini-app's own <a download> work;
-          // the bridge saveFile still routes through the parent regardless).
-          sandbox: 'allow-scripts allow-same-origin allow-forms allow-downloads',
-          allow: '',
-          referrerPolicy: 'no-referrer',
-          style: { border: 0, flex: 1, width: '100%', height: '100%', backgroundColor: '#fff' },
-          onLoad: connect,
-        })}
+        ) : (
+          // Themed loading underlay: the iframe keeps its white surface (apps
+          // may rely on it) but stays invisible until its first load, so
+          // opening a mini-app doesn't flash a white page in dark mode.
+          <View style={{ flex: 1, backgroundColor: palette.bg }}>
+            {!frameLoaded && (
+              <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' }}>
+                <ActivityIndicator size="large" color={palette.text3} />
+              </View>
+            )}
+            {React.createElement('iframe', {
+              ref: frameRef,
+              src: app.url || app.origin,
+              // No popups, no top navigation, no modals — scripts + forms +
+              // downloads only (downloads let a mini-app's own <a download> work;
+              // the bridge saveFile still routes through the parent regardless).
+              sandbox: 'allow-scripts allow-same-origin allow-forms allow-downloads',
+              allow: '',
+              referrerPolicy: 'no-referrer',
+              style: { border: 0, flex: 1, width: '100%', height: '100%', backgroundColor: '#fff', opacity: frameLoaded ? 1 : 0 },
+              onLoad: () => { setFrameLoaded(true); connect(); },
+            })}
+          </View>
+        )}
       </View>
       {approval ? (
         <ApprovalDialog

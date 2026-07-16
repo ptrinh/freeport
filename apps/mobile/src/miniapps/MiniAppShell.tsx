@@ -12,7 +12,7 @@
  *  - every bridge response is escape-encoded before injectJavaScript
  */
 import React, { useMemo, useRef, useState, useCallback } from 'react';
-import { Linking, Modal, Platform, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Linking, Modal, Platform, Pressable, Text, View } from 'react-native';
 import type { WebView as WebViewType } from 'react-native-webview';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
@@ -152,7 +152,16 @@ export function MiniAppShell({
         <WebView
           ref={webRef}
           source={{ uri: app.url || app.origin }}
-          style={{ flex: 1 }}
+          // Themed background + loading view: the WebView's default surface is
+          // white, which flashed the whole page for ~0.5s on open in dark mode.
+          style={{ flex: 1, backgroundColor: palette.bg }}
+          containerStyle={{ backgroundColor: palette.bg }}
+          startInLoadingState
+          renderLoading={() => (
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.bg }}>
+              <ActivityIndicator size="large" color={palette.text3} />
+            </View>
+          )}
           // Security posture — see module docblock before touching any of these.
           // The token statement is prepended (not interpolated into the shim)
           // and, like the shim, lands in the main frame only — so sub-iframes
