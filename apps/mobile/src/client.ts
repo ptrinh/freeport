@@ -18,7 +18,7 @@ import { buildTrustMap } from './wot';
 import { kvGet, kvSet, kvDelete } from './kv';
 import { query } from './query';
 import { kvCacheGet, kvCacheSet, kvCacheDelete } from './kvCache';
-import { timeSync } from './perfSpans';
+import { timeSync, timeAsync } from './perfSpans';
 import type { Signer } from './signer';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { applyChatInbound, applyChatOutbound, newConversation, sweepExpired, type Conversation } from './conversations';
@@ -145,6 +145,11 @@ const ESCROW_EXPIRY_SECONDS = 24 * 3600;
 const FEED_STORE_PREFIX = 'freeport.feed.';
 const FEED_MAX = 300;
 const FEED_MAX_AGE_SECONDS = 24 * 3600;
+/** Cached web-of-trust map (see loadTrust): serve instantly on cold start,
+ *  rebuild in the background well after the launch burst. */
+const WOT_STORE_PREFIX = 'freeport.wot.';
+const WOT_MAX_AGE_MS = 24 * 3600 * 1000;
+const WOT_REBUILD_DELAY_MS = 20_000;
 
 /** One escrow per deal. The buyer's `preimage` is the money key — persisted. */
 export interface EscrowState {
@@ -508,9 +513,52 @@ export class MobileClient {
 
   private trust(): Promise<Map<string, number>> {
     if (!this.trustPromise) {
-      this.trustPromise = buildTrustMap(this.pool, this.relays, this.pubkey).catch(() => new Map());
+      this.trustPromise = this.loadTrust();
     }
     return this.trustPromise;
+  }
+
+  /**
+   * WoT map with a persistent cache. Building it live is the single biggest
+   * JS-thread block of a cold start ([fp-perf]: one ~3.6s stall at +1.15s):
+   * the receipt BFS pulls up to 3 hops × 2 × 500 events whose schnorr
+   * verification lands in contiguous websocket batches — and it sits on the
+   * critical path because the FIRST fetchReputation (first live intent,
+   * ~1s after connect) awaits it. The graph changes slowly, so: serve the
+   * cached map instantly (< 24h old) and rebuild in the background WELL after
+   * the launch window, mutating the same Map in place (reputation weights
+   * pick the update up on their next read).
+   */
+  private async loadTrust(): Promise<Map<string, number>> {
+    const key = WOT_STORE_PREFIX + this.pubkey;
+    try {
+      const raw = await kvCacheGet(key);
+      if (raw) {
+        const { ts, entries } = JSON.parse(raw) as { ts: number; entries: [string, number][] };
+        if (Date.now() - ts < WOT_MAX_AGE_MS && Array.isArray(entries)) {
+          const map = new Map(entries);
+          setTimeout(() => { void this.rebuildTrust(map, key); }, WOT_REBUILD_DELAY_MS);
+          return map;
+        }
+      }
+    } catch { /* corrupt/absent cache → build live */ }
+    const map = await timeAsync('wot.build', () => buildTrustMap(this.pool, this.relays, this.pubkey).catch(() => new Map<string, number>()));
+    void this.persistTrust(map, key);
+    return map;
+  }
+
+  /** Background refresh: rebuild, swap the entries into the SAME Map, persist. */
+  private async rebuildTrust(target: Map<string, number>, key: string): Promise<void> {
+    try {
+      const fresh = await timeAsync('wot.rebuild', () => buildTrustMap(this.pool, this.relays, this.pubkey));
+      target.clear();
+      for (const [k, v] of fresh) target.set(k, v);
+      void this.persistTrust(target, key);
+    } catch { /* keep the cached map */ }
+  }
+
+  private async persistTrust(map: Map<string, number>, key: string): Promise<void> {
+    try { await kvCacheSet(key, JSON.stringify({ ts: Date.now(), entries: [...map.entries()] })); } catch { /* best-effort */ }
   }
 
   /** Newest intent created_at this session has seen — a resume resubscribes
