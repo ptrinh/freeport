@@ -89,7 +89,17 @@ export function versionLabel(): string {
   try { build = Application.nativeBuildVersion ?? null; } catch { /* not available */ }
   const id = Updates.isEmbeddedLaunch ? null : (Updates.updateId ?? null);
   const buildStr = Platform.OS === 'web' ? '' : ` (build ${build ?? '—'})`;
-  return `v${v}${buildStr}${id ? ` · OTA ${id.slice(0, 7)}` : ''}`;
+  // Publish timestamp as a human-sortable ordinal (MMDD.HHmm) — update ids are
+  // opaque uuids, so "is this the newest?" needs a glanceable sequence.
+  let seq = '';
+  try {
+    const c = Updates.createdAt;
+    if (id && c) {
+      const p = (n: number) => String(n).padStart(2, '0');
+      seq = `${p(c.getMonth() + 1)}${p(c.getDate())}.${p(c.getHours())}${p(c.getMinutes())} `;
+    }
+  } catch { /* older binary without createdAt — id alone */ }
+  return `v${v}${buildStr}${id ? ` · OTA ${seq}${id.slice(0, 7)}` : ''}`;
 }
 
 /** Check the update server, download a newer bundle if any. Does NOT reload. */
