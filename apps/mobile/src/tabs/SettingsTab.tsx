@@ -873,16 +873,6 @@ function SettingsTab({
         </View>
       </Pressable>
 
-      {/* Anonymous diagnostics — scrubbed of all identity/contact/location/content. */}
-      <Pressable accessibilityRole="switch" accessibilityState={{ checked: telemetryEnabled }} style={s.toggleRow} onPress={() => onTelemetryChange(!telemetryEnabled)}>
-        <View style={{ flex: 1, marginEnd: 12 }}>
-          <Text style={s.toggleTitle}>{t("Share anonymous diagnostics")}</Text>
-          <Text style={s.dim}>{t("Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.")}</Text>
-        </View>
-        <View style={[s.switchTrack, telemetryEnabled && s.switchTrackOn]}>
-          <View style={[s.switchThumb, telemetryEnabled && s.switchThumbOn]} />
-        </View>
-      </Pressable>
       </>
       )}
 
@@ -1160,6 +1150,17 @@ function SettingsTab({
       {subScreen === 'about' && (
       <>
       <SubHeader title={t('About')} onBack={() => setSubScreen(null)} />
+      {/* Anonymous diagnostics — scrubbed of all identity/contact/location/content.
+          Lives under About (next to version/licenses), not Marketplace. */}
+      <Pressable accessibilityRole="switch" accessibilityState={{ checked: telemetryEnabled }} style={s.toggleRow} onPress={() => onTelemetryChange(!telemetryEnabled)}>
+        <View style={{ flex: 1, marginEnd: 12 }}>
+          <Text style={s.toggleTitle}>{t("Share anonymous diagnostics")}</Text>
+          <Text style={s.dim}>{t("Send anonymous crash reports and usage stats to help improve Freeport. Never your keys, contacts, location, or messages.")}</Text>
+        </View>
+        <View style={[s.switchTrack, telemetryEnabled && s.switchTrackOn]}>
+          <View style={[s.switchThumb, telemetryEnabled && s.switchThumbOn]} />
+        </View>
+      </Pressable>
       <AboutSection onReplayTour={onReplayTour} flat />
       </>
       )}
