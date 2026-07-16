@@ -12,7 +12,9 @@ cd "$(dirname "$0")"
 export CLOUDFLARE_ACCOUNT_ID=2edc401e8f3f074f198d7290691817a3
 
 echo "▸ Exporting web bundle…"
-npx expo export --platform web
+# --source-maps: emit .map files so the GlitchTip upload below actually runs
+# (they're stripped from the public deploy right after uploading).
+npx expo export --platform web --source-maps
 
 # Upload web source maps to GlitchTip (debug-id based — no release coordination
 # needed) BEFORE they're stripped from the public deploy below. `inject` stamps
@@ -20,8 +22,7 @@ npx expo export --platform web
 # symbolicates crashes. Token comes from the env or a gitignored .env; skipped
 # if absent so the deploy still works without it.
 [ -f .env ] && { set -a; . ./.env; set +a; }
-# Note: `expo export --platform web` does not emit .map files by default, so this
-# only runs once web source-map output is enabled (and a token is present).
+# Maps exist thanks to --source-maps above; skipped only without a token.
 if [ -n "${SENTRY_AUTH_TOKEN:-}" ] && [ -n "$(find dist -name '*.map' -print -quit)" ]; then
   echo "▸ Uploading source maps to GlitchTip…"
   export SENTRY_URL="https://glitchtip.trinh.uk" SENTRY_ORG="phil-t" SENTRY_PROJECT="freeport"

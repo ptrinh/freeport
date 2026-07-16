@@ -11,6 +11,7 @@
  * Deliberately dumb and allocation-free in the hot path; ~80 ticks per run.
  */
 import { getSentry } from './telemetry';
+import { perfSpans } from './perfSpans';
 
 const TICK_MS = 100;
 const RUN_MS = 8_000;
@@ -33,16 +34,23 @@ export function startPerfProbe(tag: 'launch' | 'resume'): void {
     last = now;
     if (now - started < RUN_MS) { setTimeout(tick, TICK_MS); return; }
     running = false;
-    report(tag, blocked, stalls, now - started);
+    report(tag, blocked, stalls, now - started, started);
   };
   setTimeout(tick, TICK_MS);
 }
 
-function report(tag: string, blockedMs: number, stalls: number[], windowMs: number): void {
+function report(tag: string, blockedMs: number, stalls: number[], windowMs: number, startedAt: number): void {
   try {
     const S = getSentry();
     if (!S) return;
     stalls.sort((a, b) => b - a);
+    // Named spans that overlapped the probe window (small lead-in included —
+    // launch work often starts just before the probe does): the "who".
+    const spans = perfSpans
+      .filter((sp) => sp.at + sp.ms >= startedAt - 2000)
+      .sort((a, b) => b.ms - a.ms)
+      .slice(0, 15)
+      .map((sp) => `${sp.l}:${sp.ms}ms@+${Math.max(0, sp.at - startedAt)}`);
     S.captureMessage(`[fp-perf] ${tag}: js blocked ${Math.round(blockedMs)}ms / ${Math.round(windowMs)}ms`, {
       level: 'info',
       extra: {
@@ -51,6 +59,7 @@ function report(tag: string, blockedMs: number, stalls: number[], windowMs: numb
         windowMs: Math.round(windowMs),
         stallCount: stalls.length,
         topStallsMs: stalls.slice(0, 10),
+        spans,
       },
     });
   } catch { /* telemetry is best-effort */ }

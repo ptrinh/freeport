@@ -18,6 +18,7 @@ import { buildTrustMap } from './wot';
 import { kvGet, kvSet, kvDelete } from './kv';
 import { query } from './query';
 import { kvCacheGet, kvCacheSet, kvCacheDelete } from './kvCache';
+import { timeSync } from './perfSpans';
 import type { Signer } from './signer';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { applyChatInbound, applyChatOutbound, newConversation, sweepExpired, type Conversation } from './conversations';
@@ -486,18 +487,20 @@ export class MobileClient {
     try {
       const raw = await kvCacheGet(NEGO_STORE_KEY);
       if (!raw) return;
-      const list = JSON.parse(raw) as Negotiation[];
-      let healed = false;
-      for (const stored of list) {
-        if (!stored?.id) continue;
-        // Heal stores that accumulated duplicate chat messages before the
-        // idempotent-chat fix; persist the cleaned copy so it doesn't recur.
-        const nego = dedupeNegotiationMessages(stored);
-        if (nego !== stored) healed = true;
-        this.negotiations.set(nego.id, nego);
-        this.onNegotiationUpdate?.(nego);
-      }
-      if (healed) void this.persistNegotiations();
+      timeSync('client.loadNegotiations.parse', () => {
+        const list = JSON.parse(raw) as Negotiation[];
+        let healed = false;
+        for (const stored of list) {
+          if (!stored?.id) continue;
+          // Heal stores that accumulated duplicate chat messages before the
+          // idempotent-chat fix; persist the cleaned copy so it doesn't recur.
+          const nego = dedupeNegotiationMessages(stored);
+          if (nego !== stored) healed = true;
+          this.negotiations.set(nego.id, nego);
+          this.onNegotiationUpdate?.(nego);
+        }
+        if (healed) void this.persistNegotiations();
+      });
     } catch {
       /* corrupt/absent store → start empty */
     }
@@ -609,16 +612,18 @@ export class MobileClient {
     try {
       const raw = await kvCacheGet(key);
       if (!raw) return 0;
-      const arr = JSON.parse(raw) as Intent[];
-      for (const intent of arr) {
-        if (!intent?.id || !intent.d || !intent.pubkey) continue;
-        if (intent.createdAt < since) continue;           // beyond the live window
-        if (intent.pubkey === this.pubkey) continue;      // own posts restore via `published`
-        if (this.marketIntents.has(intent.id)) continue;  // live backfill already delivered it
-        this.marketIntents.set(intent.id, intent);
-        if (intent.createdAt > newest) newest = intent.createdAt;
-        this.onIntent?.(intent);
-      }
+      timeSync('client.hydrateFeed.parse', () => {
+        const arr = JSON.parse(raw) as Intent[];
+        for (const intent of arr) {
+          if (!intent?.id || !intent.d || !intent.pubkey) continue;
+          if (intent.createdAt < since) continue;           // beyond the live window
+          if (intent.pubkey === this.pubkey) continue;      // own posts restore via `published`
+          if (this.marketIntents.has(intent.id)) continue;  // live backfill already delivered it
+          this.marketIntents.set(intent.id, intent);
+          if (intent.createdAt > newest) newest = intent.createdAt;
+          this.onIntent?.(intent);
+        }
+      });
     } catch { /* ignore a corrupt/absent snapshot */ }
     return newest;
   }
@@ -633,10 +638,13 @@ export class MobileClient {
     if (!this.feedKey) return;
     try {
       const cutoff = Math.floor(Date.now() / 1000) - FEED_MAX_AGE_SECONDS;
-      let arr = [...this.marketIntents.values()].filter((i) => i.createdAt >= cutoff && i.pubkey !== this.pubkey);
-      arr.sort((a, b) => b.createdAt - a.createdAt);
-      if (arr.length > FEED_MAX) arr = arr.slice(0, FEED_MAX);
-      await kvCacheSet(this.feedKey, JSON.stringify(arr));
+      const json = timeSync('client.persistFeed.stringify', () => {
+        let arr = [...this.marketIntents.values()].filter((i) => i.createdAt >= cutoff && i.pubkey !== this.pubkey);
+        arr.sort((a, b) => b.createdAt - a.createdAt);
+        if (arr.length > FEED_MAX) arr = arr.slice(0, FEED_MAX);
+        return JSON.stringify(arr);
+      });
+      await kvCacheSet(this.feedKey, json);
     } catch { /* best-effort */ }
   }
 
@@ -1612,13 +1620,15 @@ export class MobileClient {
     try {
       const raw = await kvCacheGet(CHAT_STORE_KEY);
       if (!raw) return;
-      for (const conv of JSON.parse(raw) as Conversation[]) {
-        if (!conv?.peer) continue;
-        this.conversations.set(conv.peer, conv);
-        this.fetchProfile(conv.peer); // avatar + display name for the row
-        this.onConversationUpdate?.(conv);
-      }
-      this.sweepExpiredMessages(); // disappearing messages expire across restarts too
+      timeSync('client.loadConversations.parse', () => {
+        for (const conv of JSON.parse(raw) as Conversation[]) {
+          if (!conv?.peer) continue;
+          this.conversations.set(conv.peer, conv);
+          this.fetchProfile(conv.peer); // avatar + display name for the row
+          this.onConversationUpdate?.(conv);
+        }
+        this.sweepExpiredMessages(); // disappearing messages expire across restarts too
+      });
     } catch { /* corrupt/absent → start empty */ }
   }
 

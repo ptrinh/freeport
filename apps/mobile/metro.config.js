@@ -1,12 +1,17 @@
 // Monorepo support: let Metro resolve the symlinked @freeport/protocol
 // workspace package and its dependencies from the repo root.
-const { getDefaultConfig } = require('expo/metro-config');
+//
+// getSentryExpoConfig wraps expo/metro-config's getDefaultConfig and adds the
+// Sentry serializer, which stamps a DEBUG ID into every bundle + source map —
+// without it GlitchTip can't match an OTA bundle to its map and native JS
+// stacks symbolicate garbage (see the [fp-perf] mis-mapped pricing.ts frames).
+const { getSentryExpoConfig } = require('@sentry/react-native/metro');
 const path = require('path');
 
 const projectRoot = __dirname;
 const workspaceRoot = path.resolve(projectRoot, '../..');
 
-const config = getDefaultConfig(projectRoot);
+const config = getSentryExpoConfig(projectRoot);
 config.watchFolders = [workspaceRoot];
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),

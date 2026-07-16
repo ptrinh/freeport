@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { timeSync } from '../perfSpans';
 import {
   ActivityIndicator,
   Animated,
@@ -399,7 +400,7 @@ function RideshareForm({ client, profile, defaultCurrency, location, onPosted, m
   // Suggestion reference: the pinned pickup if set, else the home location.
   const toNear = useMemo(() => (fromGeohash ? geohashToCoords(fromGeohash) : homeCoords), [fromGeohash, homeCoords]);
   const priceSuggestion = useMemo(
-    () => suggestPrice({ schemaPrefix: 'rideshare', category: RIDESHARE_CATEGORY, subcategory: category, currency: payCurrency }, client ? [...client.marketIntents.values()] : [], client?.reputations ?? new Map()),
+    () => timeSync('post.suggestPrice.ride', () => suggestPrice({ schemaPrefix: 'rideshare', category: RIDESHARE_CATEGORY, subcategory: category, currency: payCurrency }, client ? [...client.marketIntents.values()] : [], client?.reputations ?? new Map())),
     [client, category, payCurrency],
   );
   // Rough fare estimate from pickup→destination distance + vehicle (when both
@@ -559,7 +560,7 @@ function ServiceForm({ client, profile, defaultCurrency, location: userLocation,
   const [images, setImages] = useState<string[]>([]);
   const [posting, setPosting] = useState(false);
   const priceSuggestion = useMemo(
-    () => suggestPrice({ schemaPrefix: 'service', category, subcategory, currency: payCurrency, durationMin: durHours * 60 + durMinutes }, client ? [...client.marketIntents.values()] : [], client?.reputations ?? new Map()),
+    () => timeSync('post.suggestPrice.service', () => suggestPrice({ schemaPrefix: 'service', category, subcategory, currency: payCurrency, durationMin: durHours * 60 + durMinutes }, client ? [...client.marketIntents.values()] : [], client?.reputations ?? new Map())),
     [client, category, subcategory, payCurrency, durHours, durMinutes],
   );
 
