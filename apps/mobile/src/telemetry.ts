@@ -63,10 +63,16 @@ export function setTelemetryEnabled(on: boolean): void {
   enabled = on;
 }
 
+/** The slice of the Sentry API low-level callers (perfProbe, the About
+ *  self-test) actually use. */
+export interface SentryLike {
+  captureMessage: (message: string, context?: { level?: 'info' | 'warning' | 'error'; extra?: Record<string, unknown> }) => void;
+}
+
 /** The live Sentry module, or null when diagnostics are off / module absent.
  *  For low-level callers (perfProbe) that need more than captureException. */
-export function getSentry(): any {
-  return enabled ? sentry : null;
+export function getSentry(): SentryLike | null {
+  return enabled ? (sentry as SentryLike | null) : null;
 }
 
 /** Init-state snapshot for the About diagnostics tester. */

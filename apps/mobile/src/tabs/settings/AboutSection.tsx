@@ -23,7 +23,7 @@ async function runTelemetryTest(): Promise<string> {
     const S = getSentry();
     if (S) { S.captureMessage('[fp-boot] manual test', { level: 'info' }); sdk += ' sent'; }
     else sdk += ' NULL';
-  } catch (e: any) { sdk += ` err:${(e?.message || 'x').slice(0, 40)}`; }
+  } catch (e) { sdk += ` err:${(e instanceof Error ? e.message : 'x').slice(0, 40)}`; }
   let http = '';
   try {
     const m = GLITCHTIP_DSN.match(/^https:\/\/([^@]+)@([^/]+)\/(\d+)$/);
@@ -43,7 +43,7 @@ async function runTelemetryTest(): Promise<string> {
       body,
     });
     http = `http=${res.status}`;
-  } catch (e: any) { http = `http=ERR:${(e?.message || 'x').slice(0, 60)}`; }
+  } catch (e) { http = `http=ERR:${(e instanceof Error ? e.message : 'x').slice(0, 60)}`; }
   return `${sdk} · ${http}`;
 }
 import { confirmAsync } from '../../ui/alerts';
