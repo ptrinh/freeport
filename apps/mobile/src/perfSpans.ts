@@ -31,3 +31,9 @@ export async function timeAsync<T>(label: string, fn: () => Promise<T>): Promise
   const t0 = Date.now();
   try { return await fn(); } finally { record(label, t0); }
 }
+
+/** Zero-duration milestone (always kept) — anchors the report's timeline. */
+export function mark(label: string): void {
+  perfSpans.push({ l: label, ms: 0, at: Date.now() });
+  if (perfSpans.length > CAP) perfSpans.shift();
+}

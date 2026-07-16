@@ -70,6 +70,7 @@ import { messagesViewForNewActivity, walletContacts, repostDraft, type RepostDra
 import { newlyConfirmed } from './src/quickReplies';
 import { initTelemetry, setTelemetryEnabled, trackEvent } from './src/telemetry';
 import { startPerfProbe } from './src/perfProbe';
+import { timeAsync, mark } from './src/perfSpans';
 import { loadPrefs, savePrefs, type UserLocation } from './src/prefs';
 import { systemLanguage, systemCountry } from './src/language';
 import { RIDESHARE_CATEGORY, categoryOf, subcategoryOf } from './src/categories';
@@ -542,10 +543,12 @@ function AppInner() {
         }
         // Last gate (and the expensive one, so it runs only when every other
         // condition already passes): the wallet must actually hold funds.
-        const { defaultWalletProvider } = await import('./src/wallet');
-        const w = await defaultWalletProvider();
+        // Timed: prime suspect for the constant ~3.7s launch/resume JS stall —
+        // Breez init happens here on the launch path (see [fp-perf] spans).
+        const { defaultWalletProvider } = await timeAsync('wallet.import', () => import('./src/wallet'));
+        const w = await timeAsync('wallet.provider', () => defaultWalletProvider());
         if (!w) return;
-        const bal = await w.balance().catch(() => null);
+        const bal = await timeAsync('wallet.balance', () => w.balance().catch(() => null));
         const hasFunds = (bal?.sats ?? 0) > 0
           || (await w.tokenBalances?.().catch(() => []) ?? []).some((tk) => tk.amount > 0);
         if (!hasFunds) return;
@@ -907,7 +910,9 @@ function AppInner() {
       // distance sorts depend on it) — batched via the same flush.
       c.onProfileFetched = () => scheduleIntentsFlush();
       c.onReputationFetched = () => scheduleIntentsFlush();
+      mark('client.created');
       await c.loadNegotiations(); // restore deals saved before the last reload
+      mark('client.negotiationsLoaded');
       // watchDMs is wired in its own effect (keyed on resumeTick) so it can be
       // re-subscribed on app resume to backfill DMs missed while offline.
       // Expose this profile's live client to the window.freeport debug API (web only).

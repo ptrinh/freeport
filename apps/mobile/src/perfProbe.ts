@@ -23,14 +23,16 @@ let running = false;
 export function startPerfProbe(tag: 'launch' | 'resume'): void {
   if (running) return; // one probe at a time; overlapping AppState flips are noise
   running = true;
-  const stalls: number[] = [];
+  const stalls: Array<{ ms: number; at: number }> = [];
   let blocked = 0;
   let last = Date.now();
   const started = last;
   const tick = () => {
     const now = Date.now();
     const drift = now - last - TICK_MS;
-    if (drift >= STALL_MIN_MS) { stalls.push(drift); blocked += drift; }
+    // `at` = offset of the stall's START within the window — lines up with the
+    // span/mark timeline so the blocking phase is identifiable by position.
+    if (drift >= STALL_MIN_MS) { stalls.push({ ms: drift, at: last - started }); blocked += drift; }
     last = now;
     if (now - started < RUN_MS) { setTimeout(tick, TICK_MS); return; }
     running = false;
@@ -39,11 +41,11 @@ export function startPerfProbe(tag: 'launch' | 'resume'): void {
   setTimeout(tick, TICK_MS);
 }
 
-function report(tag: string, blockedMs: number, stalls: number[], windowMs: number, startedAt: number): void {
+function report(tag: string, blockedMs: number, stalls: Array<{ ms: number; at: number }>, windowMs: number, startedAt: number): void {
   try {
     const S = getSentry();
     if (!S) return;
-    stalls.sort((a, b) => b - a);
+    stalls.sort((a, b) => b.ms - a.ms);
     // Named spans that overlapped the probe window (small lead-in included —
     // launch work often starts just before the probe does): the "who".
     const spans = perfSpans
@@ -58,7 +60,7 @@ function report(tag: string, blockedMs: number, stalls: number[], windowMs: numb
         blockedMs: Math.round(blockedMs),
         windowMs: Math.round(windowMs),
         stallCount: stalls.length,
-        topStallsMs: stalls.slice(0, 10),
+        topStallsMs: stalls.slice(0, 10).map((st) => `${st.ms}ms@+${st.at}`),
         spans,
       },
     });
