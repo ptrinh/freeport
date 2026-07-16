@@ -100,6 +100,44 @@ describe('reputation concurrency gate', () => {
   });
 });
 
+describe('feed snapshot cache', () => {
+  beforeEach(() => { vi.useRealTimers(); kvStore.clear(); });
+
+  const mk = (id: string, pk: string, ts: number) =>
+    ({ id, pubkey: pk, d: 'd-' + id, createdAt: ts, content: { schema: 'ride', title: 't', market: 'm', payload: {} } } as any);
+
+  it('persists only fresh, non-own intents and hydrates them on the next launch', async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const c1 = new MobileClient({ pubkey: ME } as any, ['wss://relay.example']);
+    (c1 as any).feedKey = 'freeport.feed.demo';
+    c1.marketIntents.set('i1', mk('i1', A, now - 100));
+    c1.marketIntents.set('i2', mk('i2', ME, now - 100));          // own — excluded
+    c1.marketIntents.set('i3', mk('i3', B, now - 48 * 3600));     // beyond window — excluded
+    await (c1 as any).persistFeedNow();
+    const saved = JSON.parse(kvStore.get('freeport.feed.demo')!);
+    expect(saved.map((x: any) => x.id)).toEqual(['i1']);
+
+    // Next launch hydrates: onIntent fires for the cached survivor only.
+    const c2 = new MobileClient({ pubkey: ME } as any, ['wss://relay.example']);
+    const seen: string[] = [];
+    c2.onIntent = (i) => { seen.push(i.id); };
+    await (c2 as any).hydrateFeed('freeport.feed.demo', now - 24 * 3600);
+    expect(seen).toEqual(['i1']);
+    expect(c2.marketIntents.has('i1')).toBe(true);
+  });
+
+  it('hydrate skips intents already delivered by the live backfill', async () => {
+    const now = Math.floor(Date.now() / 1000);
+    kvStore.set('freeport.feed.demo', JSON.stringify([mk('i1', A, now - 100)]));
+    const c = new MobileClient({ pubkey: ME } as any, ['wss://relay.example']);
+    c.marketIntents.set('i1', mk('i1', A, now - 100)); // live already has it
+    const seen: string[] = [];
+    c.onIntent = (i) => { seen.push(i.id); };
+    await (c as any).hydrateFeed('freeport.feed.demo', now - 24 * 3600);
+    expect(seen).toEqual([]); // no duplicate replay
+  });
+});
+
 describe('DM backfill window (dmLastSeen)', () => {
   beforeEach(() => { vi.useRealTimers(); kvStore.clear(); pendingReps = []; });
 

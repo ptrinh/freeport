@@ -138,6 +138,12 @@ const CHAT_ACK_DELAY_MS = 300;
 const ESCROW_STORE_KEY = 'freeport.escrows';
 /** Hold-invoice lifetime: unreleased funds auto-refund to the buyer after this. */
 const ESCROW_EXPIRY_SECONDS = 24 * 3600;
+/** Market-feed snapshot cache (per market key). Hydrated on watchMarket so the
+ *  feed paints instantly instead of being rebuilt from the relay backfill
+ *  (which floods a re-render/profile-fetch burst). Bounded + windowed. */
+const FEED_STORE_PREFIX = 'freeport.feed.';
+const FEED_MAX = 300;
+const FEED_MAX_AGE_SECONDS = 24 * 3600;
 
 /** One escrow per deal. The buyer's `preimage` is the money key — persisted. */
 export interface EscrowState {
@@ -491,11 +497,19 @@ export class MobileClient {
    *  the full 24 h window (and re-triggering profile/reputation fetches for
    *  every author) on every foreground. */
   private marketNewestTs = 0;
+  /** Current feed-cache key (set by watchMarket) + its debounced persist timer. */
+  private feedKey = '';
+  private feedPersistTimer: ReturnType<typeof setTimeout> | null = null;
 
   watchMarket(market: string | string[]): () => void {
     const markets = Array.isArray(market) ? market : [market];
     const now = Math.floor(Date.now() / 1000);
     const since = Math.max(now - 24 * 3600, this.marketNewestTs - 600);
+    // Paint the feed from the last snapshot before the relay backfill lands, so
+    // the first render isn't built event-by-event. Only on a fresh subscribe
+    // (empty feed) — a resume already has the in-memory feed.
+    this.feedKey = FEED_STORE_PREFIX + [...markets].sort().join(',');
+    if (this.marketIntents.size === 0) void this.hydrateFeed(this.feedKey, now - FEED_MAX_AGE_SECONDS);
     const sub = this.pool.subscribeMany(
       this.relays,
       {
@@ -529,6 +543,7 @@ export class MobileClient {
             seen.add(intent.d);
           }
           this.marketIntents.set(intent.id, intent);
+          this.persistFeedSoon();
           this.flushPending(intent.id); // a deal's DM may have been waiting on this intent
           this.onIntent?.(intent);
           this.fetchProfile(intent.pubkey);
@@ -540,7 +555,47 @@ export class MobileClient {
         },
       },
     );
-    return () => sub.close();
+    return () => {
+      sub.close();
+      if (this.feedPersistTimer) { clearTimeout(this.feedPersistTimer); this.feedPersistTimer = null; }
+      void this.persistFeedNow();
+    };
+  }
+
+  /** Populate the feed from the last snapshot for `key`, skipping stale (older
+   *  than the live window), own, or already-present intents. Each survivor goes
+   *  through onIntent, which the app coalesces into a single render. */
+  private async hydrateFeed(key: string, since: number): Promise<void> {
+    try {
+      const raw = await kvCacheGet(key);
+      if (!raw) return;
+      const arr = JSON.parse(raw) as Intent[];
+      for (const intent of arr) {
+        if (!intent?.id || !intent.d || !intent.pubkey) continue;
+        if (intent.createdAt < since) continue;           // beyond the live window
+        if (intent.pubkey === this.pubkey) continue;      // own posts restore via `published`
+        if (this.marketIntents.has(intent.id)) continue;  // live backfill already delivered it
+        this.marketIntents.set(intent.id, intent);
+        this.onIntent?.(intent);
+      }
+    } catch { /* ignore a corrupt/absent snapshot */ }
+  }
+
+  /** Debounced snapshot write (feed churns fast during a backfill). */
+  private persistFeedSoon(): void {
+    if (this.feedPersistTimer) return;
+    this.feedPersistTimer = setTimeout(() => { this.feedPersistTimer = null; void this.persistFeedNow(); }, 3000);
+  }
+
+  private async persistFeedNow(): Promise<void> {
+    if (!this.feedKey) return;
+    try {
+      const cutoff = Math.floor(Date.now() / 1000) - FEED_MAX_AGE_SECONDS;
+      let arr = [...this.marketIntents.values()].filter((i) => i.createdAt >= cutoff && i.pubkey !== this.pubkey);
+      arr.sort((a, b) => b.createdAt - a.createdAt);
+      if (arr.length > FEED_MAX) arr = arr.slice(0, FEED_MAX);
+      await kvCacheSet(this.feedKey, JSON.stringify(arr));
+    } catch { /* best-effort */ }
   }
 
   /**
