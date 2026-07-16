@@ -198,6 +198,16 @@ export class MobileClient {
   /** Peer pubkeys (hex) the user has blocked — inbound DMs from them are dropped. */
   private blocked = new Set<string>();
   /**
+   * Inbound NIP-59 gift wraps awaiting unwrap. Each unwrap is ~3 secp256k1 ops
+   * + 2 NIP-44 decrypts on the JS thread (see unwrapVerified) — a synchronous
+   * onevent handler processing the whole connect-time backfill back-to-back
+   * froze the UI for seconds until "Connected". We instead queue and drain a
+   * few per macrotask, yielding the thread between batches so the app stays
+   * responsive. Verification logic is unchanged; only the schedule is.
+   */
+  private wrapQueue: Event[] = [];
+  private wrapDraining = false;
+  /**
    * Signed DMs that could not reach ANY relay (offline, all relays down).
    * Local negotiation state commits optimistically, so these MUST eventually
    * deliver or the two parties diverge — a deal card reading "Confirmed" while
@@ -975,10 +985,10 @@ export class MobileClient {
       ? this.pool.subscribeMany(
           this.relays,
           { kinds: [1059], '#p': [this.pubkey], since: since - 2 * 24 * 3600 },
-          { onevent: (ev: Event) => this.processWrap(ev) },
+          { onevent: (ev: Event) => this.enqueueWrap(ev) },
         )
       : null;
-    return () => { clearInterval(sweepTimer); dmSub.close(); wrapSub?.close(); };
+    return () => { clearInterval(sweepTimer); dmSub.close(); wrapSub?.close(); this.wrapQueue = []; };
   }
 
   private commitEscrow(escrow: EscrowState): void {
@@ -1129,6 +1139,35 @@ export class MobileClient {
    * outbound record). The blocked check must run AFTER unwrap — the wrap's
    * author is a throwaway key by design.
    */
+  /**
+   * Enqueue a gift wrap and kick the drainer. Cheap and synchronous so the
+   * relay callback returns immediately; the expensive unwrap happens in
+   * drainWraps, spread across macrotasks.
+   */
+  private enqueueWrap(ev: Event): void {
+    this.wrapQueue.push(ev);
+    if (!this.wrapDraining) {
+      this.wrapDraining = true;
+      setTimeout(() => this.drainWraps(), 0);
+    }
+  }
+
+  /**
+   * Process a small batch of queued wraps, then yield the JS thread before the
+   * next batch so the UI (and relay I/O) stays responsive during the connect
+   * backfill burst. Drains to empty, re-scheduling itself with setTimeout(0).
+   */
+  private drainWraps(): void {
+    const BATCH = 4;
+    for (let i = 0; i < BATCH; i++) {
+      const ev = this.wrapQueue.shift();
+      if (!ev) { this.wrapDraining = false; return; }
+      this.processWrap(ev);
+    }
+    if (this.wrapQueue.length) setTimeout(() => this.drainWraps(), 0);
+    else this.wrapDraining = false;
+  }
+
   private processWrap(ev: Event): void {
     try {
       const rumor = this.unwrapVerified(ev);
