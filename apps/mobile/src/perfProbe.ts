@@ -17,6 +17,9 @@ const TICK_MS = 100;
 const RUN_MS = 8_000;
 /** Drift below this is normal scheduler jitter, not a stall. */
 const STALL_MIN_MS = 120;
+/** Report upstream only when the window was meaningfully blocked (regression
+ *  alarm), not on every healthy launch. */
+const REPORT_MIN_BLOCKED_MS = 1000;
 
 let running = false;
 
@@ -57,6 +60,11 @@ function report(tag: string, blockedMs: number, stalls: Array<{ ms: number; at: 
     `${tag}: blocked ${Math.round(blockedMs)}ms/${Math.round(windowMs)}ms · ` +
     `vfy ${verify.verifyCount}/${verify.verifyMs}ms · dec ${verify.decryptCount}/${verify.decryptMs}ms · ` +
     `stalls ${stalls.slice(0, 4).map((st) => `${st.ms}@+${st.at}`).join(' ') || '—'}`;
+  // The launch-lag investigation is closed — the probe stays as a REGRESSION
+  // alarm only: report upstream when the thread was meaningfully blocked, so
+  // healthy launches don't spam an event per open from every opted-in device.
+  // (The About readout above always updates regardless.)
+  if (blockedMs < REPORT_MIN_BLOCKED_MS) return;
   try {
     const S = getSentry();
     if (!S) return;
