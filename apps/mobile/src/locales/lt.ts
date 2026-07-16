@@ -988,6 +988,6 @@ const c: Record<string, string> = {
   "The single-file offline copy can't run mini-apps.": "Versija be interneto negali paleisti mini-programėlių.",
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "Įjunkite „Apple Intelligence“ iOS nustatymuose, kad galėtumėte tai naudoti.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "Įrenginyje veikiantis DI modelis dar atsisiunčiamas — funkcija įsijungs, kai atsisiuntimas baigsis.",
-  "This device or OS version does not support on-device AI (needs iOS 26+).": "Šis įrenginys arba OS versija nepalaiko įrenginyje veikiančio DI (reikia iOS 26+).",
+  "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "Šis įrenginys nepalaiko įrenginyje veikiančio DI („Apple Intelligence“ reikia „iPhone 15 Pro“ ar naujesnio, su iOS 26 ar naujesne versija).",
 };
 export default c;

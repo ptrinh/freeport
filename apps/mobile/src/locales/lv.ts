@@ -987,6 +987,6 @@ const c: Record<string, string> = {
   "The single-file offline copy can't run mini-apps.": "Bezsaistes versija nevar palaist mini-lietotnes.",
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "Ieslēdz Apple Intelligence iOS iestatījumos, lai to izmantotu.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "Ierīces MI modelis vēl tiek lejupielādēts — funkcija ieslēgsies, tiklīdz lejupielāde būs pabeigta.",
-  "This device or OS version does not support on-device AI (needs iOS 26+).": "Šī ierīce vai OS versija neatbalsta ierīces MI (nepieciešama iOS 26+).",
+  "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "Šī ierīce neatbalsta ierīcē darbināmu MI (Apple Intelligence nepieciešams iPhone 15 Pro vai jaunāks modelis ar iOS 26 vai jaunāku versiju).",
 };
 export default c;

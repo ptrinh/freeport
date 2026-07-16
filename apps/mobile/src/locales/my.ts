@@ -984,6 +984,6 @@ const c: Record<string, string> = {
   "The single-file offline copy can't run mini-apps.": "အော့ဖ်လိုင်းဗားရှင်းသည် mini-app များကို အလုပ်လုပ်စေနိုင်ခြင်း မရှိပါ။",
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "ဤအရာကို သုံးရန် iOS Settings အက်ပ်တွင် Apple Intelligence ကို ဖွင့်ပါ။",
   "The on-device AI model is still downloading — this turns on once it finishes.": "စက်တွင်း AI မော်ဒယ်ကို ဒေါင်းလုဒ်လုပ်နေဆဲဖြစ်သည် — ပြီးဆုံးသည်နှင့် ဤအရာ ဖွင့်သွားပါမည်။",
-  "This device or OS version does not support on-device AI (needs iOS 26+).": "ဤစက် သို့မဟုတ် OS ဗားရှင်းသည် စက်တွင်း AI ကို မပံ့ပိုးပါ (iOS 26+ လိုအပ်သည်)။",
+  "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "ဤစက်ပစ္စည်းသည် စက်တွင်း AI ကို ပံ့ပိုးမထားပါ (Apple Intelligence အတွက် iOS 26+ ပါဝင်သော iPhone 15 Pro သို့မဟုတ် ၎င်းထက်နောက်ပိုင်းမော်ဒယ်လိုအပ်သည်)။",
 };
 export default c;

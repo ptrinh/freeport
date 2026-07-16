@@ -12,7 +12,7 @@ function llmReason(a: ConciergeAvailability | undefined): string | null {
   switch (a) {
     case 'not_enabled': return t('Turn on Apple Intelligence in the iOS Settings app to use this.');
     case 'model_not_ready': return t('The on-device AI model is still downloading — this turns on once it finishes.');
-    case 'unsupported': return t('This device or OS version does not support on-device AI (needs iOS 26+).');
+    case 'unsupported': return t('This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).');
     default: return null;
   }
 }

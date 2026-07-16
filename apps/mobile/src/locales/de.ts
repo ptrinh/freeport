@@ -1030,6 +1030,6 @@ const c: Record<string, string> = {
   "The single-file offline copy can't run mini-apps.": "Die Offline-Version kann keine Mini-Apps ausführen.",
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "Aktiviere Apple Intelligence in den iOS-Einstellungen, um dies zu nutzen.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "Das KI-Modell auf dem Gerät wird noch heruntergeladen – dies wird aktiviert, sobald der Vorgang abgeschlossen ist.",
-  "This device or OS version does not support on-device AI (needs iOS 26+).": "Dieses Gerät oder diese OS-Version unterstützt keine geräteinterne KI (erfordert iOS 26+).",
+  "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "Dieses Gerät unterstützt keine geräteinterne KI (Apple Intelligence erfordert ein iPhone 15 Pro oder neuer mit iOS 26+).",
 };
 export default c;

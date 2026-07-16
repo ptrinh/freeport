@@ -993,6 +993,6 @@ const c: Record<string, string> = {
   "The single-file offline copy can't run mini-apps.": "Offline različica ne more zagnati mini-aplikacij.",
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "Za uporabo tega vklopite Apple Intelligence v aplikaciji Nastavitve v iOS.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "Model AI v napravi se še prenaša — vklopi se, ko se prenos zaključi.",
-  "This device or OS version does not support on-device AI (needs iOS 26+).": "Ta naprava ali različica sistema ne podpira AI v napravi (potrebuje iOS 26+).",
+  "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "Ta naprava ne podpira umetne inteligence v napravi (Apple Intelligence potrebuje iPhone 15 Pro ali novejši z iOS 26+).",
 };
 export default c;

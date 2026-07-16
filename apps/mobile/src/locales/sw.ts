@@ -984,6 +984,6 @@ const c: Record<string, string> = {
   "The single-file offline copy can't run mini-apps.": "Toleo la nje ya mtandao haliwezi kuendesha mini-app.",
   "Turn on Apple Intelligence in the iOS Settings app to use this.": "Washa Apple Intelligence katika programu ya Mipangilio ya iOS ili kutumia hili.",
   "The on-device AI model is still downloading — this turns on once it finishes.": "Modeli ya AI ya kifaani bado inapakuliwa — hii itawaka mara tu itakapokamilika.",
-  "This device or OS version does not support on-device AI (needs iOS 26+).": "Kifaa hiki au toleo la mfumo halitumii AI ya kifaani (inahitaji iOS 26+).",
+  "This device does not support on-device AI (Apple Intelligence needs iPhone 15 Pro or newer, on iOS 26+).": "Kifaa hiki hakitumii AI inayoendeshwa ndani ya kifaa (Apple Intelligence inahitaji iPhone 15 Pro au mpya zaidi, yenye iOS 26+).",
 };
 export default c;
