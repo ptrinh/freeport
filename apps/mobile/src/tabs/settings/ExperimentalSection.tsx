@@ -4,6 +4,18 @@ import { t } from '../../i18n';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { s, palette } from '../../ui/theme';
 import { isOfflineFile } from '../../platform';
+import type { ConciergeAvailability } from '../../concierge/model';
+
+/** When the LLM toggle is on but the model isn't usable yet, tell the user why
+ *  — otherwise the feature silently does nothing (no floating button, etc.). */
+function llmReason(a: ConciergeAvailability | undefined): string | null {
+  switch (a) {
+    case 'not_enabled': return t('Turn on Apple Intelligence in the iOS Settings app to use this.');
+    case 'model_not_ready': return t('The on-device AI model is still downloading — this turns on once it finishes.');
+    case 'unsupported': return t('This device or OS version does not support on-device AI (needs iOS 26+).');
+    default: return null;
+  }
+}
 
 /**
  * Experimental features — early, opt-in, OFF by default. Each toggle only
@@ -38,6 +50,7 @@ function ExperimentalSection({
   servicesEnabled,
   onServicesEnabledChange,
   llmEnabled,
+  llmAvailability,
   onLlmEnabledChange,
   llmSupported = true,
   miniAppsEnabled,
@@ -49,6 +62,9 @@ function ExperimentalSection({
   servicesEnabled: boolean;
   onServicesEnabledChange: (v: boolean) => void;
   llmEnabled: boolean;
+  /** Runtime availability of the on-device model, to explain why an enabled
+   *  toggle isn't doing anything yet. */
+  llmAvailability?: ConciergeAvailability;
   onLlmEnabledChange: (v: boolean) => void;
   /** Device has an on-device model layer (Apple FM / Gemini Nano / Prompt API). */
   llmSupported?: boolean;
@@ -108,6 +124,7 @@ function ExperimentalSection({
             </View>
           </Pressable>
           {llmSupported ? (
+            <>
             <Pressable
               accessibilityRole="switch"
               accessibilityState={{ checked: llmEnabled }}
@@ -123,6 +140,12 @@ function ExperimentalSection({
                 <View style={[s.switchThumb, llmEnabled && s.switchThumbOn]} />
               </View>
             </Pressable>
+            {llmEnabled && llmReason(llmAvailability) && (
+              <Text style={[s.dim, { marginTop: -4, marginBottom: 8, marginStart: 30, color: palette.warn }]}>
+                {llmReason(llmAvailability)}
+              </Text>
+            )}
+            </>
           ) : (
             <View accessibilityRole="switch" accessibilityState={{ checked: false, disabled: true }} style={[s.toggleRow, { opacity: 0.45 }]}>
               <Ionicons name="sparkles-outline" size={20} color={palette.text2} style={{ marginEnd: 10 }} />

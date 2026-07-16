@@ -81,6 +81,10 @@ export function SwipeableRow({ children, leftAction, rightActions = [], onOpenRo
       onMoveShouldSetPanResponder: (_e, g) =>
         Math.abs(g.dx) > SLOP && Math.abs(g.dx) > Math.abs(g.dy) * 1.5,
       onPanResponderGrant: () => { base.current = cur.current; beginDrag(); },
+      // Once we've claimed a horizontal swipe, don't yield the responder back to
+      // the enclosing FlatList/ScrollView mid-drag — otherwise iOS's scroll view
+      // reclaims it on the slightest vertical drift and the row snaps closed.
+      onPanResponderTerminationRequest: () => false,
       onPanResponderMove: (_e, g) => {
         const { leftW, rightW } = dims.current;
         x.setValue(Math.max(-rightW, Math.min(leftW, base.current + g.dx)));

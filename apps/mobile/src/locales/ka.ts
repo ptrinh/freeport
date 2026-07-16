@@ -977,5 +977,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "გადახდა ვერ შესრულდა. გთხოვთ, სცადოთ თავიდან.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "გახსენით პარამეტრები, შემდეგ პროფილი თქვენი მონაცემების რედაქტირებისთვის. შექმენით თქვენი იდენტობის სარეზერვო ასლი, რომ მოწყობილობის შეცვლისას karma არ დაკარგოთ.",
   "{name} is calling — tap to answer": "{name} რეკავს — შეეხეთ პასუხისთვის",
+  "Mini-apps need a newer version of the app": "მინი-აპებს აპლიკაციის უფრო ახალი ვერსია სჭირდება",
+  "Update Freeport from your app store to open mini-apps.": "მინი-აპების გასახსნელად განაახლეთ Freeport თქვენი აპების მაღაზიიდან.",
+  "Not available in the offline copy — use the installed app or the web app.": "ხაზგარეშე ვერსიაში მიუწვდომელია — გამოიყენეთ დაინსტალირებული აპი ან web app.",
+  "Mini-apps need the installed app or the web app": "მინი-აპებს სჭირდება დაინსტალირებული აპი ან web app",
+  "The single-file offline copy can't run mini-apps.": "ერთფაილიანი ხაზგარეშე ვერსია ვერ უშვებს მინი-აპებს.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "ამის გამოსაყენებლად ჩართეთ Apple Intelligence iOS-ის პარამეტრების აპში.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "მოწყობილობაზე AI მოდელი ჯერ იტვირთება — დასრულებისთანავე ჩაირთვება.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "ეს მოწყობილობა ან OS-ის ვერსია არ უჭერს მხარს მოწყობილობაზე AI-ს (საჭიროა iOS 26+).",
 };
 export default c;

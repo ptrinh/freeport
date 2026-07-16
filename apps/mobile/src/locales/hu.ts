@@ -980,5 +980,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "A fizetés sikertelen. Kérjük, próbáld újra.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Nyisd meg a Beállításokat, majd a Profilt az adataid szerkesztéséhez. Mentsd el a személyazonosságodat, hogy ne veszítsd el a karmádat eszközváltáskor.",
   "{name} is calling — tap to answer": "{name} hív — koppintson a válaszhoz",
+  "Mini-apps need a newer version of the app": "A mini-appokhoz újabb appverzió szükséges",
+  "Update Freeport from your app store to open mini-apps.": "Frissítsd a Freeportot az app store-ból a mini-appok megnyitásához.",
+  "Not available in the offline copy — use the installed app or the web app.": "Az offline verzióban nem érhető el — használd a telepített appot vagy a webappot.",
+  "Mini-apps need the installed app or the web app": "A mini-appokhoz a telepített app vagy a webapp szükséges",
+  "The single-file offline copy can't run mini-apps.": "Az offline verzió nem tudja futtatni a mini-appokat.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Ennek használatához kapcsold be az Apple Intelligence-t az iOS Beállítások appban.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Az eszközön futó AI-modell még töltődik — ez a letöltés befejeztével kapcsol be.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Ez az eszköz vagy OS-verzió nem támogatja az eszközön futó AI-t (iOS 26+ szükséges).",
 };
 export default c;

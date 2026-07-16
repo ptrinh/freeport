@@ -977,5 +977,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "ክፍያ አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "ቅንብሮችን ይክፈቱ፣ ከዚያ ዝርዝሮችዎን ለማስተካከል መገለጫ ይክፈቱ። መሣሪያ ሲቀይሩ karma እንዳያጡ ማንነትዎን ምትኬ ያስቀምጡ።",
   "{name} is calling — tap to answer": "{name} እየደወለ ነው — ለመመለስ ይንኩ",
+  "Mini-apps need a newer version of the app": "mini-apps የመተግበሪያውን አዲስ ስሪት ይፈልጋሉ",
+  "Update Freeport from your app store to open mini-apps.": "mini-apps ን ለመክፈት Freeport ን ከመተግበሪያ መደብርዎ ያዘምኑ።",
+  "Not available in the offline copy — use the installed app or the web app.": "ከመስመር ውጭ ቅጂ ውስጥ አይገኝም — የተጫነውን መተግበሪያ ወይም የድር መተግበሪያ ይጠቀሙ።",
+  "Mini-apps need the installed app or the web app": "mini-apps የተጫነውን መተግበሪያ ወይም የድር መተግበሪያ ይፈልጋሉ",
+  "The single-file offline copy can't run mini-apps.": "ከመስመር ውጭ ቅጂ mini-apps ን ማስኬድ አይችልም።",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "ይህን ለመጠቀም በ iOS Settings መተግበሪያ ውስጥ Apple Intelligence ን ያብሩ።",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "በመሣሪያው ላይ ያለው AI ሞዴል አሁንም እየወረደ ነው — ሲጨርስ ይህ ይበራል።",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "ይህ መሣሪያ ወይም የ OS ስሪት በመሣሪያ ላይ AI ን አይደግፍም (iOS 26+ ያስፈልጋል)።",
 };
 export default c;

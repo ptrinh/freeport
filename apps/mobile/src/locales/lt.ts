@@ -981,5 +981,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Mokėjimas nepavyko. Bandykite dar kartą.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Atidarykite Nustatymai, tada Profilis, kad redaguotumėte savo duomenis. Sukurkite tapatybės atsarginę kopiją, kad keisdami įrenginį neprarastumėte karmos.",
   "{name} is calling — tap to answer": "{name} skambina — palieskite, kad atsilieptumėte",
+  "Mini-apps need a newer version of the app": "Mini-programėlėms reikia naujesnės programėlės versijos",
+  "Update Freeport from your app store to open mini-apps.": "Atnaujinkite Freeport programėlių parduotuvėje, kad galėtumėte atidaryti mini-programėles.",
+  "Not available in the offline copy — use the installed app or the web app.": "Nepasiekiama versijoje be interneto — naudokite įdiegtą programėlę arba internetinę versiją.",
+  "Mini-apps need the installed app or the web app": "Mini-programėlėms reikia įdiegtos programėlės arba internetinės versijos",
+  "The single-file offline copy can't run mini-apps.": "Versija be interneto negali paleisti mini-programėlių.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Įjunkite „Apple Intelligence“ iOS nustatymuose, kad galėtumėte tai naudoti.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Įrenginyje veikiantis DI modelis dar atsisiunčiamas — funkcija įsijungs, kai atsisiuntimas baigsis.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Šis įrenginys arba OS versija nepalaiko įrenginyje veikiančio DI (reikia iOS 26+).",
 };
 export default c;

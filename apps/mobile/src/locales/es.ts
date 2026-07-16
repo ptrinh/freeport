@@ -1023,5 +1023,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "El pago falló. Inténtalo de nuevo.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Abre Ajustes y luego Perfil para editar tus datos. Haz una copia de tu identidad para no perder tu karma al cambiar de dispositivo.",
   "{name} is calling — tap to answer": "{name} está llamando — toca para responder",
+  "Mini-apps need a newer version of the app": "Las mini-apps necesitan una versión más reciente de la app",
+  "Update Freeport from your app store to open mini-apps.": "Actualiza Freeport desde tu tienda de apps para abrir mini-apps.",
+  "Not available in the offline copy — use the installed app or the web app.": "No disponible en la versión sin conexión: usa la app instalada o la versión web.",
+  "Mini-apps need the installed app or the web app": "Las mini-apps necesitan la app instalada o la versión web",
+  "The single-file offline copy can't run mini-apps.": "La versión sin conexión no puede ejecutar mini-apps.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Activa Apple Intelligence en la app Ajustes de iOS para usar esto.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "El modelo de IA en el dispositivo aún se está descargando; se activará cuando termine.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Este dispositivo o versión del sistema no admite la IA en el dispositivo (requiere iOS 26+).",
 };
 export default c;

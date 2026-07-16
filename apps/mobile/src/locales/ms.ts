@@ -977,5 +977,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Pembayaran gagal. Sila cuba lagi.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Buka Tetapan, kemudian Profil untuk menyunting butiran anda. Sandarkan identiti anda supaya anda tidak kehilangan karma apabila bertukar peranti.",
   "{name} is calling — tap to answer": "{name} sedang memanggil — ketik untuk menjawab",
+  "Mini-apps need a newer version of the app": "Mini-apl memerlukan versi apl yang lebih baharu",
+  "Update Freeport from your app store to open mini-apps.": "Kemas kini Freeport dari gedung aplikasi anda untuk membuka mini-apl.",
+  "Not available in the offline copy — use the installed app or the web app.": "Tidak tersedia dalam versi luar talian — gunakan apl yang dipasang atau apl web.",
+  "Mini-apps need the installed app or the web app": "Mini-apl memerlukan apl yang dipasang atau apl web",
+  "The single-file offline copy can't run mini-apps.": "Versi luar talian tidak boleh menjalankan mini-apl.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Hidupkan Apple Intelligence dalam apl Settings iOS untuk menggunakan ini.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Model AI pada peranti masih dimuat turun — ini akan dihidupkan sebaik sahaja selesai.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Peranti atau versi OS ini tidak menyokong AI pada peranti (memerlukan iOS 26+).",
 };
 export default c;

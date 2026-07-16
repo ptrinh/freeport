@@ -980,5 +980,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Maksu epäonnistui. Yritä uudelleen.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Avaa Asetukset ja sitten Profiili muokataksesi tietojasi. Varmuuskopioi henkilöllisyytesi, jotta et menetä karmaasi vaihtaessasi laitetta.",
   "{name} is calling — tap to answer": "{name} soittaa — vastaa napauttamalla",
+  "Mini-apps need a newer version of the app": "Mini-apps vaativat sovelluksen uudemman version",
+  "Update Freeport from your app store to open mini-apps.": "Päivitä Freeport sovelluskaupastasi, jotta voit avata mini-apps.",
+  "Not available in the offline copy — use the installed app or the web app.": "Ei käytettävissä offline-versiossa – käytä asennettua sovellusta tai verkkosovellusta.",
+  "Mini-apps need the installed app or the web app": "Mini-apps vaativat asennetun sovelluksen tai verkkosovelluksen",
+  "The single-file offline copy can't run mini-apps.": "Offline-versio ei voi suorittaa mini-apps-sovelluksia.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Ota Apple Intelligence käyttöön iOS:n Asetukset-sovelluksessa käyttääksesi tätä.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Laitteen tekoälymalli latautuu vielä – tämä otetaan käyttöön, kun lataus on valmis.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Tämä laite tai käyttöjärjestelmäversio ei tue laitteessa toimivaa tekoälyä (vaatii iOS 26+).",
 };
 export default c;

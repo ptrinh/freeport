@@ -977,5 +977,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "ငွေပေးချေမှု မအောင်မြင်ပါ။ ထပ်စမ်းကြည့်ပါ။",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "သင့်အချက်အလက်များ ပြင်ဆင်ရန် ဆက်တင်များ ကိုဖွင့်ပြီး ပရိုဖိုင် သို့သွားပါ။ စက်ပစ္စည်း ပြောင်းသည့်အခါ သင့် karma မဆုံးရှုံးစေရန် သင့်အထောက်အထားကို အရန်သိမ်းထားပါ။",
   "{name} is calling — tap to answer": "{name} ခေါ်ဆိုနေသည် — ဖြေဆိုရန် တို့ပါ",
+  "Mini-apps need a newer version of the app": "Mini-app များအတွက် ပိုမိုသစ်လွင်သော အက်ပ်ဗားရှင်း လိုအပ်သည်",
+  "Update Freeport from your app store to open mini-apps.": "Mini-app များ ဖွင့်ရန် သင့် app store မှ Freeport ကို အပ်ဒိတ်လုပ်ပါ။",
+  "Not available in the offline copy — use the installed app or the web app.": "အော့ဖ်လိုင်းဗားရှင်းတွင် မရရှိနိုင်ပါ — ထည့်သွင်းထားသော အက်ပ် သို့မဟုတ် web app ကို သုံးပါ။",
+  "Mini-apps need the installed app or the web app": "Mini-app များအတွက် ထည့်သွင်းထားသော အက်ပ် သို့မဟုတ် web app လိုအပ်သည်",
+  "The single-file offline copy can't run mini-apps.": "အော့ဖ်လိုင်းဗားရှင်းသည် mini-app များကို အလုပ်လုပ်စေနိုင်ခြင်း မရှိပါ။",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "ဤအရာကို သုံးရန် iOS Settings အက်ပ်တွင် Apple Intelligence ကို ဖွင့်ပါ။",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "စက်တွင်း AI မော်ဒယ်ကို ဒေါင်းလုဒ်လုပ်နေဆဲဖြစ်သည် — ပြီးဆုံးသည်နှင့် ဤအရာ ဖွင့်သွားပါမည်။",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "ဤစက် သို့မဟုတ် OS ဗားရှင်းသည် စက်တွင်း AI ကို မပံ့ပိုးပါ (iOS 26+ လိုအပ်သည်)။",
 };
 export default c;

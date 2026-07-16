@@ -1020,5 +1020,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "支付失败。请重试。",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "打开设置，然后进入个人资料以编辑你的信息。备份你的身份，以免换设备时丢失 karma 积分。",
   "{name} is calling — tap to answer": "{name} 来电 — 点按接听",
+  "Mini-apps need a newer version of the app": "小程序需要更新版本的应用",
+  "Update Freeport from your app store to open mini-apps.": "请在应用商店中更新 Freeport 以打开小程序。",
+  "Not available in the offline copy — use the installed app or the web app.": "离线版本中无法使用 — 请使用已安装的应用或网页版应用。",
+  "Mini-apps need the installed app or the web app": "小程序需要已安装的应用或网页版应用",
+  "The single-file offline copy can't run mini-apps.": "离线版本无法运行小程序。",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "请在 iOS 的“设置”应用中开启 Apple Intelligence 以使用此功能。",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "设备端 AI 模型正在下载 — 下载完成后此功能即会开启。",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "此设备或系统版本不支持设备端 AI（需要 iOS 26 及以上）。",
 };
 export default c;

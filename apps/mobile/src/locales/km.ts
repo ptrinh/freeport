@@ -977,5 +977,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "ការបង់ប្រាក់បរាជ័យ។ សូមព្យាយាមម្ដងទៀត។",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "បើកការកំណត់ បន្ទាប់មកប្រវត្តិរូប ដើម្បីកែសម្រួលព័ត៌មានរបស់អ្នក។ បម្រុងទុកអត្តសញ្ញាណរបស់អ្នក ដើម្បីកុំឱ្យបាត់ karma នៅពេលអ្នកប្ដូរឧបករណ៍។",
   "{name} is calling — tap to answer": "{name} កំពុងហៅ — ចុចដើម្បីឆ្លើយ",
+  "Mini-apps need a newer version of the app": "កម្មវិធីតូច (mini-app) ត្រូវការកំណែថ្មីជាងនៃកម្មវិធី",
+  "Update Freeport from your app store to open mini-apps.": "ធ្វើបច្ចុប្បន្នភាព Freeport ពី app store របស់អ្នក ដើម្បីបើកកម្មវិធីតូច (mini-app)។",
+  "Not available in the offline copy — use the installed app or the web app.": "មិនមានក្នុងកំណែក្រៅបណ្ដាញទេ — សូមប្រើកម្មវិធីដែលបានដំឡើង ឬ web app។",
+  "Mini-apps need the installed app or the web app": "កម្មវិធីតូច (mini-app) ត្រូវការកម្មវិធីដែលបានដំឡើង ឬ web app",
+  "The single-file offline copy can't run mini-apps.": "កំណែក្រៅបណ្ដាញឯកសារតែមួយ មិនអាចដំណើរការកម្មវិធីតូច (mini-app) បានទេ។",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "សូមបើក Apple Intelligence នៅក្នុងកម្មវិធីការកំណត់ (Settings) របស់ iOS ដើម្បីប្រើវា។",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "ម៉ូដែល AI នៅលើឧបករណ៍កំពុងទាញយក — វានឹងបើកនៅពេលបញ្ចប់។",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "ឧបករណ៍ ឬកំណែ OS នេះមិនគាំទ្រ AI នៅលើឧបករណ៍ទេ (ត្រូវការ iOS 26+)។",
 };
 export default c;

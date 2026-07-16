@@ -980,5 +980,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "ادائیگی ناکام۔ براہ کرم دوبارہ کوشش کریں۔",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "اپنی تفصیلات میں ترمیم کرنے کے لیے ترتیبات کھولیں، پھر پروفائل پر جائیں۔ اپنی شناخت کا بیک اپ رکھیں تاکہ ڈیوائس بدلنے پر آپ کا کرما ضائع نہ ہو۔",
   "{name} is calling — tap to answer": "{name} کال کر رہے ہیں — جواب دینے کے لیے ٹیپ کریں",
+  "Mini-apps need a newer version of the app": "منی ایپس کے لیے ایپ کا نیا ورژن درکار ہے",
+  "Update Freeport from your app store to open mini-apps.": "منی ایپس کھولنے کے لیے اپنے ایپ اسٹور سے Freeport کو اپ ڈیٹ کریں۔",
+  "Not available in the offline copy — use the installed app or the web app.": "آف لائن ورژن میں دستیاب نہیں — انسٹال شدہ ایپ یا ویب ایپ استعمال کریں۔",
+  "Mini-apps need the installed app or the web app": "منی ایپس کے لیے انسٹال شدہ ایپ یا ویب ایپ درکار ہے",
+  "The single-file offline copy can't run mini-apps.": "آف لائن ورژن منی ایپس نہیں چلا سکتا۔",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "اسے استعمال کرنے کے لیے iOS کی سیٹنگز ایپ میں Apple Intelligence آن کریں۔",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "آن ڈیوائس AI ماڈل ابھی ڈاؤن لوڈ ہو رہا ہے — مکمل ہوتے ہی یہ آن ہو جائے گا۔",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "یہ ڈیوائس یا OS ورژن آن ڈیوائس AI کو سپورٹ نہیں کرتا (iOS 26+ درکار ہے)۔",
 };
 export default c;

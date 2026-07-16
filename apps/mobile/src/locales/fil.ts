@@ -977,5 +977,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Nabigo ang pagbabayad. Pakisubukang muli.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Buksan ang Mga Setting, tapos ang Profile para i-edit ang iyong detalye. I-back up ang iyong identity para hindi mawala ang iyong karma kapag lumipat ka ng device.",
   "{name} is calling — tap to answer": "Tumatawag si {name} — i-tap para sagutin",
+  "Mini-apps need a newer version of the app": "Kailangan ng mini-apps ang mas bagong bersyon ng app",
+  "Update Freeport from your app store to open mini-apps.": "I-update ang Freeport mula sa iyong app store para buksan ang mini-apps.",
+  "Not available in the offline copy — use the installed app or the web app.": "Hindi available sa offline na bersyon — gamitin ang naka-install na app o ang web app.",
+  "Mini-apps need the installed app or the web app": "Kailangan ng mini-apps ang naka-install na app o ang web app",
+  "The single-file offline copy can't run mini-apps.": "Hindi mapapatakbo ng offline na bersyon ang mini-apps.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "I-on ang Apple Intelligence sa iOS Settings app para magamit ito.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Dina-download pa ang AI model sa device — mabubuksan ito kapag natapos na.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Hindi sinusuportahan ng device o bersyon ng OS na ito ang on-device AI (kailangan ng iOS 26+).",
 };
 export default c;

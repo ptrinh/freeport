@@ -1020,5 +1020,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "支払いに失敗しました。もう一度お試しください。",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "設定を開き、次にプロフィールで情報を編集できます。端末を変えてもカルマを失わないよう、IDをバックアップしてください。",
   "{name} is calling — tap to answer": "{name} さんから着信 — タップして応答",
+  "Mini-apps need a newer version of the app": "ミニアプリを使うにはアプリの新しいバージョンが必要です",
+  "Update Freeport from your app store to open mini-apps.": "ミニアプリを開くには、App StoreからFreeportを更新してください。",
+  "Not available in the offline copy — use the installed app or the web app.": "オフライン版では利用できません。インストール済みアプリまたはweb appをご利用ください。",
+  "Mini-apps need the installed app or the web app": "ミニアプリにはインストール済みアプリまたはweb appが必要です",
+  "The single-file offline copy can't run mini-apps.": "単一ファイルのオフライン版ではミニアプリを実行できません。",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "この機能を使うには、iOSの設定アプリでApple Intelligenceをオンにしてください。",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "端末内AIモデルをダウンロード中です。完了するとオンになります。",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "この端末またはOSバージョンは端末内AIに対応していません（iOS 26以降が必要です）。",
 };
 export default c;

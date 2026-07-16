@@ -986,5 +986,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Помилка платежу. Спробуйте ще раз.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Відкрийте Налаштування, потім Профіль, щоб змінити свої дані. Зробіть резервну копію особистих даних, щоб не втратити karma під час зміни пристрою.",
   "{name} is calling — tap to answer": "{name} телефонує — торкніться, щоб відповісти",
+  "Mini-apps need a newer version of the app": "Для мінізастосунків потрібна новіша версія застосунку",
+  "Update Freeport from your app store to open mini-apps.": "Оновіть Freeport у своєму магазині застосунків, щоб відкривати мінізастосунки.",
+  "Not available in the offline copy — use the installed app or the web app.": "Недоступно в офлайн-версії — скористайтеся встановленим застосунком або веб-застосунком.",
+  "Mini-apps need the installed app or the web app": "Для мінізастосунків потрібен встановлений застосунок або веб-застосунок",
+  "The single-file offline copy can't run mini-apps.": "Офлайн-версія не може запускати мінізастосунки.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Увімкніть Apple Intelligence у застосунку «Налаштування» на iOS, щоб цим користуватися.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Модель ШІ на пристрої ще завантажується — функція ввімкнеться, щойно завантаження завершиться.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Цей пристрій або версія ОС не підтримує ШІ на пристрої (потрібен iOS 26+).",
 };
 export default c;

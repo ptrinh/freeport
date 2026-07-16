@@ -980,5 +980,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Makse ebaõnnestus. Palun proovi uuesti.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Ava Seaded, seejärel Profiil, et oma andmeid muuta. Varunda oma identiteet, et mitte kaotada karmat seadme vahetamisel.",
   "{name} is calling — tap to answer": "{name} helistab — vastamiseks puudutage",
+  "Mini-apps need a newer version of the app": "Mini-apps vajavad rakenduse uuemat versiooni",
+  "Update Freeport from your app store to open mini-apps.": "Mini-apps'ide avamiseks uuenda Freeporti oma rakendustepoest.",
+  "Not available in the offline copy — use the installed app or the web app.": "Pole võrguühenduseta versioonis saadaval – kasuta installitud rakendust või veebirakendust.",
+  "Mini-apps need the installed app or the web app": "Mini-apps vajavad installitud rakendust või veebirakendust",
+  "The single-file offline copy can't run mini-apps.": "Võrguühenduseta versioon ei saa mini-apps'e käitada.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Selle kasutamiseks lülita iOS-i rakenduses Seaded sisse Apple Intelligence.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Seadmesisene tehisintellekti mudel laadib veel alla – see lülitub sisse, kui allalaadimine on lõppenud.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "See seade või OS-i versioon ei toeta seadmesisest tehisintellekti (vajab iOS 26+).",
 };
 export default c;

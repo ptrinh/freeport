@@ -980,5 +980,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "பணம் செலுத்துதல் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "உங்கள் விவரங்களைத் திருத்த அமைப்புகள் திறந்து, பிறகு சுயவிவரம் செல்லவும். சாதனங்களை மாற்றும்போது உங்கள் கர்மாவை இழக்காதிருக்க உங்கள் அடையாளத்தைக் காப்புப் பிரதி எடுத்து வைக்கவும்.",
   "{name} is calling — tap to answer": "{name} அழைக்கிறார் — பதிலளிக்க தட்டவும்",
+  "Mini-apps need a newer version of the app": "மினி-ஆப்களுக்கு ஆப்பின் புதிய பதிப்பு தேவை",
+  "Update Freeport from your app store to open mini-apps.": "மினி-ஆப்களைத் திறக்க உங்கள் ஆப் ஸ்டோரிலிருந்து Freeport-ஐப் புதுப்பிக்கவும்.",
+  "Not available in the offline copy — use the installed app or the web app.": "ஆஃப்லைன் பதிப்பில் கிடைக்காது — நிறுவிய ஆப்பையோ web app-ஐயோ பயன்படுத்தவும்.",
+  "Mini-apps need the installed app or the web app": "மினி-ஆப்களுக்கு நிறுவிய ஆப் அல்லது web app தேவை",
+  "The single-file offline copy can't run mini-apps.": "ஆஃப்லைன் பதிப்பால் மினி-ஆப்களை இயக்க முடியாது.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "இதைப் பயன்படுத்த iOS Settings ஆப்பில் Apple Intelligence-ஐ இயக்கவும்.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "சாதனத்தில் உள்ள AI மாடல் இன்னும் பதிவிறக்கப்படுகிறது — அது முடிந்ததும் இது இயக்கப்படும்.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "இந்தச் சாதனம் அல்லது OS பதிப்பு சாதனத்தில் இயங்கும் AI-ஐ ஆதரிக்கவில்லை (iOS 26+ தேவை).",
 };
 export default c;

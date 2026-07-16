@@ -51,7 +51,7 @@ import { ExperimentalSection } from './settings/ExperimentalSection';
 import { PaymentSecuritySection } from './settings/PaymentSecuritySection';
 import { ChatSection } from './settings/ChatSection';
 import { callsSupported } from '../calls/webrtc';
-import { conciergeModulePresent } from '../concierge/model';
+import { conciergeModulePresent, type ConciergeAvailability } from '../concierge/model';
 
 /** Which second-level screen is open (null = the top-level 6-row menu). */
 type SubScreen = 'profile' | 'marketplace' | 'features' | 'preferences' | 'about' | 'account';
@@ -112,6 +112,7 @@ function SettingsTab({
   chatTranslate,
   onChatTranslateChange,
   experimentalLlm,
+  llmAvailability,
   onExperimentalLlmChange,
   experimentalMiniApps,
   onExperimentalMiniAppsChange,
@@ -183,6 +184,7 @@ function SettingsTab({
   chatTranslate: boolean;
   onChatTranslateChange: (v: boolean) => void;
   experimentalLlm: boolean;
+  llmAvailability?: ConciergeAvailability;
   onExperimentalLlmChange: (v: boolean) => void;
   experimentalMiniApps: boolean;
   onExperimentalMiniAppsChange: (v: boolean) => void;
@@ -1024,6 +1026,7 @@ function SettingsTab({
         servicesEnabled={servicesEnabled}
         onServicesEnabledChange={onServicesEnabledChange}
         llmEnabled={experimentalLlm}
+        llmAvailability={llmAvailability}
         onLlmEnabledChange={onExperimentalLlmChange}
         llmSupported={conciergeModulePresent()}
         miniAppsEnabled={experimentalMiniApps}

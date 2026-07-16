@@ -980,5 +980,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Maksājums neizdevās. Lūdzu, mēģini vēlreiz.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Atver Iestatījumi, tad Profils, lai rediģētu savus datus. Dublē savu identitāti, lai nezaudētu karmu, mainot ierīci.",
   "{name} is calling — tap to answer": "{name} zvana — pieskarieties, lai atbildētu",
+  "Mini-apps need a newer version of the app": "Mini-lietotnēm nepieciešama jaunāka lietotnes versija",
+  "Update Freeport from your app store to open mini-apps.": "Atjaunini Freeport savā lietotņu veikalā, lai atvērtu mini-lietotnes.",
+  "Not available in the offline copy — use the installed app or the web app.": "Nav pieejams bezsaistes versijā — izmanto instalēto lietotni vai tīmekļa versiju.",
+  "Mini-apps need the installed app or the web app": "Mini-lietotnēm nepieciešama instalētā lietotne vai tīmekļa versija",
+  "The single-file offline copy can't run mini-apps.": "Bezsaistes versija nevar palaist mini-lietotnes.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Ieslēdz Apple Intelligence iOS iestatījumos, lai to izmantotu.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Ierīces MI modelis vēl tiek lejupielādēts — funkcija ieslēgsies, tiklīdz lejupielāde būs pabeigta.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Šī ierīce vai OS versija neatbalsta ierīces MI (nepieciešama iOS 26+).",
 };
 export default c;

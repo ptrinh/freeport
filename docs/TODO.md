@@ -21,23 +21,6 @@ concrete follow-ups.
        actually applies on the internal build **before** any public promotion.
   - Pairs with the "Self-hosted OTA updates on Cloudflare" roadmap item.
 
-## Untranslated strings (English-only, need the 56-locale pass)
-
-Ship via OTA once translated — no binary needed. Run the Opus locale agents
-(per project convention) over these keys, then dedup-check + `tsc`.
-
-- [ ] `"Mini-apps need a newer version of the app"` — mini-app fallback title
-      (shown only on a binary without the react-native-webview pod).
-- [ ] `"Update Freeport from your app store to open mini-apps."` — its body.
-- [ ] `"Not available in the offline copy — use the installed app or the web app."`
-      — disabled mini-apps toggle note in the offline (file://) build.
-- [ ] `"Mini-apps need the installed app or the web app"` — offline mini-app notice title.
-- [ ] `"The single-file offline copy can't run mini-apps."` — its body.
-
-_First two: the `react-native-webview` guard (`src/miniapps/MiniAppShell.tsx`).
-Last three: the offline (file://) mini-app degrade (`ExperimentalSection.tsx`,
-`MiniAppShell.web.tsx`). All low urgency — narrow fallback surfaces._
-
 ## Verify before promoting 1.7.0 to public
 
 - [ ] On TestFlight / Play internal: wallet send + receive over Lightning,

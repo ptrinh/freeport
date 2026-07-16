@@ -980,5 +980,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Plata a eșuat. Încearcă din nou.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Deschide Setări, apoi Profil pentru a-ți edita detaliile. Fă o copie a identității tale ca să nu îți pierzi karma când schimbi dispozitivul.",
   "{name} is calling — tap to answer": "{name} sună — atinge pentru a răspunde",
+  "Mini-apps need a newer version of the app": "Mini-aplicațiile necesită o versiune mai nouă a aplicației",
+  "Update Freeport from your app store to open mini-apps.": "Actualizează Freeport din magazinul tău de aplicații pentru a deschide mini-aplicații.",
+  "Not available in the offline copy — use the installed app or the web app.": "Indisponibil în versiunea offline — folosește aplicația instalată sau aplicația web.",
+  "Mini-apps need the installed app or the web app": "Mini-aplicațiile necesită aplicația instalată sau aplicația web",
+  "The single-file offline copy can't run mini-apps.": "Versiunea offline nu poate rula mini-aplicații.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Activează Apple Intelligence în aplicația Setări din iOS pentru a folosi această funcție.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Modelul AI de pe dispozitiv încă se descarcă — funcția se activează după finalizare.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Acest dispozitiv sau versiune de sistem nu acceptă AI pe dispozitiv (necesită iOS 26+).",
 };
 export default c;

@@ -983,5 +983,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Platba zlyhala. Skúste to znova.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Otvorte Nastavenia a potom Profil na úpravu svojich údajov. Zálohujte si svoju identitu, aby ste pri prechode na iné zariadenie neprišli o karmu.",
   "{name} is calling — tap to answer": "{name} volá — ťuknutím prijmete",
+  "Mini-apps need a newer version of the app": "Mini-aplikácie vyžadujú novšiu verziu aplikácie",
+  "Update Freeport from your app store to open mini-apps.": "Aktualizujte Freeport cez svoj obchod s aplikáciami, aby ste mohli otvárať mini-aplikácie.",
+  "Not available in the offline copy — use the installed app or the web app.": "Nedostupné v offline verzii — použite nainštalovanú aplikáciu alebo web app.",
+  "Mini-apps need the installed app or the web app": "Mini-aplikácie vyžadujú nainštalovanú aplikáciu alebo web app",
+  "The single-file offline copy can't run mini-apps.": "Offline verzia nedokáže spúšťať mini-aplikácie.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Ak to chcete používať, zapnite Apple Intelligence v aplikácii Nastavenia v iOS.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "AI model v zariadení sa ešte sťahuje — zapne sa hneď po dokončení.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Toto zariadenie alebo verzia systému nepodporuje AI v zariadení (vyžaduje iOS 26+).",
 };
 export default c;

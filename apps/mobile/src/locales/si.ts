@@ -977,5 +977,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "ගෙවීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "ඔබේ විස්තර සංස්කරණය කිරීමට සැකසුම් විවෘත කර, ඉන්පසු පැතිකඩ වෙත යන්න. ඔබ උපාංග මාරු කරන විට ඔබේ karma නැති නොවන පරිදි ඔබේ අනන්‍යතාව උපස්ථ කර ගන්න.",
   "{name} is calling — tap to answer": "{name} අමතයි — පිළිතුරු දීමට තට්ටු කරන්න",
+  "Mini-apps need a newer version of the app": "මිනි-ඇප් සඳහා යෙදුමේ නවතම අනුවාදයක් අවශ්‍යයි",
+  "Update Freeport from your app store to open mini-apps.": "මිනි-ඇප් විවෘත කිරීමට ඔබේ ඇප් වෙළඳසැලෙන් Freeport යාවත්කාලීන කරන්න.",
+  "Not available in the offline copy — use the installed app or the web app.": "ඔෆ්ලයින් අනුවාදයේ නොමැත — ස්ථාපිත යෙදුම හෝ වෙබ් යෙදුම භාවිතා කරන්න.",
+  "Mini-apps need the installed app or the web app": "මිනි-ඇප් සඳහා ස්ථාපිත යෙදුම හෝ වෙබ් යෙදුම අවශ්‍යයි",
+  "The single-file offline copy can't run mini-apps.": "ඔෆ්ලයින් අනුවාදයට මිනි-ඇප් ධාවනය කළ නොහැක.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "මෙය භාවිතා කිරීමට iOS Settings යෙදුමේ Apple Intelligence සක්‍රීය කරන්න.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "උපාංගයේ AI ආකෘතිය තවම බාගත වෙමින් පවතී — එය අවසන් වූ පසු මෙය සක්‍රීය වේ.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "මෙම උපාංගය හෝ OS අනුවාදය උපාංගයේ AI සඳහා සහාය නොදක්වයි (iOS 26+ අවශ්‍යයි).",
 };
 export default c;

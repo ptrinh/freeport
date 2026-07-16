@@ -1020,5 +1020,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Thanh toán thất bại. Vui lòng thử lại.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Mở Cài đặt, rồi vào Hồ sơ để chỉnh sửa thông tin của bạn. Nhớ sao lưu danh tính để khỏi mất điểm karma khi đổi thiết bị.",
   "{name} is calling — tap to answer": "{name} đang gọi — chạm để trả lời",
+  "Mini-apps need a newer version of the app": "Mini-app cần phiên bản ứng dụng mới hơn",
+  "Update Freeport from your app store to open mini-apps.": "Cập nhật Freeport từ app store để mở mini-app.",
+  "Not available in the offline copy — use the installed app or the web app.": "Không dùng được ở bản offline — hãy dùng ứng dụng đã cài hoặc ứng dụng web.",
+  "Mini-apps need the installed app or the web app": "Mini-app cần ứng dụng đã cài hoặc ứng dụng web",
+  "The single-file offline copy can't run mini-apps.": "Bản offline không chạy được mini-app.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Bật Apple Intelligence trong ứng dụng Cài đặt của iOS để dùng tính năng này.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Mô hình AI trên thiết bị vẫn đang tải xuống — tính năng này sẽ bật khi tải xong.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Thiết bị hoặc phiên bản hệ điều hành này không hỗ trợ AI trên thiết bị (cần iOS 26 trở lên).",
 };
 export default c;

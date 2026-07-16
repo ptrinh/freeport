@@ -109,7 +109,7 @@ import { type EscrowState } from './src/client';
 import { ZapSheet } from './src/ui/ZapSheet';
 import { DraggableFab } from './src/ui/DraggableFab';
 import { ConciergeSheet } from './src/concierge/ConciergeSheet';
-import { conciergeAvailability } from './src/concierge/model';
+import { conciergeAvailability, type ConciergeAvailability } from './src/concierge/model';
 import { translateToggleVisible } from './src/concierge/translate';
 import { uiAlert } from './src/ui/alerts';
 import { SettingsTab } from './src/tabs/SettingsTab';
@@ -418,9 +418,23 @@ function AppInner() {
   /** HODL escrows (one per deal). */
   const [escrows, setEscrows] = useState<EscrowState[]>([]);
   /** AI concierge (on-device Apple Foundation Models, iOS 26+). */
-  const [conciergeOk, setConciergeOk] = useState(false);
+  const [conciergeAvail, setConciergeAvail] = useState<ConciergeAvailability>('unsupported');
+  const conciergeOk = conciergeAvail === 'available';
   const [showConcierge, setShowConcierge] = useState(false);
-  useEffect(() => { conciergeAvailability().then((a) => setConciergeOk(a === 'available')).catch(() => {}); }, []);
+  // Availability is a runtime state (Apple Intelligence toggled on, model
+  // finished downloading) that can change AFTER mount — re-probe when the user
+  // turns the feature on, opens the post tab, or brings the app back to the
+  // foreground, so the FAB appears without needing an app restart.
+  const probeConcierge = React.useCallback(() => {
+    conciergeAvailability().then(setConciergeAvail).catch(() => {});
+  }, []);
+  useEffect(() => { probeConcierge(); }, [probeConcierge]);
+  useEffect(() => {
+    if (!experimentalLlm) return;
+    if (tab === 'post') probeConcierge();
+    const sub = AppState.addEventListener('change', (st) => { if (st === 'active') probeConcierge(); });
+    return () => sub.remove();
+  }, [experimentalLlm, tab, probeConcierge]);
   const [location, setLocation] = useState<UserLocation>({ country: '', state: '', city: '' });
   // Mirror the latest location so the async launch auto-detect can tell whether
   // the user has manually changed it (e.g. picked a place during onboarding)
@@ -1626,9 +1640,11 @@ function AppInner() {
             savePrefs({ chatTranslate: v }).catch(() => {});
           }}
           experimentalLlm={experimentalLlm}
+          llmAvailability={conciergeAvail}
           onExperimentalLlmChange={(v) => {
             setExperimentalLlm(v);
             savePrefs({ experimentalLlm: v }).catch(() => {});
+            if (v) probeConcierge();
           }}
           experimentalMiniApps={experimentalMiniApps}
           onExperimentalMiniAppsChange={(v) => {

@@ -977,5 +977,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "Վճարումը ձախողվեց։ Խնդրում ենք փորձել նորից։",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Բացեք Կարգավորումները, ապա Պրոֆիլը՝ ձեր տվյալները խմբագրելու համար։ Պահուստավորեք ձեր ինքնությունը, որպեսզի սարքը փոխելիս չկորցնեք ձեր կարման։",
   "{name} is calling — tap to answer": "{name} զանգում է — հպեք պատասխանելու համար",
+  "Mini-apps need a newer version of the app": "mini-apps-երը պահանջում են հավելվածի ավելի նոր տարբերակ",
+  "Update Freeport from your app store to open mini-apps.": "mini-apps-երը բացելու համար թարմացրեք Freeport-ը հավելվածների խանութից։",
+  "Not available in the offline copy — use the installed app or the web app.": "Հասանելի չէ օֆլայն տարբերակում — օգտագործեք տեղադրված հավելվածը կամ վեբ հավելվածը։",
+  "Mini-apps need the installed app or the web app": "mini-apps-երը պահանջում են տեղադրված հավելվածը կամ վեբ հավելվածը",
+  "The single-file offline copy can't run mini-apps.": "Օֆլայն տարբերակը չի կարող գործարկել mini-apps-երը։",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Սա օգտագործելու համար միացրեք Apple Intelligence-ը iOS Settings հավելվածում։",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Սարքի վրա աշխատող AI մոդելը դեռ ներբեռնվում է — այն կմիանա, հենց ավարտվի։",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Այս սարքը կամ OS-ի տարբերակը չի աջակցում սարքի վրա աշխատող AI-ին (անհրաժեշտ է iOS 26+)։",
 };
 export default c;

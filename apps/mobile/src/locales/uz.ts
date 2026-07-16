@@ -977,5 +977,13 @@ const c: Record<string, string> = {
   "Payment failed. Please try again.": "To'lov amalga oshmadi. Iltimos, qayta urinib ko'ring.",
   "Open Settings, then Profile to edit your details. Back up your identity so you don't lose your karma when you switch devices.": "Ma'lumotlaringizni tahrirlash uchun Sozlamalar, so'ng Profil bo'limini oching. Qurilmani almashtirganingizda karmangizni yo'qotmaslik uchun shaxsingizni zaxiralang.",
   "{name} is calling — tap to answer": "{name} qo'ng'iroq qilmoqda — javob berish uchun bosing",
+  "Mini-apps need a newer version of the app": "Mini-ilovalar uchun ilovaning yangiroq versiyasi kerak",
+  "Update Freeport from your app store to open mini-apps.": "Mini-ilovalarni ochish uchun Freeport'ni ilovalar do'konidan yangilang.",
+  "Not available in the offline copy — use the installed app or the web app.": "Oflayn versiyada mavjud emas — o'rnatilgan ilova yoki veb-ilovadan foydalaning.",
+  "Mini-apps need the installed app or the web app": "Mini-ilovalar uchun o'rnatilgan ilova yoki veb-ilova kerak",
+  "The single-file offline copy can't run mini-apps.": "Oflayn versiya mini-ilovalarni ishga tushira olmaydi.",
+  "Turn on Apple Intelligence in the iOS Settings app to use this.": "Bundan foydalanish uchun iOS Sozlamalar ilovasida Apple Intelligence'ni yoqing.",
+  "The on-device AI model is still downloading — this turns on once it finishes.": "Qurilmadagi AI modeli hali yuklab olinmoqda — yuklab olish tugagach, bu yoqiladi.",
+  "This device or OS version does not support on-device AI (needs iOS 26+).": "Bu qurilma yoki OS versiyasi qurilmadagi AI'ni qo'llab-quvvatlamaydi (iOS 26+ kerak).",
 };
 export default c;
