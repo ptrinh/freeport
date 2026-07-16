@@ -395,8 +395,18 @@
       ['Specimen document - demo only, no cover is provided.', 9],
     ]);
     function esc(s) { return s.replace(/([\\()])/g, '\\$1'); }
+    // Fold non-Latin1 to ASCII: the base-14 Courier font can't render them AND
+    // btoa() below throws on any char > 0xFF (e.g. the em dash in the localized
+    // "Paid at" text), which silently killed the whole click — the certificate
+    // just wouldn't download. The catch-all guarantees btoa never throws.
+    function asciiFold(s) {
+      return String(s)
+        .replace(/[‒-―−]/g, '-').replace(/[‘’]/g, "'")
+        .replace(/[“”]/g, '"').replace(/×/g, 'x').replace(/…/g, '...')
+        .replace(/[   ]/g, ' ').replace(/[^\x00-\xFF]/g, '?');
+    }
     var y = 780, body = 'BT\n';
-    lines.forEach(function (l) { body += '/F1 ' + l[1] + ' Tf\n1 0 0 1 60 ' + y + ' Tm\n(' + esc(l[0]) + ') Tj\n'; y -= (l[1] + 8); });
+    lines.forEach(function (l) { body += '/F1 ' + l[1] + ' Tf\n1 0 0 1 60 ' + y + ' Tm\n(' + esc(asciiFold(l[0])) + ') Tj\n'; y -= (l[1] + 8); });
     body += 'ET';
     var objs = [
       '<< /Type /Catalog /Pages 2 0 R >>',
