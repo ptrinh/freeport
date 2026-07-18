@@ -4,48 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { t } from '../../i18n';
 import { versionLabel, checkForUpdate, applyUpdate, getTrack, setTrack, trackSupported, type UpdateTrack } from '../../updates';
 import { lastPerfReport } from '../../perfProbe';
-import { getSentry, telemetryStatus } from '../../telemetry';
-import { GLITCHTIP_DSN } from '../../telemetry-core';
-
-/**
- * On-device telemetry self-test (dev aid, untranslated — like the perf line).
- * The device's Sentry transport went silent while the server ingest verified
- * fine from outside; this splits the failure in two:
- *  - sdk:  captureMessage through the Sentry SDK (the path that went quiet)
- *  - http: a raw fetch POST to the SAME envelope endpoint, bypassing the SDK
- * sdk ok + http ok → look again server-side; sdk dead + http ok → SDK/native
- * transport wedged; both dead → this device's network/CDN blocks the host.
- */
-async function runTelemetryTest(): Promise<string> {
-  const st = telemetryStatus();
-  let sdk = `en=${st.enabled ? 1 : 0} init=${st.started ? 1 : 0} native=${st.native ? 1 : 0} sdk=${st.sdk ? 1 : 0}`;
-  try {
-    const S = getSentry();
-    if (S) { S.captureMessage('[fp-boot] manual test', { level: 'info' }); sdk += ' sent'; }
-    else sdk += ' NULL';
-  } catch (e) { sdk += ` err:${(e instanceof Error ? e.message : 'x').slice(0, 40)}`; }
-  let http = '';
-  try {
-    const m = GLITCHTIP_DSN.match(/^https:\/\/([^@]+)@([^/]+)\/(\d+)$/);
-    if (!m) throw new Error('bad dsn');
-    const [, key, host, proj] = m;
-    const eid = Array.from({ length: 32 }, () => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join('');
-    const body =
-      `${JSON.stringify({ event_id: eid, sent_at: new Date().toISOString() })}\n` +
-      `${JSON.stringify({ type: 'event' })}\n` +
-      `${JSON.stringify({ event_id: eid, message: '[fp-boot] raw-fetch test', level: 'info', platform: 'javascript' })}\n`;
-    const res = await fetch(`https://${host}/api/${proj}/envelope/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-sentry-envelope',
-        'X-Sentry-Auth': `Sentry sentry_version=7, sentry_key=${key}, sentry_client=fp-selftest/1.0`,
-      },
-      body,
-    });
-    http = `http=${res.status}`;
-  } catch (e) { http = `http=ERR:${(e instanceof Error ? e.message : 'x').slice(0, 60)}`; }
-  return `${sdk} · ${http}`;
-}
 import { confirmAsync } from '../../ui/alerts';
 import { s, palette } from '../../ui/theme';
 
@@ -77,7 +35,6 @@ function AboutSection({
   }, []);
   const [updBusy, setUpdBusy] = useState(false);
   const [updMsg, setUpdMsg] = useState('');
-  const [teleTest, setTeleTest] = useState('');
   const [updTrack, setUpdTrack] = useState<UpdateTrack>('latest');
   const changeTrack = async (track: UpdateTrack) => {
     if (track === updTrack || updBusy) return;
@@ -138,10 +95,6 @@ function AboutSection({
           {/* Last [fp-perf] probe result — on-device readout (survives a down
               telemetry transport). Dev/diagnostic aid; intentionally untranslated. */}
           {!!lastPerfReport && <Text style={[s.mono, { fontSize: 11, marginTop: 4 }]} selectable>{lastPerfReport}</Text>}
-          <Pressable hitSlop={8} onPress={() => { setTeleTest('…'); runTelemetryTest().then(setTeleTest).catch((e) => setTeleTest(String(e?.message ?? e))); }}>
-            <Text style={[s.link, { fontSize: 12, marginTop: 4 }]}>Test diagnostics</Text>
-          </Pressable>
-          {!!teleTest && <Text style={[s.mono, { fontSize: 11 }]} selectable>{teleTest}</Text>}
           {trackSupported() && (
             <View style={{ marginTop: 12 }}>
               <Text style={s.label}>{t('Update track')}</Text>
