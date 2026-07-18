@@ -176,6 +176,8 @@ export default function App() {
 // ─── Live-trip viewer (web, read-only) ───────────────────────────────────────
 // Opened from a shared "#trip=…" link: subscribes to the rider's encrypted
 // location over Nostr and shows it live on a map. No identity / client needed.
+const TRIP_MAP_STYLE = { height: 360, borderRadius: 14 } as const;
+
 function TripViewer({ view }: { view: TripView }) {
   const insets = useSafeAreaInsets();
   const c = palette;
@@ -192,6 +194,19 @@ function TripViewer({ view }: { view: TripView }) {
   const secs = loc ? Math.max(0, now - Math.floor(loc.ts)) : 0;
   // Fresh (≤45s) ⇒ green; stale ⇒ amber; ended ⇒ gray. Drives the pulsing dot.
   const markerColor = ended ? '#9aa6b2' : secs <= 45 ? '#22c55e' : '#f59e0b';
+  // The 1s clock (setNow) re-renders this view every second for the "updated Xs
+  // ago" line — but the map must NOT re-render at 1 Hz (on web that re-inits
+  // Leaflet, ~900ms each, pegging the JS thread — [fp-perf] issue 30). Memoize
+  // the map element on the values it actually depends on: a new location fix or
+  // a freshness-colour change, not every tick. React keeps the same subtree.
+  const tripMap = useMemo(() => loc ? (
+    <AreaMap
+      center={{ latitude: loc.lat, longitude: loc.lon }}
+      follow
+      markerColor={markerColor}
+      style={TRIP_MAP_STYLE}
+    />
+  ) : null, [loc?.lat, loc?.lon, markerColor]);
   return (
     <View style={{ flex: 1, backgroundColor: c.appBg, paddingTop: insets.top }}>
       <View style={{ flex: 1, width: '100%', maxWidth: 480, alignSelf: 'center', padding: 16 }}>
@@ -208,12 +223,7 @@ function TripViewer({ view }: { view: TripView }) {
         ) : <View style={{ height: 12 }} />}
 
         {loc ? (
-          <AreaMap
-            center={{ latitude: loc.lat, longitude: loc.lon }}
-            follow
-            markerColor={markerColor}
-            style={{ height: 360, borderRadius: 14 }}
-          />
+          tripMap
         ) : (
           <View style={{ height: 360, borderRadius: 14, backgroundColor: c.card, alignItems: 'center', justifyContent: 'center' }}>
             <ActivityIndicator color={c.accent} />
